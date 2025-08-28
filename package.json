@@ -1,0 +1,26 @@
+{
+  "name": "pawradise-inn",
+  "version": "1.0.0",
+  "description": "SE Project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pawradise-Inn/pawradise-inn.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Pawradise-Inn/pawradise-inn/issues"
+  },
+  "homepage": "https://github.com/Pawradise-Inn/pawradise-inn#readme",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
