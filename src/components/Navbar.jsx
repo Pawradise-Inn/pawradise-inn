@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 
 const Navbar = () => {
+    const pages = ["room", "service", "review", "profile"];
   return (
     <nav className="bg-white shadow-md px-10 py-4 flex items-center justify-between">
       {/* Logo */}
@@ -16,7 +17,7 @@ const Navbar = () => {
 
       {/* Nav Links */}
       <div className="flex space-x-6">
-        {["room", "service", "review", "profile"].map((link) => (
+        {pages.map((link) => (
           <NavLink
             key={link}
             to={`/${link}`}
