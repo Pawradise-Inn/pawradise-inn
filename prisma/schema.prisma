@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model USER {
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  firstname       String
+  lastname        String
+  phone_number    String
+  user_name       String  @unique
+  password        String
+
+  staff           STAFF?
+  customer        CUSTOMER?
+}
+
+model STAFF{
+  id              Int      @id @default(autoincrement())
+  user            USER     @relation(fields: [id], references: [id])
+  wages           Float
+  bank_account    String   @unique
+}
+
+model CUSTOMER{
+  user            USER    @relation(fields: [id], references: [id])
+  id              Int      @id @default(autoincrement())
+}
+
+model CHATLOG{
+  id Int @id @default(autoincrement())
+  rating Int
+  date DateTime
+  text String
+}
+
+model PET{
+  id Int @id @default(autoincrement())
+  type String
+  sex String
+  name String
+  breed String
+  disease String
+  allergic String
+  picture String
+}
+
+model SERVICES{
+  id Int @id @default(autoincrement())
+  service SERVICE[]
+  room ROOM[]
+}
+
+
+
+model ROOM{
+  id Int @id @default(autoincrement())
+  capacity Int
+  price Float
+  picture String
+
+  Services SERVICES[]
+}
+
+model SERVICE{
+  id Int @id @default(autoincrement())
+  name String
+  price Float
+  queue Int
+
+  Services SERVICES[]
+}
+
+model PAYMENT{
+  id Int @id @default(autoincrement())
+  cost Float
+  bookingFlag Boolean
+  date DateTime
+  status String
+}
