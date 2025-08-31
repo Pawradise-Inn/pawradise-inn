@@ -5,7 +5,7 @@
 	padding: 0;
 	color: var(--text-color);
 	font-family: Itim_chocolate, sans-serif;
-}
+} */
 
 body {
 	background-color: var(--background-color);
@@ -27,4 +27,4 @@ body {
 
 	--primary-text-color: #353535;
 	--secondary-text-color: #ffffff;
-} */
+}
