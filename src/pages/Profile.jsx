@@ -1,5 +1,6 @@
 import { useState } from "react"
 import Booking_comp from "../components/Profile/Booking_comp"
+import Profile_comp from "../components/Profile/Profile_comp"
 
 const Profile = () => {
   
@@ -37,7 +38,7 @@ const Profile = () => {
 
       {/* Content Area */}
       <div className="flex-1 p-6">
-        {selected === "my_profile" && <div>My Profile Content</div>}
+        {selected === "my_profile" && <Profile_comp/>}
         {selected === "my_booking" && <Booking_comp/>}
         {selected === "my_pet" && <div>My Pet Content</div>}
       </div>
