@@ -22,8 +22,8 @@ const Navbar = () => {
             key={link}
             to={`/${link}`}
             className={({ isActive }) =>
-              `px-7 py-3 rounded-sm font-medium transition !text-gray-700 !hover:text-gray-900 font-semibold transition-all duration-300 ease-in-out ${
-                isActive ? "bg-[#d2bba0] !text-white" : ""
+              `px-7 py-3 rounded-sm font-medium transition font-semibold transition-all duration-300 ease-in-out ${
+                isActive ? "bg-[#d2bba0] !text-[var(--dark-brown-color)]" : ""
               }`
             }
           >
