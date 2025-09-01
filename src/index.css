@@ -1,15 +1,10 @@
 @import "tailwindcss";
 
-* {
-	box-sizing: border-box;
-	color: var(--dark-brown);
-	font-family: Roboto, sans-serif;
-}
-
 body {
 	background-color: FFFFFF;
 	height: 100vh;
 	width: 100vw;
+	overflow-x: hidden;
 }
 
 :root {
@@ -18,4 +13,21 @@ body {
 	--brown-color: #654225;
 	--light-brown-color: #D9C4AF;
 	--cream-color: #FDFAEE;
+}
+
+@font-face {
+	font-family: 'Roboto';
+	src: url(../src/assets/Roboto-VariableFont_wdth\,wght.ttf);
+}
+
+@font-face {
+	font-family: 'Roboto';
+	src: url(../src//assets/Roboto-Italic-VariableFont_wdth\,wght.ttf);
+	font-style: italic;
+}
+
+* {
+	box-sizing: border-box;
+	color: var(--dark-brown-color);
+	font-family: Roboto, sans-serif;
 }
