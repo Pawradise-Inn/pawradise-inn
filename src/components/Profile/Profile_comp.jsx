@@ -122,14 +122,14 @@ const Profile_comp = () => {
                 <div className="flex flex-col flex-1 justify-between">
                     {/* My Pets */}
                     <div>
-                        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-sleek">
                             {pets.map(pet => (<PetCard key={pet.id} pet={pet}/>))}
                         </div>
                     </div>
                     
                     {/* Room Booking */}
                     <div className="mt-8">
-                        <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
+                        <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 scrollbar-sleek">
                             {roomBookings.map(room => (<BookingCard key={room.id} room={room} getRoomStatusColor={getRoomStatusColor}/>))}
                         </div>
                     </div>
@@ -138,7 +138,7 @@ const Profile_comp = () => {
                 <div className="flex-1 flex flex-col">
                     <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
                         <h2 className="text-2xl font-bold mb-6">Service status</h2>
-                        <div className="space-y-6 overflow-y-auto pr-2" >
+                        <div className="space-y-6 overflow-y-auto pr-2 scrollbar-sleek" >
                             {serviceData.map(service => (<ServiceCard key={service.id} service={service} getStatusText={getStatusText} getStatusColor={getRoomStatusColor} />))}
                         </div>
                     </div>
@@ -208,7 +208,7 @@ const ServiceCard = ({service, getStatusText, getStatusColor}) => {
         <div className="bg-[var(--light-brown-color)] rounded-lg p-4 shadow-lg flex items-center justify-between">
             <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-4">
-                    <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden ">
                         <img 
                             src={service.img}
                             alt={service.staff_name}

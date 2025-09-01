@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import Profile from "./pages/Profile";
 import BookingService from "./pages/BookingService";
 
+
 const App = () => {
     return (
         <div>

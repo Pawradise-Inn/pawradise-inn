@@ -9,7 +9,7 @@ const Profile = () => {
   return (  
     <div className="min-h-screen flex">
       {/* Sidebar */}
-      <div className="w-48 p-4 flex flex-col space-y-2 font-semibold">
+      <div className="w-60 p-4 flex flex-col space-y-16 font-semibold mr-10 mt-10 mb-10 border-r border-gray-300">
         <button
           onClick={() => setSelected("my_profile")}
           className={`px-4 py-2 rounded ${
