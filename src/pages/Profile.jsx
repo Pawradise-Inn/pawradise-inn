@@ -36,9 +36,9 @@ const BookingCard = ({book}) => {
           </div>
             {/* {Action Button} */}
             <button onClick={() => window.confirm("Cancel booking?")}
-              className="px-4 py-2 bg-[var(--dark-brown-color)] !text-white text-lg rounded
+              className="px-4 py-2 bg-[var(--dark-brown-color)] text-lg rounded !text-white
                         shadow transition-all duration-300 ease-in-out
-                        hover:bg-[#d2bba0] !hover:text-[var(--dark-brown-color)] hover:scale-105"
+                        hover:bg-[#d2bba0] hover:!text-[var(--dark-brown-color)] hover:scale-105"
             >
               cancel
             </button>            
