@@ -108,97 +108,107 @@ const Profile_comp = () => {
     };
 
     return(
-        <div>
+        <div className="p-6 max-w-8xl">
             {/* Header */}
-            <div>
-                <h1>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-[var(--dark-brown-color)]">
                     Pawradise/My Profile
                 </h1>
             </div>
-            <div>
+            <div></div>
+            {/* Columns */}
+            <div className="flex gap-8">
                 {/* Left Column */}
-                <div>
+                <div className="flex flex-col flex-1 justify-between">
                     {/* My Pets */}
                     <div>
-                        <div>
+                        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
                             {pets.map(pet => (<PetCard key={pet.id} pet={pet}/>))}
                         </div>
                     </div>
+                    
                     {/* Room Booking */}
-                    <div>
-                        <div>
-                            {roomBookings.map(room => (<BookingCard key={room.id} room={room}/>))}
+                    <div className="mt-8">
+                        <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
+                            {roomBookings.map(room => (<BookingCard key={room.id} room={room} getRoomStatusColor={getRoomStatusColor}/>))}
                         </div>
                     </div>
                 </div>
-            </div>
-            {/* Right Column */}
-            <div>
-                <h2>Service status</h2>
-                <div>
-                    {serviceData.map(service => (<ServiceCard key={service.id} service={service} getStatusText={getStatusText} />))}
+                 {/* Right Column */}
+                <div className="flex-1 flex flex-col">
+                    <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
+                        <h2 className="text-2xl font-bold mb-6">Service status</h2>
+                        <div className="space-y-6 overflow-y-auto pr-2" >
+                            {serviceData.map(service => (<ServiceCard key={service.id} service={service} getStatusText={getStatusText} getStatusColor={getRoomStatusColor} />))}
+                        </div>
+                    </div>
                 </div>
+                
             </div>
+           
         </div>
     )
 }
 
 const PetCard = ({pet}) => {
     return(
-        <div>
-            <div>
-                <div>
+        <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
+            <div className="flex items-start space-x-6">
+                <div className="w-64 h-64 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                     <img 
                         src={pet.img}
                         alt={pet.name}
                         className="w-full h-full object-cover"
                     />
                 </div>
-                <div>
-                    <h3>{pet.name}</h3>
-                    <p><span>Pet type:</span> {pet.type}</p>
-                    <p><span>Pet breed:</span> {pet.breed}</p>
-                    <p><span>Pet gender:</span> {pet.gender}</p>
-                    <p><span>Food allergy:</span> {pet.food_allergy}</p>
-                    <p><span>Medical condition:</span> {pet.medical_condition}</p>
+                <div className="flex-1 space-y-2">
+                    <h3 className="text-xl font-bold">{pet.name}</h3>
+                    <p className="text-base"><span className="font-semibold">Pet type:</span> {pet.type}</p>
+                    <p className="text-base"><span className="font-semibold">Pet breed:</span> {pet.breed}</p>
+                    <p className="text-base"><span className="font-semibold">Pet gender:</span> {pet.gender}</p>
+                    <p className="text-base"><span className="font-semibold">Food allergy:</span> {pet.food_allergy}</p>
+                    <p className="text-base"><span className="font-semibold">Medical condition:</span> {pet.medical_condition}</p>
                 </div>
             </div>
         </div>
     )
 }
 
-const BookingCard = ({room}) => {
+const BookingCard = ({room, getRoomStatusColor}) => {
     return(
-        <div>
-            <div>
-                <h3>Room {room.room_number}</h3>
-                <span>{room.status}</span>
+        <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
+            <div className="flex items-center space-x-3 mb-4">
+                <h2 className="text-2xl font-bold">Room Status</h2>
+                <span className={`px-3 py-1 !text-white text-lg rounded font-bold ${getRoomStatusColor(room.status)}`}>
+                    {room.status}
+                </span>
             </div>
-            <div>
-                <div>
+            <div className="flex items-start space-x-6">
+                <div className="w-64 h-64 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                     <img 
                         src={room.img}
                         alt="Room"
                         className="w-full h-full object-cover"
                     />
                 </div>
-                <div>
-                    <p>Pet : {room.pet_name}</p>
-                    <p>For {room.pet_type}</p>
-                    <p>(Entry to end date)</p>
-                    <p>{room.entry_date} to {room.end_date}</p>
+                <div className="flex-1 space-y-2">
+                    <h3 className="text-xl font-bold">Room {room.room_number}</h3>
+                    <p className="text-base"><span className="font-semibold">Pet:</span> {room.pet_name}</p>
+                    <p className="text-base">For {room.pet_type}</p>
+                    <p className="text-base">(Entry to end date)</p>
+                    <p className="text-base">{room.entry_date} to {room.end_date}</p>
                 </div>
             </div>
         </div>
     )
 }
 
-const ServiceCard = ({service, getStatusText}) => {
+const ServiceCard = ({service, getStatusText, getStatusColor}) => {
     return(
-        <div>
-            <div>
-                <div>
-                    <div>
+        <div className="bg-[var(--light-brown-color)] rounded-lg p-4 shadow-lg flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-4">
+                    <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                         <img 
                             src={service.img}
                             alt={service.staff_name}
@@ -206,12 +216,12 @@ const ServiceCard = ({service, getStatusText}) => {
                         />
                     </div>
                     <div>
-                        <h3>{service.service_name}</h3>
-                        <p>{service.pet_type}</p>
-                        <p>{service.status === 'available' || service.status === 'unavailable' ? service.status : `by - ${service.staff_name}`}</p>
+                        <h3 className="text-lg font-semibold">{service.service_name}</h3>
+                        <p className="text-sm">{service.pet_type}</p>
+                        <p className="text-sm">{service.status === 'available' || service.status === 'unavailable' ? service.status : `by - ${service.staff_name}`}</p>
                     </div>
                 </div>
-                <span>
+                <span className={`px-3 py-1 text-white text-sm rounded-full ${getStatusColor(service.status)}`}>
                     {getStatusText(service.status)}
                 </span>
             </div>
