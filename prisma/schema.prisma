@@ -15,78 +15,149 @@ datasource db {
 }
 
 model USER {
-  id              Int      @id @default(autoincrement())
-  email           String   @unique
-  firstname       String
-  lastname        String
-  phone_number    String
-  user_name       String  @unique
-  password        String
+  id              Int       @id @default(autoincrement())
+  firstname       String    @db.VarChar(30)
+  lastname        String    @db.VarChar(30)
+  email           String    @unique @db.VarChar(50)
+  phone_number    String    @unique@db.Char(10)
+  user_name       String    @unique @db.VarChar(50) 
+  password        String    @db.VarChar(100)
+  role            Role      @default(CUSTOMER)
 
   staff           STAFF?
   customer        CUSTOMER?
 }
 
 model STAFF{
-  id              Int      @id @default(autoincrement())
-  user            USER     @relation(fields: [id], references: [id])
-  wages           Float
-  bank_account    String   @unique
+  staff_id        Int       @id @default(autoincrement())
+  wages           Float     @db.DoublePrecision
+  bank_company    Bank      @default(KASIKORN)
+  bank_account    String    @unique
+
+  userId          Int       @unique
+  user            USER      @relation(fields: [userId], references: [id])
 }
 
 model CUSTOMER{
-  user            USER    @relation(fields: [id], references: [id])
-  id              Int      @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
+  user            USER      @relation(fields: [id], references: [id])
 }
 
 model CHATLOG{
-  id Int @id @default(autoincrement())
-  rating Int
-  date DateTime
-  text String
+  id              Int       @id @default(autoincrement())
+  rating          Float?    @default(5) @db.DoublePrecision
+  date            DateTime  @default(now()) @db.Timestamptz(0)
+  text            String?   @db.Text
 }
 
 model PET{
-  id Int @id @default(autoincrement())
-  type String
-  sex String
-  name String
-  breed String
-  disease String
-  allergic String
-  picture String
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(30)
+  type            PetType   @default(DOG)
+  sex             Sex       @default(MALE)
+  breed           String    @db.VarChar(30)
+  disease         String[]  @db.VarChar(30)
+  allergic        String[]  @db.VarChar(30)
+  picture         Bytes     @db.ByteA
+  scheduled       BOOKED_SERVICE[]
+  stayed          BOOKED_ROOM[]
 }
 
 model SERVICES{
-  id Int @id @default(autoincrement())
-  service SERVICE[]
-  room ROOM[]
+  id              Int       @id @default(autoincrement())
+
 }
 
-
-
 model ROOM{
-  id Int @id @default(autoincrement())
-  capacity Int
-  price Float
-  picture String
+  id              Int       @id @default(autoincrement())
+  capacity        Int       @default(1) @db.Integer
+  price           Float     @default(2000.00) @db.DoublePrecision
+  picture         Bytes[]   @db.ByteA
+  stayed          BOOKED_ROOM[]
+}
 
-  Services SERVICES[]
+model BOOKED_ROOM {
+  id              Int       @id @default(autoincrement())
+  roomId          Int
+  room            ROOM      @relation(fields: [roomId], references: [id])
+  petId           Int
+  pet             PET       @relation(fields: [petId], references: [id])
+  startTime       DateTime  @db.Timestamptz(0)
+  endTime         DateTime  @db.Timestamptz(0)
+  booking_id      Int
+  booking         BOOKING   @relation(fields: [booking_id], references: [id])
 }
 
 model SERVICE{
-  id Int @id @default(autoincrement())
-  name String
-  price Float
-  queue Int
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(30)
+  price           Float     @default(500.00) @db.DoublePrecision
+  queue           BOOKED_SERVICE[]  
 
-  Services SERVICES[]
+}
+
+model BOOKED_SERVICE {
+  id              Int       @id @default(autoincrement())  
+  serviceId       Int     
+  service         SERVICE   @relation(fields: [serviceId], references: [id])
+  petId           Int
+  pet             PET       @relation(fields: [petId], references: [id])
+  scheduled       DateTime  @db.Timestamptz(0)
+  booking_id      Int
+  booking         BOOKING   @relation(fields: [booking_id], references: [id])
+}
+
+model BOOKING{
+  id              Int       @id @default(autoincrement()) 
+  booking_date    DateTime  @db.Timestamptz(0)
+  booking_status  BookingStatus @default(PENDING)
+
+  booked_service  BOOKED_SERVICE[]
+  booked_room     BOOKED_ROOM[]
 }
 
 model PAYMENT{
-  id Int @id @default(autoincrement())
-  cost Float
-  bookingFlag Boolean
-  date DateTime
-  status String
+  id              Int       @id @default(autoincrement())
+  cost            Float     @db.DoublePrecision
+  bookingFlag     Boolean
+  date            DateTime
+  status          PaymentStatus @default(PENDING)
+}
+
+enum Role {
+  STAFF
+  CUSTOMER
+}
+
+enum Bank {
+  KASIKORN
+  SCB
+  KRUNGTHAI
+}
+
+enum PetType {
+  DOG
+  CAT
+  MOUSE
+  RABBIT
+  BIRD
+}
+
+enum Sex {
+  MALE
+  FEMALE
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum BookingStatus {
+  PENDING
+  BOOKED
+  CHECKED_IN
+  CHECKED_OUT
+  CANCELLED
 }
