@@ -8,7 +8,6 @@ const Profile_comp = () => {
     const [phone, setPhone] = useState("123-456-7890");
     const [email, setEmail] = useState("john.doe@email.com");
     const [address, setAddress] = useState("123 Main St, City, Country");
-    const [isEditing, setIsEditing] = useState(false);
     return (
         <div>
             <div className="mb-8">
@@ -27,11 +26,8 @@ const Profile_comp = () => {
                                 type="text"
                                 value={firstname}
                                 onChange={(e) => setFirstname(e.target.value)}
-                                className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 ${
-                                    isEditing 
-                                        ? 'border-amber-300 bg-white focus:border-amber-500 focus:outline-none' 
-                                        : 'border-gray-200 bg-[var(--cream-color)]'
-                                }`}
+                                className=
+                                'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
                             />
                         </div>
                         <div>
@@ -42,11 +38,8 @@ const Profile_comp = () => {
                                 type="text"
                                 value={lastname}
                                 onChange={(e) => setLastname(e.target.value)}
-                                className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 ${
-                                    isEditing 
-                                        ? 'border-amber-300 bg-white focus:border-amber-500 focus:outline-none' 
-                                        : 'border-gray-200 bg-[var(--cream-color)]'
-                                }`}
+                                className=
+                                'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
                             />
                         </div>
                    </div>
@@ -59,11 +52,7 @@ const Profile_comp = () => {
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 ${
-                                isEditing
-                                    ? 'border-amber-300 bg-white focus:border-amber-500 focus:outline-none'
-                                    : 'border-gray-200 bg-[var(--cream-color)]'
-                            }`}
+                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
                         />
                    </div>
                    { /* password */}
@@ -75,11 +64,7 @@ const Profile_comp = () => {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 ${
-                                isEditing
-                                    ? 'border-amber-300 bg-white focus:border-amber-500 focus:outline-none'
-                                    : 'border-gray-200 bg-[var(--cream-color)]'
-                            }`}
+                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
                         />
                    </div>
                    { /* phone */}
@@ -91,11 +76,7 @@ const Profile_comp = () => {
                             type="tel"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 ${
-                                isEditing
-                                    ? 'border-amber-300 bg-white focus:border-amber-500 focus:outline-none'
-                                    : 'border-gray-200 bg-[var(--cream-color)]'
-                            }`}
+                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
                         />
                    </div>
                    { /* Email */}
@@ -107,11 +88,7 @@ const Profile_comp = () => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 ${
-                                isEditing
-                                    ? 'border-amber-300 bg-white focus:border-amber-500 focus:outline-none'
-                                    : 'border-gray-200 bg-[var(--cream-color)]'
-                            }`}
+                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
                         />
                    </div>
                    { /* address */}
@@ -122,11 +99,7 @@ const Profile_comp = () => {
                         <textarea
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
-                            className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 ${
-                                isEditing
-                                    ? 'border-amber-300 bg-white focus:border-amber-500 focus:outline-none'
-                                    : 'border-gray-200 bg-[var(--cream-color)]'
-                            }`}
+                            className='w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
                         />
                    </div>
                 </div>
