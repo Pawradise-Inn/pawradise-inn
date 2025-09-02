@@ -35,7 +35,7 @@ const App = () => {
                 </Route>
 
                 {/* Staff Routes */}
-                <Route path="/staff" element={<div>Staff Home Page</div>} />
+                <Route path="/staff" element={<div>Staff log in</div>} />
                 <Route path="/staff/dashboard" element={<div>Dashboard Page</div>} />
                 <Route path="/staff/pet status" element={<div>Pet Status Page</div>} />
                 <Route path="/staff/review" element={<div>Staff Review Page</div>} />
