@@ -5,6 +5,7 @@ import BookingService from "./pages/BookingService";
 import Profile_comp from "./components/Profile/Profile_comp";
 import Booking_comp from "./components/Profile/Booking_comp";
 import Pet_comp from "./components/Profile/Pet_comp";
+import PetOverall from "./components/Profile/PetOverall";
 
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
                     <Route index element={<Profile_comp />} />
                     <Route path="booking" element={<Booking_comp />} />
                     <Route path="pet" element={<Pet_comp />} />
+                    <Route path="pet/:id" element={<PetOverall/>} />
                 </Route>
             </Routes>
         </div>

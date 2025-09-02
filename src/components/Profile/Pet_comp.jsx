@@ -83,6 +83,11 @@ const Pet_comp = () => {
             img: "https://images.unsplash.com/photo-1558788353-f76d92427f16?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
         }
     ]);
+
+    const handleClickPet = (pet_id) => {
+        return 
+    }
+
     return(
         <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-8xl">
