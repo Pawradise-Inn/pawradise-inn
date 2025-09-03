@@ -6,7 +6,7 @@ const Navbar = () => {
     <nav className="bg-white shadow-md px-10 py-4 flex items-center justify-between">
       {/* Logo */}
       <div className="flex items-center space-x-3">
-        <NavLink to="/" className="flex items-center">
+        <NavLink to="/staff" className="flex items-center">
           <img src="../src/assets/logo.png" alt="logo" className="h-10 w-auto" />
           <span className="font-semibold text-lg text-gray-800 ml-2">
             Pawradise Inn.
