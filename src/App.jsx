@@ -8,6 +8,8 @@ import Booking_comp from "./components/Profile/Booking_comp";
 import Pet_comp from "./components/Profile/Pet_comp";
 import PetOverall from "./components/Profile/PetOverall";
 import NewPet from "./components/Profile/NewPet";
+import Management from "./pages/Management";
+import ServiceEdit from "./components/Management/Service_edit";
 
 const App = () => {
     const location = useLocation();
@@ -39,7 +41,11 @@ const App = () => {
                 <Route path="/staff/dashboard" element={<div>Dashboard Page</div>} />
                 <Route path="/staff/pet status" element={<div>Pet Status Page</div>} />
                 <Route path="/staff/review" element={<div>Staff Review Page</div>} />
-                <Route path="/staff/management" element={<div>Management Page</div>} />
+                <Route path="/staff/management" element={<Management />}>
+                    <Route index element={<ServiceEdit />} />
+                    <Route path="profile" element={<Profile_comp />} />
+                    <Route path="payment" element={<div>Manage Payment Page</div>} />
+                </Route>
             </Routes>
         </div>
     );
