@@ -10,7 +10,7 @@ const ServiceCard = ({img, name, review, onClick }) => {
 			<img src={img} alt={name} className="object-cover h-56 rounded-2xl mx-auto my-2" />
 			<div className="flex flex-wrap justify-between items-center">
 				<p>{name}</p>
-				<p className="block bg-(--light-brown-color) rounded py-1 px-3">{review}/5.0(star)</p>
+				<p className="block bg-(--light-brown-color) rounded py-1 px-3">{review}/5.0{" "}<i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i></p>
 			</div>
 		</div>
 	);
