@@ -1,4 +1,4 @@
-import BookingBar from "../bookingBar/BookingBar";
+import BookingBar from "./bookingBar/BookingBar";
 import { useEffect, useRef } from "react";
 
 // status: boolean to show/hide popup
