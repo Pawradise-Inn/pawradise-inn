@@ -35,11 +35,14 @@ const BookingBar = ({ data }) => {
 		}, // will be replaced by real data later which fetched from backend only 3 comments
 	]; // will be replaced by real data later which fetched from backend only 3 comments
 
+	const demoPet = [{ name: "pet1" }, { name: "pet2" }]; // will be replaced by real data later
+
 	const [commentStarSelect, setCommentStarSelect] = useState(6);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [pageAmount, setPageAmount] = useState(10);
 	const [comments, setComments] = useState(demoData);
 	const [status, setStatus] = useState("--");
+	const [petData, setPetData] = useState(demoPet);
 	const [formData, setFormData] = useState({
 		entryDate: "",
 		exitDate: "",
@@ -84,6 +87,16 @@ const BookingBar = ({ data }) => {
 		// fetch new data from backend API here
 	};
 
+	// fetch new status when date or time change
+	const fetchPetData = () => {
+		// fetch new data from backend API here
+		// fetch new data from backend API here
+		// fetch new data from backend API here
+		// fetch new data from backend API here
+		// fetch new data from backend API here
+		// fetch new data from backend API here
+	};
+
 	//  fetch pageAmount when starting web page
 	useEffect(() => {
 		// fetch new data from backend API here
@@ -110,15 +123,13 @@ const BookingBar = ({ data }) => {
 			<section className="my-5 flex justify-between">
 				<div className="w-1/2">
 					<p className="text-2xl mb-2 font-bold">
-						{data.headerType} {data.name}
+						{data.headerType}{" "}
+						{data.headerType == "Service" ? data.name : data.roomId}
 					</p>
 					<p className="text-xl mb-2">Status {status}</p>
-					<p className="text-xl mb-2">Suitable for {data.forwhich} pet</p>
+					<p className="text-xl mb-2">Suitable for {data.forwhich}</p>
 				</div>
-				<div className="w-1/2 flex flex-col items-end justify-between">
-					<p className="text-xl rounded bg-(--light-brown-color) py-2 px-3">
-						{data.size}/{data.maxsize}
-					</p>
+				<div className="w-1/2 flex flex-col justify-end items-end">
 					<p className="text-2xl font-bold">{data.price} ฿</p>
 				</div>
 			</section>
@@ -129,14 +140,24 @@ const BookingBar = ({ data }) => {
 				<b className="text-3xl block mb-2">Your pet</b>
 				<div className="relative">
 					<select className="inline-block mb-4 w-full rounded-xl px-4 py-2 text-2xl my-2 outline-0 bg-(--light-brown-color) appearance-none cursor-pointer">
-						<option>Select your pet</option>
+						{petData.map((data, idx) => {
+							return <option key={idx}>{data.name}</option>;
+						})}
 					</select>
 					<i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-2/3 flex justify-center items-center text-2xl !text-white cursor-pointer pointer-events-none"></i>
 				</div>
 				<form onSubmit={handleFormSubmit}>
 					<b className="mb-2 text-3xl inline-block w-1/2 ">Entry date</b>
-					<b className="mb-2 text-3xl inline-block w-1/2">Exit date</b>
-					<div className="relative mb-4 w-full rounded-xl text-2xl bg-(--light-brown-color) before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-3/4 before:border-2 before:border-(--dark-brown-color)">
+					{data.headerType == "Service" ? (
+						<>
+							<b className="mb-2 text-3xl inline-block w-1/2">Entry time</b>
+						</>
+					) : (
+						<>
+							<b className="mb-2 text-3xl inline-block w-1/2">Exit date</b>
+						</>
+					)}
+					<div className="relative mb-4 w-full rounded-xl text-2xl bg-(--light-brown-color) before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1  before:border-(--dark-brown-color)">
 						<input
 							required
 							type="date"
@@ -144,40 +165,31 @@ const BookingBar = ({ data }) => {
 							onChange={handleFormDataChange}
 							name="entryDate"
 						/>
-						<i className="bi bi-caret-down-fill absolute top-1/2 right-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white cursor-pointer pointer-events-none"></i>
-						<input
-							required
-							type="date"
-							className="relative w-1/2 rounded-2xl px-4 py-2 text-3xl outline-0 cursor-pointer"
-							onChange={handleFormDataChange}
-							name="exitDate"
-						/>
-						<i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white cursor-pointer pointer-events-none"></i>
+						<i className="bi bi-caret-down-fill absolute top-1/2 right-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
+						{data.headerType === "Service" ? (
+							<>
+								<input
+									required
+									type="time"
+									className="relative w-1/2 rounded-2xl px-4 py-2 text-3xl outline-0 cursor-pointer"
+									onChange={handleFormDataChange}
+									name="exitDate"
+								/>
+							</>
+						) : (
+							<>
+								<input
+									required
+									type="date"
+									className="relative w-1/2 rounded-2xl px-4 py-2 text-3xl outline-0 cursor-pointer"
+									onChange={handleFormDataChange}
+									name="exitDate"
+								/>
+							</>
+						)}
+						<i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
 					</div>
-					{data.headerType === "Service" ? (
-						<>
-							<b className="mb-2 text-3xl inline-block w-1/2 ">Entry time</b>
-							<b className="mb-2 text-3xl inline-block w-1/2">Exit time</b>
-							<div className="relative mb-4 w-full rounded-xl text-2xl bg-(--light-brown-color) before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-3/4 before:border-2 before:border-(--dark-brown-color)">
-								<input
-									required
-									type="time"
-									className="relative w-1/2 rounded-2xl px-4 py-2 text-3xl outline-0 cursor-pointer"
-									onChange={handleFormDataChange}
-									name="enterTime"
-								/>
-								<i className="bi bi-caret-down-fill absolute top-1/2 right-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white cursor-pointer pointer-events-none"></i>
-								<input
-									required
-									type="time"
-									className="relative w-1/2 rounded-2xl px-4 py-2 text-3xl outline-0 cursor-pointer"
-									onChange={handleFormDataChange}
-									name="exitTime"
-								/>
-								<i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white cursor-pointer pointer-events-none"></i>
-							</div>
-						</>
-					) : null}
+
 					<button className="block w-full bg-(--dark-brown-color) rounded !text-white text-center py-1  text-3xl mt-10 mb-4 cursor-pointer hover:bg-(--brown-color) transition-all duration-200">
 						BOOK
 					</button>

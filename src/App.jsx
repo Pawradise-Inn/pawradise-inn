@@ -1,7 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Profile from "./pages/Profile";
-import BookingService from "./pages/BookingService";
+import Profile from "./pages/customer/Profile";
+import BookingRoom from "./pages/customer/BookingRoom";
+import BookingService from "./pages/customer/BookingService";
 import Profile_comp from "./components/Profile/Profile_comp";
 import Booking_comp from "./components/Profile/Booking_comp";
 import Pet_comp from "./components/Profile/Pet_comp";
@@ -15,7 +16,7 @@ const App = () => {
             <Navbar />
             <Routes>
                 <Route path="/" element={<div>Home Page</div>} />
-                <Route path="/room" element={<div>Room Page</div>} />
+                <Route path="/room" element={<BookingRoom/> } />
                 <Route path="/service" element={<BookingService/ >} />
                 <Route path="/review" element={<div>Review Page</div>} />
                 <Route path="/profile" element={<Profile />}>
