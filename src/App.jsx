@@ -1,6 +1,7 @@
 import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import StaffNavbar from "./components/StaffNavbar";
+import Footer from "./components/Footer";
 import Profile from "./pages/Profile";
 import BookingService from "./pages/BookingService";
 import Profile_comp from "./components/Profile/Profile_comp";
@@ -25,9 +26,9 @@ const App = () => {
             <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<div>Home Page</div>} />
-                <Route path="/room" element={<div>Room Page</div>} />
-                <Route path="/service" element={<BookingService />} />
-                <Route path="/review" element={<div>Review Page</div>} />
+                <Route path="/room" element={<><div>Room Page</div><Footer/></>} />
+                <Route path="/service" element={<><BookingService /><Footer/></>} />
+                <Route path="/review" element={<><div>Review Page</div><Footer/></>} />
                 <Route path="/profile" element={<Profile />}>
                     <Route index element={<Profile_comp />} />
                     <Route path="booking" element={<Booking_comp />} />
