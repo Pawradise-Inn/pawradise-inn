@@ -27,7 +27,7 @@ const Profile_comp = () => {
                                 value={firstname}
                                 onChange={(e) => setFirstname(e.target.value)}
                                 className=
-                                'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
+                                'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                             />
                         </div>
                         <div>
@@ -39,7 +39,7 @@ const Profile_comp = () => {
                                 value={lastname}
                                 onChange={(e) => setLastname(e.target.value)}
                                 className=
-                                'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
+                                'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                             />
                         </div>
                    </div>
@@ -52,7 +52,7 @@ const Profile_comp = () => {
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
+                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                         />
                    </div>
                    { /* password */}
@@ -64,7 +64,7 @@ const Profile_comp = () => {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
+                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                         />
                    </div>
                    { /* phone */}
@@ -76,7 +76,7 @@ const Profile_comp = () => {
                             type="tel"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
+                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                         />
                    </div>
                    { /* Email */}
@@ -88,7 +88,7 @@ const Profile_comp = () => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
+                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                         />
                    </div>
                    { /* address */}
@@ -99,11 +99,11 @@ const Profile_comp = () => {
                         <textarea
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
-                            className='w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
+                            className='w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                         />
                    </div>
                 </div>
-                <div className="flex justify-end items-center mt-8 pt-6 border-t border-gray-200">
+                <div className="flex justify-end items-center mt-8 pt-6 border-t border-[var(--brown-color)]">
                     <div className="flex space-x-8">
                         <button onClick={() => console.log("Cancel changes")}
                                 className="px-6 py-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-300 cursor-pointer"

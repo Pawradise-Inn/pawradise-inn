@@ -1,6 +1,20 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const PetInput = ({data, setData, name}) => {
+    return(
+        <div>
+            <label className="block text-sm font-semibold mb-2">{name}</label>
+            <input
+                type="text"
+                value={data}
+                onChange={(e) => setData(e.target.value)}
+                className='w-full px-6 py-4 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
+            />
+        </div>
+    )
+}
+
 const NewPet = () => {
     const [petName, setPetName] = useState("")
     const [petType, setPetType] = useState("")
@@ -60,65 +74,17 @@ const NewPet = () => {
                 <div className="flex-1 flex flex-col"> {/* Takes up remaining space */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Pet name */}
-                        <div>
-                            <label className="block text-sm font-semibold mb-2">Pet name</label>
-                            <input
-                                type="text"
-                                value={petName}
-                                onChange={(e) => setPetName(e.target.value)}
-                                className='w-full px-6 py-4 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
-                            />
-                        </div>
+                        <PetInput data={petName} setData={setPetName} name='Pet name'/>
                         {/* Pet gender */}
-                        <div>
-                            <label className="block text-sm font-semibold mb-2">Pet gender</label>
-                            <input
-                                type="text"
-                                value={petGender}
-                                onChange={(e) => setPetGender(e.target.value)}
-                                className='w-full px-6 py-4 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
-                            />
-                        </div>
+                        <PetInput data={petGender} setData={setPetGender} name='Pet gender'/>
                         {/* Pet type */}
-                        <div>
-                            <label className="block text-sm font-semibold mb-2">Pet type</label>
-                            <input
-                                type="text"
-                                value={petType}
-                                onChange={(e) => setPetType(e.target.value)}
-                                className='w-full px-6 py-4 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
-                            />
-                        </div>
+                        <PetInput data={petType} setData={setPetType} name='Pet type'/>
                         {/* Food allergy */}
-                        <div>
-                            <label className="block text-sm font-semibold mb-2">Food allergy</label>
-                            <input
-                                type="text"
-                                value={foodAllergy}
-                                onChange={(e) => setFoodAllergy(e.target.value)}
-                                className='w-full px-6 py-4 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
-                            />
-                        </div>
+                        <PetInput data={foodAllergy} setData={setFoodAllergy} name='Food allergy'/>
                         {/* Pet breed */}
-                        <div>
-                            <label className="block text-sm font-semibold mb-2">Pet breed</label>
-                            <input
-                                type="text"
-                                value={petBreed}
-                                onChange={(e) => setPetBreed(e.target.value)}
-                                className='w-full px-6 py-4 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
-                            />
-                        </div>
+                        <PetInput data={petBreed} setData={setPetBreed} name='Pet breed'/>
                         {/* Medical condition */}
-                        <div>
-                            <label className="block text-sm font-semibold mb-2">Medical condition</label>
-                            <input
-                                type="text"
-                                value={medicalCondition}
-                                onChange={(e) => setMedicalCondition(e.target.value)}
-                                className='w-full px-6 py-4 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
-                            />
-                        </div>
+                        <PetInput data={medicalCondition} setData={setMedicalCondition} name='Medical condition'/>
                     </div>
 
                     {/* Buttons - Right aligned within the input section */}
