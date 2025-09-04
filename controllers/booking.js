@@ -2,7 +2,7 @@ const prisma = require('../prisma/prisma');
 
 const getBookings = async (req, res) => {   //Only Staff, customer use getCustomerBookings
     try {
-        const bookings = await prisma.bookings.findMany();
+        const bookings = await prisma.booking.findMany();
         res.status(200).json({success: true, data: bookings});
     } catch(err) {
         res.status(400).json({success: false, error: err.message});
@@ -11,7 +11,7 @@ const getBookings = async (req, res) => {   //Only Staff, customer use getCustom
 
 const getBooking = async (req, res) => {    //Both
     try {
-        const booking = await prisma.bookings.findUnique({
+        const booking = await prisma.booking.findUnique({
             where: {id: Number(req.params.id)}
         });
         if(!booking){
@@ -25,7 +25,7 @@ const getBooking = async (req, res) => {    //Both
 
 const getBookingStatus = async (req, res) => {  //Both
     try {
-        const booking = await prisma.bookings.findUnique({
+        const booking = await prisma.booking.findUnique({
             where: {id: Number(req.params.id)},
         });
         if(!booking){
@@ -39,7 +39,7 @@ const getBookingStatus = async (req, res) => {  //Both
 
 const getCustomerBookings = async (req, res) => {  //Both
     try {
-        const customer = await prisma.customers.findUnique({
+        const customer = await prisma.customer.findUnique({
             where: {id: Number(req.params.id)},
             include: {
                 booking: true
@@ -58,7 +58,7 @@ const getCustomerBookings = async (req, res) => {  //Both
 
 const updateBooking = async (req, res) => { //Staff Only
     try {
-        const booking = await prisma.bookings.update({
+        const booking = await prisma.booking.update({
             where: {id: Number(req.params.id)},
             data: req.body
         });
@@ -73,7 +73,7 @@ const updateBooking = async (req, res) => { //Staff Only
 
 const updateBookingStatus = async (req, res) => { //Staff or System(If automated payment is successfully)Only
     try {
-        const booking = await prisma.bookings.update({
+        const booking = await prisma.booking.update({
             where: {id: Number(req.params.id)},
             data: {status: req.body.status}
         });
@@ -104,7 +104,7 @@ const updateBookingStatus = async (req, res) => { //Staff or System(If automated
 
 const deleteBooking = async (req, res) => { //If customer not paid yet, Using this to delete
     try {                                   //Else, Using update status to cancle instead!
-        const booking = await prisma.bookings.delete({
+        const booking = await prisma.booking.delete({
             where : {id : Number(req.params.id)}
         });
 
@@ -112,7 +112,7 @@ const deleteBooking = async (req, res) => { //If customer not paid yet, Using th
             return res.status(404).json({success: false, error: 'Booking not found or already deleted'});
         }
 
-        res.status(200).json({success: true, data: booking});
+        res.status(200).json({success: true, data: {}});
     } catch(err) {
         res.status(400).json({success: false, error: err.message});
     }
