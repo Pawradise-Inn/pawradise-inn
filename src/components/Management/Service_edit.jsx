@@ -10,8 +10,8 @@ const mockServices = Array.from({ length: 9 }).map((_, i) => ({
 const ServiceEdit = () => (
   <main className="flex-1">
     <div className="flex justify-end gap-6 mb-8" style={{ marginTop: "10px", marginRight: "20px" }}>
-      <button className="px-8 py-2 bg-[var(--light-brown-color)] rounded">ADD</button>
-      <button className="px-8 py-2 bg-[var(--light-brown-color)] rounded">DELETE</button>
+      <button className="px-8 py-2 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110">add</button>
+      <button className="px-8 py-2 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110">delete</button>
     </div>
 
     {/* Use your ServiceCard component */}
