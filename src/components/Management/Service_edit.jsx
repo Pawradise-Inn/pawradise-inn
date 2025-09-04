@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import ServiceCard from "../ServiceCard";
+import ServiceCard from "../service/ServiceCard";
 
 const mockServices = Array.from({ length: 9 }).map((_, i) => ({
   id: i + 1,
