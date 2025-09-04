@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  output   = "../generated/prisma/client"
 }
 
 datasource db {
@@ -14,181 +14,187 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model USER {
-  id              Int       @id @default(autoincrement())
-  firstname       String    @db.VarChar(30)
-  lastname        String    @db.VarChar(30)
-  email           String    @unique @db.VarChar(50)
-  phone_number    String    @unique@db.Char(10)
-  user_name       String    @unique @db.VarChar(50) 
-  password        String    @db.VarChar(255)
-  role            Role      @default(CUSTOMER)
+model User {
+  id           Int    @id @default(autoincrement())
+  firstname    String @db.VarChar(30)
+  lastname     String @db.VarChar(30)
+  email        String @unique @db.VarChar(50)
+  phone_number String @unique @db.Char(10)
+  user_name    String @unique @db.VarChar(50)
+  password     String @db.VarChar(255)
+  role         Role   @default(CUSTOMER)
 
-  staff           STAFF?
-  customer        CUSTOMER?
+  staff    Staff?
+  customer Customer?
+
+  @@map("User")
 }
 
-model STAFF{
-  id              Int       @id @default(autoincrement())
-  wages           Float     @db.DoublePrecision
-  bank_company    Bank      @default(KASIKORN)
-  bank_account    String    @unique
+model Staff {
+  id           Int    @id @default(autoincrement())
+  wages        Float  @db.DoublePrecision
+  bank_company Bank   @default(KASIKORN)
+  bank_account String @unique
 
-  userId          Int       @unique
-  user            USER      @relation(fields: [userId], references: [id])
-  replies         CHATLOG[]
-  cares           CARE[]
-  staffOnServices STAFF_ON_SERVICE[]
-  ROOM_STAFF      ROOM_STAFF[]
+  userId          Int              @unique
+  user            User             @relation(fields: [userId], references: [id])
+  replies         ChatLog[]
+  cares           Care[]
+  staffOnServices StaffOnService[]
+  roomStaff       RoomStaff[]
 }
 
-model CUSTOMER{
-  id              Int       @id
+model Customer {
+  id Int @id @default(autoincrement())
 
-  userId          Int       @unique
-  user            USER      @relation(fields: [userId], references: [id])
-  chats           CHATLOG[]
-  pets            PET[]
-  bookings        BOOKING[]
-  payments        PAYMENT[]
+  userId   Int       @unique
+  user     User      @relation(fields: [userId], references: [id])
+  chats    ChatLog[]
+  pets     Pet[]
+  bookings Booking[]
+  payments Payment[]
 }
 
-model CHATLOG{
-  id              Int       @id @default(autoincrement())
-  review          String?   @db.Text
-  reply           String?   @db.Text
-  rating          Float?    @default(5) @db.DoublePrecision
-  review_date     DateTime  @default(now()) @db.Timestamptz(0)
-  reply_date      DateTime? @db.Timestamptz(0)
+model ChatLog {
+  id          Int       @id @default(autoincrement())
+  review      String?   @db.Text
+  reply       String?   @db.Text
+  rating      Float?    @default(5) @db.DoublePrecision
+  review_date DateTime  @default(now()) @db.Timestamptz(0)
+  reply_date  DateTime? @db.Timestamptz(0)
 
-  customerId      Int
-  customer        CUSTOMER  @relation(fields: [customerId], references: [id])
-  staffId         Int?
-  staff           STAFF?    @relation(fields: [staffId], references: [id])
-  serviceId       Int
-  service         SERVICE   @relation(fields: [serviceId], references: [id])
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id])
+  staffId    Int?
+  staff      Staff?   @relation(fields: [staffId], references: [id])
+  serviceId  Int
+  service    Service  @relation(fields: [serviceId], references: [id])
 
   @@unique([customerId, serviceId])
 }
 
-model PET{
-  id              Int       @id @default(autoincrement())
-  name            String    @db.VarChar(30)
-  sex             Sex       @default(MALE)
-  age             Int
-  type            PetType   @default(DOG)
-  breed           String    @db.VarChar(30)
-  disease         String[]  @db.VarChar(30)
-  allergic        String[]  @db.VarChar(30)
-  picture         Bytes     @db.ByteA
+model Pet {
+  id       Int       @id @default(autoincrement())
+  name     String    @db.VarChar(30)
+  sex      Sex       @default(MALE)
+  age      Int
+  type     PetType   @default(DOG)
+  status   PetStatus @default(QUEUE)
+  breed    String    @db.VarChar(30)
+  disease  String[]  @db.VarChar(30)
+  allergic String[]  @db.VarChar(30)
+  picture  Bytes     @db.ByteA
 
-  scheduled       BOOKED_SERVICE[]
-  stayed          BOOKED_ROOM[]
-  customerId      Int
-  customer        CUSTOMER  @relation(fields: [customerId], references: [id])
-  cares           CARE[]
+  scheduled  BookedService[]
+  stayed     BookedRoom[]
+  customerId Int
+  customer   Customer        @relation(fields: [customerId], references: [id])
+  cares      Care[]
 }
 
-model ROOM{
-  id              Int       @id @default(autoincrement())
-  capacity        Int       @default(1) @db.Integer
-  price           Float     @default(2000.00) @db.DoublePrecision
-  picture         Bytes[]   @db.ByteA
+model Room {
+  id       Int     @id @default(autoincrement())
+  capacity Int     @default(1) @db.Integer
+  price    Float   @default(2000.00) @db.DoublePrecision
+  picture  Bytes[] @db.ByteA
+  petType  PetType @default(DOG)
 
-  bookings        BOOKED_ROOM[]
-  staffOnRooms    ROOM_STAFF[]
+  bookings     BookedRoom[]
+  staffOnRooms RoomStaff[]
 }
 
-model BOOKED_ROOM {
-  id              Int       @id @default(autoincrement())
-  startTime       DateTime  @db.Timestamptz(0)
-  endTime         DateTime  @db.Timestamptz(0)
+model BookedRoom {
+  id        Int      @id @default(autoincrement())
+  startTime DateTime @db.Timestamptz(0)
+  endTime   DateTime @db.Timestamptz(0)
 
-  roomId          Int
-  room            ROOM      @relation(fields: [roomId], references: [id])
-  petId           Int
-  pet             PET       @relation(fields: [petId], references: [id])
-  bookingId       Int
-  booking         BOOKING   @relation(fields: [bookingId], references: [id])
+  roomId    Int
+  room      Room    @relation(fields: [roomId], references: [id])
+  petId     Int
+  pet       Pet     @relation(fields: [petId], references: [id])
+  bookingId Int
+  booking   Booking @relation(fields: [bookingId], references: [id])
 }
 
-model SERVICE{
-  id              Int       @id @default(autoincrement())
-  name            String    @db.VarChar(30)
-  price           Float     @default(500.00) @db.DoublePrecision
-  picture         Bytes     @db.ByteA
+model Service {
+  id      Int       @id @default(autoincrement())
+  name    String    @db.VarChar(30)
+  price   Float     @default(500.00) @db.DoublePrecision
+  petType PetType[]
+  picture Bytes     @db.ByteA
 
   reviewId        Int?
-  reviews         CHATLOG[]
-  staffOnServices STAFF_ON_SERVICE[]
-  bookedServices  BOOKED_SERVICE[]
+  reviews         ChatLog[]
+  staffOnServices StaffOnService[]
+  bookedServices  BookedService[]
 }
 
-model BOOKED_SERVICE {
-  id              Int       @id @default(autoincrement())  
-  
-  serviceId       Int     
-  service         SERVICE   @relation(fields: [serviceId], references: [id])
-  petId           Int
-  pet             PET       @relation(fields: [petId], references: [id])
-  scheduled       DateTime  @db.Timestamptz(0)
-  booking_id      Int
-  booking         BOOKING   @relation(fields: [booking_id], references: [id])
+model BookedService {
+  id Int @id @default(autoincrement())
+
+  serviceId  Int
+  service    Service  @relation(fields: [serviceId], references: [id])
+  petId      Int
+  pet        Pet      @relation(fields: [petId], references: [id])
+  scheduled  DateTime @db.Timestamptz(0)
+  booking_id Int
+  booking    Booking  @relation(fields: [booking_id], references: [id])
 }
 
-model BOOKING{
-  id              Int       @id @default(autoincrement()) 
-  booking_date    DateTime  @db.Timestamptz(0)
-  booking_status  BookingStatus @default(PENDING)
+model Booking {
+  id             Int           @id @default(autoincrement())
+  booking_date   DateTime      @db.Timestamptz(0)
+  booking_status BookingStatus @default(PENDING)
 
-  booked_service  BOOKED_SERVICE[]
-  booked_room     BOOKED_ROOM[]
-  customerId      Int
-  customer        CUSTOMER  @relation(fields: [customerId], references: [id])
+  booked_service BookedService[]
+  booked_room    BookedRoom[]
+  customerId     Int
+  customer       Customer        @relation(fields: [customerId], references: [id])
 
-  PAYMENT         PAYMENT?
+  Payment Payment?
 }
 
-model PAYMENT{
-  id              Int       @id @default(autoincrement())
-  cost            Float     @db.DoublePrecision
-  date            DateTime
-  status          PaymentStatus @default(PENDING)
+model Payment {
+  id     Int           @id @default(autoincrement())
+  cost   Float         @db.DoublePrecision
+  date   DateTime
+  status PaymentStatus @default(PENDING)
 
-  bookingId       Int       @unique
-  booking         BOOKING   @relation(fields: [bookingId], references: [id])
-  customerId      Int
-  customer        CUSTOMER  @relation(fields: [customerId], references: [id])
+  bookingId  Int      @unique
+  booking    Booking  @relation(fields: [bookingId], references: [id])
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id])
 }
 
-model CARE{
-  id              Int       @id @default(autoincrement())
-  start_period    DateTime  @default(now()) @db.Timestamptz(0)
-  end_period      DateTime  @db.Timestamptz(0)
+model Care {
+  id           Int      @id @default(autoincrement())
+  start_period DateTime @default(now()) @db.Timestamptz(0)
+  end_period   DateTime @db.Timestamptz(0)
 
-  staff_id        Int
-  staff           STAFF     @relation(fields: [staff_id], references: [id])
-  pet_id          Int
-  pet             PET       @relation(fields: [pet_id], references: [id])
+  staff_id Int
+  staff    Staff @relation(fields: [staff_id], references: [id])
+  pet_id   Int
+  pet      Pet   @relation(fields: [pet_id], references: [id])
+
   @@unique([staff_id, pet_id])
 }
 
-model STAFF_ON_SERVICE {
-  staffId         Int
-  serviceId       Int
+model StaffOnService {
+  staffId   Int
+  serviceId Int
 
-  staff           STAFF     @relation(fields: [staffId], references: [id])
-  service         SERVICE   @relation(fields: [serviceId], references: [id])
+  staff   Staff   @relation(fields: [staffId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
 
   @@id([staffId, serviceId])
 }
 
-model ROOM_STAFF {
-  roomId         Int
-  staffId        Int
+model RoomStaff {
+  roomId  Int
+  staffId Int
 
-  room           ROOM      @relation(fields: [roomId], references: [id])
-  staff          STAFF     @relation(fields: [staffId], references: [id])
+  room  Room  @relation(fields: [roomId], references: [id])
+  staff Staff @relation(fields: [staffId], references: [id])
 
   @@id([roomId, staffId])
 }
@@ -229,4 +235,10 @@ enum BookingStatus {
   CHECKED_IN
   CHECKED_OUT
   CANCELLED
+}
+
+enum PetStatus {
+  QUEUE
+  IN_PROGRESS
+  COMPLETED
 }
