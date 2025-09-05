@@ -46,7 +46,7 @@ const ServiceEdit = () => {
       
       {noResult ? (
         <p className="text-2xl w-full text-center mt-32 italic">
-          Sorry, your desired service is not on operation now.
+          No result.
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4">
