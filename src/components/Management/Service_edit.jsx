@@ -1,29 +1,40 @@
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
 import ServiceCard from "../ServiceCard";
+import AddServicePopup from "./add_service";
 
 const mockServices = Array.from({ length: 9 }).map((_, i) => ({
   id: i + 1,
   name: "service_name",
   review: "x.x/5.0(star)",
-  image: "", // Add image property if needed
+  image: "",
 }));
 
 const ServiceEdit = () => {
+  const [services, setServices] = useState(mockServices);
   const [search, setSearch] = useState("");
-  
-  // Filter services based on search input
-  const filterService = () => {
-    if (!search) return mockServices;
-    return mockServices.filter(service =>
-      service.name.toLowerCase().includes(search.toLowerCase())
-    );
-  };
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  const noResult = filterService().length === 0;
+  const filtered = !search
+    ? services
+    : services.filter((s) =>
+        s.name.toLowerCase().includes(search.toLowerCase())
+      );
 
-  const handleTypeService = (e) => {
-    setSearch(e.target.value);
+  const handleTypeService = (e) => setSearch(e.target.value);
+
+  const handleSaveService = (svcFromPopup) => {
+    // svcFromPopup: { roomName, petType, price, image }
+    const newService = {
+      id: Date.now(),
+      name: svcFromPopup.roomName || "new service",
+      review: "0.0/5.0(star)",
+      image: svcFromPopup.image || "",
+      petType: svcFromPopup.petType,
+      price: svcFromPopup.price,
+    };
+    setServices((prev) => [newService, ...prev]);
+    setIsPopupOpen(false);
   };
 
   return (
@@ -38,27 +49,43 @@ const ServiceEdit = () => {
             value={search}
           />
         </div>
+
         <div className="flex gap-6 ml-8">
-          <button className="px-12 py-4 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 text-xl w-40">add</button>
-          <button className="px-12 py-4 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 text-xl w-40">delete</button>
+          {/* OPEN POPUP */}
+          <button
+            onClick={() => setIsPopupOpen(true)}
+            className="px-12 py-4 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 text-xl w-40"
+          >
+            add
+          </button>
+
+          <button className="px-12 py-4 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 text-xl w-40">
+            delete
+          </button>
         </div>
       </div>
-      
-      {noResult ? (
-        <p className="text-2xl w-full text-center mt-32 italic">
-          No result.
-        </p>
+
+      {filtered.length === 0 ? (
+        <p className="text-2xl w-full text-center mt-32 italic">No result.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4">
-          {filterService().map((data, idx) => (
+          {filtered.map((data) => (
             <ServiceCard
-              key={idx}
+              key={data.id}
               img={data.image}
               name={data.name}
               rating={data.review}
             />
           ))}
         </div>
+      )}
+
+      {/* POPUP */}
+      {isPopupOpen && (
+        <AddServicePopup
+          onClose={() => setIsPopupOpen(false)}
+          onSave={handleSaveService}
+        />
       )}
 
       <Outlet />
