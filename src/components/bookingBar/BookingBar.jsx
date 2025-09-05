@@ -1,9 +1,8 @@
 import CommentCard from "./CommentCard";
 import "../../styles/bookingBarStyle.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import CommentStarSelector from "./CommentStarSelector";
 import Pagination from "./Pagination";
-import { useNavigate } from "react-router-dom";
 import { getWarningTextForDateValidation } from "../../utils/HandleValidation";
 import { handleFormDataChange } from "../../utils/HandleForm";
 
@@ -40,19 +39,33 @@ const BookingBar = ({ data }) => {
 
 	const demoPet = [{ name: "pet1" }, { name: "pet2" }]; // will be replaced by real data later
 
-	const navigate = useNavigate();
 	const [commentStarSelect, setCommentStarSelect] = useState(6);
 	const [currentPage, setCurrentPage] = useState(data.currentPage);
 	const [comments, setComments] = useState(demoData);
 	const [status, setStatus] = useState("--");
 	const [petData, setPetData] = useState(demoPet);
-	const [validDateStatus, setValidDateStatus] = useState(true); // 0 = valid, 1 = booking in same day, 2 = entry date > exit date
 	const [formData, setFormData] = useState({
 		entryDate: " ",
 		exitDate: "z",
 		entryTime: "13:00",
 		exitTime: "10:00",
 	});
+
+	//  status using for display error when meet constraint
+	const validDateStatus = useMemo(() => {
+		if (
+			getWarningTextForDateValidation(formData.entryDate, formData.exitDate) !==
+			""
+		) {
+			return false;
+		} else {
+			return true;
+		}
+	}, [formData]);
+
+	const handleCommentStarSelect = useCallback((star) => {
+		setCommentStarSelect(star);
+	}, []);
 
 	// handle form submit and check availability and validation
 	const handleFormSubmit = (e) => {
@@ -114,16 +127,7 @@ const BookingBar = ({ data }) => {
 		// fetch new data from backend API here
 	}, [currentPage]);
 
-	useEffect(() => {
-		if (
-			getWarningTextForDateValidation(formData.entryDate, formData.exitDate) !==
-			""
-		) {
-			setValidDateStatus(false);
-		} else {
-			setValidDateStatus(true);
-		}
-	}, [formData]);
+	useEffect(() => {}, [formData]);
 
 	// reset currentPage to 1 when this bookingBar data is change(reopen)
 	useEffect(() => {
@@ -250,41 +254,21 @@ const BookingBar = ({ data }) => {
 					<i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
 				</b>
 				<div className="my-5 grid grid-cols-5 gap-2 bg-(--light-brown-color)  p-2">
-					<CommentStarSelector
-						star={6}
-						commentStarSelect={commentStarSelect}
-						onClick={() => setCommentStarSelect(6)}
-					/>
-					<CommentStarSelector
-						star={5}
-						commentStarSelect={commentStarSelect}
-						onClick={() => setCommentStarSelect(5)}
-					/>
-					<CommentStarSelector
-						star={4}
-						commentStarSelect={commentStarSelect}
-						onClick={() => setCommentStarSelect(4)}
-					/>
-					<CommentStarSelector
-						star={3}
-						commentStarSelect={commentStarSelect}
-						onClick={() => setCommentStarSelect(3)}
-					/>
-					<CommentStarSelector
-						star={2}
-						commentStarSelect={commentStarSelect}
-						onClick={() => setCommentStarSelect(2)}
-					/>
-					<CommentStarSelector
-						star={1}
-						commentStarSelect={commentStarSelect}
-						onClick={() => setCommentStarSelect(1)}
-					/>
-					<CommentStarSelector
-						star={0}
-						commentStarSelect={commentStarSelect}
-						onClick={() => setCommentStarSelect(0)}
-					/>
+					{[6, 5, 4, 3, 2, 1, 0].map((star) => {
+						return (
+							<CommentStarSelector
+								style ={`${
+									commentStarSelect === star
+										? "bg-(--cream-color) outline-2"
+										: "bg-white"
+								}`}
+								key={star}
+								star={star}
+								// commentStarSelect={commentStarSelect}
+								onClick={handleCommentStarSelect}
+							/>
+						);
+					})}
 				</div>
 				<div className="my-5 flex gap-3 flex-col">
 					{comments.map((data, index) => {
@@ -300,9 +284,10 @@ const BookingBar = ({ data }) => {
 				</div>
 
 				<Pagination
+					id={data.headerType == "Service" ? data.name : data.roomId}
 					pageAmount={data.pageAmount}
 					currentPage={currentPage}
-					onClick={(page) => setCurrentPage(page)}
+					onClick={setCurrentPage}
 				/>
 			</section>
 			{/* comment section */}

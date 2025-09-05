@@ -2,31 +2,40 @@
 // currentPage: current page number
 // onClick: function to handle page change, takes the new page number as argument
 
-import { getArrayWithRange } from "../../utils/HandleArray";
+import { memo, useMemo } from "react";
+import { getArrayWithRangeWithMid } from "../../utils/HandleArray";
 
-const Pagination = ({ pageAmount, currentPage, onClick }) => {
+const Pagination = ({ id, pageAmount, currentPage, onClick }) => {
 
-	// Check if the page number is the current page and hightlight it
-	const getCurrentPageDisplay = (pageNum) => {
+	// check if the page number is the current page and hightlight it
+	const checkCurrentPage = (pageNum) => {
 		return pageNum === currentPage;
 	};
 
 	return (
 		<div className="my-10 flex justify-center items-center gap-1">
-					<i
-						onClick={() => onClick(1)}
-						className="bi bi-chevron-double-left inline-flex justify-center items-center text-2xl cursor-pointer hover:scale-125 p-1 transition-all duration-200"
-					></i>
-					<i
-						onClick={() => onClick(Math.max(1, currentPage - 1))}
-						className="bi bi-chevron-left inline-flex justify-center items-center text-2xl cursor-pointer hover:scale-125 p-1 transition-all duration-200 mr-2"
-					></i>
+			<i
+				onClick={() => onClick(1)}
+				className={`${
+					checkCurrentPage(1)
+						? "pointer-events-none opacity-40"
+						: "pointer-events-auto opacity-100"
+				} bi bi-chevron-double-left inline-flex justify-center items-center text-2xl cursor-pointer hover:scale-125 p-1 transition-all duration-200`}
+			></i>
+			<i
+				onClick={() => onClick(Math.max(1, currentPage - 1))}
+				className={`${
+					checkCurrentPage(1)
+						? "pointer-events-none opacity-40"
+						: "pointer-events-auto opacity-100"
+				} bi bi-chevron-left inline-flex justify-center items-center text-2xl cursor-pointer hover:scale-125 p-1 transition-all duration-200 mr-2`}
+			></i>
 
-			{getArrayWithRange(5, currentPage, pageAmount).map((pageNum) => (
+			{getArrayWithRangeWithMid(5, currentPage, pageAmount).map((pageNum) => (
 				<button
-					key={pageNum}
-					className={` px-3 py-1 cursor-pointer hover:bg-(--light-brown-color) transition-all duration-200 rounded-full ${
-						getCurrentPageDisplay(pageNum) ? "bg-(--light-brown-color)" : null
+					key={`${id}${pageNum}`}
+					className={`px-3 py-1 cursor-pointer hover:bg-(--light-brown-color) transition-all duration-200 rounded-full ${
+						checkCurrentPage(pageNum) ? "bg-(--light-brown-color)" : null
 					}`}
 					onClick={() => onClick(pageNum)}
 				>
@@ -34,16 +43,24 @@ const Pagination = ({ pageAmount, currentPage, onClick }) => {
 				</button>
 			))}
 
-					<i
-						onClick={() => onClick(Math.min(pageAmount, currentPage + 1))}
-						className="bi bi-chevron-right inline-flex justify-center items-center text-2xl cursor-pointer hover:scale-125 p-1 transition-all duration-200 ml-2"
-					></i>
-					<i
-						onClick={() => onClick(pageAmount)}
-						className="bi bi-chevron-double-right inline-flex justify-center items-center text-2xl cursor-pointer hover:scale-125 p-1 transition-all duration-200"
-					></i>
+			<i
+				onClick={() => onClick(Math.min(pageAmount, currentPage + 1))}
+				className={`${
+					checkCurrentPage(pageAmount)
+						? "pointer-events-none opacity-40"
+						: "pointer-events-auto opacity-100"
+				} bi bi-chevron-right inline-flex justify-center items-center text-2xl cursor-pointer hover:scale-125 p-1 transition-all duration-200 ml-2`}
+			></i>
+			<i
+				onClick={() => onClick(pageAmount)}
+				className={`${
+					checkCurrentPage(pageAmount)
+						? "pointer-events-none opacity-40"
+						: "pointer-events-auto opacity-100"
+				} bi bi-chevron-double-right inline-flex justify-center items-center text-2xl cursor-pointer hover:scale-125 p-1 transition-all duration-200`}
+			></i>
 		</div>
 	);
 };
 
-export default Pagination;
+export default memo(Pagination);
