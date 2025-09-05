@@ -1,0 +1,48 @@
+.custom-checkbox-container {
+    /* Style for the whole container */
+    cursor: pointer;
+    user-select: none;
+}
+
+.custom-checkbox-container input[type="checkbox"] {
+    /* Hide the default checkbox */
+    position: absolute;
+    opacity: 0;
+}
+
+.custom-checkbox {
+    /* Style for our custom checkbox */
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #333;
+    background-color: #fff;
+    position: relative;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+
+.custom-checkbox-container input[type="checkbox"]:checked + .custom-checkbox {
+    /* Change background color when checked */
+    background-color: #333;
+    border-color: #333;
+}
+
+.custom-checkbox::before {
+    /* Create the diagonal line using a pseudo-element */
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 15px;
+    height: 2px;
+    background-color: #fff;
+    transform: translate(-50%, -50%) rotate(45deg) scale(0);
+    transform-origin: center;
+    transition: transform 0.2s ease-in-out;
+}
+
+.custom-checkbox-container input[type="checkbox"]:checked + .custom-checkbox::before {
+    /* Animate the diagonal line when checked */
+    transform: translate(-50%, -50%) rotate(45deg) scale(1);
+}
