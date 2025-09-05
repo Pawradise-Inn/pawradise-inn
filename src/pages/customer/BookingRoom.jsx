@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import RoomCard from "../../components/room/RoomCard";
 import testImg from "../../assets/test.png"; // to be replaced by API data. don't forget to delete.
-import ServiceBookingPopup from "../../components/BookingPopup";
+import BookingPopup from "../../components/BookingPopup";
 import { getWarningTextForDateValidation } from "../../utils/HandleValidation";
 import { handleFormDataChange } from "../../utils/HandleForm";
 
@@ -76,8 +76,8 @@ const BookingRoom = () => {
 			pageAmount: 100,
 		}, // to be replaced by API data. don't forget to delete.
 	];
+	
 	const [room, setRoom] = useState(demoData);
-	const [noResult, setNoResult] = useState(false);
 	const [formData, setFormData] = useState({
 		entryDate: " ",
 		exitDate: "z",
@@ -102,26 +102,26 @@ const BookingRoom = () => {
 	});
 
 	// check if there is no result after filtering
-	useEffect(() => {
+	const noResult = useMemo(() => {
 		if (
 			getWarningTextForDateValidation(formData.entryDate, formData.exitDate) !==
 			""
 		) {
-			setNoResult(true);
+			return true;
 		} else {
 			if (room.length === 0) {
-				setNoResult(true);
+				return true;
 			} else {
-				setNoResult(false);
+				return false;
 			}
 		}
-	}, [formData]);
+	}, [formData, room]);
 
 	// handle popup data and status
-	const handlePopUpData = (data, status) => {
+	const handlePopUpData = useCallback((data, status) => {
 		setPopUpStatus(status);
 		setPopUpData(data);
-	};
+	}, []);
 
 	return (
 		<div className="w-full max-w-6xl mx-auto py-12">
@@ -182,7 +182,7 @@ const BookingRoom = () => {
 							<RoomCard
 								key={idx}
 								data={data}
-								onClick={() => handlePopUpData(data, true)}
+								onClick={handlePopUpData}
 							/>
 						);
 					})}
@@ -190,10 +190,10 @@ const BookingRoom = () => {
 			)}
 
 			{
-				<ServiceBookingPopup
+				<BookingPopup
 					status={popUpStatus}
 					data={popUpData}
-					onClick={() => handlePopUpData([], false)}
+					onClick={handlePopUpData}
 				/>
 			}
 		</div>

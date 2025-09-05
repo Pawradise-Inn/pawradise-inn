@@ -17,7 +17,7 @@ const ServiceEdit = () => (
     {/* Use your ServiceCard component */}
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4">
       {mockServices.map((s) => (
-        <ServiceCard key={s.id} name={s.name} rating={s.rating} />
+        <ServiceCard key={s.id} data={{"name" : s.name, "review" : s.rating}} />
       ))}
     </div>
 

@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 // data: data to be shown in popup
 // onClick: function to close popup
 
-const ServiceBookingPopup = ({ status, data, onClick }) => {
+const BookingPopup = ({ status, data, onClick }) => {
 	const popupRef = useRef(null);
 
 	// Show/hide popup based on status prop
@@ -34,7 +34,7 @@ const ServiceBookingPopup = ({ status, data, onClick }) => {
 				/>
 				<BookingBar data={data} />
 				<i
-					onClick={onClick}
+					onClick={() => onClick([], false)}
 					className="bi bi-x-lg flex justify-center items-center absolute top-0 right-0 -translate-x-1/2 translate-y-1/2 text-3xl cursor-pointer transition-all duration-200 hover:scale-125"
 				></i>
 			</div>
@@ -42,4 +42,4 @@ const ServiceBookingPopup = ({ status, data, onClick }) => {
 	);
 };
 
-export default ServiceBookingPopup;
+export default BookingPopup;

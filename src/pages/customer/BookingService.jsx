@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ServiceCard from "../../components/service/ServiceCard";
 import testImg from "../../assets/test.png"; // to be replaced by API data. don't forget to delete.
-import ServiceBookingPopup from "../../components/BookingPopup";
+import BookingPopup from "../../components/BookingPopup";
 import { filteredObjectByType } from "../../utils/HandleSearch";
 
 const BookingService = () => {
@@ -48,12 +48,10 @@ const BookingService = () => {
 	}, [filter]);
 
 	// handle popup data and status
-	const handlePopUpData = (data, status) => {
+	const handlePopUpData = useCallback((data, status) => {
 		setPopUpStatus(status);
 		setPopUpData(data);
-	}
-
-	
+	}, []);
 
 	return (
 		<div className="w-full max-w-6xl mx-auto py-12">
@@ -77,20 +75,18 @@ const BookingService = () => {
 						return (
 							<ServiceCard
 								key={idx}
-								img={data.image}
-								name={data.name}
-								review={data.review}
-								onClick={() => handlePopUpData(data, true)}
+								data = {data}
+								onClick={handlePopUpData}
 							/>
 						);
 					})}
 				</div>
 			)}
 
-			<ServiceBookingPopup
+			<BookingPopup
 				status={popUpStatus}
 				data={popUpData}
-				onClick={() => handlePopUpData([], false)}
+				onClick={handlePopUpData}
 			/>
 		</div>
 	);
