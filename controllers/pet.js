@@ -104,7 +104,7 @@ exports.deletePet = async (req, res) => {
         if (!pet) {
             return res.status(404).json({success: false, error: 'Pet not found'});
         }
-        res.status(200).json({success: true, data: pet});
+        res.status(200).json({success: true, data: {}});
     } catch(err) {
         res.status(400).json({success: false, error: err.message});
     }

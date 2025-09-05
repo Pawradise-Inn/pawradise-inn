@@ -8,6 +8,7 @@ const { PrismaClient } = require("./generated/prisma/client");
 const auth = require('./routes/auth');
 const booking = require('./routes/booking');
 const pet = require('./routes/pet');
+const staff = require('./routes/staff');
 
 // Load env vars (change path if you use a different filename)
 dotenv.config({ path: './config/config.env.local' });
@@ -22,6 +23,7 @@ app.use(cookieParser());
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/booking', booking);
 app.use('/api/v1/pet', pet);
+app.use('/api/v1/staff', staff);
 
 const PORT = process.env.PORT || 5000;
 
