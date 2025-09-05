@@ -1,10 +1,5 @@
 import { useState } from "react"
 import { NavLink } from "react-router-dom";
-import '../../styles/custom-checkbox-container.css'
-
-const filterButton = ({}) => {
-
-}
 
 const Pet_card = ({pet}) => {
     return (
