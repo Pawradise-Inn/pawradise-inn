@@ -3,6 +3,8 @@ import Navbar from "./components/Navbar";
 import Profile from "./pages/customer/Profile";
 import BookingRoom from "./pages/customer/BookingRoom";
 import BookingService from "./pages/customer/BookingService";
+import Registration from "./pages/customer/Registration";
+
 
 import StaffNavbar from "./components/StaffNavbar";
 import Footer from "./components/Footer";
@@ -20,12 +22,13 @@ const App = () => {
 
     // Check if the current path starts with "/staff"
     const isStaffPath = location.pathname.startsWith("/staff");
+    const isRegistrationPath = location.pathname === "/register";
 
     return (
         <div>
             {/* Conditionally render Navbar or StaffNavbar */}
-            {isStaffPath ? <StaffNavbar /> : <Navbar />}
-            
+            {/* {isStaffPath ? <StaffNavbar /> : <Navbar />} */}
+            {isRegistrationPath ? null : isStaffPath ? <StaffNavbar /> : <Navbar /> }
             <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<div>Home Page</div>} />
@@ -40,6 +43,7 @@ const App = () => {
                     <Route path="pet/:id" element={<PetOverall />} />
                     <Route path="pet/new" element={<NewPet />} />
                 </Route>
+                <Route path="/register" element={<Registration />} />
 
                 {/* Staff Routes */}
                 <Route path="/staff" element={<div>Staff log in</div>} />
