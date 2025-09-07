@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
-import ServiceCard from "../ServiceCard";
+import ServiceCard from "../service/ServiceCard";
 import AddServicePopup from "./add_service";
 
 const mockServices = Array.from({ length: 9 }).map((_, i) => ({
