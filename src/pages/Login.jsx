@@ -20,9 +20,6 @@ const Login = ()=>{
     };
     const handleSubmit = (e) => {
         e.preventDefault();
-        
-        // Add your form submission logic here
-        alert("Login Successful");
         navigate("/room");
     };
     
