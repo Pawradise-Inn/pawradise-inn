@@ -56,6 +56,7 @@ const App = () => {
                     <Route index element={<ServiceEdit />} />
                     <Route path="profile" element={<Profile_comp />} />
                     <Route path="payment" element={<div>Manage Payment Page</div>} />
+                    <Route path="room" element={<div>Manage Room Page</div>} />
                 </Route>
             </Routes>
         </div>

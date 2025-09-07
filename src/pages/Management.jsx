@@ -18,6 +18,18 @@ const Management = () => {
         </NavLink>
 
         <NavLink
+          to="/staff/management/room"
+          className={({ isActive }) =>
+            `px-4 py-4 rounded transition-all duration-300 ease-in-out ${
+              isActive ? "bg-[var(--dark-brown-color)] font-bold !text-white" : ""
+            }`
+          }
+          end
+        >
+          Room
+        </NavLink>
+
+        <NavLink
           to="/staff/management/payment"
           className={({ isActive }) =>
             `px-4 py-4 rounded transition-all duration-300 ease-in-out ${
