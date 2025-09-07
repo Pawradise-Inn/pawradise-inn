@@ -9,7 +9,7 @@ const PetInput = ({data, setData, name}) => {
                 type="text"
                 value={data}
                 onChange={(e) => setData(e.target.value)}
-                className='w-full px-6 py-4 rounded-lg border-2 transition-all duration-300 border-gray-200 bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
+                className='w-full shadow-md px-6 py-4 rounded-lg border-2 transition-all duration-300 border-[var(--dark-brown-color)] bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300'
             />
         </div>
     )
@@ -89,7 +89,7 @@ const NewPet = () => {
 
                     {/* Buttons - Right aligned within the input section */}
                     <div className="flex justify-end mt-8 pt-6 border-t border-gray-200 space-x-4">
-                        <button onClick={handleCancel} className="bg-[#d2bba0] px-6 py-2 rounded hover:bg-[#bda890] transition-colors duration-300 cursor-pointer">
+                        <button onClick={handleCancel} className=" px-6 py-2 rounded hover:bg-gray-100 transition-colors duration-300 cursor-pointer">
                             Cancel
                         </button>
                         <button onClick={() => console.log("Save changes")} className="!text-white px-6 py-2 bg-amber-800 text-white rounded hover:bg-amber-700 transition-colors duration-300 cursor-pointer">    
