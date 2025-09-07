@@ -23,7 +23,7 @@ const App = () => {
     // Check if the current path starts with "/staff"
     const isStaffPath = location.pathname.startsWith("/staff");
     const isRegistrationPath = location.pathname === "/register";
-    const isLogin = location.pathname == "/login";
+    const isLogin = location.pathname === "/login";
 
     return (
         <div>
@@ -45,7 +45,7 @@ const App = () => {
                     <Route path="pet/new" element={<NewPet />} />
                 </Route>
                 <Route path="/register" element={<Registration />} />
-                <Route path='login' element={<Login/>} />
+                <Route path="/login" element={<Login/>} />
 
                 {/* Staff Routes */}
                 <Route path="/staff" element={<div>Staff log in</div>} />

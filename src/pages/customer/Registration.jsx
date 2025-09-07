@@ -14,20 +14,20 @@ const fields = [
 ];
 
 const Registration = () => {
-  const [form, setForm] = useState({
-    Firstname: "",
-    Lastname: "",
-    Username: "",
-    Email: "",
-    Password: "",
-    ConfirmPassword: "",
-    PhoneNumber: "",
-    Address: "",
-  });
-
-  const navigate = useNavigate();
-  const handleChange = createHandleChange(form, setForm);
-  const isFormValid = Object.values(form).every((field) => field.trim() !== "");
+    const [form, setForm] = useState({
+        Firstname: "",
+        Lastname: "",
+        Username: "",
+        Email: "",
+        Password: "",
+        ConfirmPassword: "",
+        PhoneNumber: "",
+        Address: "",
+    });
+    
+    const navigate = useNavigate();
+    const handleChange = createHandleChange(form, setForm);
+    const isFormValid = Object.values(form).every((field) => field.trim() !== "");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -60,8 +60,7 @@ const Registration = () => {
                 name={field.name}
                 placeholder={field.placeholder}
                 value={form[field.name]}
-                onChange={handleChange}
-                required
+                onChange={handleChange} 
               />
             </div>
           ))}
@@ -78,7 +77,7 @@ const Registration = () => {
             <NavLink to="/login">
                 <button 
                 type="button" 
-                className="w-40 h-10 text-[var(--dark-brown-color)] bg-[var(--light-brown-color)] rounded shadow px-4 py-2"
+                className="w-40 h-10 text-[var(--dark-brown-color)] bg-[var(--light-brown-color)] rounded shadow px-4 py-2 transition-colors"
                 >
                 cancel
                 </button>
