@@ -55,7 +55,7 @@ const Registration = () => {
                 {field.label}
               </label>
               <input
-                className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)]"
+                className="border-2 border-[var(--dark-brown-color)] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] shawdow-lg"
                 type={field.type}
                 name={field.name}
                 placeholder={field.placeholder}
@@ -70,7 +70,7 @@ const Registration = () => {
             placeholder="Address"
             value={form.Address}
             onChange={handleChange}
-            className="border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)]"
+            className="border-2 border-[var(--dark-brown-color)] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] shawdow-lg"
             rows="3"
           ></textarea>
           <div className="flex float-right gap-4 p-2 ml-auto">
@@ -85,10 +85,10 @@ const Registration = () => {
             <button
               type="submit"
               disabled={!isFormValid}
-              className={`w-40 h-10 !text-[var(--beige-cream-color)] rounded shadow px-4 py-2 ${
+              className={`w-40 h-10 rounded shadow px-4 py-2 ${
                 isFormValid
-                  ? "bg-[var(--dark-brown-color)]"
-                  : "!text-[var(--beige-cream-color)] bg-[var(--light-brown-color)] cursor-not-allowed"
+                  ? "!text-[var(--beige-cream-color)] bg-[var(--dark-brown-color)]"
+                  : "bg-[var(--light-brown-color)] cursor-not-allowed"
               }`}
             >
               done
