@@ -36,7 +36,7 @@ const Login = ()=>{
 
             </div>
 
-            <div className="bg-[var(--beige-cream-color)] h-full w-[40%] flex flex-col items-center">
+            <div className="bg-[var(--beige-cream-color)] h-full w-[40%] flex flex-col items-center pt-16">
                 <img src={PawLogo} alt="Logo" className="h-48 w-96 object-contain mt-8" />
                 <h1 className="text-[40px] text-[var(--dark-brown-color)] font-bold mt-6">Pawradise In</h1>
                 <form className="flex flex-col space-y-2 p-5 w-full" onSubmit={(e) => handleSubmit(e, form, navigate)}>
@@ -49,7 +49,7 @@ const Login = ()=>{
                             {field.label}
                         </label>
                         <input
-                            className="border-[var(--brown-color)] border-2 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full shadow-lg"
+                            className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full shadow-lg"
                             type={field.type}
                             name={field.name}
                             placeholder={field.placeholder}
@@ -63,15 +63,20 @@ const Login = ()=>{
                     disabled={!isFormValid}
                     className={`w-40 h-10 mt-5 rounded shadow px-4 py-2 mx-auto hover:bg-[var(--brown-color)] transition-colors ${
                         isFormValid
-                        ? "bg-[var(--dark-brown-color)]"
-                        : "text-[var(--beige-cream-color)] bg-[var(--light-brown-color)] cursor-not-allowed"
+                        ? "!text-[var(--beige-cream-color)] bg-[var(--dark-brown-color)]"
+                        : "bg-[var(--light-brown-color)] cursor-not-allowed"
                     }`}
                     >
                     Login
                     </button>
 
-            <hr className="border-t-2 border-[var(--brown-color)] w-3/4 my-4 mx-auto" />
-
+                    <hr className="border-t-2 border-[var(--brown-color)] w-3/4 my-4 mx-auto" />
+                    <p className="text-[var(--brown-color)] font-medium text-center">Don't have an account?
+                         <a href="/register" className="ml-3 !text-red-700 font-semibold text-center hover:underline">
+                         Register here
+                    </a>
+                    </p>
+                
             </form>
             </div>
         </div>
