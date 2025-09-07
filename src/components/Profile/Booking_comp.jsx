@@ -1,4 +1,5 @@
 import { useState } from "react"
+import SuccessMessage from "./SuccessMessage";
 
 const Booking_comp = () => {
     const [my_booking, setMyBooking] = useState([
@@ -9,6 +10,8 @@ const Booking_comp = () => {
 
     const [showModal, setShowModal] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [cancelledBooking, setCanceledBooking] = useState(null);
 
     const handleCancelClick = (book) => {
       setSelectedBooking(book);
@@ -16,14 +19,24 @@ const Booking_comp = () => {
     }
 
     const handleConfirmCancel = () => {
+      setCanceledBooking(selectedBooking)
       setMyBooking(my_booking.filter(book => book.id !== selectedBooking.id));
       setShowModal(false);
       setSelectedBooking(null);
+      setShowSuccessMessage(true);
+
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 3000);
     }
 
     const handleCloseModal = () => {
       setShowModal(false);
       setSelectedBooking(null);
+    }
+
+    const handleCloseSuccessMessage = () => {
+      setShowSuccessMessage(false);
     }
 
     return(
@@ -36,6 +49,12 @@ const Booking_comp = () => {
           {showModal && (
             <CancelModal booking={selectedBooking} onConfirm={handleConfirmCancel} onCancel={handleCloseModal} />
           )}
+
+          <SuccessMessage 
+            show = {showSuccessMessage}
+            booking = {cancelledBooking}
+            onClose = {handleCloseSuccessMessage}
+          />
         </div>
     )
 }
@@ -78,19 +97,19 @@ const CancelModal = ({ booking, onConfirm, onCancel }) => {
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100">
                     {/* Modal Header */}
-                    <div className="bg-[var(--brown-color)] text-white p-6 rounded-t-2xl">
+                    <div className="bg-[var(--brown-color)] p-6 rounded-t-2xl">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold flex items-center">
+                            <h2 className="text-2xl font-bold flex items-center !text-[var(--cream-color)]">
                                 <span className="mr-3 text-3xl">⚠️</span>
                                 Cancel Booking
                             </h2>
-                            <button 
-                                onClick={onCancel}
-                                className="text-white hover:text-gray-200 transition-colors duration-200"
+                            <button
+                              onClick={onCancel}
+                              className="!text-white hover:!text-gray-300 transition-colors duration-200"
                             >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
                             </button>
                         </div>
                     </div>
@@ -118,7 +137,7 @@ const CancelModal = ({ booking, onConfirm, onCancel }) => {
                                 </div>
                             </div>
                             
-                            <p className="text-amber-600 text-sm mt-4 flex items-center">
+                            <p className="!text-amber-600 text-sm mt-4 flex items-center">
                                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                 </svg>
