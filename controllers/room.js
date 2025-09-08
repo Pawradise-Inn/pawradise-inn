@@ -45,7 +45,7 @@ const updateRoom = async (req, res) => {
         if (req.body.price !== undefined) dataToUpdate.price = req.body.price;
         if (req.body.petType !== undefined) dataToUpdate.petType = req.body.petType;
 
-        if (Object.keys(dataToUpdate).length === 0) return res.status(400).json({ success: false, msg: "No valid fields to update" });
+        if (Object.keys(dataToUpdate).length === 0) return res.status(400).json({ success: false, msg: "No valid fields to update"});
         
         const room = await prisma.room.update({
             where: {id: Number(roomId)},
@@ -79,19 +79,19 @@ const addPicturesToRoom = async (req, res) =>{
         res.status(200).json({success: true, data: room});
     }catch(err){
         if (err.code === 'P2025') return res.status(404).json({success: false, msg: 'Room is not found'});
-        res.status(400).json({success: false, error: err.message})
+        res.status(400).json({success: false, error: err.message});
     }
 };
 
 const deletePicturesFromRoom = async (req, res) =>{
-    const roomId = req.params.id;
-    const pictures = req.body.picture;
     try {
+        const roomId = req.params.id;
+        const pictures = req.body.picture;
         const room = await removeRoomPictures(roomId, pictures);
         res.status(200).json({success: true, data: room});
     }catch(err){
         if (err.code === 'P2025') return res.status(404).json({success: false, msg: 'Room is not found'});
-        res.status(400).json({success: false, error: err.message})
+        res.status(400).json({success: false, error: err.message});
     }
 };
 
