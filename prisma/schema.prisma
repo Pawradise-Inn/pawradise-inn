@@ -81,7 +81,7 @@ model Pet{
   breed           String    @db.VarChar(30)
   disease         String[]  @db.VarChar(30)
   allergic        String[]  @db.VarChar(30)
-  picture         Bytes     @db.ByteA
+  picture         String    
 
   scheduled       BookedService[]
   stayed          BookedRoom[]
@@ -94,7 +94,7 @@ model Room{
   id              Int       @id @default(autoincrement())
   capacity        Int       @default(1) @db.Integer
   price           Float     @default(2000.00) @db.DoublePrecision
-  picture         Bytes[]   @db.ByteA
+  picture         String[]  
   petType         PetType   @default(DOG)
 
   bookings        BookedRoom[]
@@ -103,8 +103,8 @@ model Room{
 
 model BookedRoom{
   id              Int       @id @default(autoincrement())
-  startTime       DateTime  @db.Timestamptz(0)
-  endTime         DateTime  @db.Timestamptz(0)
+  checkIn         DateTime  @db.Timestamptz(0)
+  checkOut        DateTime  @db.Timestamptz(0)
 
   roomId          Int
   room            Room      @relation(fields: [roomId], references: [id])
@@ -119,7 +119,7 @@ model Service{
   name            String    @db.VarChar(30)
   price           Float     @default(500.00) @db.DoublePrecision
   petType         PetType[] 
-  picture         Bytes     @db.ByteA
+  picture         String    
 
   reviewId        Int?
   reviews         ChatLog[]
