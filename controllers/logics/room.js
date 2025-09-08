@@ -40,8 +40,15 @@ const removeRoomPictures = async(id, pictures)=>{
     return updatedRoom;
 };
 
+const getRoomCap = async(id)=>{
+    const room = await findRoomById(id);
+
+    return room.capacity;
+}
+
 module.exports = {
     findRoomById,
     addRoomPictures,
-    removeRoomPictures
+    removeRoomPictures,
+    getRoomCap
 };

@@ -1,4 +1,6 @@
 const prisma = require('../prisma/prisma');
+const {findBookedRoomById, overlappingCount} = require('./logics/bookedRoom');
+const {getRoomCap} = require('./logics/room');
 
 const getBookedRooms = async (req, res) => {
     try {
@@ -11,10 +13,9 @@ const getBookedRooms = async (req, res) => {
 
 const getBookedRoom = async (req, res) => {
     try {
-        const bookedRoom = await prisma.bookedRoom.findUnique({
-            where: {id: Number(req.params.id)}
-        });
-        if(!bookedRoom) res.status(404).json({success: false, msg: 'Booked Room not found'});
+        const bookedRoomId = req.params.id;
+        const bookedRoom = await findBookedRoomById(bookedRoomId);
+        if(!bookedRoom) res.status(404).json({success: false, msg: 'Booked room is not found'});
         res.status(200).json({success:true, data: bookedRoom});
     } catch (err){
         res.status(400).json({success: false, error: err.message});
@@ -23,13 +24,20 @@ const getBookedRoom = async (req, res) => {
 
 const createBookedRoom = async (req, res) => {
     try {
+        const {roomId, petId, bookingId, checkIn, checkOut} = req.body;
+
+        const count = await overlappingCount(roomId, checkIn, checkOut)
+        const cap = await getRoomCap(roomId);
+        if (count >= cap){
+            res.status(400).json({success: false, msg: 'Room is not available'});
+        }
         const bookedRoom = await prisma.bookedRoom.create({
             data: {
-                bookingId: req.body.bookingId,
-                roomId: req.body.roomId,
-                petId: req.body.petId,
-                checkIn: req.body.checkIn,
-                checkOut: req.body.checkOut
+                roomId: roomId,
+                petId: petId,
+                bookingId: bookingId,
+                checkIn: new Date(checkIn),
+                checkOut: new Date(checkOut)
             }
         });
         res.status(201).json({success: true, data: bookedRoom});
@@ -40,23 +48,41 @@ const createBookedRoom = async (req, res) => {
 
 const updateBookedRoom = async (req, res) => {
     try {
-        const bookedRoom = await prisma.bookedRoom.update({
-            where: {id: Number(req.params.id)},
-            data: req.body
+        const bookedId = Number(req.params.id);
+        const {checkIn, checkOut} = req.body;
+        const bookedRoom = await findBookedRoomById(bookedId);
+        if(!checkIn, !checkOut){
+            return res.status(400).json({success: false, msg: "Nothing to update"});
+        }
+
+        const count = await overlappingCount(bookedRoom.roomId, checkIn, checkOut);
+        const cap = await getRoomCap(roomId);
+        if (count >= cap){
+            res.status(400).json({success: false, msg: 'Room is not available'});
+        }
+
+        const updateBookedRoom = await prisma.bookedRoom.update({
+            where: {id: bookedId},
+            data: {
+                checkIn: checkIn,
+                checkOut: checkOut
+            }
         });
-        res.status(200).json({success: true, data: bookedRoom});
-    } catch (err){
+        res.status(200).json({success: true, data: updateBookedRoom});
+    }catch(err){
         res.status(400).json({success: false, error: err.message});
     }
 };
 
 const deleteBookedRoom = async (req, res) => {
     try {
+        const bookedRoomId = req.params.id;
         const bookedRoom = await prisma.bookedRoom.delete({
-            where: {id: Number(req.params.id)}
+            where: {id: Number(bookedRoomId)}
         });
         res.status(200).json({success: true, data: {}});
     } catch (err){
+        if (err.code === 'P2025') return res.status(404).json({success: false, msg: 'Booked room is not found or already deleted'});
         res.status(400).json({success: false, error: err.message})
     }
 };
