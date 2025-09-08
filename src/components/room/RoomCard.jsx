@@ -1,5 +1,7 @@
 // data = {// data: { image, roomId, review, forwhich, price, size, maxsize } of room
 
+import { memo } from "react";
+
 const RoomCard = ({ data, onClick }) => {
 
 	return (
@@ -27,7 +29,7 @@ const RoomCard = ({ data, onClick }) => {
 							{data.review} / 5.0{" "}
 							<i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
 						</p>
-						<button onClick={onClick} className="py-2 px-8 bg-(--dark-brown-color) rounded !text-white font-bold hover:shadow-lg hover:scale-105 hover:bg-(--brown-color) cursor-pointer transition-all duration-200">
+						<button onClick={() => onClick(data, true)} className="py-2 px-8 bg-(--dark-brown-color) rounded !text-white font-bold hover:shadow-lg hover:scale-105 hover:bg-(--brown-color) cursor-pointer transition-all duration-200">
 							BOOK
 						</button>
 					</div>
@@ -37,4 +39,4 @@ const RoomCard = ({ data, onClick }) => {
 	);
 };
 
-export default RoomCard;
+export default memo(RoomCard);

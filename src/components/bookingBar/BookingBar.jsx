@@ -1,8 +1,10 @@
 import CommentCard from "./CommentCard";
 import "../../styles/bookingBarStyle.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import CommentStarSelector from "./CommentStarSelector";
 import Pagination from "./Pagination";
+import { getWarningTextForDateValidation } from "../../utils/HandleValidation";
+import { handleFormDataChange } from "../../utils/HandleForm";
 
 // data: { image, name, review, forwhich, price, size, maxsize, headerType } of service and room
 
@@ -38,37 +40,55 @@ const BookingBar = ({ data }) => {
 	const demoPet = [{ name: "pet1" }, { name: "pet2" }]; // will be replaced by real data later
 
 	const [commentStarSelect, setCommentStarSelect] = useState(6);
-	const [currentPage, setCurrentPage] = useState(1);
-	const [pageAmount, setPageAmount] = useState(10);
+	const [currentPage, setCurrentPage] = useState(data.currentPage);
 	const [comments, setComments] = useState(demoData);
 	const [status, setStatus] = useState("--");
 	const [petData, setPetData] = useState(demoPet);
 	const [formData, setFormData] = useState({
-		entryDate: "",
-		exitDate: "",
-		enterTime: "",
-		exitTime: "",
+		entryDate: " ",
+		exitDate: "z",
+		entryTime: "13:00",
+		exitTime: "10:00",
 	});
 
-	// handle comment star change
-	const handleCommentStarChange = (star) => {
+	//  status using for display error when meet constraint
+	const validDateStatus = useMemo(() => {
+		if (
+			getWarningTextForDateValidation(formData.entryDate, formData.exitDate) !==
+			""
+		) {
+			return false;
+		} else {
+			return true;
+		}
+	}, [formData]);
+
+	const handleCommentStarSelect = useCallback((star) => {
 		setCommentStarSelect(star);
-	};
-
-	// handle pageNum change
-	const handlePageChange = (page) => {
-		setCurrentPage(page);
-	};
-
-	// handle form data change
-	const handleFormDataChange = (e) => {
-		const { name, value } = e.target;
-		setFormData((prevData) => ({ ...prevData, [name]: value }));
-	};
+	}, []);
 
 	// handle form submit and check availability and validation
 	const handleFormSubmit = (e) => {
 		e.preventDefault();
+		let entryDataWithTime;
+		let exitDataWithTime;
+
+		if (data.headerType === "Service") {
+			entryDataWithTime = new Date(
+				`${formData.entryDate}T${formData.entryTime}`
+			);
+		} else {
+			if (validDateStatus) {
+				entryDataWithTime = new Date(
+					`${formData.entryDate}T${formData.entryTime}`
+				);
+				exitDataWithTime = new Date(
+					`${formData.exitDate}T${formData.exitTime}`
+				);
+			}
+		}
+
+		console.log("Entry =", entryDataWithTime, "Exit =", exitDataWithTime);
 		// fetch new data from backend API here and validate form data
 		// fetch new data from backend API here and validate form data
 		// fetch new data from backend API here and validate form data
@@ -97,16 +117,6 @@ const BookingBar = ({ data }) => {
 		// fetch new data from backend API here
 	};
 
-	//  fetch pageAmount when starting web page
-	useEffect(() => {
-		// fetch new data from backend API here
-		// fetch new data from backend API here
-		// fetch new data from backend API here
-		// fetch new data from backend API here
-		// fetch new data from backend API here
-		// fetch new data from backend API here
-	}, []);
-
 	// fetch new comment data when currentPage change
 	useEffect(() => {
 		// fetch new data from backend API here
@@ -116,6 +126,13 @@ const BookingBar = ({ data }) => {
 		// fetch new data from backend API here
 		// fetch new data from backend API here
 	}, [currentPage]);
+
+	useEffect(() => {}, [formData]);
+
+	// reset currentPage to 1 when this bookingBar data is change(reopen)
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [data]);
 
 	return (
 		<div className="w-1/2 bg-white rounded-3xl p-8 border-2 border-(--brown-color) ">
@@ -134,6 +151,7 @@ const BookingBar = ({ data }) => {
 				</div>
 			</section>
 			<hr />
+			{/* header dataial section */}
 
 			{/* booking detail section */}
 			<section className="py-5 px-4">
@@ -161,36 +179,56 @@ const BookingBar = ({ data }) => {
 						<input
 							required
 							type="date"
-							className="relative w-1/2 rounded-2xl px-4 py-2 text-3xl outline-0 cursor-pointer"
-							onChange={handleFormDataChange}
+							className="relative w-1/2 rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
+							onChange={(e) => handleFormDataChange(e, setFormData)}
 							name="entryDate"
 						/>
 						<i className="bi bi-caret-down-fill absolute top-1/2 right-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
 						{data.headerType === "Service" ? (
 							<>
-								<input
-									required
-									type="time"
-									className="relative w-1/2 rounded-2xl px-4 py-2 text-3xl outline-0 cursor-pointer"
-									onChange={handleFormDataChange}
-									name="exitDate"
-								/>
+								<select
+									className="relative w-1/2 rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer appearance-none"
+									name="entryTime"
+									onChange={(e) => handleFormDataChange(e, setFormData)}
+								>
+									<option value={"08:00"}>08 : 00</option>
+									<option value={"10:00"}>10 : 00</option>
+									<option value={"12:00"}>12 : 00</option>
+									<option value={"14:00"}>14 : 00</option>
+									<option value={"16:00"}>16 : 00</option>
+								</select>
 							</>
 						) : (
 							<>
 								<input
 									required
 									type="date"
-									className="relative w-1/2 rounded-2xl px-4 py-2 text-3xl outline-0 cursor-pointer"
-									onChange={handleFormDataChange}
+									className="relative w-1/2 rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
+									onChange={(e) => handleFormDataChange(e, setFormData)}
 									name="exitDate"
 								/>
 							</>
 						)}
 						<i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
 					</div>
+					{/* booking detail section */}
 
-					<button className="block w-full bg-(--dark-brown-color) rounded !text-white text-center py-1  text-3xl mt-10 mb-4 cursor-pointer hover:bg-(--brown-color) transition-all duration-200">
+					{/* validation for booking */}
+					<span className="text-center block w-full mt-8">
+						<i className="!text-(--warning-color)">
+							{getWarningTextForDateValidation(
+								formData.entryDate,
+								formData.exitDate
+							)}
+						</i>
+					</span>
+					{/* validation for booking */}
+
+					<button
+						className={`${
+							validDateStatus ? "mt-13" : "mt-2"
+						} block w-full bg-(--dark-brown-color) rounded !text-white text-center py-1 text-3xl mb-4 cursor-pointer hover:bg-(--brown-color) transition-all duration-200`}
+					>
 						BOOK
 					</button>
 				</form>
@@ -216,41 +254,21 @@ const BookingBar = ({ data }) => {
 					<i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
 				</b>
 				<div className="my-5 grid grid-cols-5 gap-2 bg-(--light-brown-color)  p-2">
-					<CommentStarSelector
-						star={6}
-						commentStarSelect={commentStarSelect}
-						onClick={() => handleCommentStarChange(6)}
-					/>
-					<CommentStarSelector
-						star={5}
-						commentStarSelect={commentStarSelect}
-						onClick={() => handleCommentStarChange(5)}
-					/>
-					<CommentStarSelector
-						star={4}
-						commentStarSelect={commentStarSelect}
-						onClick={() => handleCommentStarChange(4)}
-					/>
-					<CommentStarSelector
-						star={3}
-						commentStarSelect={commentStarSelect}
-						onClick={() => handleCommentStarChange(3)}
-					/>
-					<CommentStarSelector
-						star={2}
-						commentStarSelect={commentStarSelect}
-						onClick={() => handleCommentStarChange(2)}
-					/>
-					<CommentStarSelector
-						star={1}
-						commentStarSelect={commentStarSelect}
-						onClick={() => handleCommentStarChange(1)}
-					/>
-					<CommentStarSelector
-						star={0}
-						commentStarSelect={commentStarSelect}
-						onClick={() => handleCommentStarChange(0)}
-					/>
+					{[6, 5, 4, 3, 2, 1, 0].map((star) => {
+						return (
+							<CommentStarSelector
+								style ={`${
+									commentStarSelect === star
+										? "bg-(--cream-color) outline-2"
+										: "bg-white"
+								}`}
+								key={star}
+								star={star}
+								// commentStarSelect={commentStarSelect}
+								onClick={handleCommentStarSelect}
+							/>
+						);
+					})}
 				</div>
 				<div className="my-5 flex gap-3 flex-col">
 					{comments.map((data, index) => {
@@ -266,11 +284,13 @@ const BookingBar = ({ data }) => {
 				</div>
 
 				<Pagination
-					pageAmount={pageAmount}
+					id={data.headerType == "Service" ? data.name : data.roomId}
+					pageAmount={data.pageAmount}
 					currentPage={currentPage}
-					onClick={handlePageChange}
+					onClick={setCurrentPage}
 				/>
 			</section>
+			{/* comment section */}
 		</div>
 	);
 };
