@@ -14,6 +14,7 @@ import NewPet from "./components/Profile/NewPet";
 import Management from "./pages/Management";
 import ServiceEdit from "./components/Management/Service_edit";
 import PetStatus from "./pages/staff/PetStatus";
+import PetUpdate from "./pages/staff/PetUpdate";
 
 const App = () => {
     const location = useLocation();
@@ -45,6 +46,7 @@ const App = () => {
                 <Route path="/staff" element={<div>Staff log in</div>} />
                 <Route path="/staff/dashboard" element={<div>Dashboard Page</div>} />
                 <Route path="/staff/pet" element={<PetStatus />} />
+                <Route path="/staff/pet/:id" element={<PetUpdate />} />
                 <Route path="/staff/review" element={<div>Staff Review Page</div>} />
                 <Route path="/staff/management" element={<Management />}>
                     <Route index element={<ServiceEdit />} />
