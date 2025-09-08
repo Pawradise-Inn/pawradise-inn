@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ServiceCard from "../../components/service/ServiceCard";
 import testImg from "../../assets/test.png"; // to be replaced by API data. don't forget to delete.
-import ServiceBookingPopup from "../../components/BookingPopup";
+import BookingPopup from "../../components/BookingPopup";
+import { filteredObjectByType } from "../../utils/HandleSearch";
 
 const BookingService = () => {
 	const demoData = [
 		// to be replaced by API data. don't forget to delete.
-		{image: testImg, name: "Boarding", review: 4.5, forwhich: "small", price: 2000 }, // to be replaced by API data. don't forget to delete.
-		{image: testImg, name: "Grooming", review: 4.0, forwhich: "big", price: 1500 }, // to be replaced by API data. don't forget to delete.
-		{image: testImg, name: "Training", review: 4.8, forwhich: "small", price: 3000 }, // to be replaced by API data. don't forget to delete.
-		{image: testImg, name: "Walking", review: 4.2, forwhich: "big", price: 500 }, // to be replaced by API data. don't forget to delete.
-		{image: testImg, name: "Vet Visit", review: 4.7, forwhich: "small", price: 2500 }, // to be replaced by API data. don't forget to delete.
-		{image: testImg, name: "Daycare", review: 4.3, forwhich: "big", price: 1800 }, // to be replaced by API data. don't forget to delete.
+		{image: testImg, name: "Boarding", review: 4.5, forwhich: "small", price: 2000, pageAmount : 3 }, // to be replaced by API data. don't forget to delete.
+		{image: testImg, name: "Grooming", review: 4.0, forwhich: "big", price: 1500, pageAmount : 4 }, // to be replaced by API data. don't forget to delete.
+		{image: testImg, name: "Training", review: 4.8, forwhich: "small", price: 3000, pageAmount : 5 }, // to be replaced by API data. don't forget to delete.
+		{image: testImg, name: "Walking", review: 4.2, forwhich: "big", price: 500, pageAmount : 13 }, // to be replaced by API data. don't forget to delete.
+		{image: testImg, name: "Vet Visit", review: 4.7, forwhich: "small", price: 2500, pageAmount : 13 }, // to be replaced by API data. don't forget to delete.
+		{image: testImg, name: "Daycare", review: 4.3, forwhich: "big", price: 1800, pageAmount : 1 }, // to be replaced by API data. don't forget to delete.
 	]; // to be replaced by API data. don't forget to delete.
 
 	const [service, setService] = useState(demoData);
@@ -19,6 +20,8 @@ const BookingService = () => {
 	const [noResult, setNoResult] = useState(false);
 	const [popUpStatus, setPopUpStatus] = useState(false);
 	const [popUpData, setPopUpData] = useState([]);
+
+	const filterService = filteredObjectByType(service, filter, "name");
 
 	// fetch service data from backend and setService
 	useEffect(() => {
@@ -37,7 +40,7 @@ const BookingService = () => {
 
 	// check if there is no result after filtering
 	useEffect(() => {
-		if (filterService().length === 0) {
+		if (filterService.length === 0) {
 			setNoResult(true);
 		} else {
 			setNoResult(false);
@@ -45,22 +48,10 @@ const BookingService = () => {
 	}, [filter]);
 
 	// handle popup data and status
-	const handlePopUpData = (data, status) => {
+	const handlePopUpData = useCallback((data, status) => {
 		setPopUpStatus(status);
 		setPopUpData(data);
-	}
-
-	// handle search input change
-	const handleTypeService = (e) => {
-		setFilter(e.target.value);
-	};
-
-	// filter service based on search input
-	const filterService = () => {
-		return service.filter((data) =>
-			data.name.toLowerCase().includes(filter.toLowerCase())
-		);
-	};
+	}, []);
 
 	return (
 		<div className="w-full max-w-6xl mx-auto py-12">
@@ -70,7 +61,7 @@ const BookingService = () => {
 				<input
 					className="w-full outline-0 placeholder:opacity-75"
 					placeholder="search"
-					onChange={handleTypeService}
+					onChange={(e) => setFilter(e.target.value)}
 				/>
 			</div>
 
@@ -80,24 +71,22 @@ const BookingService = () => {
 				</p>
 			) : (
 				<div className="grid grid-cols-4 gap-x-8 gap-y-4">
-					{filterService().map((data, idx) => {
+					{filterService.map((data, idx) => {
 						return (
 							<ServiceCard
 								key={idx}
-								img={data.image}
-								name={data.name}
-								review={data.review}
-								onClick={() => handlePopUpData(data, true)}
+								data = {data}
+								onClick={handlePopUpData}
 							/>
 						);
 					})}
 				</div>
 			)}
 
-			<ServiceBookingPopup
+			<BookingPopup
 				status={popUpStatus}
 				data={popUpData}
-				onClick={() => handlePopUpData([], false)}
+				onClick={handlePopUpData}
 			/>
 		</div>
 	);
