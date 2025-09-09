@@ -63,24 +63,7 @@ exports.getPet = async (req, res) => {  //Both
         res.status(400).json({success: false, error: err.message});
     }
 };
-// should be in customer.js
-/*exports.getCustomerPets = async (req, res) => { 
-    try {
-        console.log(req.body);
-        const customer = await prisma.customer.findUnique({
-            where: {id: Number(req.params.id)},
-            include: {
-                pet: true
-            }
-        });
-        if (!customer) {
-            return res.status(404).json({success: false, error: "Customer not found"});
-        }
-        res.status(200).json({success: true, data: customer.pet});
-    } catch(err) {
-        res.status(400).json({success: false, error: err.message});
-    }
-};*/
+
 exports.updatePet = async (req, res) => {
     try {
         const pet = await prisma.pet.update({
@@ -96,6 +79,33 @@ exports.updatePet = async (req, res) => {
         console.log(err.stack);
     }
 };
+
+exports.updatePetStatus = async (req, res) => {
+  try {
+    const petId = Number(req.params.id);
+    console.log(petId);
+    const { status } = req.body;
+    if (Number.isNaN(petId)) {
+      return res.status(400).json({ success: false, error: "Invalid petId" });
+    }
+    if (!status) {
+      return res.status(400).json({ success: false, error: "status is required" });
+    }
+
+    const pet = await prisma.pet.update({
+      where: { id: petId },
+      data: { status },
+    });
+
+    res.status(200).json({ success: true, data: pet });
+  } catch (err) {
+    if (err.code === 'P2025') {
+      return res.status(404).json({ success: false, error: "Pet not found" });
+    }
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
 exports.deletePet = async (req, res) => {
     try {
         const pet = await prisma.pet.delete({

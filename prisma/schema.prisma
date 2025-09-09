@@ -67,11 +67,6 @@ model ChatLog{
   staff           Staff?    @relation(fields: [staffId], references: [id])
   serviceId       Int
   service         Service   @relation(fields: [serviceId], references: [id])
-
-  staff    Staff?
-  customer Customer?
-
-  @@map("User")
 }
 
 model Pet{
