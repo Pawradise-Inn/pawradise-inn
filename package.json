@@ -12,12 +12,15 @@
     "type": "git",
     "url": "git+https://github.com/Pawradise-Inn/pawradise-inn.git"
   },
-  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Pawradise-Inn/pawradise-inn/issues"
+  "author": "",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:push:local": "dotenv -e config/config.env.local -- npx prisma db push",
+    "dev": "nodemon server.js"
   },
-  "homepage": "https://github.com/Pawradise-Inn/pawradise-inn#readme",
   "dependencies": {
     "@prisma/client": "^6.15.0",
     "bcryptjs": "^3.0.2",
