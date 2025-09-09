@@ -2,9 +2,11 @@
   "name": "pawradise-inn",
   "version": "1.0.0",
   "description": "SE Project",
-  "homepage": "https://github.com/Pawradise-Inn/pawradise-inn#readme",
-  "bugs": {
-    "url": "https://github.com/Pawradise-Inn/pawradise-inn/issues"
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "db:push:local": "dotenv -e config/config.env.local -- npx prisma db push"
   },
   "repository": {
     "type": "git",

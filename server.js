@@ -1,17 +1,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser');
 const { PrismaClient } = require("./generated/prisma/client");
-//const { connectDB, prisma } = require('./config/db');
 
-// routes files
-const auth = require('./routes/auth');
-const booking = require('./routes/booking');
-const pet = require('./routes/pet');
-const staff = require('./routes/staff');
-
-// Load env vars (change path if you use a different filename)
-dotenv.config({ path: './config/config.env.local' });
+dotenv.config({path: './config/config.env.local'});
 
 const app = express();
 const prisma = new PrismaClient();
