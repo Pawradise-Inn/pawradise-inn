@@ -37,7 +37,7 @@ exports.updateMyProfile = async (req, res) => {
     res.status(200).json({ success: true, data: result });
   } catch (err) {
     if (err.code === 'P2025') {
-      return res.status(404).json({ success: false, error: "Staff profile not found" });
+      return res.status(404).json({ success: false, error: "Staff profile is not found" });
     }
     res.status(500).json({ success: false, error: err.message });
   }
