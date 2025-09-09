@@ -119,3 +119,53 @@ exports.deletePet = async (req, res) => {
         res.status(400).json({success: false, error: err.message});
     }
 };
+
+const getCustomerPetNames = async (req, res) =>{ //requirement: 3
+    try {
+        const userId = Number(req.query.userId);
+        const bookingDate = new Date(req.query.date);
+
+        const pets = await prisma.pet.findMany({
+            where: {
+                customerId: {
+                  userId: userId
+                },
+            },
+            select: {
+                name: true
+            }
+        });
+
+        if(!pets) return res.status(400).json({success: false, msg: "There is no pet for this customer"});
+        res.status(200).json({success: true, data: pets});
+    }catch(err){
+        res.status(400).json({success: false, error: err.message});
+    }
+};
+
+const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
+    try {
+        const userId = Number(req.query.userId);
+        const bookingDate = new Date(req.query.date);
+
+        const pets = await prisma.pet.findMany({
+            where: {
+                customerId: {userId: userId},
+                bookedRooms: {
+                    none: {
+                        checkIn: { lte: bookingDate },
+                        checkOut: { gte: bookingDate } 
+                    }
+                }
+            },
+            select: {
+                name: true
+            }
+        });
+
+        if(!pets) return res.status(400).json({success: false, msg: "There is no pet available"});
+        res.status(200).json({success: true, data: pets});
+    }catch(err){
+        res.status(400).json({success: false, error: err.message});
+    }
+}
