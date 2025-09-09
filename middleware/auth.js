@@ -1,6 +1,5 @@
-// middleware/auth.js
 const jwt = require('jsonwebtoken');
-const prisma = require('../prisma/prisma'); // <-- import PrismaClient instance
+const prisma = require('../prisma/prisma');
 
 // Protect routes
 exports.protect = async (req, res, next) => {

@@ -1,6 +1,7 @@
 const prisma = require('../prisma/prisma');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const {hashPassword, matchPassword, getSignedJwtToken} = require('./logics/auth.js')
 
 exports.register = async (req, res, next) => {
     try {
@@ -8,39 +9,33 @@ exports.register = async (req, res, next) => {
         const firstname   = req.body.firstname   ?? req.body.firstname;
         const lastname    = req.body.lastname    ?? req.body.lastname;
         const email       = (req.body.email || '').trim();
-        const phone_number = req.body.phone_number ?? req.body.phone_number;
-        const user_name    = req.body.user_name    ?? req.body.user_name;
+        const phone = req.body.phone_number ?? req.body.phone_number;
+        const username    = req.body.user_name    ?? req.body.user_name;
         const password    = req.body.password;
         const role        = (req.body.role ?? 'CUSTOMER').toUpperCase(); // if Role is enum
-        console.log(req.body);
 
-        // unique check
-        /*const exist = await prisma.user.findUnique({ where: { username : req.params.username } });
-        if (exist) {
-            return res.status(409).json({ success: false, message: 'Username already registered' });
-        }*/
-
-        // salt & hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashed = await bcrypt.hash(password, salt);
+        const hashed = await hashPassword(password);
 
         const user = await prisma.user.create({
             data: {
-                firstname,
-                lastname,
-                email,
-                phone_number,
-                user_name,
-                password : hashed,
-                role
+                firstname: firstname,
+                lastname: lastname,
+                email: email,
+                phone_number: phone,
+                user_name: username,
+                password: hashed,
+                role: role
             },
         });
 
-        await prisma.customer.create({
-            data: { userId: user.id }
-        });
-        
-        console.log(`User created: ${user.id} - ${user.username}`);
+        if (user.role === 'CUSTOMER') {
+            await prisma.customer.create({ data: { userId: user.id } });
+        }
+
+        if (user.role === 'STAFF') {
+            await prisma.staff.create({ data: { userId: user.id, wages: 0, bank_account: "TBD" } });
+        }
+
 
         // Create token
         //const token = user.getSignedJwtToken();
@@ -53,9 +48,7 @@ exports.register = async (req, res, next) => {
 };
 
 const sendTokenResponse = (user, statusCode, res) => {
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE,
-    });
+    const token = getSignedJwtToken(user.id);
 
     const days = Number(process.env.JWT_COOKIE_EXPIRE || 7);
     const options = {
@@ -76,8 +69,8 @@ exports.getMe = async (req, res) => {
         if (!idParam) return res.status(400).json({ success: false, error: "Missing id param" });
 
         const user = await prisma.user.findUnique({
-        where: { id: Number(idParam) },
-        select: { id: true, firstname: true, lastname: true, email: true, phone_number: true, user_name: true, role: true },
+            where: { id: Number(idParam) },
+            select: { id: true, firstname: true, lastname: true, email: true, phone_number: true, user_name: true, role: true },
         });
 
         if (!user) return res.status(404).json({ success: false, error: "User not found" });
