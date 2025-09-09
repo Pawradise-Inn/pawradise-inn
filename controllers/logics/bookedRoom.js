@@ -3,7 +3,7 @@ const prisma = require('.../prisma/prisma');
 const findBookedRoomById = async(id)=>{
     const bookedId = Number(id);
     if(isNaN(bookedId)){
-        throw new Error("Invalid room ID");
+        throw new Error("Invalid booked room ID");
     }
     const bookedRoom = await prisma.bookedRoom.findUnique({
         where: {id: bookedId}
@@ -12,7 +12,7 @@ const findBookedRoomById = async(id)=>{
     return bookedRoom;
 };
 
-const overlappingCount = async(roomId, checkIn, checkOut)=>{
+const overlappingRoom = async(roomId, checkIn, checkOut)=>{
     const count = await prisma.bookedRoom.count({
         where: {roomId: roomId},
         AND: [
@@ -25,5 +25,5 @@ const overlappingCount = async(roomId, checkIn, checkOut)=>{
 
 module.exports = {
     findBookedRoomById,
-    overlappingCount
+    overlappingRoom
 };
