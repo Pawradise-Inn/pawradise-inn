@@ -1,5 +1,6 @@
 const prisma = require('../prisma/prisma');
 const {findRoomById, addRoomPictures, removeRoomPictures} = require('./logics/room');
+const {overlappingRoom} = require('./logics/bookedRoom');
 
 const getRooms = async (req, res) => {
     try {
@@ -95,6 +96,21 @@ const deletePicturesFromRoom = async (req, res) =>{
     }
 };
 
+const getRoomStatus = async (req, res)=>{ //requirement: 8
+    try{
+        const id = Number(req.query.id);
+        const checkIn = new Date(req.query.entry_date);
+        const checkOut = new Date(req.query.exit_date);
+        const room = await findRoomById(id);
+        if(!room) return res.status(404).json({ success: false, error: "Room is not found" });
+
+        const status = await overlappingRoom(id, checkIn, checkOut);
+        res.status(200).json({success: true, available: status < room.capacity});
+    }catch(err){
+        res.status(400).json({success: false, error: err.message});
+    }
+};
+
 module.exports = {
     getRooms,
     getRoom,
@@ -102,6 +118,7 @@ module.exports = {
     updateRoom,
     deleteRoom,
     addPicturesToRoom,
-    deletePicturesFromRoom
+    deletePicturesFromRoom,
+    getRoomStatus
 };
 

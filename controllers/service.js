@@ -1,6 +1,7 @@
 const prisma = require('../prisma/prisma');
 const {findServiceById} = require('logics/service');
 const { addServicePictures, removeServicePictures } = require('./logics/service');
+const {overlappingService} = require('./logics/bookedService');
 
 const getServices = async (req, res) =>{
     try {
@@ -37,7 +38,7 @@ const createService = async (req, res) => {
     } catch (err) {
         res.status(400).json({success: false, error: err.message});
     }
-}
+};
 
 const updateService = async (req, res) => {
     try {
@@ -58,7 +59,7 @@ const updateService = async (req, res) => {
         if (err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found'});
         res.status(400).json({success: false, error: err.message});
     }
-}
+};
 
 const deleteService = async (req, res) => {
     try {
@@ -97,6 +98,50 @@ const deletePicturesFromService = async (req, res) => {
     }
 };
 
+const getAllServiceComments = async (req, res)=>{ //requirement: 1
+    try{
+        const services = await prisma.service.findMany({
+            include: {
+                reviews: true,
+                petType: true
+            }
+        });
+
+        const formatted = services.map((service)=>{
+            const totalReviews = service.reviews.length;
+            const avgRating = totalReviews > 0 ? service.reviews.reduce((sum ,r)=> sum + (r.rating || 0), 0) / totalReviews : 0;
+            return {
+                image: service.picture,
+                name: service.name,
+                reviewStar: avgRating,
+                forWhich: service.petType.map((p) => p.name),
+                price: service.price,
+                commentPages: Math.ceil(totalReviews/3)
+            }
+        });
+
+        res.status(200).json({success: true, data: formatted});
+    }catch(err){
+        res.status(400).json({success: false, error: err.message});
+    }
+};
+
+const getServiceStatus = async (req, res)=>{ //requirement: 6
+    try{
+        const name = req.query.name;
+        const schedule = new Date(req.query.entry_date_with_time);
+        const service = await prisma.service.findFirst({
+            where: {name: name}
+        });
+        if (!service) return res.status(404).json({ success: false, error: "Service not found" });
+
+        const status = await overlappingService(service.id, schedule);
+        res.status(200).json({success: true, available: status < 3});
+    }catch(err){
+        res.status(400).json({success: false, error: err.message});
+    }
+};
+
 module.exports = {
     getServices,
     getService,
@@ -104,5 +149,7 @@ module.exports = {
     updateService,
     deleteService,
     addPicturesToService,
-    deletePicturesFromService
+    deletePicturesFromService,
+    getAllServiceComments,
+    getServiceStatus
 };

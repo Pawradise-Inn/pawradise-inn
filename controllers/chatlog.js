@@ -30,7 +30,7 @@ const getChatLogs = async (req, res) => {
         if (!chatlog) return res.status(404).json({success: false, msg: 'Chatlog not found'});
 
         res.status(200).json({success: true, data: chatlog});
-    } catch (error) {
+    } catch (err) {
         res.status(400).json({ success: true, error: err.message});
     }
   };
@@ -101,10 +101,10 @@ const deleteChatLog = async(req, res)=>{
         });
 
         res.status(200).json({success: true, data: chatlog});
-    } catch (error) {
-        res.status(400).json({success: false, error: "Chatlog is not found"});
+    } catch (err) {
+        res.status(400).json({success: false, error: err.message});
     }
-  };
+};
 
 module.exports = {
     getChatLogs,
