@@ -7,47 +7,40 @@ dotenv.config({path: './config/config.env.local'});
 const app = express();
 const prisma = new PrismaClient();
 
+// Body parser & cookie parser
 app.use(express.json());
+app.use(cookieParser());
 
-const booking = require('./routes/booking');
-
+app.use('/api/v1/auth', auth);
 app.use('/api/v1/booking', booking);
-
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ success: false, error: 'Server Error' });
-});
+app.use('/api/v1/pet', pet);
+app.use('/api/v1/staff', staff);
 
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+
+const server = app.listen(
+  PORT,
+  () => console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`),
+  //console.log('DB URL at runtime:', process.env.DATABASE_URL)
+);
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.log(`Error: ${err.message}`);
+  server.close(async () => {
+    try { await prisma.$disconnect(); } catch {}
+    process.exit(1);
+  });
 });
 
-async function testConnection() { //for testing database connection
-  try {
-    const count = await prisma.booking.count();
-    console.log(`Database connected! Bookings count: ${count}`);
-  } catch (err) {
-    console.error('Database connection failed:', err);
-  }
-}
-testConnection();
-
-process.on('unhandledRejection', (err, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', err);
-    server.close(() => {
-        process.exit(1);
-    });
-});
-
-process.on('uncaughtException', async (err) => {
-  console.error('Uncaught Exception:', err);
-  await prisma.$disconnect();
-  process.exit(1);
-});
-
+// Graceful shutdown (Ctrl+C / platform stop)
 process.on('SIGINT', async () => {
-  console.log('SIGINT received, closing server');
-  await prisma.$disconnect();
-  process.exit(0);
+  console.log('Shutting down...');
+  try { await prisma.$disconnect(); } catch {}
+  server.close(() => process.exit(0));
+});
+process.on('SIGTERM', async () => {
+  console.log('Shutting down...');
+  try { await prisma.$disconnect(); } catch {}
+  server.close(() => process.exit(0));
 });
