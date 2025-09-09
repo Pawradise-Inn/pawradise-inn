@@ -23,7 +23,25 @@ const overlappingRoom = async(roomId, checkIn, checkOut)=>{
     return count;
 };
 
+const duplicatedRoom = async(roomId, petId, checkIn, checkOut)=>{
+    const overlapping = await prisma.bookedRoom.findMany({
+        where: {
+            roomId: roomId,
+            petId: petId,
+            AND: [
+                { checkIn: { lte: new Date(checkOut) } },
+                { checkOut: { gte: new Date(checkIn) } }
+            ]
+        },
+        select: {
+            checkIn: true,
+            checkOut: true
+        }
+    });
+    return overlapping;
+}
 module.exports = {
     findBookedRoomById,
-    overlappingRoom
+    overlappingRoom,
+    duplicatedRoom
 };
