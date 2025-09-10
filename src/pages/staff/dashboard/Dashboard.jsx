@@ -1,10 +1,12 @@
 import { useState } from "react";
+import DashboardTab1 from "./DashboardTab1";
+
 
 const boxData = [
-    { id: 1, label: "Overview" },
-    { id: 2, label: "Bookings" },
-    { id: 3, label: "Pets" },
-    { id: 4, label: "Staff" },
+    { id: 1, label: "Today's Booking" },
+    { id: 2, label: "Check-in" },
+    { id: 3, label: "Check-out" },
+    { id: 4, label: "Service booked" },
 ];
 
 const Dashboard = () => {
@@ -30,7 +32,7 @@ const Dashboard = () => {
                         // In the future, replace this with navigation logic
                         onClick={() => setActiveBox(box.id)}
                         className={getBoxClass(activeBox === box.id)}
-                        style={{ minWidth: "180px", maxWidth: "300px" }}
+                        style={{ minWidth: "350px", maxWidth: "300px" }}
                     >
                         {box.label}
                     </button>
@@ -39,12 +41,19 @@ const Dashboard = () => {
             <div
                 className="mt-4"
                 style={{
-                    width: "calc(4 * 260px)", // Increased from 220px to 260px for a longer line
+                    width: "calc(4 * 380px)", // Increased from 220px to 260px for a longer line
                     borderBottom: "2px solid #222",
                     marginLeft: "auto",
                     marginRight: "auto"
                 }}
             />
+            {}
+            <div className = "w-full-flex justify-center mt-8"> 
+                {activeBox === 1 && <DashboardTab1 />}
+                {/* {activeBox === 2 && <DashboardTab2 />} */}
+                {/* {activeBox === 3 && <DashboardTab3 />} */}
+                {/* {activeBox === 4 && <DashboardTab4 />} */}
+            </div>
         </div>
     );
 };

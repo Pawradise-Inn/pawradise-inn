@@ -17,7 +17,7 @@ import Management from "./pages/Management";
 import ServiceEdit from "./components/Management/Service_edit";
 import PetStatus from "./pages/staff/PetStatus";
 import PetUpdate from "./pages/staff/PetUpdate";
-import Dashboard from "./pages/staff/Dashboard";
+import Dashboard from "./pages/staff/dashboard/Dashboard";
 
 const App = () => {
     const location = useLocation();
