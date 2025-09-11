@@ -94,7 +94,7 @@ const Profile_comp = () => {
                    { /* address */}
                    <div>
                         <label className="block text-sm font-semibold mb-2">
-                            Username
+                            Label
                         </label>
                         <textarea
                             value={address}
