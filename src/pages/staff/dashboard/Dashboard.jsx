@@ -25,14 +25,12 @@ const Dashboard = () => {
             <div className="w-full flex">
                 <h2 className="text-5xl font-extrabold mb-8 ml-8 mt-2 text-left">Dashboard</h2>
             </div>
-            <div className="flex justify-center w-full max-w-5xl space-x-8">
+            <div className="flex justify-center w-full max-w-5xl space-x-4 flex-wrap">
                 {boxData.map((box) => (
                     <button
                         key={box.id}
-                        // In the future, replace this with navigation logic
                         onClick={() => setActiveBox(box.id)}
-                        className={getBoxClass(activeBox === box.id)}
-                        style={{ minWidth: "350px", maxWidth: "300px" }}
+                        className={getBoxClass(activeBox === box.id)}  
                     >
                         {box.label}
                     </button>
@@ -41,14 +39,13 @@ const Dashboard = () => {
             <div
                 className="mt-4"
                 style={{
-                    width: "calc(4 * 380px)", // Increased from 220px to 260px for a longer line
+                    width: "100%",
                     borderBottom: "2px solid #222",
                     marginLeft: "auto",
                     marginRight: "auto"
                 }}
             />
-            {}
-            <div className = "w-full-flex justify-center mt-8"> 
+            <div className="w-full flex justify-center mt-8"> 
                 {activeBox === 1 && <DashboardTab1 />}
                 {/* {activeBox === 2 && <DashboardTab2 />} */}
                 {/* {activeBox === 3 && <DashboardTab3 />} */}
