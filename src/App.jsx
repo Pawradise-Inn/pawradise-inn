@@ -28,14 +28,14 @@ const App = () => {
 
     return (
         <div>
-            {/* Conditionally render Navbar or StaffNavbar */}
             {/* {isStaffPath ? <StaffNavbar /> : <Navbar />} */}
             {isRegistrationPath||isLogin ? null : isStaffPath ? <StaffNavbar /> : <Navbar /> }
             <Routes>
                 {/* Public Routes */}
+                <Route path="/login" element={<Login/>} />
+                <Route path="/register" element={<Registration />} />
                 <Route path="/" element={<div>Home Page</div>} />
                 <Route path="/room" element={<><BookingRoom/><Footer/></> } />
-
                 <Route path="/service" element={<><BookingService /><Footer/></>} />
                 <Route path="/review" element={<><div>Review Page</div><Footer/></>} />
                 <Route path="/profile" element={<Profile />}>
@@ -45,8 +45,6 @@ const App = () => {
                     <Route path="pet/:id" element={<PetOverall />} />
                     <Route path="pet/new" element={<NewPet />} />
                 </Route>
-                <Route path="/register" element={<Registration />} />
-                <Route path="/login" element={<Login/>} />
 
                 {/* Staff Routes */}
                 <Route path="/staff" element={<div>Staff log in</div>} />
