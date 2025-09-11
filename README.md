@@ -1,3 +1,0 @@
-# Pawradise Inn
-
-SE Project
