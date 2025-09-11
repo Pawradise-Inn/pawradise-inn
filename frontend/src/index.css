@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+* {
+	box-sizing: border-box;
+	color: var(--dark-brown-color);
+	font-family: Roboto, sans-serif;
+}
+
+html {
+	scroll-behavior: smooth;
+	overflow-x: hidden;
+}
+
+body {
+	background-color: #FFFFFF;
+	height: 100vh;
+	width: 100vw;
+}
+
+/* Minimal sleek scrollbar */
+.scrollbar-sleek {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: transparent transparent; /* initially invisible */
+  overflow: auto;
+  position: relative;
+}
+
+/* WebKit browsers */
+.scrollbar-sleek::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-sleek::-webkit-scrollbar-track {
+  background: transparent; /* invisible track */
+}
+
+.scrollbar-sleek::-webkit-scrollbar-thumb {
+  background-color: #a78bfa; /* visible thumb */
+  border-radius: 9999px; /* fully rounded */
+}
+.scrollbar-sleek:hover::-webkit-scrollbar-thumb {
+  background-color: #7c3aed; /* darker thumb on hover */
+}
+/* Hide scrollbar buttons & corners completely */
+.scrollbar-sleek::-webkit-scrollbar-button,
+.scrollbar-sleek::-webkit-scrollbar-corner {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px; 
+}
+
+/* Track (background) */
+::-webkit-scrollbar-track {
+  background: var(--cream-color);
+  border-radius: 10px;
+}
+
+/* Thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: var(--brown-color);
+  border-radius: 10px;
+}
+
+/* Thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--dark-brown-color);
+}
+
+:root {
+	/* color */
+	--dark-brown-color: #38220E;
+	--brown-color: #654225;
+	--light-brown-color: #D9C4AF;
+	--cream-color: #FDFAEE;
+	--warning-color: #FF6467;
+	--beige-cream-color: #FEF7DB;
+}
+
+@font-face {
+	font-family: 'Roboto';
+	src: url(../src/assets/Roboto-VariableFont_wdth\,wght.ttf);
+}
+
+@font-face {
+	font-family: 'Roboto';
+	src: url(../src//assets/Roboto-Italic-VariableFont_wdth\,wght.ttf);
+	font-style: italic;
+}
+
+* {
+	box-sizing: border-box;
+	color: var(--dark-brown-color);
+	font-family: Roboto, sans-serif;
+}
