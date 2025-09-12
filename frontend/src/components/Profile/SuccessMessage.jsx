@@ -2,7 +2,7 @@ const SuccessMessage = ({ show, booking, onClose }) => {
     if (!show || !booking) return null;
 
     return (
-        <div className="mb-6 bg-green-100 border-l-4 border-green-500  p-4 rounded-lg shadow-md">
+        <div className="sticky top-0 mb-6 bg-green-100 border-l-4 border-green-500  p-4 rounded-lg shadow-md">
             <div className="flex items-center">
                 <div className="flex-1">
                     <p className="font-semibold !text-green-700">Booking Successfuly Cancelled!</p>

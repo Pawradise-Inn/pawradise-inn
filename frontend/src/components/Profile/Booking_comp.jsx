@@ -42,6 +42,12 @@ const Booking_comp = () => {
 
     return(
         <div>
+          <SuccessMessage 
+            show = {showSuccessMessage}
+            booking = {cancelledBooking}
+            onClose = {handleCloseSuccessMessage}
+          />
+
           {my_booking.map(book => (
             <BookingCard key={book.service_name} book={book} onCancelClick={handleCancelClick} />
           ))}
@@ -50,12 +56,6 @@ const Booking_comp = () => {
           {showModal && (
             <CancelModal booking={selectedBooking} onConfirm={handleConfirmCancel} onCancel={handleCloseModal} />
           )}
-
-          <SuccessMessage 
-            show = {showSuccessMessage}
-            booking = {cancelledBooking}
-            onClose = {handleCloseSuccessMessage}
-          />
         </div>
     )
 }
