@@ -1,10 +1,10 @@
-import { Route, Routes, useLocation } from "react-router-dom"; 
-import Navbar from "./components/Navbar"; 
-import Profile from "./pages/customer/Profile"; 
-import BookingRoom from "./pages/customer/BookingRoom"; 
-import BookingService from "./pages/customer/BookingService"; 
-import Registration from "./pages/customer/Registration"; 
-import Login from "./pages/login"; 
+import { Route, Routes, useLocation } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Profile from "./pages/customer/Profile";
+import BookingRoom from "./pages/customer/BookingRoom";
+import BookingService from "./pages/customer/BookingService";
+import Registration from "./pages/customer/Registration";
+import Login from "./pages/login";
 
 import StaffNavbar from "./components/StaffNavbar"; 
 import Footer from "./components/Footer"; 
