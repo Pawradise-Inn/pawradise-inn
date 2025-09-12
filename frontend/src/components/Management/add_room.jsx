@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 const AddRoomPopup = ({
   title = "Add room",
-  initialData = null,            // null = add, object = edit
+  initialData = null,          
   onClose,
-  onSave,                        // (payload) => void
-  onDelete,                      // (roomId) => void
+  onSave,                       
+  onDelete,                      
 }) => {
-  // Form fields aligned with your data keys
+
   const [status, setStatus]     = useState(initialData?.status   ?? "available");
   const [forwhich, setForwhich] = useState(initialData?.forwhich ?? "small");
   const [price, setPrice]       = useState(
@@ -24,7 +24,7 @@ const AddRoomPopup = ({
   const createdObjectUrl = useRef(null);
   const isEdit = useMemo(() => Boolean(initialData?.roomId), [initialData]);
 
-  // Keep form in sync if the selected room changes while popup is open
+
   useEffect(() => {
     setStatus(initialData?.status ?? "available");
     setForwhich(initialData?.forwhich ?? "small");
@@ -34,7 +34,7 @@ const AddRoomPopup = ({
     setImage(initialData?.image || null);
   }, [initialData]);
 
-  // Lock body scroll while modal is open
+
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";

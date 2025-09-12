@@ -1,8 +1,8 @@
 import { Outlet } from "react-router-dom";
 import { useMemo, useState } from "react";
-import RoomCard from "../room/RoomCard";      // your existing card
-import AddRoomPopup from "./add_room";        // popup component below
-import testImg from "../../assets/test.png";  // make sure this exists
+import RoomCard from "../room/RoomCard";      
+import AddRoomPopup from "./add_room";        
+import testImg from "../../assets/test.png"; 
 
 // Demo data (replace with API later)
 const demoData = [
