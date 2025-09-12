@@ -4,7 +4,7 @@ import Profile from "./pages/customer/Profile";
 import BookingRoom from "./pages/customer/BookingRoom";
 import BookingService from "./pages/customer/BookingService";
 import Registration from "./pages/customer/Registration";
-import Login from "./pages/login";
+import Login from "./pages/Login";
 
 import StaffNavbar from "./components/StaffNavbar";
 import Footer from "./components/Footer";
