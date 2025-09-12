@@ -15,6 +15,7 @@ import PetOverall from "./components/Profile/PetOverall";
 import NewPet from "./components/Profile/NewPet"; 
 import Management from "./pages/Management"; 
 import ServiceEdit from "./components/Management/Service_edit"; 
+import RoomEdit from "./components/Management/room_edit";
 import PetStatus from "./pages/staff/PetStatus"; 
 import PetUpdate from "./pages/staff/PetUpdate"; 
 import Dashboard from "./pages/staff/dashboard/Dashboard"; 
@@ -54,7 +55,7 @@ const App = () => {
                     <Route index element={<ServiceEdit />} /> 
                     <Route path="profile" element={<Profile_comp />} /> 
                     <Route path="payment" element={<div>Manage Payment Page</div>} /> 
-                    <Route path="room" element={<div>Manage Room Page</div>} /> 
+                    <Route path="room" element={<RoomEdit />} /> 
                 </Route> 
             </Routes> 
         </div> 
