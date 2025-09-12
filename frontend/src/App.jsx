@@ -16,6 +16,8 @@ import NewPet from "./components/Profile/NewPet";
 import Management from "./pages/Management";
 import ServiceEdit from "./components/Management/Service_edit";
 import PetStatus from "./pages/staff/PetStatus";
+import PetUpdate from "./pages/staff/PetUpdate";
+import Dashboard from "./pages/staff/dashboard/Dashboard";
 
 const App = () => {
     const location = useLocation();
@@ -27,14 +29,14 @@ const App = () => {
 
     return (
         <div>
-            {/* Conditionally render Navbar or StaffNavbar */}
             {/* {isStaffPath ? <StaffNavbar /> : <Navbar />} */}
             {isRegistrationPath||isLogin ? null : isStaffPath ? <StaffNavbar /> : <Navbar /> }
             <Routes>
                 {/* Public Routes */}
+                <Route path="/login" element={<Login/>} />
+                <Route path="/register" element={<Registration />} />
                 <Route path="/" element={<div>Home Page</div>} />
                 <Route path="/room" element={<><BookingRoom/><Footer/></> } />
-
                 <Route path="/service" element={<><BookingService /><Footer/></>} />
                 <Route path="/review" element={<><div>Review Page</div><Footer/></>} />
                 <Route path="/profile" element={<Profile />}>
@@ -44,20 +46,20 @@ const App = () => {
                     <Route path="pet/:id" element={<PetOverall />} />
                     <Route path="pet/new" element={<NewPet />} />
                 </Route>
-                <Route path="/register" element={<Registration />} />
-                <Route path="/login" element={<Login/>} />
 
                 {/* Staff Routes */}
                 <Route path="/staff" element={<div>Staff log in</div>} />
-                <Route path="/staff/dashboard" element={<div>Dashboard Page</div>} />
+                <Route path="/staff/dashboard" element={<Dashboard />} />
+
                 <Route path="/staff/pet" element={<PetStatus />} />
+                <Route path="/staff/pet/:id" element={<PetUpdate />} />
                 <Route path="/staff/review" element={<div>Staff Review Page</div>} />
                 <Route path="/staff/management" element={<Management />}>
                     <Route index element={<ServiceEdit />} />
                     <Route path="profile" element={<Profile_comp />} />
                     <Route path="payment" element={<div>Manage Payment Page</div>} />
                     <Route path="room" element={<div>Manage Room Page</div>} />
-                </Route>
+                </Route>  
             </Routes>
         </div>
     );
