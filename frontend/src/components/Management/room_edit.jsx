@@ -18,7 +18,7 @@ const RoomEdit = () => {
   const [rooms, setRooms] = useState(demoData);
   const [search, setSearch] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selected, setSelected] = useState(null); // null = add, object = edit
+  const [selected, setSelected] = useState(null); 
 
   const filtered = useMemo(() => {
     if (!search) return rooms;
@@ -70,7 +70,7 @@ const RoomEdit = () => {
             <i className="bi bi-search opacity-50 pr-2 flex justify-center items-center -bottom-1 relative"></i>
             <input
               className="w-full outline-0 placeholder:opacity-75 text-2xl"
-              placeholder="search by roomId / status / forwhich"
+              placeholder="search"
               onChange={(e) => setSearch(e.target.value)}
               value={search}
             />
@@ -97,8 +97,8 @@ const RoomEdit = () => {
                 <RoomCard
                     key={r.roomId}
                     data={r}
-                    compact                    // 👈 hide extra details
-                    actionLabel="EDIT"         // 👈 optional; defaults to "EDIT" in compact anyway
+                    compact                    
+                    actionLabel="EDIT"         
                     onClick={(room) => openEdit(room)}
                 />
             ))}
