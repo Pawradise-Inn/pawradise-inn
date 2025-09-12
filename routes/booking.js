@@ -4,24 +4,18 @@ const router = express.Router();
 const {
     getBookings,
     getBooking,
-    getBookingStatus,
-    getCustomerBookings,
     updateBookingStatus,
+    createBooking,
     deleteBooking
-} = require('../controllers/booking')
+} = require('../controllers/booking');
 
 router.route('/')
     .get(getBookings)
+    .post(createBooking);
 
 router.route('/:id')
     .get(getBooking)
-    .delete(deleteBooking);
-
-router.route('/:id/status')
-    .get(getBookingStatus)
-    .put(updateBookingStatus);
-
-router.route('/customers/:id')
-    .get(getCustomerBookings);
+    .delete(deleteBooking)
+    .patch(updateBookingStatus);
 
 module.exports = router;

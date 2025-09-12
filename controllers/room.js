@@ -1,4 +1,4 @@
-const prisma = require('../../prisma/prisma');
+const prisma = require('../prisma/prisma');
 const {findRoomById, addRoomPictures, removeRoomPictures} = require('./logics/room');
 const {overlappingRoom} = require('./logics/bookedRoom');
 
@@ -74,7 +74,7 @@ const deleteRoom = async (req, res) => {
 
 const addPicturesToRoom = async (req, res) =>{
     try {
-        const roomId = req.params.id;
+        const roomId = Number(req.params.id);
         const pictures = req.body.picture;
         const room = await addRoomPictures(roomId, pictures);
         res.status(200).json({success: true, data: room});
@@ -86,7 +86,7 @@ const addPicturesToRoom = async (req, res) =>{
 
 const deletePicturesFromRoom = async (req, res) =>{
     try {
-        const roomId = req.params.id;
+        const roomId = Number(req.params.id);
         const pictures = req.body.picture;
         const room = await removeRoomPictures(roomId, pictures);
         res.status(200).json({success: true, data: room});
@@ -98,9 +98,14 @@ const deletePicturesFromRoom = async (req, res) =>{
 
 const getRoomStatus = async (req, res)=>{ //requirement: 8
     try{
-        const id = Number(req.query.id);
+        const id = Number(req.params.id);
         const checkIn = new Date(req.query.entry_date);
         const checkOut = new Date(req.query.exit_date);
+
+        if (checkIn >= checkOut) {
+            return res.status(400).json({ success: false, msg: "Check-in date must be before check-out date" });
+        }
+
         const room = await findRoomById(id);
         if(!room) return res.status(404).json({ success: false, error: "Room is not found" });
 

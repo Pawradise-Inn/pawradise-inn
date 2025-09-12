@@ -4,7 +4,20 @@ const {createBookedService} = require('./bookedService');
 
 const getBookings = async (req, res) => {
     try {
-        const bookings = await prisma.booking.findMany();
+        const {customerId, status, fields} = req.query;
+        const where = {}; 
+        if (customerId) where.customerId = parseInt(customerId); 
+        if (status) where.status = status; 
+        if (fields) { 
+            select = {}; 
+            fields.split(',').forEach(f => { 
+                select[f.trim()] = true; 
+            }); 
+        }
+        const bookings = await prisma.booking.findMany({
+            where,
+            select
+        });
         res.status(200).json({success: true, data: bookings});
     } catch(err) {
         res.status(400).json({success: false, error: err.message});
@@ -14,8 +27,17 @@ const getBookings = async (req, res) => {
 const getBooking = async (req, res) => {
     try {
         const bookingId = req.params.id;
+        if (fields) { 
+            select = {}; 
+            fields.split(',').forEach(f => { 
+                select[f.trim()] = true; 
+            }); 
+        }
         const booking = await prisma.booking.findUnique({
-            where: {id: Number(bookingId)}
+            where: {
+                id: Number(bookingId)
+            },
+            select
         });
         if(!booking){
             return res.status(404).json({success: false, error: 'Booking not found'});
@@ -26,47 +48,17 @@ const getBooking = async (req, res) => {
     }
 }
 
-const getBookingStatus = async (req, res) => {
-    try {
-        const bookingId = req.params.id;
-        const booking = await prisma.booking.findUnique({
-            where: {id: bookingId},
-        });
-        if(!booking){
-            return res.status(404).json({success: false, error: 'Booking not found'});
-        }
-        res.status(200).json({success: true, data: booking.status});
-    } catch(err) {
-        res.status(400).json({success: false, error: err.message});
-    }
-}
-
-const getCustomerBookings = async (req, res) => {
-    try {
-        const customer = await prisma.customer.findUnique({
-            where: {id: Number(req.params.id)},
-            include: {
-                booking: true
-            }
-        });
-
-        if(!customer){
-            return res.status(404).json({success: false, error: 'Customer not found'})
-        }
-
-        res.status(200).json({success: true, data: customer.booking})
-    } catch(err) {
-        res.status(400).json({success: false, error: err.message});
-    }
-};
-
 const updateBookingStatus = async (req, res) => { 
     try {
         const bookingId = req.params.id;
         const status = req.body.status;
         const booking = await prisma.booking.update({
-            where: {id: Number(bookingId)},
-            data: {status: status}
+            where: {
+                id: Number(bookingId)
+            },
+            data: {
+                status: status
+            }
         });
 
         if (status === 'BOOKED'){
@@ -144,8 +136,6 @@ const deleteBooking = async (req, res) => {
 module.exports = {
     getBookings,
     getBooking,
-    getBookingStatus,
-    getCustomerBookings,
     updateBookingStatus,
     createBooking,
     deleteBooking

@@ -1,6 +1,5 @@
 const prisma = require('../prisma/prisma');
-const {findServiceById} = require('logics/service');
-const { addServicePictures, removeServicePictures } = require('./logics/service');
+const {findServiceById, addServicePictures, removeServicePictures } = require('./logics/service');
 const {overlappingService} = require('./logics/bookedService');
 
 const getServices = async (req, res) =>{
