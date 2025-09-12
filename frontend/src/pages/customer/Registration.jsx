@@ -44,12 +44,7 @@ const Registration = () => {
 
   return (
     <>
-      {/* 🔍 DEBUG BAR: red on mobile, green on md+, blue on lg+ */}
-      {/* <div className="h-2 w-full bg-red-500 md:bg-green-500 lg:bg-blue-500"></div> */}
-
-      {/* Main layout */}
       <div className="flex flex-col md:flex-row w-full min-h-screen overflow-hidden">
-        {/* Left side - Image */}
         <div className="w-full md:w-3/5 h-64 md:h-auto flex-shrink-0">
           <img
             className="w-full h-full object-cover"
@@ -58,10 +53,10 @@ const Registration = () => {
           />
         </div>
 
-        {/* Right side - Form */}
+
         <div className="w-full md:w-2/5 h-full bg-[var(--cream-color)] flex flex-col items-center justify-center p-4">
           <h1
-            className="text-center pt-2 text-2xl md:text-3xl text-[var(--brown-color)] font-semibold"
+            className="text-center pt-2 text-[60px] md:text-3xl text-[var(--brown-color)] font-semibold"
             style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)" }}
           >
             Registration
@@ -134,12 +129,11 @@ const Registration = () => {
               </label>
             </div>
 
-            {/* Buttons - stack on mobile, row on md+ */}
-            <div className="flex flex-col md:flex-row gap-4 mt-4 w-full justify-end">
+            <div className="flex flex-col md:flex-row gap-4 mt-2 w-full justify-end">
               <NavLink to="/" className="w-full md:w-40">
                 <button
                   type="button"
-                  className="w-full h-10 text-[var(--dark-brown-color)] bg-[var(--light-brown-color)] rounded shadow px-4 py-2 hover:bg-[var(--brown-color)] hover:!text-[var(--beige-cream-color)] transition-colors cursor-pointer "
+                  className="w-full h-10 text-[var(--dark-brown-color)] bg-[var(--light-brown-color)] rounded shadow px-4 py-1 hover:bg-[var(--brown-color)] hover:!text-[var(--beige-cream-color)] transition-colors cursor-pointer "
                 >
                   Cancel
                 </button>
@@ -148,7 +142,7 @@ const Registration = () => {
               <button
                 type="submit"
                 disabled={!isFormValid}
-                className={`w-full md:w-40 h-10 rounded shadow px-4 py-2 hover:bg-[var(--brown-color)] hover:!text-[var(--beige-cream-color)] transition-colors  cursor-pointer ${
+                className={`w-full md:w-40 h-10 rounded shadow px-4 py-1 hover:bg-[var(--brown-color)] hover:!text-[var(--beige-cream-color)] transition-colors  cursor-pointer ${
                   isFormValid
                     ? "bg-[var(--dark-brown-color)] !text-[var(--beige-cream-color)]"
                     : "bg-[var(--light-brown-color)] cursor-not-allowed"
