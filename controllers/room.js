@@ -1,4 +1,4 @@
-const prisma = require('../prisma/prisma');
+const prisma = require('../../prisma/prisma');
 const {findRoomById, addRoomPictures, removeRoomPictures} = require('./logics/room');
 const {overlappingRoom} = require('./logics/bookedRoom');
 

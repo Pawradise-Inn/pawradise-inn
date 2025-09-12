@@ -2,7 +2,7 @@ const prisma = require('../prisma/prisma');
 const {createBookedRoom} = require('./bookedRoom');
 const {createBookedService} = require('./bookedService');
 
-const getBookings = async (req, res) => {   //Only Staff, customer use getCustomerBookings
+const getBookings = async (req, res) => {
     try {
         const bookings = await prisma.booking.findMany();
         res.status(200).json({success: true, data: bookings});
