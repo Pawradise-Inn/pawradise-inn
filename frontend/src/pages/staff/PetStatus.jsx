@@ -144,7 +144,6 @@ const PetStatus = () => {
                 {filterPets.map(pet => <Pet_card key={pet.id} pet={pet}/>)}
                     
             </div>
-            
         </div>
     )
 
