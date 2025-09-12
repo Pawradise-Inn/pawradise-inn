@@ -13,9 +13,17 @@ app.use(express.json());
 app.use(cookieParser());
 
 const booking = require('./routes/booking');
+const bookedRoom = require('./routes/bookedRoom');
+const bookedService = require('./routes/bookedService');
+const room = require('./routes/room');
+const service = require('./routes/service');
 
 //app.use('/api/v1/auth', auth);
 app.use('/api/v1/booking', booking);
+app.use('/api/v1/bookedRoom', bookedRoom);
+app.use('/api/v1/bookedService', bookedService);
+app.use('/api/v1/room', room);
+app.use('/api/v1/service', service);
 //app.use('/api/v1/pet', pet);
 //app.use('/api/v1/staff', staff);
 

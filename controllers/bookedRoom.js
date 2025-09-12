@@ -1,5 +1,5 @@
 const prisma = require('../prisma/prisma');
-const {findBookedRoomById, overlappingRoom, duplicatedRoom} = require('./logics/bookedRoom');
+const {findBookedRoomById, overlappingRoom, createBookedRoomWithCondition} = require('./logics/bookedRoom');
 const {getRoomCap} = require('./logics/room');
 
 const getBookedRooms = async (req, res) => {
@@ -26,34 +26,22 @@ const getBookedRoom = async (req, res) => {
 const createBookedRoom = async (req, res) => {
     try {
         const {roomId, petId, bookingId, checkIn, checkOut} = req.body;
-
-        const count = await overlappingRoom(roomId, checkIn, checkOut);
-        const cap = await getRoomCap(roomId);
-        if (count >= cap){
-            return res.status(400).json({success: false, msg: 'Room is not available'});
-        }
-        const overlapping = await duplicatedRoom(roomId, petId, checkIn, checkOut);
-        if (overlapping.length > 0){
-            res.status(400).json({
-                success: false,
-                message: 'Room is not avaiable for the selected dates',
-                duplicatedDates: overlapping.map(b => ({
-                    checkIn: b.checkIn,
-                    checkOut: b.checkout
-                }))
-            });
-        }
-        const bookedRoom = await prisma.bookedRoom.create({
-            data: {
-                roomId: roomId,
-                petId: petId,
-                bookingId: bookingId,
-                checkIn: new Date(checkIn),
-                checkOut: new Date(checkOut)
-            }
-        });
+        const bookedRoom = await createBookedRoomWithCondition(
+             roomId, 
+             petId, 
+             bookingId, 
+             checkIn, 
+             checkOut
+        );
         res.status(201).json({success: true, data: bookedRoom});
     } catch (err){
+        if (err.duplicatedDates) {
+            return res.status(400).json({
+                success: false,
+                message: err.message,
+                duplicatedDates: err.duplicatedDates
+            });
+        }
         res.status(400).json({success: false, error: err.message});
     }
 };
