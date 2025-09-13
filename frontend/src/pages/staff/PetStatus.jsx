@@ -20,12 +20,9 @@ const Pet_card = ({pet}) => {
                             </div>
                             <span className="px-5 py-1 !text-white text-xs rounded-full bg-[var(--dark-brown-color)] font-semibold">
                                 🔴 pet_status
-                            </span>
-                            
+                            </span>   
                     </div>
-                    
-                </div>
-                
+                </div>\
             </NavLink>
         </div>
         

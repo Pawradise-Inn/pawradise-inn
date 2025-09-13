@@ -48,7 +48,7 @@ const App = () => {
                 {/* Staff Routes */} 
                 <Route path="/staff" element={<div>Staff log in</div>} /> 
                 <Route path="/staff/dashboard" element={<Dashboard />} /> 
-                <Route path="/staff/pet" element={<PetStatus />} /> 
+                <Route path="/staff/pet status" element={<PetStatus />} /> 
                 <Route path="/staff/pet/:id" element={<PetUpdate />} /> 
                 <Route path="/staff/review" element={<div>Staff Review Page</div>} /> 
                 <Route path="/staff/management" element={<Management />}> 
