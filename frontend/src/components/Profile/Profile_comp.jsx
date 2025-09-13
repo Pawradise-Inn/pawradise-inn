@@ -7,7 +7,6 @@ const Profile_comp = () => {
     const [password, setPassword] = useState("password123");
     const [phone, setPhone] = useState("123-456-7890");
     const [email, setEmail] = useState("john.doe@email.com");
-    const [address, setAddress] = useState("123 Main St, City, Country");
     return (
         <div>
             <div className="mb-8">
@@ -79,17 +78,7 @@ const Profile_comp = () => {
                             className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                         />
                    </div>
-                   { /* address */}
-                   <div>
-                        <label className="block text-sm font-semibold mb-2">
-                            Label
-                        </label>
-                        <textarea
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            className='w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
-                        />
-                   </div>
+                   
                 </div>
                 <div className="flex justify-end items-center mt-8 pt-6 border-t border-[var(--brown-color)]">
                     <div className="flex space-x-8">
