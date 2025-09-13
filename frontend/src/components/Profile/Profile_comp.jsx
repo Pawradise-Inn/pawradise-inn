@@ -55,18 +55,6 @@ const Profile_comp = () => {
                             className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                         />
                    </div>
-                   { /* password */}
-                   <div>
-                        <label className="block text-sm font-semibold mb-2">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
-                        />
-                   </div>
                    { /* phone */}
                    <div>
                         <label className="block text-sm font-semibold mb-2">
