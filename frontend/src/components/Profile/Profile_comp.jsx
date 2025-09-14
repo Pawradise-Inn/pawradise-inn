@@ -26,7 +26,7 @@ const Profile_comp = () => {
                                 value={firstname}
                                 onChange={(e) => setFirstname(e.target.value)}
                                 className=
-                                'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
+                                'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none'
                             />
                         </div>
                         <div>
@@ -38,7 +38,7 @@ const Profile_comp = () => {
                                 value={lastname}
                                 onChange={(e) => setLastname(e.target.value)}
                                 className=
-                                'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
+                                'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none'
                             />
                         </div>
                    </div>
@@ -51,7 +51,7 @@ const Profile_comp = () => {
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
+                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none'
                         />
                    </div>
                    { /* phone */}
@@ -63,7 +63,7 @@ const Profile_comp = () => {
                             type="tel"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
+                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none'
                         />
                    </div>
                    { /* Email */}
@@ -75,7 +75,7 @@ const Profile_comp = () => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
+                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none'
                         />
                    </div>
                    
@@ -88,7 +88,7 @@ const Profile_comp = () => {
                             Cancel
                         </button>
                         <button onClick={() => console.log("Save changes")}
-                                className="!text-white px-6 py-2 bg-[var(--dark-brown-color)] text-white rounded hover:bg-[var(--light-brown-color)] transition-colors duration-300 cursor-pointer"    
+                                className="!text-white px-6 py-2 bg-[var(--dark-brown-color)] rounded hover:bg-[var(--light-brown-color)] transition-colors duration-300 cursor-pointer"    
                         >
                             Done
                         </button>
