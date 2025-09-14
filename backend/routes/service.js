@@ -10,7 +10,8 @@ const {
     addPicturesToService,
     deletePicturesFromService,
     getAllServiceComments,
-    getServiceStatus
+    getServiceStatus,
+    getServiceReviews
 } = require('../controllers/service');
 
 router.route('/')
@@ -26,10 +27,13 @@ router.route('/:id/pictures')
     .post(addPicturesToService) //
     .delete(deletePicturesFromService); //
 
-router.route('/:id/status')
+router.route('/status')
     .get(getServiceStatus); //
 
 router.route('/:id/comments')
     .get(getAllServiceComments); //
+
+router.route('/comments')
+    .get(getServiceReviews);
 
 module.exports = router;
