@@ -14,22 +14,22 @@ const {
 } = require('../controllers/service');
 
 router.route('/')
-    .get(getServices)
-    .post(createService);
+    .get(getServices)       //
+    .post(createService);   //
 
 router.route('/:id')
-    .get(getService)
-    .post(updateService)
+    .get(getService)        //
+    .patch(updateService)   //
     .delete(deleteService);
 
 router.route('/:id/pictures')
-    .post(addPicturesToService)
-    .delete(deletePicturesFromService);
+    .post(addPicturesToService) //
+    .delete(deletePicturesFromService); //
 
 router.route('/:id/status')
-    .get(getServiceStatus);
+    .get(getServiceStatus); //
 
 router.route('/:id/comments')
-    .get(getAllServiceComments);
+    .get(getAllServiceComments); //
 
 module.exports = router;

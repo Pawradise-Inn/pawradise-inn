@@ -23,14 +23,15 @@ const getService = async (req, res) => {
     }
 };
 
-const createService = async (req, res) => {
+const createService = async (req, res) => { //requirement: 15
     try {
-        const {name, price, petType} = req.body;
+        const {name, price, petType, picture} = req.body;
         const service = await prisma.service.create({
             data: {
                 name: name,
                 price: price,
-                petType: petType
+                petType: petType,
+                picture: picture
             }
         });
         res.status(201).json({success: true, data: service});
@@ -46,6 +47,7 @@ const updateService = async (req, res) => {
         if (req.body.name !== undefined) dataToUpdate.name = req.body.name;
         if (req.body.price !== undefined) dataToUpdate.price = req.body.price;
         if (req.body.petType !== undefined) dataToUpdate.petType = req.body.petType;
+        if (req.body.picture !== undefined) dataToUpdate.picture = req.body.picture;
 
         if(Object.keys(dataToUpdate).length === 0) return res.status(400).json({success: false, msg: "No valid fields to update"});
 
@@ -60,7 +62,7 @@ const updateService = async (req, res) => {
     }
 };
 
-const deleteService = async (req, res) => {
+const deleteService = async (req, res) => { //requirement: 15
     try {
         const serviceId = req.params.id;
         const service = await prisma.service.delete({
@@ -141,6 +143,51 @@ const getServiceStatus = async (req, res)=>{ //requirement: 6
     }
 };
 
+const getServiceReviews = async (req, res) => { //requirement: 7
+  try {
+    const { serviceId, NSP } = req.query;
+    const page = Number(NSP) || 1;
+    const take = 3;
+    const skip = (page - 1) * take;
+
+    if (!serviceId) {
+      return res.status(400).json({ success: false, msg: "serviceId is required" });
+    }
+
+    const reviews = await prisma.chatLog.findMany({
+      where: {
+        serviceId: Number(serviceId),
+        review: { not: null }
+      },
+      skip,
+      take,
+      select: {
+        review: true,
+        rating: true,
+        review_date: true,
+        customer: {
+          select: { name: true }
+        }
+      }
+    });
+
+    if (!reviews || reviews.length === 0) {
+      return res.status(404).json({ success: false, msg: "No reviews found" });
+    }
+
+    const formattedReviews = reviews.map(r => ({
+      commenter_name: r.customer?.name || "Anonymous",
+      comment_detail: r.review,
+      comment_star: r.rating,
+    }));
+
+    res.status(200).json({ success: true, data: formattedReviews });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+
 module.exports = {
     getServices,
     getService,
@@ -150,5 +197,6 @@ module.exports = {
     addPicturesToService,
     deletePicturesFromService,
     getAllServiceComments,
-    getServiceStatus
+    getServiceStatus,
+    getServiceReviews
 };

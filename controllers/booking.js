@@ -133,6 +133,17 @@ const deleteBooking = async (req, res) => {
     }
 }
 
+const checkBookingStatus = async (req, res) => {
+    const bookingId = Number(req.query.id);
+    const booking = await prisma.booking.findUnique({
+        where: {
+            id: bookingId
+        }
+    });
+
+    if(!booking) res
+}
+
 module.exports = {
     getBookings,
     getBooking,

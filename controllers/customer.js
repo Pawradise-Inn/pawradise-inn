@@ -2,12 +2,21 @@ const prisma = require('../prisma/prisma');
 
 const getCustomerProfile = async(req, res)=>{ //requirement: 2
     try{
-        const customerId = req.query.id;
+        const customerId = req.params.id;
         const customerWithPets = await prisma.customer.findUnique({
             where: {
                 userId: Number(customerId)
             },
             include:{
+                user: {
+                    select:{
+                        firstname: true,
+                        lastname: true,
+                        email: true,
+                        phone_number: true,
+                        user_name: true,
+                    }
+                },
                 pets: {
                     include: {
                         bookedRooms: {
@@ -38,5 +47,6 @@ const getCustomerProfile = async(req, res)=>{ //requirement: 2
 };
 
 module.exports = {
-    getCustomerProfile
+    getCustomerProfile,
+    getMyBooking
 }

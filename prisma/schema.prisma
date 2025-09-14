@@ -65,8 +65,10 @@ model ChatLog {
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
   staffId    Int?
   staff      Staff?    @relation(fields: [staffId], references: [id], onDelete: SetNull)
-  serviceId  Int
-  service    Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  serviceId  Int?
+  service    Service?  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  roomId     Int?
+  room       Room?     @relation(fields: [roomId], references: [id], onDelete: Cascade)
 }
 
 model Pet {
@@ -97,6 +99,7 @@ model Room {
 
   bookings     BookedRoom[]
   staffOnRooms RoomStaff[]
+  ChatLog      ChatLog[]
 }
 
 model BookedRoom {

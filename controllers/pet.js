@@ -1,6 +1,6 @@
 const prisma = require('../prisma/prisma');
 
-exports.register = async (req, res) => {
+const register = async (req, res) => {
   try {
     const userId = req.user.id; // from protect middleware
     console.log(userId);
@@ -48,7 +48,7 @@ exports.register = async (req, res) => {
 };
 
 
-exports.getPet = async (req, res) => {  //Both
+const getPet = async (req, res) => {  //Both
     try {
         const pet = await prisma.pet.findUnique({
             where: {
@@ -64,7 +64,7 @@ exports.getPet = async (req, res) => {  //Both
     }
 };
 
-exports.updatePet = async (req, res) => {
+const updatePet = async (req, res) => {
     try {
         const pet = await prisma.pet.update({
             where: {id: Number(req.params.id)},
@@ -80,7 +80,7 @@ exports.updatePet = async (req, res) => {
     }
 };
 
-exports.updatePetStatus = async (req, res) => {
+const updatePetStatus = async (req, res) => {
   try {
     const petId = Number(req.params.id);
     console.log(petId);
@@ -106,7 +106,7 @@ exports.updatePetStatus = async (req, res) => {
   }
 };
 
-exports.deletePet = async (req, res) => {
+const deletePet = async (req, res) => {
     try {
         const pet = await prisma.pet.delete({
             where: {id: Number(req.params.id)}
@@ -123,7 +123,6 @@ exports.deletePet = async (req, res) => {
 const getCustomerPetNames = async (req, res) =>{ //requirement: 3
     try {
         const userId = Number(req.query.userId);
-        const bookingDate = new Date(req.query.date);
 
         const pets = await prisma.pet.findMany({
             where: {
@@ -146,7 +145,7 @@ const getCustomerPetNames = async (req, res) =>{ //requirement: 3
 const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
     try {
         const userId = Number(req.query.userId);
-        const bookingDate = new Date(req.query.date);
+        const bookingDate = new Date();
 
         const pets = await prisma.pet.findMany({
             where: {
@@ -168,4 +167,14 @@ const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
     }catch(err){
         res.status(400).json({success: false, error: err.message});
     }
+}
+
+module.exports = {
+  register,
+  getPet,
+  updatePet,
+  updatePetStatus,
+  deletePet,
+  getCustomerPetNames,
+  getCustomerPetNamesWithAvailable
 }
