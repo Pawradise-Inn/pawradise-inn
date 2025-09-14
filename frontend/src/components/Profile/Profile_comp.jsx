@@ -88,7 +88,7 @@ const Profile_comp = () => {
                             Cancel
                         </button>
                         <button onClick={() => console.log("Save changes")}
-                                className="!text-white px-6 py-2 bg-amber-800 text-white rounded hover:bg-amber-700 transition-colors duration-300 cursor-pointer"    
+                                className="!text-white px-6 py-2 bg-[var(--dark-brown-color)] text-white rounded hover:bg-[var(--light-brown-color)] transition-colors duration-300 cursor-pointer"    
                         >
                             Done
                         </button>
