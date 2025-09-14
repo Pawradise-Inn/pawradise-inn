@@ -121,7 +121,7 @@ const createBooking = async (req, res) => {
     }
 };
 
-const deleteBooking = async (req, res) => {
+const deleteBooking = async (req, res) => { 
     try {          
         const bookingId = req.params.id;                         
         const booking = await prisma.booking.delete({
@@ -131,7 +131,7 @@ const deleteBooking = async (req, res) => {
     } catch(err) {
         res.status(400).json({success: false, error: err.message});
     }
-}
+};
 
 const checkBookingStatus = async (req, res) => {
     const bookingId = Number(req.query.id);
@@ -142,12 +142,57 @@ const checkBookingStatus = async (req, res) => {
     });
 
     if(!booking) res
-}
+};
+
+const getMyBookings = async (req, res) => {
+  try {
+    const customerId = req.query.customerId;
+    if (!customerId) {
+      return res.status(401).json({ success: false, msg: 'Unauthorized' });
+    }
+
+    const bookings = await prisma.booking.findMany({
+      where: { customerId },
+      include: {
+        booked_room: { include: { room: true, pet: true } },
+        booked_service: { include: { service: true, pet: true } }
+      },
+    });
+
+    const formattedBookings = bookings.map(b => ({
+      bookingId: b.id,
+      date: b.date,
+      status: b.status,
+      rooms: b.booked_room.map(br => ({
+        id: br.id,
+        image: br.room.picture[0] ?? null,
+        roomId: br.room.id,
+        checkIn: br.checkIn,
+        checkOut: br.checkOut,
+        petId: br.petId,
+        pet: br.pet ? { id: br.pet.id, name: br.pet.name, type: br.pet.type } : null
+      })),
+      services: b.booked_service.map(bs => ({
+        id: bs.id,
+        image: bs.service.picture ?? null,
+        serviceId: bs.service.id,
+        scheduled: bs.scheduled,
+        petId: bs.petId,
+        pet: bs.pet ? { id: bs.pet.id, name: bs.pet.name, type: bs.pet.type } : null
+      }))
+    }));
+
+    res.status(200).json({ success: true, data: formattedBookings });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
 
 module.exports = {
     getBookings,
     getBooking,
     updateBookingStatus,
     createBooking,
-    deleteBooking
+    deleteBooking,
+    getMyBookings
 };

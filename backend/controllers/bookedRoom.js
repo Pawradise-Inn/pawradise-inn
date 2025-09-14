@@ -88,10 +88,50 @@ const deleteBookedRoom = async (req, res) => {
     }
 };
 
+const getTodayRooms = async (req, res) => {
+  try {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const bookedRooms = await prisma.bookedRoom.findMany({
+      where: {
+        checkIn: {
+          gte: todayStart,
+          lte: todayEnd
+        }
+      },
+      include: {
+        room: true,
+        pet: true,
+        booking: true 
+      }
+    });
+
+    const formattedRooms = bookedRooms.map(br => ({
+      bookingId: br.bookingId,
+      roomId: br.roomId,
+      roomImage: br.room.picture[0] ?? null,
+      petId: br.petId,
+      petName: br.pet?.name ?? null,
+      checkIn: br.checkIn,
+      checkOut: br.checkOut
+    }));
+
+    res.status(200).json({ success: true, data: formattedRooms });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+
 module.exports = {
     getBookedRooms,
     getBookedRoom,
     createBookedRoom,
     updateBookedRoom,
-    deleteBookedRoom
+    deleteBookedRoom,
+    getTodayRooms
 };

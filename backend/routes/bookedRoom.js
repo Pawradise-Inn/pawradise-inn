@@ -6,7 +6,8 @@ const {
     getBookedRoom,
     createBookedRoom,
     updateBookedRoom,
-    deleteBookedRoom
+    deleteBookedRoom,
+    getTodayRooms
 } = require('../controllers/bookedRoom');
 
 router.route('/')
@@ -17,5 +18,8 @@ router.route('/:id')
     .get(getBookedRoom)
     .patch(updateBookedRoom)
     .delete(deleteBookedRoom);
+
+router.route('/dashboard')
+    .get(getTodayRooms);
 
 module.exports = router;
