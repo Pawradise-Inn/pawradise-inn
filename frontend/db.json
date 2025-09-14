@@ -9,7 +9,46 @@
       "user_name": "johndoe123",
       "password": "$2b$10$abcdefg1234567890hashedpassword",
       "role": "CUSTOMER",
-      "pets": [
+      "bookings": [
+        {
+          "id": 1,
+          "date": "2025-09-10T10:00:00Z",
+          "status": "BOOKED",
+          "customerId": 1,
+          "service_name": "Grooming",
+          "pet_name": "Buddy",
+          "pet_type": "DOG",
+          "img": "https://example.com/pets/buddy.jpg"
+        }
+      ]
+    },
+    {
+      "id": "2"
+    }
+  ],
+  "services": [
+    {
+      "id": "1",
+      "name": "Grooming",
+      "price": 500,
+      "petType": [
+        "DOG"
+      ],
+      "picture": "https://example.com/services/grooming.png"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "1",
+      "capacity": 1,
+      "price": 2000,
+      "picture": [
+        "https://example.com/rooms/room1.jpg"
+      ],
+      "petType": "DOG"
+    }
+  ],
+  "pets": [
         {
           "id": 1,
           "name": "Buddy",
@@ -60,44 +99,5 @@
           "medical_condition": "Healthy",
           "img": "https://images.unsplash.com/photo-1558788353-f76d92427f16?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
         }
-      ],
-      "bookings": [
-        {
-          "id": 1,
-          "date": "2025-09-10T10:00:00Z",
-          "status": "BOOKED",
-          "customerId": 1,
-          "service_name": "Grooming",
-          "pet_name": "Buddy",
-          "pet_type": "DOG",
-          "img": "https://example.com/pets/buddy.jpg"
-        }
       ]
-    },
-    {
-      "id": "2"
-    }
-  ],
-  "services": [
-    {
-      "id": "1",
-      "name": "Grooming",
-      "price": 500,
-      "petType": [
-        "DOG"
-      ],
-      "picture": "https://example.com/services/grooming.png"
-    }
-  ],
-  "rooms": [
-    {
-      "id": "1",
-      "capacity": 1,
-      "price": 2000,
-      "picture": [
-        "https://example.com/rooms/room1.jpg"
-      ],
-      "petType": "DOG"
-    }
-  ]
 }
