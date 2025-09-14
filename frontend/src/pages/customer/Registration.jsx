@@ -25,7 +25,7 @@ const Registration = () => {
     Password: "",
     ConfirmPassword: "",
     PhoneNumber: "",
-
+    Address: "",
   });
 
   const [consentChecked, setConsentChecked] = useState(false);
@@ -44,8 +44,7 @@ const Registration = () => {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row w-full min-h-screen overflow-hidden bg-[var(--cream-color)]">
-        {/* Left side image */}
+      <div className="flex flex-col md:flex-row w-full min-h-screen overflow-hidden">
         <div className="w-full md:w-3/5 h-64 md:h-auto flex-shrink-0">
           <img
             className="w-full h-full object-cover"
@@ -54,8 +53,8 @@ const Registration = () => {
           />
         </div>
 
-        {/* Right side form */}
-        <div className="w-full md:w-2/5 h-full flex flex-col items-center justify-center p-4">
+
+        <div className="w-full md:w-2/5 h-full bg-[var(--cream-color)] flex flex-col items-center justify-center p-4">
           <h1
             className="text-center pt-2 text-[60px] md:text-3xl text-[var(--brown-color)] font-semibold"
             style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)" }}
@@ -67,7 +66,6 @@ const Registration = () => {
             className="flex flex-col space-y-2 p-2 w-full max-w-md"
             onSubmit={handleSubmit}
           >
-            
             {fields.map((field) => (
               <div key={field.name} className="flex flex-col w-full">
                 <label
@@ -86,6 +84,24 @@ const Registration = () => {
                 />
               </div>
             ))}
+
+            <div className="flex flex-col w-full">
+              <label
+                className="text-[var(--brown-color)] font-semibold text-left mb-1"
+                htmlFor="Address"
+              >
+                Address
+              </label>
+              <textarea
+                id="Address"
+                name="Address"
+                placeholder="Address"
+                value={form.Address}
+                onChange={handleChange}
+                rows="2"
+                className="border-2 border-[var(--dark-brown-color)] bg-white opacity-65 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] shadow-lg w-full"
+              />
+            </div>
 
             <div className="flex items-center mt-2">
               <input
