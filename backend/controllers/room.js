@@ -163,12 +163,12 @@ const getAvailableRooms = async (req, res) => { //requirement: 7
     const formattedRooms = availableRooms.map(r => {
       const ratings = r.ChatLog.map(c => c.rating ?? 5);
       const avgRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 5;
-
+      const count = overlappingRoom(r.id, entryDate, exitDate);
       return {
         image: r.picture,
         roomId: r.id,
         price: r.price,
-        size: r.capacity,
+        size: count,
         maxsize: r.capacity,
         review: avgRating
       };
@@ -180,7 +180,7 @@ const getAvailableRooms = async (req, res) => { //requirement: 7
   }
 };
 
-const getAllRoomsWithReviews = async (req, res) => {
+const getAllRoomsWithReviews = async (req, res) => { //requirement: 9
   try {
     const rooms = await prisma.room.findMany({
       select: {
@@ -205,7 +205,7 @@ const getAllRoomsWithReviews = async (req, res) => {
       const avgRating = ratings.length
         ? ratings.reduce((a, b) => a + b, 0) / ratings.length
         : 5;
-
+    
       return {
         image: r.picture,
         roomId: r.id,
@@ -234,6 +234,8 @@ module.exports = {
     deleteRoom,
     addPicturesToRoom,
     deletePicturesFromRoom,
-    getRoomStatus
+    getRoomStatus,
+    getAvailableRooms,
+    getAllRoomsWithReviews
 };
 
