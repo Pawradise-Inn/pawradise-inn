@@ -7,7 +7,7 @@ const {
     createChatLog,
     replyToChatLog,
     deleteChatLog
-} = require('../controller/chatlog');
+} = require('../controllers/chatlog');
 
 router.route('/')
     .get(getChatLogs)
