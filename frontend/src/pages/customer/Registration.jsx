@@ -114,7 +114,7 @@ const Registration = () => {
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 mt-2 w-full justify-end">
-              <NavLink to="/" className="w-full md:w-40">
+              <NavLink to="/login" className="w-full md:w-40">
                 <button
                   type="button"
                   className="w-full h-10 text-[var(--dark-brown-color)] bg-[var(--light-brown-color)] rounded shadow px-4 py-1 hover:bg-[var(--brown-color)] hover:!text-[var(--beige-cream-color)] transition-colors cursor-pointer "
