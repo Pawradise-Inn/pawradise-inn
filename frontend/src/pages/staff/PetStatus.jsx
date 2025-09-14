@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { NavLink } from "react-router-dom";
+import { fetchAllPetAPI } from "../../hooks/petAPI";
 
 const Pet_card = ({pet}) => {
     return (
@@ -22,7 +23,7 @@ const Pet_card = ({pet}) => {
                                 🔴 pet_status
                             </span>   
                     </div>
-                </div>\
+                </div>
             </NavLink>
         </div>
         
@@ -31,62 +32,23 @@ const Pet_card = ({pet}) => {
 
 
 const PetStatus = () => {
-    const [pets, setPets] = useState([
-        {
-            id: 1,
-            name: "Buddy",
-            type: "Dog",
-            breed: "Golden Retriever", 
-            gender: "Male",
-            food_allergy: "None",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 2,
-            name: "Whiskers",
-            type: "Cat",
-            breed: "Persian",
-            gender: "Female", 
-            food_allergy: "Fish",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 3,
-            name: "Max",
-            type: "Dog",
-            breed: "Beagle",
-            gender: "Female", 
-            food_allergy: "None",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
-        },
-        {
-            id: 4,
-            name: "Luna",
-            type: "Cat",
-            breed: "Siamese",
-            gender: "Female", 
-            food_allergy: "Dairy",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1574158622682-e40e69881006?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 5,
-            name: "Charlie",
-            type: "Dog",
-            breed: "Bulldog",
-            gender: "Female", 
-            food_allergy: "None",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1558788353-f76d92427f16?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        }
-    ]);
-
+    const [pets, setPets] = useState([])
     const [filters, setFilter] = useState([])
     const [search, setSearch] = useState("")
 
+    const fetchPets = async () => {
+        try{
+            const response = await fetchAllPetAPI();
+            setPets(response)
+        } catch(err){
+            console.error(err)
+        }
+
+    }
+
+    useEffect(() => {
+        fetchPets()
+    }, [])
     const handleCheckboxChange = (e) => {
         const value = e.target.value;
         if(e.target.checked){
@@ -111,11 +73,11 @@ const PetStatus = () => {
                     />
                     
                 </div>
-                <div class="flex my-6 space-x-6">
-                    <label class="relative flex items-center space-x-2 cursor-pointer font-semibold">
-                        <input type="checkbox" value="book" onChange={handleCheckboxChange} class="hidden peer" />
+                <div className="flex my-6 space-x-6">
+                    <label className="relative flex items-center space-x-2 cursor-pointer font-semibold">
+                        <input type="checkbox" value="book" onChange={handleCheckboxChange} className="hidden peer" />
 
-                        <div class="relative w-10 h-10 border-2 border-[var(--brown-color)] rounded transition-all bg-[var(--cream-color)] 
+                        <div className="relative w-10 h-10 border-2 border-[var(--brown-color)] rounded transition-all bg-[var(--cream-color)] 
                                     before:absolute before:top-1/2 before:left-1/2 before:w-8 before:h-0.5 before:bg-[var(--dark-brown-color)] 
                                     before:origin-center before:-translate-x-1/2 before:-translate-y-1/2 before:rotate-135 before:transform 
                                     before:transition-all before:scale-0 peer-checked:before:scale-100">
@@ -124,10 +86,10 @@ const PetStatus = () => {
                         <span >book</span>
                     </label>
 
-                    <label class="relative flex items-center space-x-2 cursor-pointer font-semibold">
-                        <input type="checkbox" value="service" onChange={handleCheckboxChange} class="hidden peer" />
+                    <label className="relative flex items-center space-x-2 cursor-pointer font-semibold">
+                        <input type="checkbox" value="service" onChange={handleCheckboxChange} className="hidden peer" />
 
-                        <div class="relative w-10 h-10 border-2 border-[var(--brown-color)] rounded transition-all bg-[var(--cream-color)]
+                        <div className="relative w-10 h-10 border-2 border-[var(--brown-color)] rounded transition-all bg-[var(--cream-color)]
                                     before:absolute before:top-1/2 before:left-1/2 before:w-8 before:h-0.5 before:bg-[var(--dark-brown-color)] 
                                     before:origin-center before:-translate-x-1/2 before:-translate-y-1/2 before:rotate-135 before:transform 
                                     before:transition-all before:scale-0 peer-checked:before:scale-100">
