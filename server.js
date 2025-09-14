@@ -20,6 +20,7 @@ const service = require('./routes/service');
 const pet = require('./routes/pet');
 const staff = require('./routes/staff');
 const auth = require('./routes/auth');
+const chatlog = require('./routes/chatlog');
 
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/booking', booking);
@@ -29,6 +30,7 @@ app.use('/api/v1/room', room);
 app.use('/api/v1/service', service);
 app.use('/api/v1/pet', pet);
 app.use('/api/v1/staff', staff);
+app.use('/api/v1/chatlog', chatlog);
 
 const PORT = process.env.PORT || 5000;
 
