@@ -1,4 +1,4 @@
-const prisma = require('.../prisma/prisma');
+const prisma = require('../../prisma/prisma');
 
 const findBookedServiceById = async(id)=>{
     const bookedId = Number(id);
