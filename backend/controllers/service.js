@@ -143,20 +143,20 @@ const getServiceStatus = async (req, res)=>{ //requirement: 6
     }
 };
 
-const getServiceReviews = async (req, res) => { //requirement: 7
+const getServiceReviews = async (req, res) => { //requirement: 5
   try {
-    const { serviceId, NSP } = req.query;
+    const { name, NSP } = req.query;
     const page = Number(NSP) || 1;
     const take = 3;
     const skip = (page - 1) * take;
 
-    if (!serviceId) {
-      return res.status(400).json({ success: false, msg: "serviceId is required" });
+    if (!name) {
+      return res.status(400).json({ success: false, msg: "name is required" });
     }
 
     const reviews = await prisma.chatLog.findMany({
       where: {
-        serviceId: Number(serviceId),
+        name: name,
         review: { not: null }
       },
       skip,

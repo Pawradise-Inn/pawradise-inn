@@ -47,6 +47,5 @@ const getCustomerProfile = async(req, res)=>{ //requirement: 2
 };
 
 module.exports = {
-    getCustomerProfile,
-    getMyBooking
+    getCustomerProfile
 }
