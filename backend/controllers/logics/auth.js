@@ -1,5 +1,5 @@
-const prisma = require('.../prisma/prisma');
-const bcrypt = require('bcrytjs');
+const prisma = require('../../prisma/prisma');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const findUserByUsername = async(username)=>{

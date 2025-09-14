@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {hashPassword, matchPassword, getSignedJwtToken} = require('./logics/auth.js')
 
-exports.register = async (req, res, next) => {
+exports.register = async (req, res, next) => { //requirement: 10
     try {
         // Accept either camelCase or snake_case keys from frontend
         const firstname   = req.body.firstname   ?? req.body.firstname;
@@ -63,7 +63,7 @@ const sendTokenResponse = (user, statusCode, res) => {
     res.status(statusCode).cookie('token', token, options).json({ success: true, token });
 };
 
-exports.getMe = async (req, res) => {
+exports.getMe = async (req, res) => { //requirement: 11
     try {
         const idParam = req.params.id;
         if (!idParam) return res.status(400).json({ success: false, error: "Missing id param" });

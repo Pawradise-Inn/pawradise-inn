@@ -11,7 +11,7 @@ const getBookedServices = async (req, res) => {
     }
 };
 
-const getBookedService = async (req, res) => {
+const getBookedService = async (req, res) => { //requirement: 13
     try {
         const bookedServiceId = Number(req.params.id);
         const bookedService = await findBookedServiceById(bookedServiceId);
@@ -81,6 +81,57 @@ const deleteBookedService = async (req, res) => {
         res.status(400).json({success: false, error: err.message});
     }
 };
+
+const getMyBookings = async (req, res) => { //requirement: 12
+  try {
+    const customerId = req.query.customerId;
+    const bookings = await prisma.bookedService.findMany({
+      select: {
+        id: true, 
+        scheduled: true,
+        booking: {
+          select: {
+            id: true,
+            date: true,
+            status: true,
+          }
+        },
+        petId: true,
+        pet: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            age: true,
+            picture: true
+          }
+        },
+        service: {
+          select: {
+            picture: true
+          }
+        }
+      }
+    });
+
+    if (!bookings || bookings.length === 0) {
+      return res.status(404).json({ success: false, msg: "No bookings found" });
+    }
+
+    const formattedBookings = bookings.map(b => ({
+      image: b.service.picture,
+      booking_id: b.booking.id,
+      booking: b.booking,
+      petId: b.petId,
+      pet: b.pet
+    }));
+
+    res.status(200).json({ success: true, data: formattedBookings });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
 
 module.exports = {
     getBookedServices,

@@ -1,4 +1,4 @@
-const prisma = require('.../prisma/prisma');
+const prisma = require('../../prisma/prisma');
 
 const findBookedRoomById = async(id)=>{
     const bookedId = Number(id);
@@ -40,8 +40,44 @@ const duplicatedRoom = async(roomId, petId, checkIn, checkOut)=>{
     });
     return overlapping;
 }
+
+const createBookedRoomWithCondition = async (roomId, petId, bookingId, checkIn, checkOut) => {
+    const count = await overlappingRoom(roomId, checkIn, checkOut);
+    const cap = await getRoomCap(roomId);
+
+    if (count >= cap) {
+        const error = new Error('Room is not available');
+        error.code = 'ROOM_FULL';
+        throw error;
+    }
+
+    const overlapping = await duplicatedRoom(roomId, petId, checkIn, checkOut);
+    if (overlapping.length > 0) {
+        const error = new Error('Room is not available for the selected dates');
+        error.duplicatedDates = overlapping.map(b => ({
+            checkIn: b.checkIn,
+            checkOut: b.checkOut
+        }));
+        error.code = 'ROOM_DUPLICATE';
+        throw error;
+    }
+
+    const bookedRoom = await prisma.bookedRoom.create({
+        data: {
+            roomId,
+            petId,
+            bookingId,
+            checkIn: new Date(checkIn),
+            checkOut: new Date(checkOut)
+        }
+    });
+
+    return bookedRoom;
+};
+
 module.exports = {
     findBookedRoomById,
     overlappingRoom,
-    duplicatedRoom
+    duplicatedRoom,
+    createBookedRoomWithCondition
 };
