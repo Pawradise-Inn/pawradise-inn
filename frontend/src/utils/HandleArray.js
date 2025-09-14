@@ -1,4 +1,5 @@
 // function for generate array which have specific range [1, len] and depend on middle idx
+// @param
 // range: range of generated array
 // middle: middle index of generated array
 // len: maximum number this array can generate
