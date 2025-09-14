@@ -30,10 +30,10 @@ router.route('/:id/pictures')
 router.route('/status')
     .get(getServiceStatus); //
 
-router.route('/:id/comments')
+router.route('/comments')
     .get(getAllServiceComments); //
 
-router.route('/comments')
+router.route('/reviews')
     .get(getServiceReviews);
 
 module.exports = router;

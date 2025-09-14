@@ -47,7 +47,6 @@ const register = async (req, res) => {
   }
 };
 
-
 const getPet = async (req, res) => {  //Both
     try {
         const pet = await prisma.pet.findUnique({
@@ -120,27 +119,29 @@ const deletePet = async (req, res) => {
     }
 };
 
-const getCustomerPetNames = async (req, res) =>{ //requirement: 3
-    try {
-        const userId = Number(req.query.userId);
+const getCustomerPets = async (req, res) => {
+  try {
+    const userId = Number(req.query.userId);
+    const fields = req.query.fields ? req.query.fields.split(',') : ['name', 'breed', 'sex', 'age', 'type', 'status','breed', 'disease', 'allergic', 'picture'];
 
-        const pets = await prisma.pet.findMany({
-            where: {
-                customerId: {
-                  userId: userId
-                },
-            },
-            select: {
-                name: true
-            }
-        });
+    const select = {};
+    fields.forEach(f => select[f] = true);
 
-        if(!pets) return res.status(400).json({success: false, msg: "There is no pet for this customer"});
-        res.status(200).json({success: true, data: pets});
-    }catch(err){
-        res.status(400).json({success: false, error: err.message});
+    const pets = await prisma.pet.findMany({
+      where: { customerId: userId },
+      select
+    });
+
+    if (!pets || pets.length === 0) {
+      return res.status(404).json({ success: false, msg: "There is no pet for this customer" });
     }
+
+    res.status(200).json({ success: true, data: pets });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
 };
+
 
 const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
     try {
@@ -175,6 +176,6 @@ module.exports = {
   updatePet,
   updatePetStatus,
   deletePet,
-  getCustomerPetNames,
+  getCustomerPets,
   getCustomerPetNamesWithAvailable
 }

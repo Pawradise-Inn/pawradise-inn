@@ -9,7 +9,9 @@ const {
     deleteRoom,
     addPicturesToRoom,
     deletePicturesFromRoom,
-    getRoomStatus
+    getRoomStatus,
+    getAvailableRooms,
+    getAllRoomsWithReviews
 } = require('../controllers/room')
 
 router.route('/')
@@ -27,5 +29,11 @@ router.route('/:id/pictures')
 
 router.route('/:id/status')
     .get(getRoomStatus);
+
+router.route('/available')
+    .get(getAvailableRooms);
+
+router.route('/reviews')
+    .get(getAllRoomsWithReviews);
 
 module.exports = router;
