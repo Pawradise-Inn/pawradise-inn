@@ -4,7 +4,7 @@ const API_URL = 'http://......'
 
 export const fetchAllPetAPI = async() => {
     const response = await axios.get(API_URL);
-    return response;
+    return response.data;
 }
 
 export const fetchPetAPI = async (id) => {

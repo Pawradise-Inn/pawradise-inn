@@ -1,13 +1,12 @@
-import { useState } from "react";
+
+import { useOutletContext } from "react-router-dom";
 
 const Profile_comp = () => {
-    const [firstname, setFirstname] = useState("John");
-    const [lastname, setLastname] = useState("Doe");
-    const [username, setUsername] = useState("johndoe");
-    const [password, setPassword] = useState("password123");
-    const [phone, setPhone] = useState("123-456-7890");
-    const [email, setEmail] = useState("john.doe@email.com");
-    const [address, setAddress] = useState("123 Main St, City, Country");
+    const {user, setUser} = useOutletContext();
+    
+    if (!user) {
+        return <div>Loading user data...</div>;
+    }
     return (
         <div>
             <div className="mb-8">
@@ -24,8 +23,8 @@ const Profile_comp = () => {
                             </label>
                             <input
                                 type="text"
-                                value={firstname}
-                                onChange={(e) => setFirstname(e.target.value)}
+                                value={user.firstname || ""}
+                                onChange={(e) => setUser({...user, firstname: e.target.value})}
                                 className=
                                 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                             />
@@ -36,8 +35,8 @@ const Profile_comp = () => {
                             </label>
                             <input
                                 type="text"
-                                value={lastname}
-                                onChange={(e) => setLastname(e.target.value)}
+                                value={user.lastname || ""}
+                                onChange={(e) => setUser({...user, lastname: e.target.value})}
                                 className=
                                 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                             />
@@ -50,8 +49,8 @@ const Profile_comp = () => {
                         </label>
                         <input
                             type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={user.user_name || ""}
+                            onChange={(e) => setUser({...user, user_name: e.target.value})}
                             className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                         />
                    </div>
@@ -62,8 +61,8 @@ const Profile_comp = () => {
                         </label>
                         <input
                             type="tel"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            value={user.phone_number || ""}
+                            onChange={(e) => setUser({...user, phone_number: e.target.value})}
                             className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                         />
                    </div>
@@ -74,19 +73,19 @@ const Profile_comp = () => {
                         </label>
                         <input
                             type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={user.email || ""}
+                            onChange={(e) => setUser({...user, email: e.target.value})}
                             className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                         />
                    </div>
                    { /* address */}
                    <div>
                         <label className="block text-sm font-semibold mb-2">
-                            Label
+                            Address
                         </label>
                         <textarea
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
+                            value={user.address || ""}
+                            onChange={(e) => setUser({...user, address: e.target.value})}
                             className='w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
                         />
                    </div>

@@ -18,7 +18,7 @@ router.route('/')
 
 router.route('/:id')
     .get(getBooking)
-    .put(updateBooking)
+    //.put(updateBooking)
     .delete(deleteBooking);
 
 router.route('/:id/status')
