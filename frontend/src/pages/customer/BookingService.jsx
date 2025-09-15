@@ -60,7 +60,7 @@ const BookingService = () => {
 
       {noResult ? (
         <p className="text-2xl w-full text-center mt-32 italic">
-          Sorry, your desired service is not on operation now.
+          Sorry, your desired services is not on operation now.
         </p>
       ) : (
         <div className="grid grid-cols-4 gap-x-8 gap-y-4">

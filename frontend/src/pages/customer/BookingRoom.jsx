@@ -103,7 +103,7 @@ const BookingRoom = () => {
 
 			{noResult ? (
 				<p className="text-2xl w-full text-center mt-32 italic">
-					Sorry, your desired service is not on operation now.
+					Sorry, no available rooms match your desire.
 				</p>
 			) : (
 				<div className="m-8 grid grid-cols-2 gap-y-4 gap-x-8">
