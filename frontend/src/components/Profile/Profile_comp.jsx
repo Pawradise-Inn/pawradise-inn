@@ -4,7 +4,6 @@ import { useOutletContext } from "react-router-dom";
 import { updateUserAPI } from "../../hooks/userAPI";
 
 const Profile_comp = () => {
-<<<<<<< HEAD
     const {user, setUser} = useOutletContext();
     const [newUser, setNewUser] = useState([]);
     
@@ -33,14 +32,6 @@ const Profile_comp = () => {
             alert("Failed to update profile. Please try again.");
         }
     }
-=======
-    const [firstname, setFirstname] = useState("John");
-    const [lastname, setLastname] = useState("Doe");
-    const [username, setUsername] = useState("johndoe");
-    const [password, setPassword] = useState("password123");
-    const [phone, setPhone] = useState("123-456-7890");
-    const [email, setEmail] = useState("john.doe@email.com");
->>>>>>> c252c4ca659b1c00cb83621363b86ed637cb6d2c
     return (
         <div>
             <div className="mb-8">
@@ -83,15 +74,9 @@ const Profile_comp = () => {
                         </label>
                         <input
                             type="text"
-<<<<<<< HEAD
                             value={newUser.user_name || ""}
                             onChange={(e) => setNewUser({...newUser, user_name: e.target.value})}
                             className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
-=======
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none'
->>>>>>> c252c4ca659b1c00cb83621363b86ed637cb6d2c
                         />
                    </div>
                    { /* phone */}
@@ -101,15 +86,9 @@ const Profile_comp = () => {
                         </label>
                         <input
                             type="tel"
-<<<<<<< HEAD
                             value={newUser.phone_number || ""}
                             onChange={(e) => setNewUser({...newUser, phone_number: e.target.value})}
                             className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
-=======
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none'
->>>>>>> c252c4ca659b1c00cb83621363b86ed637cb6d2c
                         />
                    </div>
                    { /* Email */}
@@ -119,7 +98,6 @@ const Profile_comp = () => {
                         </label>
                         <input
                             type="email"
-<<<<<<< HEAD
                             value={newUser.email || ""}
                             onChange={(e) => setNewUser({...newUser, email: e.target.value})}
                             className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
@@ -134,11 +112,6 @@ const Profile_comp = () => {
                             value={newUser.address || ""}
                             onChange={(e) => setUser({...newUser, address: e.target.value})}
                             className='w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none transition-all duration-300'
-=======
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className= 'w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none'
->>>>>>> c252c4ca659b1c00cb83621363b86ed637cb6d2c
                         />
                    </div>
                    
@@ -150,13 +123,8 @@ const Profile_comp = () => {
                         >
                             Cancel
                         </button>
-<<<<<<< HEAD
                         <button onClick={() => handleConfirm()}
-                                className="!text-white px-6 py-2 bg-amber-800 text-white rounded hover:bg-amber-700 transition-colors duration-300 cursor-pointer"    
-=======
-                        <button onClick={() => console.log("Save changes")}
                                 className="!text-white px-6 py-2 bg-[var(--dark-brown-color)] rounded hover:bg-[var(--light-brown-color)] transition-colors duration-300 cursor-pointer"    
->>>>>>> c252c4ca659b1c00cb83621363b86ed637cb6d2c
                         >
                             Done
                         </button>
