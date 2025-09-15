@@ -1,6 +1,10 @@
 import axios from 'axios';
 
+<<<<<<< HEAD
 const API_URL = 'http://localhost:5000/api/v1/pet';
+=======
+const API_URL = 'http://localhost:5000/api/v1/pets'
+>>>>>>> 7f8244c1629a7d76a0c8a0b4bb42150bb54831b4
 
 // 1. Fetch all pets (optional userId + fields)
 export const fetchAllPetAPI = async (userId, fields) => {
