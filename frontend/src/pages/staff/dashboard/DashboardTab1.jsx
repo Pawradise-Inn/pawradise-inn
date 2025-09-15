@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 // --- API Functions (adjust path as needed) ---
 // Change this in: src/pages/staff/dashboard/DashboardTab1.jsx
 
-import { getTodayService } from "../../../hooks/bookedServiceAPI";
+import { getTodayService, createBookedService } from "../../../hooks/bookedServiceAPI";
 
 import {
   fetchTodaysBookedRoomsAPI,
@@ -202,6 +202,10 @@ const DashboardTab1 = () => {
                 // ADD mode
                 const newItem = await addBookedRoomAPI({ ...itemFromPopup, status: 'pending' });
                 setItems((prev) => [newItem, ...prev]);
+
+                const newBookedService = await createBookedService({ ...itemFromPopup, status: 'pending' });
+                
+                fetchServices(); // Refresh the services list to include the new booking
             }
         } catch (error) {
             console.error("Failed to save item:", error);

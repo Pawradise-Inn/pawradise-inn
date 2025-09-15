@@ -4,14 +4,7 @@ import { useState, useEffect } from "react";
 // --- API Functions (adjust path as needed) ---
 // Change this in: src/pages/staff/dashboard/DashboardTab4.jsx
 
-import { getTodayService } from "../../../hooks/bookedServiceAPI";
-
-import {
-  fetchTodaysBookedRoomsAPI,
-  addBookedRoomAPI,
-  updateBookedRoomAPI,
-  deleteBookedRoomAPI,
-} from "../../../hooks/bookedRoomAPI"; // Corrected Path
+import { getTodayService, createBookedService } from "../../../hooks/bookedServiceAPI";
 
 // --- Helper Components ---
 
@@ -86,7 +79,18 @@ const ItemPopup = ({ onClose, onSave, onDelete, initialData }) => {
     const [petName, setPetName] = useState(initialData?.petName || "");
     const [timeBooked, setTimeBooked] = useState(initialData?.timeBooked || "");
 
+    const getNowForInput = () => {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        return now.toISOString().slice(0,16);
+    }
+
     const handleSave = () => {
+        if (!timeBooked) {
+            alert("Please select a valid date and time.");
+            return;
+        }
+
         onSave({
             name: name || "New Service",
             petName: petName || "Pet's Name",
@@ -110,7 +114,12 @@ const ItemPopup = ({ onClose, onSave, onDelete, initialData }) => {
                 <h2>{isEditing ? 'Edit Booking' : 'Add New Booking'}</h2>
                 <input type="text" placeholder="Enter service name" value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />
                 <input type="text" placeholder="Enter pet name" value={petName} onChange={(e) => setPetName(e.target.value)} style={inputStyle} />
-                <input type="text" placeholder="Enter time" value={timeBooked} onChange={(e) => setTimeBooked(e.target.value)} style={inputStyle} />
+                <input
+                    type="datetime-local"
+                    value={timeBooked}
+                    onChange={(e) => setTimeBooked(e.target.value)}
+                    style={inputStyle}
+                />
                 <div style={buttonContainerStyle}>
                     <div>
                         {isEditing && (
@@ -142,29 +151,20 @@ const DashboardTab4 = () => { // Renamed
 
     const fetchServices = async () => {
         try {
+            setLoading(true);
             const data = await getTodayService();
             setItems(data.data || []); 
         } catch (error) {
             console.error("Failed to fetch services:", error);
+        } finally {
+            setLoading(false);
         }
     }
 
     // NEW: useEffect to load data from the API on component mount.
     useEffect(() => {
-        const loadBookings = async () => {
-            try {
-                setLoading(true);
-                const data = await fetchTodaysBookedRoomsAPI();
-                setItems(data.data); // Assuming API data matches the expected structure
-            } catch (error) {
-                console.error("Failed to fetch bookings:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadBookings();
         fetchServices();
-    }, []); // Empty array ensures this runs only once.
+    }, []); 
 
     const filtered = !search
         ? items
@@ -200,8 +200,8 @@ const DashboardTab4 = () => { // Renamed
                 ));
             } else {
                 // ADD mode
-                const newItem = await addBookedRoomAPI({ ...itemFromPopup, status: 'pending' });
-                setItems((prev) => [newItem, ...prev]);
+                await createBookedService(itemFromPopup);
+                fetchServices(); 
             }
         } catch (error) {
             console.error("Failed to save item:", error);
