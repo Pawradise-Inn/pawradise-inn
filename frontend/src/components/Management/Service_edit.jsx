@@ -1,75 +1,99 @@
 import { Outlet } from "react-router-dom";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ServiceCard from "../service/ServiceCard"; // keep this path
 import AddServicePopup from "./add_service";
+import testImg from "../../assets/test.png"; // ensure this exists
 
-const mockServices = Array.from({ length: 9 }).map((_, i) => ({
-  id: i + 1,
-  name: "service_name",
-  review: "x.x/5.0(star)",
-  image: "",
-}));
+// Demo data (replace with API later). Keep stable ids.
+const demoData = [
+  { id: 1, image: testImg, name: "Boarding",  review: 4.5, petType: "small", price: 2000, pageAmount: 3 },
+  { id: 2, image: testImg, name: "Grooming",  review: 4.0, petType: "big",   price: 1500, pageAmount: 4 },
+  { id: 3, image: testImg, name: "Training",  review: 4.8, petType: "small", price: 3000, pageAmount: 5 },
+  { id: 4, image: testImg, name: "Walking",   review: 4.2, petType: "big",   price: 500,  pageAmount: 13 },
+  { id: 5, image: testImg, name: "Vet Visit", review: 4.7, petType: "small", price: 2500, pageAmount: 13 },
+  { id: 6, image: testImg, name: "Daycare",   review: 4.3, petType: "big",   price: 1800, pageAmount: 1 },
+];
 
 const ServiceEdit = () => {
-  const [services, setServices] = useState(mockServices);
+  const [services, setServices] = useState(demoData);
   const [search, setSearch] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selected, setSelected] = useState(null); // null = add mode, object = edit mode
 
-  const filtered = !search
-    ? services
-    : services.filter((s) =>
-        s.name.toLowerCase().includes(search.toLowerCase())
-      );
+  const filtered = useMemo(() => {
+    if (!search) return services;
+    const q = search.toLowerCase();
+    return services.filter((s) => s.name.toLowerCase().includes(q));
+  }, [services, search]);
 
-  const handleTypeService = (e) => setSearch(e.target.value);
-
-  const handleSaveService = (svcFromPopup) => {
-    // svcFromPopup: { roomName, petType, price, image }
-    const newService = {
-      id: Date.now(),
-      name: svcFromPopup.roomName || "new service",
-      review: "0.0/5.0(star)",
-      image: svcFromPopup.image || "",
-      petType: svcFromPopup.petType,
-      price: svcFromPopup.price,
-    };
-    setServices((prev) => [newService, ...prev]);
-    setIsPopupOpen(false);
+  const openAdd = () => {
+    setSelected(null);
+    setIsPopupOpen(true);
   };
 
-  const handleCardClick = (svc) => {
-    // Open edit popup or do whatever you need
-    console.log("Service clicked:", svc);
+  const openEdit = (svc) => {
+    setSelected(svc);
     setIsPopupOpen(true);
+  };
+
+  const closePopup = () => {
+    setIsPopupOpen(false);
+    setSelected(null);
+  };
+
+  // Save handler works for both add & edit
+  const handleSaveService = (payload) => {
+    if (selected) {
+      // EDIT
+      setServices((prev) =>
+        prev.map((item) =>
+          item.id === selected.id ? { ...item, ...payload } : item
+        )
+      );
+    } else {
+      // ADD
+      const newItem = {
+        id: Date.now(),
+        review: 0.0,
+        pageAmount: 1,
+        image: payload.image || testImg,
+        ...payload, // { name, petType, price }
+      };
+      setServices((prev) => [newItem, ...prev]);
+    }
+    closePopup();
+  };
+
+  const handleDeleteService = (id) => {
+    setServices((prev) => prev.filter((s) => s.id !== id));
+    closePopup();
   };
 
   return (
     <main className="flex-1">
+      {/* Top bar */}
       <div className="flex items-center my-8 w-full px-8">
         <div className="flex flex-1 border-2 rounded-4xl px-6 py-4 text-3xl">
           <i className="bi bi-search opacity-50 pr-2 flex justify-center items-center -bottom-1 relative"></i>
           <input
             className="w-full outline-0 placeholder:opacity-75 text-2xl"
             placeholder="search"
-            onChange={handleTypeService}
+            onChange={(e) => setSearch(e.target.value)}
             value={search}
           />
         </div>
 
         <div className="flex gap-6 ml-8">
           <button
-            onClick={() => setIsPopupOpen(true)}
+            onClick={openAdd}
             className="px-12 py-4 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 text-xl w-40"
           >
             add
           </button>
-
-          <button className="px-12 py-4 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 text-xl w-40">
-            delete
-          </button>
         </div>
       </div>
 
+      {/* Grid */}
       {filtered.length === 0 ? (
         <p className="text-2xl w-full text-center mt-32 italic">No result.</p>
       ) : (
@@ -78,16 +102,20 @@ const ServiceEdit = () => {
             <ServiceCard
               key={s.id}
               data={{ image: s.image, name: s.name, review: s.review }}
-              onClick={handleCardClick}
+              onClick={() => openEdit(s)}
             />
           ))}
         </div>
       )}
 
+      {/* Popup */}
       {isPopupOpen && (
         <AddServicePopup
-          onClose={() => setIsPopupOpen(false)}
+          title={selected ? "Edit service" : "Add service"}
+          initialData={selected}
+          onClose={closePopup}
           onSave={handleSaveService}
+          onDelete={(id) => handleDeleteService(id)}
         />
       )}
 

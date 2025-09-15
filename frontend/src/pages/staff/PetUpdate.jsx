@@ -1,60 +1,24 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom";
+import { fetchPetAPI, updatePetAPI } from "../../hooks/petAPI";
 
 const PetUpdate = () => {
     const { id } = useParams();
-    const [pets, setPets] = useState([
-        {
-            id: 1,
-            name: "Buddy",
-            type: "Dog",
-            breed: "Golden Retriever", 
-            gender: "Male",
-            food_allergy: "None",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 2,
-            name: "Whiskers",
-            type: "Cat",
-            breed: "Persian",
-            gender: "Female", 
-            food_allergy: "Fish",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 3,
-            name: "Max",
-            type: "Dog",
-            breed: "Beagle",
-            gender: "Female", 
-            food_allergy: "None",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
-        },
-        {
-            id: 4,
-            name: "Luna",
-            type: "Cat",
-            breed: "Siamese",
-            gender: "Female", 
-            food_allergy: "Dairy",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1574158622682-e40e69881006?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 5,
-            name: "Charlie",
-            type: "Dog",
-            breed: "Bulldog",
-            gender: "Female", 
-            food_allergy: "None",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1558788353-f76d92427f16?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+    const [pet, setPet] = useState({});
+    const [status, setStatus] = useState('Completed');
+    const fetchPet = async () => {
+        try{
+            const response = await fetchPetAPI(id);
+            console.log(response)
+            setPet(response);
+        } catch(err) {
+            console.err(err)
         }
-    ]);
+        
+    }
+    useEffect(() => {
+        fetchPet();
+    }, [])
     const [serviceData, setServiceData] = useState([
         {
         id: 1,
@@ -62,7 +26,7 @@ const PetUpdate = () => {
         pet_type: "Dog",
         status: "completed",
         staff_name: "Sarah Johnson",
-        img: "https://images.unsplash.com/photo-1629135099459-a743b6a2ff0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+        img: "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
         },
         {
         id: 2,
@@ -90,7 +54,6 @@ const PetUpdate = () => {
         }
     ])
      
-    const pet = pets.find(p => p.id === parseInt(id)) || pets[0];
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -103,10 +66,10 @@ const PetUpdate = () => {
     }
     const getStatusText = (status) => {
         switch(status) {
-        case 'completed': return '🔴 Completed';
-        case 'in_progress': return '🔴 In Progress';
-        case 'available': return '🔴 Available';
+        case 'completed': return '🟢 Completed'
+        case 'available': return '🔵 Available';
         case 'unavailable': return '🔴 Unavailable';
+        case 'in_progress': return '🟡 In progress'
         default: return status;
         }
     };
@@ -121,10 +84,18 @@ const PetUpdate = () => {
     const navigate = useNavigate();
     
     const handleSave = () => {
-        navigate('/staff/pet')
+        const confirm = window.confirm('Confirm the status?')
+        if(confirm){
+            updatePetAPI(id, {...pet, status: status});
+            alert('update complete');
+            navigate('/staff/pet status')
+        }
     }
     const handleCancel = () => {
-        navigate('/staff/pet')
+        const confirm = window.confirm('Back to status page ?')
+        if(confirm){
+            navigate('/staff/pet status')
+        }
     }
 
     return(
@@ -150,7 +121,7 @@ const PetUpdate = () => {
                     {/* Room Booking */}
                     <div className="mt-8">
                         <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
-                            <StatusUpdate handleSave={handleSave} handleCancel={handleCancel}/>
+                            <StatusUpdate handleSave={handleSave} handleCancel={handleCancel} status={status} setStatus={setStatus}/>
                         </div>
                     </div>
                 </div>
@@ -176,7 +147,7 @@ const PetCard = ({pet}) => {
             <div className="flex items-start space-x-6">
                 <div className="w-64 h-64 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
                     <img 
-                        src={pet.img}
+                        src={pet.picture}
                         alt={pet.name}
                         className="w-full h-full object-cover"
                     />
@@ -185,18 +156,20 @@ const PetCard = ({pet}) => {
                     <h3 className="text-xl font-bold">{pet.name}</h3>
                     <p className="text-base"><span className="font-semibold">Pet type:</span> {pet.type}</p>
                     <p className="text-base"><span className="font-semibold">Pet breed:</span> {pet.breed}</p>
-                    <p className="text-base"><span className="font-semibold">Pet gender:</span> {pet.gender}</p>
-                    <p className="text-base"><span className="font-semibold">Food allergy:</span> {pet.food_allergy}</p>
-                    <p className="text-base"><span className="font-semibold">Medical condition:</span> {pet.medical_condition}</p>
+                    <p className="text-base"><span className="font-semibold">Pet gender:</span> {pet.sex}</p>
+                    <p className="text-base"><span className="font-semibold">Food allergy:</span> {pet.allergic}</p>
+                    <p className="text-base"><span className="font-semibold">Medical condition:</span> {pet.disease}</p>
                 </div>
             </div>
         </div>
     )
 }
 
-const StatusUpdate = ({handleSave, handleCancel}) => {
+const StatusUpdate = ({handleSave, handleCancel, status, setStatus}) => {
 
-
+    const handleStatusChange = (e) => {
+        setStatus(e.target.value);
+    };
     return(
         <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
             {/* Header */}
@@ -211,7 +184,10 @@ const StatusUpdate = ({handleSave, handleCancel}) => {
                 {/* Status Dropdown */}
                 <div className="flex flex-row justify-start">
                     <label className="font-semibold mb-1 mr-4">Status:</label>
-                    <select className="py-1 px-1 text-center p-2 border rounded-lg focus:ring-2 focus:ring-[var(--dark-brown-color)] focus:outline-none">
+                    <select className="py-1 px-1 text-center p-2 border rounded-lg focus:ring-2 focus:ring-[var(--dark-brown-color)] focus:outline-none"
+                        value={status}
+                        onChange={handleStatusChange}
+                    >
                         <option>Completed</option>
                         <option>In Progress</option>
                         <option>Available</option>
