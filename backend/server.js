@@ -7,10 +7,6 @@ dotenv.config({path: './config/config.env.local'});
 
 const app = express();
 const prisma = new PrismaClient();
-const cookieParser = require('cookie-parser')
-const pet = require('./routes/pet');
-const booking = require('./routes/booking');
-const staff = require('./routes/staff');
 
 // Body parser & cookie parser
 app.use(express.json());
