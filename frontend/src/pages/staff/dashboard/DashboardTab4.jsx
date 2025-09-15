@@ -49,7 +49,15 @@ const DashboardCard = ({ data, onClick, onStatusChange }) => {
             <div style={textContainerStyle}>
                 <p style={nameStyle}>{data.serviceName}</p>
                 <p style={detailStyle}>{data.petName}</p>
-                <p style={detailStyle}>{data.timeBooked}</p>
+                <p style={detailStyle}>
+                    {new Date(data.timeBooked).toLocaleString('en-US', {
+                        month: 'short',  // "Sep"
+                        day: 'numeric',    // "17"
+                        hour: 'numeric',   // "2"
+                        minute: '2-digit', // "44"
+                        hour12: true       // "AM/PM"
+                    })}
+                </p>
             </div>
             <div style={dropdownContainerStyle}>
                 <div style={dropdownBoxStyle} onClick={handleStatusBoxClick}>
@@ -120,6 +128,17 @@ const ItemPopup = ({ onClose, onSave, onDelete, initialData }) => {
                     onChange={(e) => setTimeBooked(e.target.value)}
                     style={inputStyle}
                 />
+                {timeBooked && (
+                    <div style={{ marginTop: '-0.5rem', marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#f0f8ff', borderRadius: '4px', color: '#333' }}>
+                        Selected time: <strong>
+                            {new Date(timeBooked).toLocaleString('en-US', {
+                                dateStyle: 'full', // "Wednesday, September 17, 2025"
+                                timeStyle: 'short',  // "2:44 AM"
+                            })}
+                        </strong>
+                    </div>
+                )}
+
                 <div style={buttonContainerStyle}>
                     <div>
                         {isEditing && (
