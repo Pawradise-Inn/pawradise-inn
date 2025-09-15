@@ -7,6 +7,12 @@ export const fetchTodaysBookedRoomsAPI = async () => {
   return response.data;
 };
 
+// You need this function for editing and status changes.
+export const updateBookedRoomAPI = async (id, bookingData) => {
+  const response = await axios.patch(`${API_URL}/${id}`, bookingData);
+  return response.data;
+};
+
 export const addBookedRoomAPI = async (bookedRoom) => {
   const response = await axios.post(API_URL, bookedRoom);
   return response.data;
