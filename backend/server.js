@@ -7,6 +7,8 @@ dotenv.config({path: './config/config.env.local'});
 
 const app = express();
 const prisma = new PrismaClient();
+const pet = require('./routes/pet');
+const staff = require('./routes/staff');
 
 // Body parser & cookie parser
 app.use(express.json());
@@ -17,8 +19,6 @@ const bookedRoom = require('./routes/bookedRoom');
 const bookedService = require('./routes/bookedService');
 const room = require('./routes/room');
 const service = require('./routes/service');
-const pet = require('./routes/pet');
-const staff = require('./routes/staff');
 const auth = require('./routes/auth');
 const chatlog = require('./routes/chatlog');
 
