@@ -89,7 +89,7 @@ const Login = ()=>{
                         Don't have an account?
                         <NavLink 
                             to="/register" 
-                            className="text-l ml-2 !text-red-700 font-bold hover:underline"
+                            className="text-l ml-2 !text-[var(--warning-color)] font-bold hover:underline "
                         >
                             Register here
                         </NavLink>
