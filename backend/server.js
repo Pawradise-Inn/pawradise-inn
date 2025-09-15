@@ -7,11 +7,21 @@ dotenv.config({path: './config/config.env.local'});
 
 const app = express();
 const prisma = new PrismaClient();
+const cookieParser = require('cookie-parser')
+const pet = require('./routes/pet');
+const booking = require('./routes/booking');
+const staff = require('./routes/staff');
 
 // Body parser & cookie parser
 app.use(express.json());
 app.use(cookieParser());
 
+<<<<<<< HEAD
+// app.use('/api/v1/auth', auth);
+app.use('/api/v1/booking', booking);
+//app.use('/api/v1/pet', pet);
+//app.use('/api/v1/staff', staff);
+=======
 const booking = require('./routes/booking');
 const bookedRoom = require('./routes/bookedRoom');
 const bookedService = require('./routes/bookedService');
@@ -31,13 +41,18 @@ app.use('/api/v1/service', service);
 app.use('/api/v1/pet', pet);
 app.use('/api/v1/staff', staff);
 app.use('/api/v1/chatlog', chatlog);
+>>>>>>> c252c4ca659b1c00cb83621363b86ed637cb6d2c
 
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(
   PORT,
   () => console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`),
+<<<<<<< HEAD
+  // console.log('DB URL at runtime:', process.env.DATABASE_URL)
+=======
   console.log('DB URL at runtime:', process.env.DATABASE_URL)
+>>>>>>> c252c4ca659b1c00cb83621363b86ed637cb6d2c
 );
 
 // Handle unhandled promise rejections

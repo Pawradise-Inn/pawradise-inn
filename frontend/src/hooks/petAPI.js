@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const API_URL = 'http://......'
+const API_URL = 'http://localhost:5000/pets'
 
 export const fetchAllPetAPI = async() => {
     const response = await axios.get(API_URL);
-    return response;
+    return response.data;
 }
 
 export const fetchPetAPI = async (id) => {

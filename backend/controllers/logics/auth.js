@@ -1,5 +1,9 @@
 const prisma = require('../../prisma/prisma');
+<<<<<<< HEAD
+const bcrypt = require('bcrytjs');
+=======
 const bcrypt = require('../../node_modules/bcryptjs/umd');
+>>>>>>> c252c4ca659b1c00cb83621363b86ed637cb6d2c
 const jwt = require('jsonwebtoken');
 
 const findUserByUsername = async(username)=>{
