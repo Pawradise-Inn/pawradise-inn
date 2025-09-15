@@ -1,63 +1,115 @@
 import { Outlet } from "react-router-dom";
-import { useMemo, useState } from "react";
-import RoomCard from "../room/RoomCard";      
-import AddRoomPopup from "./add_room";        
-import testImg from "../../assets/test.png"; 
+import { useEffect, useMemo, useState } from "react";
+import RoomCard from "../room/RoomCard";
+import AddRoomPopup from "./add_room";
+import testImg from "../../assets/test.png";
 
-// Demo data (replace with API later)
-const demoData = [
-  { image: testImg, status: "full",      roomId: 1, review: 4.5, forwhich: "small", price: 2000, size: 10, maxsize: 20, pageAmount: 30 },
-  { image: testImg, status: "full",      roomId: 2, review: 4.0, forwhich: "big",   price: 1500, size: 5,  maxsize: 10, pageAmount: 10 },
-  { image: testImg, status: "full",      roomId: 3, review: 4.8, forwhich: "small", price: 3000, size: 2,  maxsize: 5,  pageAmount: 2  },
-  { image: testImg, status: "full",      roomId: 4, review: 4.2, forwhich: "big",   price: 500,  size: 8,  maxsize: 15, pageAmount: 35 },
-  { image: testImg, status: "full",      roomId: 5, review: 4.7, forwhich: "small", price: 2500, size: 1,  maxsize: 3,  pageAmount: 50 },
-  { image: testImg, status: "available", roomId: 6, review: 4.3, forwhich: "big",   price: 1800, size: 12, maxsize: 20, pageAmount: 100 },
-];
+import {
+  fetchAllRoomsAPI,
+  addRoomAPI,
+  updateRoomAPI,
+  deleteRoomAPI,
+} from "../../hooks/roomAPI"; 
 
 const RoomEdit = () => {
-  const [rooms, setRooms] = useState(demoData);
+  const [rooms, setRooms] = useState([]);
   const [search, setSearch] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selected, setSelected] = useState(null); 
+  const [loading, setLoading] = useState(false);
+
+  // Load from API once
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      const data = await fetchAllRoomsAPI();
+
+      const normalized = data.map((r) => ({
+        roomId: r.roomId ?? r.id,                 // map id -> roomId if needed
+        status: r.status,
+        forwhich: r.forwhich ?? r.type,           // e.g., "small" | "big"
+        price: r.price,
+        size: r.size,
+        maxsize: r.maxsize ?? r.capacity,
+        review: r.review ?? 0,
+        pageAmount: r.pageAmount ?? 1,
+        image: r.image ?? testImg,
+        ...r,                                     // keep any extra backend fields
+      }));
+
+      setRooms(normalized);
+      setLoading(false);
+    };
+    load();
+  }, []);
 
   const filtered = useMemo(() => {
     if (!search) return rooms;
     const q = search.toLowerCase();
-    return rooms.filter((r) =>
-      String(r.roomId).includes(q) ||
-      r.status.toLowerCase().includes(q) ||
-      r.forwhich.toLowerCase().includes(q)
+    return rooms.filter(
+      (r) =>
+        String(r.roomId).includes(q) ||
+        (r.status ?? "").toLowerCase().includes(q) ||
+        (r.forwhich ?? "").toLowerCase().includes(q)
     );
   }, [rooms, search]);
 
-  const openAdd  = () => { setSelected(null); setIsPopupOpen(true); };
-  const openEdit = (room) => { setSelected(room); setIsPopupOpen(true); };
-  const closePopup = () => { setIsPopupOpen(false); setSelected(null); };
+  const openAdd = () => {
+    setSelected(null);
+    setIsPopupOpen(true);
+  };
+  const openEdit = (room) => {
+    setSelected(room);
+    setIsPopupOpen(true);
+  };
+  const closePopup = () => {
+    setIsPopupOpen(false);
+    setSelected(null);
+  };
 
-  // Save (add & edit)
-  const handleSaveRoom = (payload) => {
+  // Save (add or edit) -> calls API then refreshes list locally
+  const handleSaveRoom = async (payload) => {
+    // payload from your AddRoomPopup should contain fields like:
+    // { status, forwhich, price, size, maxsize, image? }
     if (selected) {
       // EDIT
-      setRooms(prev =>
-        prev.map(it => it.roomId === selected.roomId ? { ...it, ...payload } : it)
+      const id = selected.roomId; // or selected.id if your backend uses id
+      await updateRoomAPI(id, payload);
+
+      // Optimistic local update (no extra fetch)
+      setRooms((prev) =>
+        prev.map((it) =>
+          it.roomId === id ? { ...it, ...payload } : it
+        )
       );
     } else {
       // ADD
-      const nextId = rooms.length ? Math.max(...rooms.map(r => r.roomId)) + 1 : 1;
-      const newItem = {
-        roomId: nextId,
-        review: 0.0,
-        pageAmount: 1,
-        image: payload.image || testImg,
-        ...payload, // { status, forwhich, price, size, maxsize }
+      const created = await addRoomAPI(payload);
+
+      // Normalize the created room back into your UI shape
+      const newRoom = {
+        roomId: created.roomId ?? created.id,
+        review: created.review ?? 0,
+        pageAmount: created.pageAmount ?? 1,
+        image: created.image ?? payload.image ?? testImg,
+        status: created.status ?? payload.status,
+        forwhich: created.forwhich ?? created.type ?? payload.forwhich,
+        price: created.price ?? payload.price,
+        size: created.size ?? payload.size,
+        maxsize: created.maxsize ?? created.capacity ?? payload.maxsize,
+        ...created,
       };
-      setRooms(prev => [newItem, ...prev]);
+
+      setRooms((prev) => [newRoom, ...prev]);
     }
     closePopup();
   };
 
-  const handleDeleteRoom = (roomId) => {
-    setRooms(prev => prev.filter(r => r.roomId !== roomId));
+  const handleDeleteRoom = async (roomId) => {
+    const id = roomId; // or map if backend expects a different key
+    await deleteRoomAPI(id);
+
+    setRooms((prev) => prev.filter((r) => r.roomId !== id));
     closePopup();
   };
 
@@ -87,24 +139,25 @@ const RoomEdit = () => {
         </div>
       </div>
 
-      {/* Grid → 2 columns on ≥640px, 1 column on tiny screens */}
-      {filtered.length === 0 ? (
+      {/* Grid */}
+      {loading ? (
+        <p className="text-2xl w-full text-center mt-32 italic">Loading…</p>
+      ) : filtered.length === 0 ? (
         <p className="text-2xl w-full text-center mt-32 italic">No result.</p>
       ) : (
         <div className="px-4 md:px-8">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {filtered.map((r) => (
-                <RoomCard
-                    key={r.roomId}
-                    data={r}
-                    compact                    
-                    actionLabel="EDIT"         
-                    onClick={(room) => openEdit(room)}
-                />
+          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {filtered.map((r) => (
+              <RoomCard
+                key={r.roomId}
+                data={r}
+                compact
+                actionLabel="EDIT"
+                onClick={() => openEdit(r)}
+              />
             ))}
+          </div>
         </div>
-    </div>
-
       )}
 
       {/* Popup */}
