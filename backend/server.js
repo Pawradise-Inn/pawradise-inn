@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const { PrismaClient } = require("./generated/prisma/client");
 
 dotenv.config({path: './config/config.env.local'});
@@ -13,6 +14,10 @@ const staff = require('./routes/staff');
 // Body parser & cookie parser
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: false,  
+}));
 
 const booking = require('./routes/booking');
 const bookedRoom = require('./routes/bookedRoom');
@@ -21,6 +26,7 @@ const room = require('./routes/room');
 const service = require('./routes/service');
 const auth = require('./routes/auth');
 const chatlog = require('./routes/chatlog');
+const customer = require('./routes/customer')
 
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/booking', booking);
@@ -31,6 +37,7 @@ app.use('/api/v1/service', service);
 app.use('/api/v1/pet', pet);
 app.use('/api/v1/staff', staff);
 app.use('/api/v1/chatlog', chatlog);
+app.use('/api/v1/customer', customer);
 
 const PORT = process.env.PORT || 5000;
 
