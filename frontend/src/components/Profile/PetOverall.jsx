@@ -9,56 +9,25 @@ const PetOverall = () => {
     const { id } = useParams();
     const {user, setUser} = useOutletContext();
     const [pet, setPet] = useState([])
-    const [scheduled, setScheduled] = useState([])
     const [service, setService] = useState([])
     const [booking, setBooking] = useState([])
-    const [roomBookings, setRoomBookings] = useState([])
-    const [serviceData, setServiceData] = useState([])
-    const [myBooking, setMyBooking] = useState([])
+    const [stayed, setStayed] = useState([])
+    const [scheduled, setScheduled] = useState([])
     const fetchData = async () => {
         try{
-            const response = await fetchAllServicesAPI();
-            setService(response.data);
-            const response2 = await fetchAllBookedServiceAPI();
-            setBooking(response2.data);
-            const response3 = await fetchMyBookingAPI();
-            setMyBooking(response3.data)
+            const response = await fetchPetAPI(id);
+            setPet(response.data)
+            setStayed(response.data.stayed)
+            setScheduled(response.data.scheduled)
+            
         } catch (err){
             console.error(err);
         }
     }
     useEffect(() => {
         fetchData();
+
     }, [])
-    console.log("my booking: ", myBooking)
-    useEffect(() => {
-        if (!user) return;
-
-        const currentPet = user.pets.find(p => p.id === Number(id));
-        if (!currentPet) return;
-
-        setPet(currentPet);
-        console.log(currentPet);
-
-        // Get all unique booking IDs from the scheduled array
-        const allBookingId = currentPet.scheduled
-            .filter(sch => sch.booking_id) // Add a filter to handle items without a booking_id
-            .map(sch => sch.booking_id);
-
-        // Get all unique service IDs from the scheduled array
-        const allServiceId = currentPet.scheduled
-            .filter(sch => sch.serviceId) // Add a filter to handle items without a serviceId
-            .map(sch => sch.serviceId);
-
-        // Filter bookings that belong to this pet
-        const matchedRoomBookings = booking.filter(b => allBookingId.includes(b.id));
-        setRoomBookings(matchedRoomBookings);
-
-        // Filter services that belong to this pet
-        const matchedServiceData = service.filter(s => allServiceId.includes(s.id));
-        setServiceData(matchedServiceData);
-
-    }, [user, booking, service, id]);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -111,7 +80,7 @@ const PetOverall = () => {
                     {/* Room Booking */}
                     <div className="mt-8">
                         <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 scrollbar-sleek">
-                            {roomBookings.map(room => (<BookingCard key={room.id} room={room} getRoomStatusColor={getRoomStatusColor}/>))}
+                            {stayed.map(s => (<BookingCard key={s.room.id} room={s.room} pet={pet} getRoomStatusColor={getRoomStatusColor} checkIn={s.checkIn} checkOut={s.checkOut}/>))}
                         </div>
                     </div>
                 </div>
@@ -120,7 +89,7 @@ const PetOverall = () => {
                     <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
                         <h2 className="text-2xl font-bold mb-6">Service status</h2>
                         <div className="space-y-6 overflow-y-auto pr-2 scrollbar-sleek" >
-                            {serviceData.map(service => (<ServiceCard key={service.id} service={service} getStatusText={getStatusText} getStatusColor={getRoomStatusColor} />))}
+                            {scheduled.map(sch => (<ServiceCard key={sch.id} service={sch.service} pet={pet} getStatusText={getStatusText} getStatusColor={getRoomStatusColor} />))}
                         </div>
                     </div>
                 </div>
@@ -146,22 +115,30 @@ const PetCard = ({pet}) => {
                     <h3 className="text-xl font-bold">{pet.name}</h3>
                     <p className="text-base"><span className="font-semibold">Pet type:</span> {pet.type}</p>
                     <p className="text-base"><span className="font-semibold">Pet breed:</span> {pet.breed}</p>
-                    <p className="text-base"><span className="font-semibold">Pet gender:</span> {pet.gender}</p>
-                    <p className="text-base"><span className="font-semibold">Food allergy:</span> {pet.food_allergy}</p>
-                    <p className="text-base"><span className="font-semibold">Medical condition:</span> {pet.medical_condition}</p>
+                    <p className="text-base"><span className="font-semibold">Pet gender:</span> {pet.sex}</p>
+                    <p className="text-base"><span className="font-semibold">Food allergy:</span> {pet.allergic}</p>
+                    <p className="text-base"><span className="font-semibold">Medical condition:</span> {pet.disease}</p>
                 </div>
             </div>
         </div>
     )
 }
 
-const BookingCard = ({room, getRoomStatusColor}) => {
+const BookingCard = ({room, getRoomStatusColor, pet, checkIn, checkOut}) => {
+    console.log("pet:::", pet)
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    };
+    const formattedCheckIn = formatDate(checkIn);
+    const formattedCheckOut = formatDate(checkOut);
     return(
         <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
             <div className="flex items-center space-x-3 mb-4">
                 <h2 className="text-2xl font-bold">Room Status</h2>
                 <span className={`px-3 py-1 !text-white text-lg rounded font-bold ${getRoomStatusColor(room.status)}`}>
-                    {room.status}
+                    {"Full"}
                 </span>
             </div>
             <div className="flex items-start space-x-6">
@@ -174,36 +151,37 @@ const BookingCard = ({room, getRoomStatusColor}) => {
                 </div>
                 <div className="flex-1 space-y-2">
                     <h3 className="text-xl font-bold">Room {room.room_number}</h3>
-                    <p className="text-base"><span className="font-semibold">Pet:</span> {room.pet_name}</p>
-                    <p className="text-base">For {room.pet_type}</p>
+                    <p className="text-base"><span className="font-semibold">Pet:</span> {pet.name}</p>
+                    <p className="text-base">For {pet.type}</p>
                     <p className="text-base">(Entry to end date)</p>
-                    <p className="text-base">{room.entry_date} to {room.end_date}</p>
+                    <p className="text-base">{formattedCheckIn} to {formattedCheckOut}</p>
                 </div>
             </div>
         </div>
     )
 }
 
-const ServiceCard = ({service, getStatusText, getStatusColor}) => {
+const ServiceCard = ({service, getStatusText, getStatusColor, pet}) => {
     return(
         <div className="bg-[var(--light-brown-color)] rounded-lg p-4 shadow-lg flex items-center justify-between">
             <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-4">
                     <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden ">
                         <img 
-                            src={service.img}
-                            alt={service.staff_name}
+                            src={service.picture}
+                            alt={service.name}
                             className="w-full h-full object-cover"
                         />
                     </div>
                     <div>
                         <h3 className="text-lg font-semibold">{service.name}</h3>
-                        <p className="text-sm">{service.petType[0]}</p>
-                        <p className="text-sm">{service.status === 'available' || service.status === 'unavailable' ? service.status : `by - ${service.staff_name}`}</p>
+                        <p className="text-sm">{pet.type}</p>
+                        {/* <p className="text-sm">{service.status === 'available' || service.status === 'unavailable' ? service.status : `by - ${service.staff_name}`}</p> */}
+                        <p className="text-sm">unavailable</p>
                     </div>
                 </div>
-                <span className={`px-3 py-1 text-white text-sm rounded-full ${getStatusColor(service.status)}`}>
-                    {getStatusText(service.status)}
+                <span className={`px-3 py-1 text-white text-sm rounded-full ${getStatusColor("unavailable")}`}>
+                    {getStatusText("unavailable")}
                 </span>
             </div>
         </div>

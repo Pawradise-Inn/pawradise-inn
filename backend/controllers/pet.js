@@ -52,6 +52,18 @@ const getPet = async (req, res) => {  //Both
         const pet = await prisma.pet.findUnique({
             where: {
                 id: Number(req.params.id)
+            },
+            include: {
+              scheduled:{
+                include:{
+                  service: true
+                }
+              },
+              stayed: {
+                include:{
+                  room: true,
+                }
+              }
             }
         });
         if (!pet) {
