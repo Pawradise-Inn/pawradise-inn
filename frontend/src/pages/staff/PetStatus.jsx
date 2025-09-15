@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { fetchAllPetAPI } from "../../hooks/petAPI";
 
 const Pet_card = ({pet}) => {
+    console.log(pet)
     return (
         <div>
             <NavLink to={`/staff/pet/${pet.id}`}>
@@ -35,11 +36,11 @@ const PetStatus = () => {
     const [pets, setPets] = useState([])
     const [filters, setFilter] = useState([])
     const [search, setSearch] = useState("")
-
+    
     const fetchPets = async () => {
         try{
             const response = await fetchAllPetAPI();
-            setPets(response)
+            setPets(response.data)
         } catch(err){
             console.error(err)
         }
@@ -49,6 +50,7 @@ const PetStatus = () => {
     useEffect(() => {
         fetchPets()
     }, [])
+    console.log(pets)
     const handleCheckboxChange = (e) => {
         const value = e.target.value;
         if(e.target.checked){
@@ -58,7 +60,39 @@ const PetStatus = () => {
         }
     }
 
-    const filterPets = pets.filter(pet => pet.name.toLowerCase().includes(search.toLowerCase()))
+        const filteredPets = pets.filter(pet => {
+            // First, apply the name search filter
+            const matchesSearch = pet.name.toLowerCase().includes(search.toLowerCase());
+
+            const hasBook = filters.includes('book');
+            const hasService = filters.includes('service');
+
+            // If no filters are selected, just return search match
+            if (!hasBook && !hasService) {
+                return matchesSearch;
+            }
+
+            // Require both if both filters are checked
+            if (hasBook && hasService) {
+                return (
+                    matchesSearch &&
+                    pet.stayed && pet.stayed.length > 0 &&
+                    pet.scheduled && pet.scheduled.length > 0
+                );
+            }
+
+            // Otherwise, handle individual filters
+            if (hasBook) {
+                return matchesSearch && pet.stayed && pet.stayed.length > 0;
+            }
+
+            if (hasService) {
+                return matchesSearch && pet.scheduled && pet.scheduled.length > 0;
+            }
+
+            return false;
+        });
+
     return (
         <div className="mt-8 flex flex-col items-center">
             <b className="text-7xl text-center block m-8 mt-0">Pet Status</b>
@@ -100,7 +134,7 @@ const PetStatus = () => {
                 </div>
             </div>
             <div className="grid grid-cols-3 gap-6 max-w-7xl mx-32 my-8">
-                {filterPets.map(pet => <Pet_card key={pet.id} pet={pet}/>)}
+                {filteredPets.map(pet => <Pet_card key={pet.id} pet={pet}/>)}
                     
             </div>
         </div>

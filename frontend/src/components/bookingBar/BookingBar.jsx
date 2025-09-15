@@ -5,6 +5,7 @@ import CommentStarSelector from "./CommentStarSelector";
 import Pagination from "./Pagination";
 import { getWarningTextForDateValidation } from "../../utils/HandleValidation";
 import { handleFormDataChange } from "../../utils/HandleForm";
+import { fetchServiceStatusAPI } from "../../hooks/serviceAPI";
 
 // data: { image, name, review, forwhich, price, size, maxsize, headerType } of service and room
 
@@ -105,6 +106,7 @@ const BookingBar = ({ data }) => {
 		// fetch new data from backend API here
 		// fetch new data from backend API here
 		// fetch new data from backend API here
+		
 	};
 
 	// fetch new status when date or time change

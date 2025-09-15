@@ -5,7 +5,7 @@ const {
   updatePet,
   updatePetStatus,
   deletePet,
-  getCustomerPets,
+  getAllPets,
   getCustomerPetNamesWithAvailable
 } = require('../controllers/pet');
 const {protect, authorize} = require('../middleware/auth');
@@ -14,7 +14,8 @@ const router = express.Router();
 
 router.post('/register', protect, authorize('CUSTOMER'),register);
 router.get("/:id", getPet);
-router.get("/", getCustomerPets);
+router.get("/", getAllPets)
+// router.get("/", getCustomerPets);
 router.put("/:id", updatePet);
 router.delete("/:id", deletePet);
 

@@ -47,11 +47,51 @@ const register = async (req, res) => {
   }
 };
 
+const getAllPets = async (req, res) => {
+    try {
+        const pets = await prisma.pet.findMany({
+            include: {
+                scheduled: {
+                    include: {
+                        service: true
+                    }
+                },
+                stayed: {
+                    include: {
+                        room: true,
+                    }
+                }
+            }
+        });
+        
+        // Check if any pets were found
+        if (pets.length === 0) {
+            return res.status(404).json({ success: false, error: "No pets found" });
+        }
+
+        res.status(200).json({ success: true, data: pets });
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
+};
+
 const getPet = async (req, res) => {  //Both
     try {
         const pet = await prisma.pet.findUnique({
             where: {
                 id: Number(req.params.id)
+            },
+            include: {
+              scheduled:{
+                include:{
+                  service: true
+                }
+              },
+              stayed: {
+                include:{
+                  room: true,
+                }
+              }
             }
         });
         if (!pet) {
@@ -177,5 +217,6 @@ module.exports = {
   updatePetStatus,
   deletePet,
   getCustomerPets,
-  getCustomerPetNamesWithAvailable
+  getCustomerPetNamesWithAvailable,
+  getAllPets
 }

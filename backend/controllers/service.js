@@ -30,10 +30,11 @@ const createService = async (req, res) => { //requirement: 15
             data: {
                 name: name,
                 price: price,
-                petType: petType,
-                picture: picture
+                petType: [petType.toUpperCase()],
+                picture: "not done yet"
             }
         });
+        console.log(service.data);
         res.status(201).json({success: true, data: service});
     } catch (err) {
         res.status(400).json({success: false, error: err.message});
@@ -43,10 +44,12 @@ const createService = async (req, res) => { //requirement: 15
 const updateService = async (req, res) => {
     try {
         const serviceId = req.params.id;
+        console.log(serviceId);
+        console.log(req.body.petType.toUpperCase());
         const dataToUpdate = {};
         if (req.body.name !== undefined) dataToUpdate.name = req.body.name;
         if (req.body.price !== undefined) dataToUpdate.price = req.body.price;
-        if (req.body.petType !== undefined) dataToUpdate.petType = req.body.petType;
+        if (req.body.petType !== undefined) dataToUpdate.petType = [req.body.petType.toUpperCase()];
         if (req.body.picture !== undefined) dataToUpdate.picture = req.body.picture;
 
         if(Object.keys(dataToUpdate).length === 0) return res.status(400).json({success: false, msg: "No valid fields to update"});
