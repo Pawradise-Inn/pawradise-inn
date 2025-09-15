@@ -1,11 +1,11 @@
-import { Outlet } from "react-router-dom";
+// src/pages/room/RoomEdit.jsx
 import { useEffect, useMemo, useState } from "react";
+import { Outlet } from "react-router-dom";
 import RoomCard from "../room/RoomCard";
 import AddRoomPopup from "./add_room";
-import testImg from "../../assets/test.png";
 
 import {
-  fetchAllRoomsAPI,
+  fetchAllRoomsWithReviewsAPI,
   addRoomAPI,
   updateRoomAPI,
   deleteRoomAPI,
@@ -27,36 +27,18 @@ const RoomEdit = () => {
 
   useEffect(() => {
     let mounted = true;
-
     const load = async () => {
       setLoading(true);
       setTimeoutReached(false);
       try {
-        const data = await fetchAllRoomsAPI();
-
-        const normalized = (Array.isArray(data) ? data : []).map((r) => ({
-          roomId: r.roomId ?? r.id,
-          status: r.status,
-          forwhich: r.forwhich ?? r.type,
-          price: r.price,
-          size: r.size,
-          maxsize: r.maxsize ?? r.capacity,
-          review: r.review ?? 0,
-          pageAmount: r.pageAmount ?? 1,
-          image: r.image ?? testImg,
-          ...r,
-        }));
-
-        if (mounted) setRooms(normalized);
+        const list = await fetchAllRoomsWithReviewsAPI(); // ⬅️ use /reviews
+        if (mounted) setRooms(Array.isArray(list) ? list : []);
       } finally {
         if (mounted) setLoading(false);
       }
     };
-
     load();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
   const filtered = useMemo(() => {
@@ -70,38 +52,50 @@ const RoomEdit = () => {
     );
   }, [rooms, search]);
 
-  const openAdd = () => {
-    setSelected(null);
-    setIsPopupOpen(true);
-  };
-  const openEdit = (room) => {
-    setSelected(room);
-    setIsPopupOpen(true);
-  };
-  const closePopup = () => {
-    setIsPopupOpen(false);
-    setSelected(null);
-  };
+  const openAdd = () => { setSelected(null); setIsPopupOpen(true); };
+  const openEdit = (room) => { setSelected(room); setIsPopupOpen(true); };
+  const closePopup = () => { setIsPopupOpen(false); setSelected(null); };
 
-  // add / edit
+  // Map popup payload -> backend fields
+  const mapPayloadToBackend = (p) => ({
+    // UI fields: { forwhich, price, maxsize, image }
+    // createRoom requires: { capacity, price, petType, picture }
+    capacity: p.maxsize ?? p.size,   // UI uses maxsize = capacity
+    price: p.price,
+    petType: p.forwhich,             // "small"/"big"
+    picture: p.image,                // URL or string per your backend
+  });
+
   const handleSaveRoom = async (payload) => {
     if (selected) {
-      const id = selected.roomId;
-      await updateRoomAPI(id, payload);
-      setRooms((prev) => prev.map((it) => (it.roomId === id ? { ...it, ...payload } : it)));
+      // EDIT: your backend only allows { price, petType } in PATCH
+      const update = {
+        price: payload.price,
+        petType: payload.forwhich,
+        // capacity/picture NOT supported by your updateRoom controller
+      };
+      await updateRoomAPI(selected.roomId, update);
+
+      // Optimistic local update
+      setRooms((prev) =>
+        prev.map((it) =>
+          it.roomId === selected.roomId
+            ? { ...it, price: update.price, forwhich: update.petType }
+            : it
+        )
+      );
     } else {
-      const created = await addRoomAPI(payload);
+      // ADD
+      const body = mapPayloadToBackend(payload);
+      const created = await addRoomAPI(body);
       const newRoom = {
-        roomId: created.roomId ?? created.id,
-        review: created.review ?? 0,
-        pageAmount: created.pageAmount ?? 1,
-        image: created.image ?? payload.image ?? testImg,
-        status: created.status ?? payload.status,
-        forwhich: created.forwhich ?? created.type ?? payload.forwhich,
-        price: created.price ?? payload.price,
-        size: created.size ?? payload.size,
-        maxsize: created.maxsize ?? created.capacity ?? payload.maxsize,
-        ...created,
+        image: created.picture,
+        roomId: created.id,
+        review: 5,                          // default if you want
+        forwhich: created.petType,
+        price: created.price,
+        size: created.capacity,
+        maxsize: created.capacity,
       };
       setRooms((prev) => [newRoom, ...prev]);
     }
