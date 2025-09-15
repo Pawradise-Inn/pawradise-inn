@@ -9,38 +9,54 @@ import {
   addRoomAPI,
   updateRoomAPI,
   deleteRoomAPI,
-} from "../../hooks/roomAPI"; 
+} from "../../hooks/roomAPI";
 
 const RoomEdit = () => {
   const [rooms, setRooms] = useState([]);
   const [search, setSearch] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selected, setSelected] = useState(null); 
+  const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [timeoutReached, setTimeoutReached] = useState(false);
 
-  // Load from API once
   useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => setTimeoutReached(true), 15000);
+    return () => clearTimeout(t);
+  }, [loading]);
+
+  useEffect(() => {
+    let mounted = true;
+
     const load = async () => {
       setLoading(true);
-      const data = await fetchAllRoomsAPI();
+      setTimeoutReached(false);
+      try {
+        const data = await fetchAllRoomsAPI();
 
-      const normalized = data.map((r) => ({
-        roomId: r.roomId ?? r.id,                 // map id -> roomId if needed
-        status: r.status,
-        forwhich: r.forwhich ?? r.type,           // e.g., "small" | "big"
-        price: r.price,
-        size: r.size,
-        maxsize: r.maxsize ?? r.capacity,
-        review: r.review ?? 0,
-        pageAmount: r.pageAmount ?? 1,
-        image: r.image ?? testImg,
-        ...r,                                     // keep any extra backend fields
-      }));
+        const normalized = (Array.isArray(data) ? data : []).map((r) => ({
+          roomId: r.roomId ?? r.id,
+          status: r.status,
+          forwhich: r.forwhich ?? r.type,
+          price: r.price,
+          size: r.size,
+          maxsize: r.maxsize ?? r.capacity,
+          review: r.review ?? 0,
+          pageAmount: r.pageAmount ?? 1,
+          image: r.image ?? testImg,
+          ...r,
+        }));
 
-      setRooms(normalized);
-      setLoading(false);
+        if (mounted) setRooms(normalized);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     };
+
     load();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const filtered = useMemo(() => {
@@ -67,26 +83,14 @@ const RoomEdit = () => {
     setSelected(null);
   };
 
-  // Save (add or edit) -> calls API then refreshes list locally
+  // add / edit
   const handleSaveRoom = async (payload) => {
-    // payload from your AddRoomPopup should contain fields like:
-    // { status, forwhich, price, size, maxsize, image? }
     if (selected) {
-      // EDIT
-      const id = selected.roomId; // or selected.id if your backend uses id
+      const id = selected.roomId;
       await updateRoomAPI(id, payload);
-
-      // Optimistic local update (no extra fetch)
-      setRooms((prev) =>
-        prev.map((it) =>
-          it.roomId === id ? { ...it, ...payload } : it
-        )
-      );
+      setRooms((prev) => prev.map((it) => (it.roomId === id ? { ...it, ...payload } : it)));
     } else {
-      // ADD
       const created = await addRoomAPI(payload);
-
-      // Normalize the created room back into your UI shape
       const newRoom = {
         roomId: created.roomId ?? created.id,
         review: created.review ?? 0,
@@ -99,17 +103,14 @@ const RoomEdit = () => {
         maxsize: created.maxsize ?? created.capacity ?? payload.maxsize,
         ...created,
       };
-
       setRooms((prev) => [newRoom, ...prev]);
     }
     closePopup();
   };
 
   const handleDeleteRoom = async (roomId) => {
-    const id = roomId; // or map if backend expects a different key
-    await deleteRoomAPI(id);
-
-    setRooms((prev) => prev.filter((r) => r.roomId !== id));
+    await deleteRoomAPI(roomId);
+    setRooms((prev) => prev.filter((r) => r.roomId !== roomId));
     closePopup();
   };
 
@@ -139,9 +140,15 @@ const RoomEdit = () => {
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Grid / states */}
       {loading ? (
-        <p className="text-2xl w-full text-center mt-32 italic">Loading…</p>
+        timeoutReached ? (
+          <p className="text-2xl w-full text-center mt-32 italic text-red-600">
+            Server not responding. Please try again later.
+          </p>
+        ) : (
+          <p className="text-2xl w-full text-center mt-32 italic">Loading…</p>
+        )
       ) : filtered.length === 0 ? (
         <p className="text-2xl w-full text-center mt-32 italic">No result.</p>
       ) : (
