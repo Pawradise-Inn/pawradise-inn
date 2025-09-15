@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/v1/pets'
+const API_URL = 'http://localhost:5000/api/v1/pet'
 
 // 1. Fetch all pets (optional userId + fields)
 export const fetchAllPetAPI = async (userId, fields) => {
@@ -19,9 +19,9 @@ export const fetchPetAPI = async (id) => {
 };
 
 // 3. Fetch only available pets for a user
-export const fetchAvailablePetAPI = async (userId) => {
+export const fetchAvailablePetAPI = async (customerId) => {
   const response = await axios.get(`${API_URL}/available`, {
-    params: { userId },
+    params: { customerId },
   });
   return response.data;
 };

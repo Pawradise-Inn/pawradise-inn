@@ -1,83 +1,14 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import RoomCard from "../../components/room/RoomCard";
-import testImg from "../../assets/test.png"; // to be replaced by API data. don't forget to delete.
 import BookingPopup from "../../components/BookingPopup";
 import { getWarningTextForDateValidation } from "../../utils/HandleValidation";
 import { handleFormDataChange } from "../../utils/HandleForm";
+import { fetchAllRoomsWithReviewsAPI } from "../../hooks/roomAPI";
 
 const BookingRoom = () => {
 	const petType = ["Dog", "Cat", "Bird", "Raccoon", "Fish  :)"];
-
-	const demoData = [
-		{
-			image: testImg,
-			status: "full",
-			roomId: 1,
-			review: 4.5,
-			forwhich: "small",
-			price: 2000,
-			size: 10,
-			maxsize: 20,
-			pageAmount: 30,
-		}, // to be replaced by API data. don't forget to delete.
-		{
-			image: testImg,
-			status: "full",
-			roomId: 2,
-			review: 4.0,
-			forwhich: "big",
-			price: 1500,
-			size: 5,
-			maxsize: 10,
-			pageAmount: 10,
-		}, // to be replaced by API data. don't forget to delete.
-		{
-			image: testImg,
-			status: "full",
-			roomId: 3,
-			review: 4.8,
-			forwhich: "small",
-			price: 3000,
-			size: 2,
-			maxsize: 5,
-			pageAmount: 2,
-		}, // to be replaced by API data. don't forget to delete.
-		{
-			image: testImg,
-			status: "full",
-			roomId: 4,
-			review: 4.2,
-			forwhich: "big",
-			price: 500,
-			size: 8,
-			maxsize: 15,
-			pageAmount: 35,
-		}, // to be replaced by API data. don't forget to delete.
-		{
-			image: testImg,
-			status: "full",
-			roomId: 5,
-			review: 4.7,
-			forwhich: "small",
-			price: 2500,
-			size: 1,
-			maxsize: 3,
-			pageAmount: 50,
-		}, // to be replaced by API data. don't forget to delete.
-		{
-			image: testImg,
-			status: "available",
-			roomId: 6,
-			review: 4.3,
-			forwhich: "big",
-			price: 1800,
-			size: 12,
-			maxsize: 20,
-			pageAmount: 100,
-		}, // to be replaced by API data. don't forget to delete.
-	];
 	
-	const [room, setRoom] = useState(demoData);
+	const [room, setRoom] = useState([]);
 	const [formData, setFormData] = useState({
 		entryDate: " ",
 		exitDate: "z",
@@ -89,17 +20,16 @@ const BookingRoom = () => {
 
 	// fetch room data from backend and setRoom
 	useEffect(() => {
-		// fetch room data from backend and setRoom
-		// fetch room data from backend and setRoom
-		// fetch room data from backend and setRoom
-		// fetch room data from backend and setRoom
-		// fetch room data from backend and setRoom
-
-		room.forEach((data) => {
-			data.headerType = "Room";
-			data.roomId = data.roomId.toString().padStart(3, 0);
-		});
-	});
+		fetchAllRoomsWithReviewsAPI().then((data) => {
+			  data.data.forEach((room) => {
+				  room.headerType = "Room";
+				  room.reviewStar = room.reviewStar.toFixed(1);
+				  room.commentPages = Math.max(1, room.commentPages);
+			  });
+		
+			  setRoom(data.data);
+			});
+	}, []);
 
 	// check if there is no result after filtering
 	const noResult = useMemo(() => {

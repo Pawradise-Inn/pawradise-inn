@@ -10,12 +10,16 @@ const {
     addPicturesToRoom,
     deletePicturesFromRoom,
     getRoomStatus,
+    getRoomReviews,
     getAvailableRooms,
     getAllRoomsWithReviews
 } = require('../controllers/room')
 
 router.route('/available')
     .get(getAvailableRooms);
+
+router.route('/comments')
+    .get(getRoomReviews);
 
 router.route('/reviews')
     .get(getAllRoomsWithReviews);
