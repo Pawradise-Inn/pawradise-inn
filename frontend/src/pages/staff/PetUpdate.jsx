@@ -10,7 +10,7 @@ const PetUpdate = () => {
         try{
             const response = await fetchPetAPI(id);
             console.log(response)
-            setPet(response);
+            setPet(response.data);
         } catch(err) {
             console.err(err)
         }

@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
+import testImg from "../../assets/test.png";
 
 const AddServicePopup = ({ title = "Add service", initialData = null, onClose, onSave, onDelete }) => {
   const [name, setName] = useState(initialData?.name || "");
   const [petType, setPetType] = useState(initialData?.petType || "");
   const [price, setPrice] = useState(initialData?.price ?? "");
-  const [image, setImage] = useState(initialData?.image || null);
+  const [image, setImage] = useState(initialData?.image || "");
 
   useEffect(() => {
     setName(initialData?.name || "");
     setPetType(initialData?.petType || "");
     setPrice(initialData?.price ?? "");
-    setImage(initialData?.image || null);
+    setImage(initialData?.image || "");
   }, [initialData]);
 
   const handleImageChange = (e) => {

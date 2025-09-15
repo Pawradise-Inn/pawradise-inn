@@ -1,46 +1,44 @@
-import { Outlet } from "react-router-dom";
+// src/pages/room/RoomEdit.jsx
 import { useEffect, useMemo, useState } from "react";
+import { Outlet } from "react-router-dom";
 import RoomCard from "../room/RoomCard";
 import AddRoomPopup from "./add_room";
-import testImg from "../../assets/test.png";
 
 import {
-  fetchAllRoomsAPI,
+  fetchAllRoomsWithReviewsAPI,
   addRoomAPI,
   updateRoomAPI,
   deleteRoomAPI,
-} from "../../hooks/roomAPI"; 
+} from "../../hooks/roomAPI";
 
 const RoomEdit = () => {
   const [rooms, setRooms] = useState([]);
   const [search, setSearch] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selected, setSelected] = useState(null); 
+  const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [timeoutReached, setTimeoutReached] = useState(false);
 
-  // Load from API once
   useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => setTimeoutReached(true), 15000);
+    return () => clearTimeout(t);
+  }, [loading]);
+
+  useEffect(() => {
+    let mounted = true;
     const load = async () => {
       setLoading(true);
-      const data = await fetchAllRoomsAPI();
-
-      const normalized = data.map((r) => ({
-        roomId: r.roomId ?? r.id,                 // map id -> roomId if needed
-        status: r.status,
-        forwhich: r.forwhich ?? r.type,           // e.g., "small" | "big"
-        price: r.price,
-        size: r.size,
-        maxsize: r.maxsize ?? r.capacity,
-        review: r.review ?? 0,
-        pageAmount: r.pageAmount ?? 1,
-        image: r.image ?? testImg,
-        ...r,                                     // keep any extra backend fields
-      }));
-
-      setRooms(normalized);
-      setLoading(false);
+      setTimeoutReached(false);
+      try {
+        const list = await fetchAllRoomsWithReviewsAPI(); // ⬅️ use /reviews
+        if (mounted) setRooms(Array.isArray(list) ? list : []);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     };
     load();
+    return () => { mounted = false; };
   }, []);
 
   const filtered = useMemo(() => {
@@ -54,62 +52,59 @@ const RoomEdit = () => {
     );
   }, [rooms, search]);
 
-  const openAdd = () => {
-    setSelected(null);
-    setIsPopupOpen(true);
-  };
-  const openEdit = (room) => {
-    setSelected(room);
-    setIsPopupOpen(true);
-  };
-  const closePopup = () => {
-    setIsPopupOpen(false);
-    setSelected(null);
-  };
+  const openAdd = () => { setSelected(null); setIsPopupOpen(true); };
+  const openEdit = (room) => { setSelected(room); setIsPopupOpen(true); };
+  const closePopup = () => { setIsPopupOpen(false); setSelected(null); };
 
-  // Save (add or edit) -> calls API then refreshes list locally
+  // Map popup payload -> backend fields
+  const mapPayloadToBackend = (p) => ({
+    // UI fields: { forwhich, price, maxsize, image }
+    // createRoom requires: { capacity, price, petType, picture }
+    capacity: p.maxsize ?? p.size,   // UI uses maxsize = capacity
+    price: p.price,
+    petType: p.forwhich,             // "small"/"big"
+    picture: p.image,                // URL or string per your backend
+  });
+
   const handleSaveRoom = async (payload) => {
-    // payload from your AddRoomPopup should contain fields like:
-    // { status, forwhich, price, size, maxsize, image? }
     if (selected) {
-      // EDIT
-      const id = selected.roomId; // or selected.id if your backend uses id
-      await updateRoomAPI(id, payload);
+      // EDIT: your backend only allows { price, petType } in PATCH
+      const update = {
+        price: payload.price,
+        petType: payload.forwhich,
+        // capacity/picture NOT supported by your updateRoom controller
+      };
+      await updateRoomAPI(selected.roomId, update);
 
-      // Optimistic local update (no extra fetch)
+      // Optimistic local update
       setRooms((prev) =>
         prev.map((it) =>
-          it.roomId === id ? { ...it, ...payload } : it
+          it.roomId === selected.roomId
+            ? { ...it, price: update.price, forwhich: update.petType }
+            : it
         )
       );
     } else {
       // ADD
-      const created = await addRoomAPI(payload);
-
-      // Normalize the created room back into your UI shape
+      const body = mapPayloadToBackend(payload);
+      const created = await addRoomAPI(body);
       const newRoom = {
-        roomId: created.roomId ?? created.id,
-        review: created.review ?? 0,
-        pageAmount: created.pageAmount ?? 1,
-        image: created.image ?? payload.image ?? testImg,
-        status: created.status ?? payload.status,
-        forwhich: created.forwhich ?? created.type ?? payload.forwhich,
-        price: created.price ?? payload.price,
-        size: created.size ?? payload.size,
-        maxsize: created.maxsize ?? created.capacity ?? payload.maxsize,
-        ...created,
+        image: created.picture,
+        roomId: created.id,
+        review: 5,                          // default if you want
+        forwhich: created.petType,
+        price: created.price,
+        size: created.capacity,
+        maxsize: created.capacity,
       };
-
       setRooms((prev) => [newRoom, ...prev]);
     }
     closePopup();
   };
 
   const handleDeleteRoom = async (roomId) => {
-    const id = roomId; // or map if backend expects a different key
-    await deleteRoomAPI(id);
-
-    setRooms((prev) => prev.filter((r) => r.roomId !== id));
+    await deleteRoomAPI(roomId);
+    setRooms((prev) => prev.filter((r) => r.roomId !== roomId));
     closePopup();
   };
 
@@ -139,9 +134,15 @@ const RoomEdit = () => {
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Grid / states */}
       {loading ? (
-        <p className="text-2xl w-full text-center mt-32 italic">Loading…</p>
+        timeoutReached ? (
+          <p className="text-2xl w-full text-center mt-32 italic text-red-600">
+            Server not responding. Please try again later.
+          </p>
+        ) : (
+          <p className="text-2xl w-full text-center mt-32 italic">Loading…</p>
+        )
       ) : filtered.length === 0 ? (
         <p className="text-2xl w-full text-center mt-32 italic">No result.</p>
       ) : (
