@@ -10,7 +10,7 @@ const Pet_card = ({pet}) => {
                     
                     <div className="w-full aspect-square bg-gray-200 rounded mb-4 flex items-center justify-center overflow-hidden">
                         <img 
-                            src={pet.img}
+                            src={pet.picture}
                             alt="pet"
                             className="w-full h-full object-cover"
                         />
@@ -20,7 +20,7 @@ const Pet_card = ({pet}) => {
                                 <p className="text-xl font-semibold">{pet.name}</p>
                             </div>
                             <span className="px-5 py-1 !text-white text-xs rounded-full bg-[var(--dark-brown-color)] font-semibold">
-                                🔴 pet_status
+                                {pet.status}
                             </span>   
                     </div>
                 </div>
