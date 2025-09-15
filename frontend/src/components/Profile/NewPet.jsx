@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { addPetAPI } from "../../hooks/petAPI";
+import { updateCustomerAPI } from "../../hooks/customerAPI";
 
 const PetInput = ({data, setData, name}) => {
     return(
@@ -16,8 +18,10 @@ const PetInput = ({data, setData, name}) => {
 }
 
 const NewPet = () => {
+    const {user, setUser} = useOutletContext();
     const [petName, setPetName] = useState("")
     const [petType, setPetType] = useState("")
+    const [petAge, setPetAge] = useState("")
     const [petGender, setPetGender] = useState("")
     const [petBreed, setPetBreed] = useState("")
     const [foodAllergy, setFoodAllergy] = useState("")
@@ -41,6 +45,34 @@ const NewPet = () => {
             };
             reader.readAsDataURL(file);
         }
+    }
+    console.log(user)
+
+    const handleConfirm = () => {
+        if(window.confirm('are you sure?') && petName && petGender && petAge && petType && petBreed && medicalCondition && foodAllergy){
+            const newPet = {
+                name: petName,
+                sex: petGender,
+                age: Number(petAge),
+                type: petType,
+                status: "IDLE",
+                breed: petBreed,
+                disease: medicalCondition,
+                allergic: foodAllergy,
+                picture: 'test.img'
+            }
+            const newPetsArr = user.pets;
+            newPetsArr.push(newPet)
+            const newUser = {...user, pets: newPetsArr}
+            setUser(newUser);
+            addPetAPI(newPet);
+            updateCustomerAPI(user.id, newUser)
+            navigate('/profile/pet')
+            
+
+        }
+        
+        
     }
 
     const handleCancel = () => {
@@ -77,6 +109,8 @@ const NewPet = () => {
                         <PetInput data={petName} setData={setPetName} name='Pet name'/>
                         {/* Pet gender */}
                         <PetInput data={petGender} setData={setPetGender} name='Pet gender'/>
+                        {/* { Pet age} */}
+                        <PetInput data={petAge} setData={setPetAge} name='Pet age'/>
                         {/* Pet type */}
                         <PetInput data={petType} setData={setPetType} name='Pet type'/>
                         {/* Food allergy */}
@@ -92,7 +126,7 @@ const NewPet = () => {
                         <button onClick={handleCancel} className=" px-6 py-2 rounded hover:bg-gray-100 transition-colors duration-300 cursor-pointer">
                             Cancel
                         </button>
-                        <button onClick={() => console.log("Save changes")} className="!text-white px-6 py-2 bg-amber-800 text-white rounded hover:bg-amber-700 transition-colors duration-300 cursor-pointer">    
+                        <button onClick={handleConfirm} className="!text-white px-6 py-2 bg-amber-800 text-white rounded hover:bg-amber-700 transition-colors duration-300 cursor-pointer">    
                             Done
                         </button>
                     </div>

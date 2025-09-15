@@ -2,6 +2,11 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/v1/bookedRoom';
 
+export const fetchAllBookedRoomsAPI = async () => {
+  const response = await axios.get(API_URL);
+  return response.data;
+}
+
 export const fetchTodaysBookedRoomsAPI = async () => {
   const response = await axios.get(`${API_URL}/dashboard`);
   return response.data;

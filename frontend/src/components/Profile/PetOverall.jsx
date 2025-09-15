@@ -1,118 +1,64 @@
-import { useState } from "react"
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react"
+import { useOutletContext, useParams } from "react-router-dom";
+import { fetchAllServicesAPI } from "../../hooks/serviceAPI";
+import { fetchAllBookedServiceAPI } from "../../hooks/bookedServiceAPI";
+import { fetchMyBookingAPI } from "../../hooks/bookingAPI";
+import { fetchPetAPI } from "../../hooks/petAPI";
 
 const PetOverall = () => {
     const { id } = useParams();
-    const [pets, setPets] = useState([
-        {
-            id: 1,
-            name: "Buddy",
-            type: "Dog",
-            breed: "Golden Retriever", 
-            gender: "Male",
-            food_allergy: "None",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 2,
-            name: "Whiskers",
-            type: "Cat",
-            breed: "Persian",
-            gender: "Female", 
-            food_allergy: "Fish",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 3,
-            name: "Max",
-            type: "Dog",
-            breed: "Beagle",
-            gender: "Female", 
-            food_allergy: "None",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
-        },
-        {
-            id: 4,
-            name: "Luna",
-            type: "Cat",
-            breed: "Siamese",
-            gender: "Female", 
-            food_allergy: "Dairy",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1574158622682-e40e69881006?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 5,
-            name: "Charlie",
-            type: "Dog",
-            breed: "Bulldog",
-            gender: "Female", 
-            food_allergy: "None",
-            medical_condition: "Healthy",
-            img: "https://images.unsplash.com/photo-1558788353-f76d92427f16?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+    const {user, setUser} = useOutletContext();
+    const [pet, setPet] = useState([])
+    const [scheduled, setScheduled] = useState([])
+    const [service, setService] = useState([])
+    const [booking, setBooking] = useState([])
+    const [roomBookings, setRoomBookings] = useState([])
+    const [serviceData, setServiceData] = useState([])
+    const [myBooking, setMyBooking] = useState([])
+    const fetchData = async () => {
+        try{
+            const response = await fetchAllServicesAPI();
+            setService(response.data);
+            const response2 = await fetchAllBookedServiceAPI();
+            setBooking(response2.data);
+            const response3 = await fetchMyBookingAPI();
+            setMyBooking(response3.data)
+        } catch (err){
+            console.error(err);
         }
-    ]);
-    const [roomBookings, setRoomBookings] = useState([
-        {
-            id: 1,
-            room_number: "A-12",
-            status: "full",
-            pet_name: "Buddy",
-            pet_type: "Dog",
-            entry_date: "2024/08/15",
-            end_date: "2024/08/20",
-            img: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 2,
-            room_number: "B-05",
-            status: "reserved",
-            pet_name: "Whiskers", 
-            pet_type: "Cat",
-            entry_date: "2024/08/22",
-            end_date: "2024/08/25",
-            img: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-        }
-    ])
-    const [serviceData, setServiceData] = useState([
-        {
-        id: 1,
-        service_name: "Bath & Grooming",
-        pet_type: "Dog",
-        status: "completed",
-        staff_name: "Sarah Johnson",
-        img: "https://images.unsplash.com/photo-1629135099459-a743b6a2ff0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-        },
-        {
-        id: 2,
-        service_name: "Vet Checkup", 
-        pet_type: "Dog",
-        status: "in_progress",
-        staff_name: "Dr. Mike Wilson",
-        img: "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-        },
-        {
-        id: 3,
-        service_name: "Playtime",
-        pet_type: "Dog",
-        status: "available", 
-        staff_name: "Emma Davis",
-        img: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-        },
-        {
-        id: 4,
-        service_name: "Training Session",
-        pet_type: "Dog",
-        status: "unavailable",
-        staff_name: "John Smith", 
-        img: "https://images.unsplash.com/photo-1588943211346-0908a1fb0b01?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-        }
-    ])
-     
-    const pet = pets.find(p => p.id === parseInt(id)) || pets[0];
+    }
+    useEffect(() => {
+        fetchData();
+    }, [])
+    console.log("my booking: ", myBooking)
+    useEffect(() => {
+        if (!user) return;
+
+        const currentPet = user.pets.find(p => p.id === Number(id));
+        if (!currentPet) return;
+
+        setPet(currentPet);
+        console.log(currentPet);
+
+        // Get all unique booking IDs from the scheduled array
+        const allBookingId = currentPet.scheduled
+            .filter(sch => sch.booking_id) // Add a filter to handle items without a booking_id
+            .map(sch => sch.booking_id);
+
+        // Get all unique service IDs from the scheduled array
+        const allServiceId = currentPet.scheduled
+            .filter(sch => sch.serviceId) // Add a filter to handle items without a serviceId
+            .map(sch => sch.serviceId);
+
+        // Filter bookings that belong to this pet
+        const matchedRoomBookings = booking.filter(b => allBookingId.includes(b.id));
+        setRoomBookings(matchedRoomBookings);
+
+        // Filter services that belong to this pet
+        const matchedServiceData = service.filter(s => allServiceId.includes(s.id));
+        setServiceData(matchedServiceData);
+
+    }, [user, booking, service, id]);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -156,6 +102,7 @@ const PetOverall = () => {
                 <div className="flex flex-col flex-1 justify-between">
                     {/* My Pets */}
                     <div>
+
                         <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-sleek">
                             {<PetCard pet={pet}/>}
                         </div>
@@ -250,8 +197,8 @@ const ServiceCard = ({service, getStatusText, getStatusColor}) => {
                         />
                     </div>
                     <div>
-                        <h3 className="text-lg font-semibold">{service.service_name}</h3>
-                        <p className="text-sm">{service.pet_type}</p>
+                        <h3 className="text-lg font-semibold">{service.name}</h3>
+                        <p className="text-sm">{service.petType[0]}</p>
                         <p className="text-sm">{service.status === 'available' || service.status === 'unavailable' ? service.status : `by - ${service.staff_name}`}</p>
                     </div>
                 </div>
