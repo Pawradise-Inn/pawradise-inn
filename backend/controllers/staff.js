@@ -43,8 +43,6 @@ const updateMyProfile = async (req, res) => {
   }
 };
 
-const prisma = require('../prisma/prisma');
-
 const getStaffProfile = async(req, res)=>{ //requirement: 17
     try{
         const staffId = req.params.id;
