@@ -20,8 +20,13 @@ router.route('/')
 
 router.route('/:id')
     .get(getBooking)
+<<<<<<< HEAD
+    //.put(updateBooking)
+    .delete(deleteBooking);
+=======
     .delete(deleteBooking)
     .patch(updateBookingStatus);
+>>>>>>> c252c4ca659b1c00cb83621363b86ed637cb6d2c
 
 router.route('/:id/cancel')
     .patch(cancelBooking);
