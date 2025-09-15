@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 // --- API Functions (adjust path as needed) ---
 // Change this in: src/pages/staff/dashboard/DashboardTab1.jsx
 
+import { getTodayService } from "../../../hooks/bookedServiceAPI";
+
 import {
   fetchTodaysBookedRoomsAPI,
   addBookedRoomAPI,
@@ -138,6 +140,15 @@ const DashboardTab1 = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
 
+    const fetchServices = async () => {
+        try {
+            const data = await getTodayService();
+            setItems(data.data || []); 
+        } catch (error) {
+            console.error("Failed to fetch services:", error);
+        }
+    }
+
     // NEW: useEffect to load data from the API on component mount.
     useEffect(() => {
         const loadBookings = async () => {
@@ -152,6 +163,7 @@ const DashboardTab1 = () => {
             }
         };
         loadBookings();
+        fetchServices();
     }, []); // Empty array ensures this runs only once.
 
     const filtered = !search
