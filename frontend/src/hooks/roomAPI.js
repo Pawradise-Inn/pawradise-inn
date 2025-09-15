@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5050/api/v1/room";
+const API_URL = "http://localhost:5000/api/v1/room";
 
 export const fetchAllRoomsAPI = async () => {
   const response = await axios.get(API_URL);
