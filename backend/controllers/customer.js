@@ -19,22 +19,8 @@ const getCustomerProfile = async(req, res)=>{ //requirement: 2
                 },
                 pets: {
                     include: {
-                        bookedRooms: {
-                            include: {
-                                roomId: true,
-                                bookingId: true
-                            }
-                        },
-                        bookedServices: {
-                            include: {
-                                service:{
-                                    select:{
-                                        name: true
-                                    }
-                                },
-                                bookingId: true
-                            }
-                        }
+                        stayed: true,
+                        scheduled: true
                     }
                 }
             }
