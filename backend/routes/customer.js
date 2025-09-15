@@ -5,7 +5,6 @@ const {
     getCustomerProfile
 } = require('../controllers/customer')
 
-router.route('/:id')
-    .get(getCustomerProfile);
+router.get('/:id', getCustomerProfile)
 
 module.exports = router;

@@ -19,6 +19,11 @@ import RoomEdit from "./components/Management/room_edit";
 import PetStatus from "./pages/staff/PetStatus"; 
 import PetUpdate from "./pages/staff/PetUpdate"; 
 import Dashboard from "./pages/staff/dashboard/Dashboard"; 
+import DashboardTab1 from "./pages/staff/dashboard/DashboardTab1"; 
+import DashboardTab2 from "./pages/staff/dashboard/DashboardTab2"; 
+import DashboardTab3 from "./pages/staff/dashboard/DashboardTab3"; 
+import DashboardTab4 from "./pages/staff/dashboard/DashboardTab4"; 
+
 const App = () => { 
     const location = useLocation(); 
     
@@ -47,7 +52,12 @@ const App = () => {
 
                 {/* Staff Routes */} 
                 <Route path="/staff" element={<div>Staff log in</div>} /> 
-                <Route path="/staff/dashboard" element={<Dashboard />} /> 
+                <Route path="/staff/dashboard" element={<Dashboard />}>
+                    <Route index element={<DashboardTab1 />} />
+                    <Route path="check-in" element={<DashboardTab2 />} />  
+                    <Route path="check-out" element={<DashboardTab3 />} /> 
+                    <Route path="service-booked" element={<DashboardTab4 />} />
+                </Route>
                 <Route path="/staff/pet status" element={<PetStatus />} /> 
                 <Route path="/staff/pet/:id" element={<PetUpdate />} /> 
                 <Route path="/staff/review" element={<div>Staff Review Page</div>} /> 

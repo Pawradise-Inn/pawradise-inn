@@ -6,3 +6,8 @@ export const fetchCustomerAPI = async (id) => {
   const response = await axios.get(`${API_URL}/${id}`);
   return response.data;
 };
+
+export const updateCustomerAPI = async(id, customer) => {
+    const response = await axios.put(`${API_URL}/${id}`, customer);
+    return response.data
+}
