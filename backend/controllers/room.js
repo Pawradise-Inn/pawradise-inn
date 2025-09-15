@@ -184,23 +184,28 @@ const getAllRoomsWithReviews = async (req, res) => { //requirement: 9
   try {
     const rooms = await prisma.room.findMany({
       select: {
+        id: true,
         picture: true,
         price: true,
         capacity: true,
         petType: true,
         ChatLog: {
           select: {
-            rating: true
+            rating: true,
+            review: true
           }
         }
-      }
+        
+      },
     });
 
     if (!rooms || rooms.length === 0) {
       return res.status(404).json({ success: false, msg: "No rooms found" });
     }
+    
 
     const formattedRooms = rooms.map(r => {
+      const totalReviews = r.ChatLog.length;
       const ratings = r.ChatLog.map(c => c.rating ?? 5);
       const avgRating = ratings.length
         ? ratings.reduce((a, b) => a + b, 0) / ratings.length
@@ -209,11 +214,12 @@ const getAllRoomsWithReviews = async (req, res) => { //requirement: 9
       return {
         image: r.picture,
         roomId: r.id,
-        review: avgRating,
-        forwhich: r.petType,
+        reviewStar: avgRating,
+        forWhich: r.petType,
         price: r.price,
         size: r.capacity,
-        maxsize: r.capacity
+        maxsize: r.capacity,
+        commentPages: Math.ceil(totalReviews/3)
       };
     });
 
@@ -223,7 +229,53 @@ const getAllRoomsWithReviews = async (req, res) => { //requirement: 9
   }
 };
 
+const getRoomReviews = async (req, res) => { //requirement: 5
+  try {
+    const { roomId, NSP } = req.query;
+    const page = Number(NSP) || 1;
+    const take = 3;
+    const skip = (page - 1) * take;
 
+    if (!roomId) {
+      return res.status(400).json({ success: false, msg: "roomId is required" });
+    }
+    const reviews = await prisma.chatLog.findMany({
+      where: {
+        roomId: Number(roomId),
+        review: { not: null }
+      },
+      skip,
+      take,
+      select: {
+        review: true,
+        rating: true,
+        review_date: true,
+        customer: {
+          include:{
+            user:{
+                select: {
+                    user_name: true
+            }}
+          }
+        }
+      }
+    });
+
+    if (!reviews || reviews.length === 0) {
+      return res.status(200).json({ success: false, msg: "No reviews found" });
+    }
+
+    const formattedReviews = reviews.map(r => ({
+      commenter_name: r.customer?.name || "Anonymous",
+      comment_detail: r.review,
+      comment_star: r.rating,
+    }));
+
+    res.status(200).json({ success: true, data: formattedReviews });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
 
 
 module.exports = {
@@ -235,6 +287,7 @@ module.exports = {
     addPicturesToRoom,
     deletePicturesFromRoom,
     getRoomStatus,
+    getRoomReviews,
     getAvailableRooms,
     getAllRoomsWithReviews
 };

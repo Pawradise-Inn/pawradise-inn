@@ -1,7 +1,7 @@
-import axios from 'axios';
+import axios from "axios";
 
 // The base URL for all service-related API calls
-const API_URL = 'http://localhost:5000/api/v1/service';
+const API_URL = "http://localhost:5000/api/v1/service";
 
 // --- Basic CRUD Operations ---
 
@@ -10,8 +10,8 @@ const API_URL = 'http://localhost:5000/api/v1/service';
  * Corresponds to: GET api/v1/service
  */
 export const fetchAllServicesAPI = async () => {
-    const response = await axios.get(API_URL);
-    return response.data;
+  const response = await axios.get(API_URL);
+  return response.data;
 };
 
 /**
@@ -19,8 +19,8 @@ export const fetchAllServicesAPI = async () => {
  * Corresponds to: GET api/v1/service/:id
  */
 export const fetchServiceAPI = async (id) => {
-    const response = await axios.get(`${API_URL}/${id}`);
-    return response.data;
+  const response = await axios.get(`${API_URL}/${id}`);
+  return response.data;
 };
 
 /**
@@ -28,8 +28,8 @@ export const fetchServiceAPI = async (id) => {
  * Corresponds to: POST api/v1/service
  */
 export const addServiceAPI = async (serviceData) => {
-    const response = await axios.post(API_URL, serviceData);
-    return response.data;
+  const response = await axios.post(API_URL, serviceData);
+  return response.data;
 };
 
 /**
@@ -37,8 +37,8 @@ export const addServiceAPI = async (serviceData) => {
  * Corresponds to: DELETE api/v1/service/:id
  */
 export const deleteServiceAPI = async (id) => {
-    const response = await axios.delete(`${API_URL}/${id}`);
-    return response.data;
+  const response = await axios.delete(`${API_URL}/${id}`);
+  return response.data;
 };
 
 /**
@@ -46,10 +46,9 @@ export const deleteServiceAPI = async (id) => {
  * (This is based on your example file and is a standard operation)
  */
 export const updateServiceAPI = async (id, serviceData) => {
-    const response = await axios.put(`${API_URL}/${id}`, serviceData);
-    return response.data;
+  const response = await axios.put(`${API_URL}/${id}`, serviceData);
+  return response.data;
 };
-
 
 // --- Custom Requirement Operations ---
 
@@ -57,13 +56,16 @@ export const updateServiceAPI = async (id, serviceData) => {
  * GET: Fetches comments, optionally filtered by name and page.
  * Corresponds to: GET api/v1/service/comments?name=${ชื่อ}&NSP=${page}
  */
-export const fetchServiceCommentsAPI = async ({ name, page }) => {
-    const params = {};
-    if (name) params.name = name;
-    if (page) params.NSP = page;
+export const fetchServiceCommentsAPI = async () => {
+  const response = await axios.get(`${API_URL}/comments`);
+  return response.data;
+};
 
-    const response = await axios.get(`${API_URL}/comments`, { params });
-    return response.data;
+export const fetchServiceReviewAPI = async (name, NSP) => {
+  const response = await axios.get(`${API_URL}/reviews`, {
+    params: { name, NSP },
+  });
+  return response.data;
 };
 
 /**
@@ -71,11 +73,11 @@ export const fetchServiceCommentsAPI = async ({ name, page }) => {
  * Corresponds to: GET api/v1/service/status?name=${ชื่อ}&entry_date_with_time=${วันเวลา}
  */
 export const fetchServiceStatusAPI = async ({ name, entryDate }) => {
-    const params = {
-        name: name,
-        entry_date_with_time: entryDate
-    };
+  const params = {
+    name: name,
+    entry_date_with_time: entryDate,
+  };
 
-    const response = await axios.get(`${API_URL}/status`, { params });
-    return response.data;
+  const response = await axios.get(`${API_URL}/status`, { params });
+  return response.data;
 };
