@@ -12,6 +12,7 @@ const getBookedServices = async (req, res) => {
 };
 
 const getBookedService = async (req, res) => { //requirement: 13
+    console.log("ROTI1");
     try {
         const bookedServiceId = Number(req.params.id);
         const bookedService = await findBookedServiceById(bookedServiceId);
@@ -83,6 +84,7 @@ const deleteBookedService = async (req, res) => {
 };
 
 const getTodayService = async (req, res) => {
+    console.log("ROTI2");
   try {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -119,9 +121,6 @@ const getTodayService = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-
-module.exports = { getTodayService };
-
 
 module.exports = {
     getBookedServices,

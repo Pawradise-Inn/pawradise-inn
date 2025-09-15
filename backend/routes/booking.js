@@ -11,6 +11,9 @@ const {
     cancelBooking
 } = require('../controllers/booking');
 
+router.route('/mine')
+    .get(getMyBookings);
+
 router.route('/')
     .get(getBookings)
     .post(createBooking);
@@ -19,9 +22,6 @@ router.route('/:id')
     .get(getBooking)
     .delete(deleteBooking)
     .patch(updateBookingStatus);
-
-router.route('/mine')
-    .get(getMyBookings);
 
 router.route('/:id/cancel')
     .patch(cancelBooking);
