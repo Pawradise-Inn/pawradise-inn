@@ -10,6 +10,9 @@ const {
     getTodayService
 } = require('../controllers/bookedService');
 
+router.route('/dashboard')
+    .get(getTodayService);
+
 router.route('/')
     .get(getBookedServices)
     .post(createBookedService);
@@ -18,8 +21,5 @@ router.route('/:id')
     .get(getBookedService)
     .patch(updateBookedService)
     .delete(deleteBookedService);
-
-router.route('/dashboard')
-    .get(getTodayService);
 
 module.exports = router;

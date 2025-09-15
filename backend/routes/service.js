@@ -14,6 +14,15 @@ const {
     getServiceReviews
 } = require('../controllers/service');
 
+router.route('/status')
+    .get(getServiceStatus); //
+
+router.route('/comments')
+    .get(getAllServiceComments); //
+
+router.route('/reviews')
+    .get(getServiceReviews);
+
 router.route('/')
     .get(getServices)       //
     .post(createService);   //
@@ -26,14 +35,5 @@ router.route('/:id')
 router.route('/:id/pictures')
     .post(addPicturesToService) //
     .delete(deletePicturesFromService); //
-
-router.route('/status')
-    .get(getServiceStatus); //
-
-router.route('/comments')
-    .get(getAllServiceComments); //
-
-router.route('/reviews')
-    .get(getServiceReviews);
 
 module.exports = router;

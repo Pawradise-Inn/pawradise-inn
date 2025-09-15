@@ -14,6 +14,12 @@ const {
     getAllRoomsWithReviews
 } = require('../controllers/room')
 
+router.route('/available')
+    .get(getAvailableRooms);
+
+router.route('/reviews')
+    .get(getAllRoomsWithReviews);
+
 router.route('/')
     .get(getRooms)
     .post(createRoom);
@@ -29,11 +35,5 @@ router.route('/:id/pictures')
 
 router.route('/:id/status')
     .get(getRoomStatus);
-
-router.route('/available')
-    .get(getAvailableRooms);
-
-router.route('/reviews')
-    .get(getAllRoomsWithReviews);
 
 module.exports = router;
