@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { fetchAllPetAPI } from "../../hooks/petAPI";
 
 const Pet_card = ({pet}) => {
+    console.log(pet)
     return (
         <div>
             <NavLink to={`/staff/pet/${pet.id}`}>
@@ -35,11 +36,11 @@ const PetStatus = () => {
     const [pets, setPets] = useState([])
     const [filters, setFilter] = useState([])
     const [search, setSearch] = useState("")
-
+    
     const fetchPets = async () => {
         try{
             const response = await fetchAllPetAPI();
-            setPets(response)
+            setPets(response.data)
         } catch(err){
             console.error(err)
         }
@@ -49,6 +50,7 @@ const PetStatus = () => {
     useEffect(() => {
         fetchPets()
     }, [])
+    console.log(pets)
     const handleCheckboxChange = (e) => {
         const value = e.target.value;
         if(e.target.checked){
