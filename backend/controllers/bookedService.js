@@ -114,7 +114,7 @@ const getTodayService = async (req, res) => {
       serviceImage: bs.service.picture ?? null,
       petId: bs.petId,
       petName: bs.pet?.name ?? null,
-      timeBooked: bs.timeBooked
+      timeBooked: bs.scheduled
     }));
 
     res.status(200).json({ success: true, data: formattedServices });

@@ -54,7 +54,7 @@ const DashboardCard = ({ data, onClick, onStatusChange }) => {
         <div style={cardStyle} onClick={onClick}>
             <div style={imagePlaceholderStyle}></div>
             <div style={textContainerStyle}>
-                <p style={nameStyle}>{data.name}</p>
+                <p style={nameStyle}>{data.serviceName}</p>
                 <p style={detailStyle}>{data.petName}</p>
                 <p style={detailStyle}>{data.timeBooked}</p>
             </div>
@@ -155,7 +155,7 @@ const DashboardTab1 = () => {
             try {
                 setLoading(true);
                 const data = await fetchTodaysBookedRoomsAPI();
-                setItems(data); // Assuming API data matches the expected structure
+                setItems(data.data); // Assuming API data matches the expected structure
             } catch (error) {
                 console.error("Failed to fetch bookings:", error);
             } finally {
