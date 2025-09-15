@@ -8,14 +8,14 @@ const Pet_card = ({pet}) => {
                 <div className="bg-[var(--cream-color)] rounded p-4 shadow-lg flex flex-col space-y-4 hover:shadow-xl hover:scale-110 transition-all duration-300 cursor-pointer">
                     <div className="w-full h-full bg-gray-200 rounded mb-4 flex items-center justify-center overflow-hidden">
                         <img 
-                            src={pet.img}
+                            src={pet.picture}
                             alt="pet"
                             className="w-full h-64 object-cover"
                         />
                     </div>
                     <div className="flex justify-between mb-3">
                             <span className="px-5 py-1 !text-white text-xs rounded-full bg-[var(--dark-brown-color)] font-semibold">
-                                🔴 pet_status
+                                {pet.status}
                             </span>
                             <div className="text-center">
                                 <p className="text-xl font-semibold">{pet.name}</p>
