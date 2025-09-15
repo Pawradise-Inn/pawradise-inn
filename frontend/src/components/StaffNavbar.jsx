@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import Logo from "../assets/logo.png";
 
 const Navbar = () => {
     const pages = ["dashboard", "pet status", "review", "management"];
@@ -7,7 +8,7 @@ const Navbar = () => {
       {/* Logo */}
       <div className="flex items-center space-x-3">
         <NavLink to="/staff" className="flex items-center">
-          <img src="../src/assets/logo.png" alt="logo" className="h-10 w-auto" />
+          <img src={Logo} alt="logo" className="h-10 w-auto" />
           <span className="font-semibold text-lg text-gray-800 ml-2">
             Pawradise Inn.
           </span>
