@@ -1,210 +1,74 @@
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-// --- Helper Components (defined in-file to resolve import errors) ---
+// --- API Functions (adjust path as needed) ---
+// Now using the new bookedRoomAPI functions
+import {
+  getTodayRoom,
+  createBookedRoom,
+  deleteBookedRoom,
+} from "../../../hooks/bookedRoomAPI";
+
+// --- Helper Components ---
 
 /**
- * A placeholder for the DashboardCard component.
- * It displays the item's name and is clickable.
+ * MODIFIED: The DashboardCard is now for display only and includes a delete button.
+ * The status dropdown and the main click handler for editing have been removed.
  */
-const DashboardCard = ({ data, onClick, onStatusChange }) => {
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-    const handleStatusBoxClick = (e) => {
-        e.stopPropagation(); // Prevent card's onClick from firing
-        setIsDropdownOpen(prev => !prev);
-    };
-
-    const handleStatusSelect = (e, newStatus) => {
-        e.stopPropagation();
-        onStatusChange(data.id, newStatus);
-        setIsDropdownOpen(false);
-    };
-
-    const getStatusColor = (status) => {
-        if (status === 'completed') return 'limegreen';
-        if (status === 'cancelled') return 'grey';
-        return 'gold'; // for 'pending'
-    };
- 
-    // STYLES for a horizontal card layout
-    const cardStyle = {
-        display: 'flex',
-        alignItems: 'center',
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-        padding: '16px',
-        cursor: 'pointer',
-        backgroundColor: '#f9f9f9',
-        width: '100%', // Take full width of the container
-        marginBottom: '1rem', // Add space between cards
-    };
-
-    const imagePlaceholderStyle = {
-        width: '80px',
-        height: '80px',
-        backgroundColor: '#e0e0e0',
-        borderRadius: '4px',
-        marginRight: '16px', // Space between image and text
-        flexShrink: 0, // Prevent image from shrinking
-    };
-
-    const textContainerStyle = {
-        textAlign: 'left',
-        flexGrow: 1, // Allow this container to grow
-    };
-
-    const dropdownContainerStyle = {
-        position: 'relative',
-        marginLeft: '16px',
-    };
-
-    const dropdownBoxStyle = {
-        width: '100px',
-        height: '30px',
-        backgroundColor: '#ebebeb',
-        borderRadius: '8px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '0 8px',
-    };
-
-    const statusCircleStyle = {
-        width: '12px',
-        height: '12px',
-        backgroundColor: getStatusColor(data.status),
-        borderRadius: '50%',
-    };
-
-    const statusTextStyle = {
-        fontSize: '0.9rem',
-        fontWeight: '500',
-        color: '#333',
-        marginLeft: '6px',
-        textTransform: 'capitalize',
-    };
-
-    const dropdownMenuStyle = {
-        position: 'absolute',
-        top: '100%',
-        right: 0,
-        backgroundColor: 'white',
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-        marginTop: '4px',
-        zIndex: 10,
-        width: '120px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    };
-
-    const dropdownItemStyle = {
-        padding: '8px 12px',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-    };
+const DashboardCard = ({ data, onDelete }) => {
+    const cardStyle = { display: 'flex', alignItems: 'center', border: '1px solid #ccc', borderRadius: '8px', padding: '16px', backgroundColor: '#f9f9f9', width: '100%', marginBottom: '1rem' };
+    const imagePlaceholderStyle = { width: '80px', height: '80px', backgroundColor: '#e0e0e0', borderRadius: '4px', marginRight: '16px', flexShrink: 0 };
+    const textContainerStyle = { textAlign: 'left', flexGrow: 1 };
+    const nameStyle = { margin: '0', fontSize: '1.2rem', fontWeight: 'bold' };
+    const detailStyle = { margin: '4px 0 0', color: '#666' };
+    const deleteButtonStyle = { backgroundColor: '#ff4d4d', color: 'white', border: 'none', borderRadius: '4px', padding: '8px 12px', cursor: 'pointer', marginLeft: '1rem' };
 
     return (
-        <div style={cardStyle} onClick={onClick}>
-            <div style={imagePlaceholderStyle}>
-                {/* Image placeholder */}
-            </div>
+        <div style={cardStyle}>
+            <div style={imagePlaceholderStyle}></div>
             <div style={textContainerStyle}>
-                <p style={{ margin: '0', fontSize: '1.2rem', fontWeight: 'bold' }}>{data.serviceName}</p>
-                <p style={{ margin: '4px 0 0', color: '#666' }}>{data.petName}</p>
-                <p style={{ margin: '4px 0 0', color: '#666' }}>{data.timeBooked}</p>
+                <p style={nameStyle}>{data.name}</p>
+                <p style={detailStyle}>{data.petName}</p>
+                <p style={detailStyle}>{data.timeBooked}</p>
             </div>
-            <div style={dropdownContainerStyle}>
-                <div style={dropdownBoxStyle} onClick={handleStatusBoxClick}>
-                    <div style={statusCircleStyle}></div>
-                    <span style={statusTextStyle}>{data.status}</span>
-                </div>
-                 {isDropdownOpen && (
-                    <div style={dropdownMenuStyle}>
-                        <div style={dropdownItemStyle} onMouseEnter={(e) => e.target.style.backgroundColor='#f0f0f0'} onMouseLeave={(e) => e.target.style.backgroundColor='white'} onClick={(e) => handleStatusSelect(e, 'pending')}>
-                            <div style={{...statusCircleStyle, backgroundColor: 'gold'}}></div>
-                            <span style={statusTextStyle}>pending</span>
-                        </div>
-                        <div style={dropdownItemStyle} onMouseEnter={(e) => e.target.style.backgroundColor='#f0f0f0'} onMouseLeave={(e) => e.target.style.backgroundColor='white'} onClick={(e) => handleStatusSelect(e, 'completed')}>
-                             <div style={{...statusCircleStyle, backgroundColor: 'limegreen'}}></div>
-                            <span style={statusTextStyle}>completed</span>
-                        </div>
-                        <div style={dropdownItemStyle} onMouseEnter={(e) => e.target.style.backgroundColor='#f0f0f0'} onMouseLeave={(e) => e.target.style.backgroundColor='white'} onClick={(e) => handleStatusSelect(e, 'cancelled')}>
-                             <div style={{...statusCircleStyle, backgroundColor: 'grey'}}></div>
-                            <span style={statusTextStyle}>cancelled</span>
-                        </div>
-                    </div>
-                )}
-            </div>
+            <button onClick={onDelete} style={deleteButtonStyle}>Delete</button>
         </div>
     );
 };
 
 /**
- * A popup component for adding or editing an item.
- * It now accepts initialData to pre-fill the form for editing.
+ * MODIFIED: The ItemPopup is now only for adding new items.
+ * Edit and delete functionalities have been removed from the popup.
  */
-const ItemPopup = ({ onClose, onSave, initialData }) => {
-    const [serviceName, setServiceName] = useState(initialData?.serviceName || "");
-    const [petName, setPetName] = useState(initialData?.petName || "");
-    const [timeBooked, setTimeBooked] = useState(initialData?.timeBooked || "");
+const ItemPopup = ({ onClose, onSave }) => {
+    const [name, setName] = useState("");
+    const [petName, setPetName] = useState("");
+    const [timeBooked, setTimeBooked] = useState("");
 
     const handleSave = () => {
         onSave({
-            serviceName: serviceName || "New Service",
+            name: name || "New Room Booking",
             petName: petName || "Pet's Name",
             timeBooked: timeBooked || "Scheduled Time"
         });
     };
     
-    const isEditing = !!initialData;
-
-    const popupOverlayStyle = {
-        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex',
-        justifyContent: 'center', alignItems: 'center', zIndex: 1000,
-    };
-    const popupContentStyle = {
-        backgroundColor: 'white', padding: '2rem', borderRadius: '8px',
-        width: '90%', maxWidth: '500px',
-    };
-    const inputStyle = {
-        width: '100%', padding: '0.5rem', marginBottom: '1rem',
-        border: '1px solid #ccc', borderRadius: '4px',
-    };
-    const buttonContainerStyle = {
-        display: 'flex', justifyContent: 'flex-end', gap: '1rem',
-    };
+    const popupOverlayStyle = { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 };
+    const popupContentStyle = { backgroundColor: 'white', padding: '2rem', borderRadius: '8px', width: '90%', maxWidth: '500px' };
+    const inputStyle = { width: '100%', padding: '0.5rem', marginBottom: '1rem', border: '1px solid #ccc', borderRadius: '4px' };
+    const buttonContainerStyle = { display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' };
+    const buttonStyle = { padding: '0.5rem 1rem', borderRadius: '4px', border: '1px solid #ccc', cursor: 'pointer' };
 
     return (
-        <div style={popupOverlayStyle}>
-            <div style={popupContentStyle}>
-                <h2>{isEditing ? 'Edit Booking' : 'Add New Booking'}</h2>
-                <input
-                    type="text"
-                    placeholder="Enter service name"
-                    value={serviceName}
-                    onChange={(e) => setServiceName(e.target.value)}
-                    style={inputStyle}
-                />
-                 <input
-                    type="text"
-                    placeholder="Enter pet name"
-                    value={petName}
-                    onChange={(e) => setPetName(e.target.value)}
-                    style={inputStyle}
-                />
-                 <input
-                    type="text"
-                    placeholder="Enter time"
-                    value={timeBooked}
-                    onChange={(e) => setTimeBooked(e.target.value)}
-                    style={inputStyle}
-                />
+        <div style={popupOverlayStyle} onClick={onClose}>
+            <div style={popupContentStyle} onClick={(e) => e.stopPropagation()}>
+                <h2>Add New Booking</h2>
+                <input type="text" placeholder="Enter room name" value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />
+                <input type="text" placeholder="Enter pet name" value={petName} onChange={(e) => setPetName(e.target.value)} style={inputStyle} />
+                <input type="text" placeholder="Enter time" value={timeBooked} onChange={(e) => setTimeBooked(e.target.value)} style={inputStyle} />
                 <div style={buttonContainerStyle}>
-                    <button onClick={onClose}>Cancel</button>
-                    <button onClick={handleSave}>Save</button>
+                    <button onClick={onClose} style={buttonStyle}>Cancel</button>
+                    <button onClick={handleSave} style={{...buttonStyle, backgroundColor: '#007bff', color: 'white', border: 'none'}}>Save</button>
                 </div>
             </div>
         </div>
@@ -214,141 +78,101 @@ const ItemPopup = ({ onClose, onSave, initialData }) => {
 
 // --- Main Component ---
 
-// Demo data that will be replaced by a real API call
-const demoItems = [
-    { id: 1, serviceName: "Dog Grooming", petName: "Buddy", timeBooked: "Tomorrow at 10:00 AM", image: "", status: "pending" },
-    { id: 2, serviceName: "Vet Check-up", petName: "Whiskers", timeBooked: "Today at 2:30 PM", image: "", status: "completed" },
-    { id: 3, serviceName: "Nail Clipping", petName: "Rex", timeBooked: "Sep 15 at 11:00 AM", image: "", status: "cancelled" },
-];
-
 const DashboardTab1 = () => {
-    const [items, setItems] = useState([]); // Start with an empty array
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState(null);
-    const [hoveredButton, setHoveredButton] = useState(null);
+    // Removed editingItem state
 
-    // Simulate fetching data from an API when the component mounts
+    // Fetch rooms on component mount
     useEffect(() => {
-        // --- Fetch initial data ---
-        // This is where you would make an API call to get the bookings.
-        // For now, we'll use the demo data.
-        console.log("Fetching initial booking data...");
-        setItems(demoItems);
-    }, []); // Empty dependency array means this runs once on mount
-
+        const loadRooms = async () => {
+            try {
+                setLoading(true);
+                const data = await getTodayRoom();
+                setItems(data.data || []);
+            } catch (error) {
+                console.error("Failed to fetch rooms:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadRooms();
+    }, []);
 
     const filtered = !search
         ? items
         : items.filter((item) =>
-            item.serviceName.toLowerCase().includes(search.toLowerCase())
-        );
+            item.name.toLowerCase().includes(search.toLowerCase())
+          );
 
-    const handleSearch = (e) => setSearch(e.target.value);
-    
     const handleClosePopup = () => {
         setIsPopupOpen(false);
-        setEditingItem(null);
     };
-
-    const handleStatusChange = (itemId, newStatus) => {
-        setItems(items.map(item => 
-            item.id === itemId ? { ...item, status: newStatus } : item
-        ));
-    };
-
-    const handleSaveItem = (itemFromPopup) => {
-        if (editingItem) {
-            // In a real app, you would send an update request to the API here
-            setItems(items.map(item =>
-                item.id === editingItem.id ? { ...item, ...itemFromPopup } : item
-            ));
-        } else {
-            // In a real app, you would send a create request to the API here
-            const newItem = {
-                id: Date.now(),
-                ...itemFromPopup,
-                image: "",
-                status: "pending", // Default status for new items
-            };
+    
+    // Simplified to only handle adding a new item
+    const handleSaveItem = async (itemFromPopup) => {
+        try {
+            const newItem = await createBookedRoom({ ...itemFromPopup, status: 'pending' });
             setItems((prev) => [newItem, ...prev]);
+        } catch (error) {
+            console.error("Failed to save item:", error);
         }
         handleClosePopup();
     };
-
-    const handleEditClick = (item) => {
-        setEditingItem(item);
-        setIsPopupOpen(true);
-    };
     
+    // Handles deleting a booking from the card
+    const handleDeleteItem = async (id) => {
+        // Optional: Add a confirmation dialog before deleting
+        // if (!window.confirm("Are you sure you want to delete this booking?")) {
+        //   return;
+        // }
+        try {
+            await deleteBookedRoom(id);
+            setItems(prev => prev.filter(item => item.id !== id));
+        } catch (error) {
+            console.error("Failed to delete booking:", error);
+        }
+    };
+
     const handleAddClick = () => {
-        setEditingItem(null);
         setIsPopupOpen(true);
     };
 
-    // STYLES
+    // --- Styles ---
     const mainStyle = { flex: 1 };
     const headerStyle = { display: 'flex', alignItems: 'center', margin: '2rem 0', width: '100%', padding: '0 2rem' };
-    const searchContainerStyle = { display: 'flex', flex: 1, border: '2px solid #ccc', borderRadius: '30px', padding: '0.75rem 1.5rem', fontSize: '1.5rem' };
     const inputStyle = { width: '100%', outline: 0, fontSize: '1.25rem' };
     const buttonGroupStyle = { display: 'flex', gap: '1.5rem', marginLeft: '2rem' };
-    const buttonStyle = { 
-        padding: '1rem 2rem', 
-        fontWeight: 600, 
-        backgroundColor: '#D2B48C', 
-        borderRadius: '8px', 
-        border: 'none', 
-        cursor: 'pointer', 
-        fontSize: '1.1rem', 
-        width: '140px',
-        transition: 'transform 0.2s ease-in-out',
-    };
+    const buttonStyle = { padding: '1rem 2rem', fontWeight: 600, backgroundColor: '#D2B48C', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '1.1rem', width: '140px', transition: 'transform 0.2s ease-in-out' };
     const listContainerStyle = { padding: '0 2rem', marginTop: '2rem' };
-    const noResultStyle = { fontSize: '1.25rem', width: '100%', textAlign: 'center', marginTop: '8rem', fontStyle: 'italic' };
+    const feedbackStyle = { fontSize: '1.25rem', width: '100%', textAlign: 'center', marginTop: '8rem', fontStyle: 'italic' };
 
     return (
         <main style={mainStyle}>
             <div style={headerStyle}>
                 <div className="flex flex-1 border-2 rounded-4xl px-6 py-4 text-3xl">
                     <i className="bi bi-search opacity-50 pr-2 flex justify-center items-center -bottom-1 relative"></i>
-                    <input
-                        style={inputStyle}
-                        placeholder="search"
-                        onChange={handleSearch}
-                        value={search}
-                    />
+                    <input style={inputStyle} placeholder="search by room name" onChange={(e) => setSearch(e.target.value)} value={search} />
                 </div>
-
                 <div style={buttonGroupStyle}>
-                    <button
-                        onClick={handleAddClick}
-                            onMouseEnter={() => setHoveredButton('add')}
-                            onMouseLeave={() => setHoveredButton(null)}
-                        style={{...buttonStyle, ...(hoveredButton === 'add' && { transform: 'scale(1.05)' })}}
-                    >
-                        add
-                    </button>
-
-                    <button 
-                            onMouseEnter={() => setHoveredButton('delete')}
-                            onMouseLeave={() => setHoveredButton(null)}
-                            style={{...buttonStyle, ...(hoveredButton === 'delete' && { transform: 'scale(1.05)' })}}
-                        >
-                        delete
-                    </button>
+                    <button onClick={handleAddClick} style={buttonStyle}>add</button>
+                    <button style={{...buttonStyle, backgroundColor: '#ccc', cursor: 'not-allowed'}}>delete</button>
                 </div>
             </div>
 
-            {filtered.length === 0 ? (
-                <p style={noResultStyle}>No result.</p>
+            {loading ? (
+                <p style={feedbackStyle}>Loading bookings...</p>
+            ) : filtered.length === 0 ? (
+                <p style={feedbackStyle}>No results found.</p>
             ) : (
                 <div style={listContainerStyle}>
                     {filtered.map((item) => (
                         <DashboardCard
                             key={item.id}
                             data={item}
-                            onClick={() => handleEditClick(item)}
-                                onStatusChange={handleStatusChange}
+                            onDelete={() => handleDeleteItem(item.id)}
                         />
                     ))}
                 </div>
@@ -358,7 +182,6 @@ const DashboardTab1 = () => {
                 <ItemPopup
                     onClose={handleClosePopup}
                     onSave={handleSaveItem}
-                    initialData={editingItem}
                 />
             )}
 
@@ -368,4 +191,3 @@ const DashboardTab1 = () => {
 };
 
 export default DashboardTab1;
-

@@ -93,12 +93,13 @@ const getTodayService = async (req, res) => {
     todayEnd.setHours(23, 59, 59, 999);
 
     const bookedServices = await prisma.bookedService.findMany({
-      where: {
-        scheduled: {
-          gte: todayStart,
-          lte: todayEnd
-        }
-      },
+        // just comment for a test data in postgres
+    //   where: {
+    //     scheduled: {
+    //       gte: todayStart,
+    //       lte: todayEnd
+    //     }
+    //   },
       include: {
         service: true,  
         pet: true, 
@@ -113,7 +114,7 @@ const getTodayService = async (req, res) => {
       serviceImage: bs.service.picture ?? null,
       petId: bs.petId,
       petName: bs.pet?.name ?? null,
-      scheduled: bs.scheduled
+      timeBooked: bs.scheduled
     }));
 
     res.status(200).json({ success: true, data: formattedServices });
