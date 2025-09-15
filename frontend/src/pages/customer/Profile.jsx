@@ -1,13 +1,14 @@
   import { useEffect, useState } from "react";
   import { NavLink, Outlet } from "react-router-dom";
   import { fetchUserAPI } from "../../hooks/userAPI";
+import { fetchCustomerAPI } from "../../hooks/customerAPI";
 
   const Profile = () => {
     const [user, setUser] = useState(null)
 
     const fetchData = async () => {
       try{
-        const response = await fetchUserAPI(1);
+        const response = await fetchCustomerAPI(1);
         setUser(response);
       } catch (err){
         console.error(err);
