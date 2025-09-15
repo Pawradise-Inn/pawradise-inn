@@ -6,6 +6,7 @@ const getBookings = async (req, res) => {
     try {
         const {customerId, status, fields} = req.query;
         const where = {}; 
+        let select = undefined;
         if (customerId) where.customerId = parseInt(customerId); 
         if (status) where.status = status; 
         if (fields) { 
@@ -26,7 +27,9 @@ const getBookings = async (req, res) => {
 
 const getBooking = async (req, res) => {
     try {
-        const bookingId = req.params.id;
+        const bookingId = Number(req.params.id);
+        const { fields } = req.query;
+        let select = undefined;
         if (fields) { 
             select = {}; 
             fields.split(',').forEach(f => { 
@@ -35,7 +38,7 @@ const getBooking = async (req, res) => {
         }
         const booking = await prisma.booking.findUnique({
             where: {
-                id: Number(bookingId)
+                id: bookingId
             },
             select
         });
@@ -188,11 +191,42 @@ const getMyBookings = async (req, res) => {
   }
 };
 
+const cancelBooking = async(req, res) =>{
+    try {
+    const id = Number(req.params.id);
+
+    const booking = await prisma.booking.findUnique({
+      where: { id: id }
+    });
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+
+    if (booking.status !== "BOOKED" && booking.status !== "PENDING") {
+      return res.status(400).json({
+        success: false,
+        message: "Booking cannot be cancelled"
+      });
+    }
+
+    const updatedBooking = await prisma.booking.update({
+      where: { id: id },
+      data: { status: "CANCELLED" }
+    });
+
+    res.status(200).json({ success: true, booking: updatedBooking });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+};
+
 module.exports = {
     getBookings,
     getBooking,
     updateBookingStatus,
     createBooking,
     deleteBooking,
-    getMyBookings
+    getMyBookings,
+    cancelBooking
 };
