@@ -58,15 +58,17 @@ model ChatLog {
   review      String?   @db.Text
   reply       String?   @db.Text
   rating      Float?    @default(5) @db.DoublePrecision
-  review_date DateTime  @default(now()) @db.Timestamptz(0)
-  reply_date  DateTime? @db.Timestamptz(0)
+  review_date DateTime  @default(now()) @db.Timestamp(0)
+  reply_date  DateTime? @db.Timestamp(0)
 
-  customerId Int
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId Int?
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
   staffId    Int?
-  staff      Staff?   @relation(fields: [staffId], references: [id], onDelete: Cascade)
-  serviceId  Int
-  service    Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  staff      Staff?    @relation(fields: [staffId], references: [id], onDelete: SetNull)
+  serviceId  Int?
+  service    Service?  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  roomId     Int?
+  room       Room?     @relation(fields: [roomId], references: [id], onDelete: Cascade)
 }
 
 model Pet {
@@ -97,17 +99,18 @@ model Room {
 
   bookings     BookedRoom[]
   staffOnRooms RoomStaff[]
+  ChatLog      ChatLog[]
 }
 
 model BookedRoom {
   id       Int      @id @default(autoincrement())
-  checkIn  DateTime @db.Timestamptz(0)
-  checkOut DateTime @db.Timestamptz(0)
+  checkIn  DateTime @db.Timestamp(0)
+  checkOut DateTime @db.Timestamp(0)
 
   roomId    Int
   room      Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  petId     Int
-  pet       Pet     @relation(fields: [petId], references: [id], onDelete: Cascade)
+  petId     Int?
+  pet       Pet?    @relation(fields: [petId], references: [id], onDelete: SetNull)
   bookingId Int
   booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 }
@@ -119,7 +122,6 @@ model Service {
   petType PetType[]
   picture String
 
-  reviewId        Int?
   reviews         ChatLog[]
   staffOnServices StaffOnService[]
   bookedServices  BookedService[]
@@ -130,24 +132,27 @@ model BookedService {
 
   serviceId  Int
   service    Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  petId      Int
-  pet        Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
-  scheduled  DateTime @db.Timestamptz(0)
+  petId      Int?
+  pet        Pet?     @relation(fields: [petId], references: [id], onDelete: SetNull)
+  scheduled  DateTime @db.Timestamp(0)
   booking_id Int
   booking    Booking  @relation(fields: [booking_id], references: [id], onDelete: Cascade)
 }
 
 model Booking {
   id     Int           @id @default(autoincrement())
-  date   DateTime      @db.Timestamptz(0)
+  date   DateTime      @db.Timestamp(0)
   status BookingStatus @default(PENDING)
 
   booked_service BookedService[]
   booked_room    BookedRoom[]
-  customerId     Int
-  customer       Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId     Int?
+  customer       Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
 
-  payment Payment?
+  payment        Payment?
+  customerName   String   @db.VarChar(60)
+  customerEmail  String   @db.VarChar(50)
+  customerNumber String   @db.Char(10)
 }
 
 model Payment {
@@ -156,16 +161,19 @@ model Payment {
   date   DateTime
   status PaymentStatus @default(PENDING)
 
-  bookingId  Int      @unique
-  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  customerId Int
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  bookingId  Int?      @unique
+  booking    Booking?  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customerId Int?
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  customerName   String @db.VarChar(60)
+  customerEmail  String @db.VarChar(50)
+  customerNumber String @db.Char(10)
 }
 
 model Care {
-  id           Int      @id @default(autoincrement())
-  start_period DateTime @default(now()) @db.Timestamptz(0)
-  end_period   DateTime @db.Timestamptz(0)
+  start_period DateTime @default(now()) @db.Timestamp(0)
+  end_period   DateTime @db.Timestamp(0)
 
   staff_id Int
   staff    Staff @relation(fields: [staff_id], references: [id], onDelete: Cascade)
@@ -234,6 +242,7 @@ enum BookingStatus {
 }
 
 enum PetStatus {
+  IDLE
   QUEUE
   IN_PROGRESS
   COMPLETED

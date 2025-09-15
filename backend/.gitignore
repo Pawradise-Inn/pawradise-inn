@@ -1,5 +1,4 @@
-node_modules/*
-config/config.env
-config/config.env.local
+node_modules
+config
 /generated/
 /out/

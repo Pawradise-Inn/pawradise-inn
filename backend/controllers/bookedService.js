@@ -11,7 +11,7 @@ const getBookedServices = async (req, res) => {
     }
 };
 
-const getBookedService = async (req, res) => {
+const getBookedService = async (req, res) => { //requirement: 13
     try {
         const bookedServiceId = Number(req.params.id);
         const bookedService = await findBookedServiceById(bookedServiceId);
@@ -82,10 +82,52 @@ const deleteBookedService = async (req, res) => {
     }
 };
 
+const getTodayService = async (req, res) => {
+  try {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const bookedServices = await prisma.bookedService.findMany({
+      where: {
+        scheduled: {
+          gte: todayStart,
+          lte: todayEnd
+        }
+      },
+      include: {
+        service: true,  
+        pet: true, 
+        booking: true 
+      }
+    });
+
+    const formattedServices = bookedServices.map(bs => ({
+      bookingId: bs.booking_id,
+      serviceId: bs.serviceId,
+      serviceName: bs.service.name,
+      serviceImage: bs.service.picture ?? null,
+      petId: bs.petId,
+      petName: bs.pet?.name ?? null,
+      scheduled: bs.scheduled
+    }));
+
+    res.status(200).json({ success: true, data: formattedServices });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+module.exports = { getTodayService };
+
+
 module.exports = {
     getBookedServices,
     getBookedService,
     createBookedService,
     updateBookedService,
-    deleteBookedService
+    deleteBookedService,
+    getTodayService
 };
