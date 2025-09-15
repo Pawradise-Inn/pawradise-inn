@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // The base URL for all service-related API calls
-const API_URL = 'http://localhost:500/api/v1/service';
+const API_URL = 'http://localhost:5050/api/v1/service';
 
 // --- Basic CRUD Operations ---
 
@@ -46,11 +46,17 @@ export const deleteServiceAPI = async (id) => {
  * (This is based on your example file and is a standard operation)
  */
 export const updateServiceAPI = async (id, serviceData) => {
-    const response = await axios.put(`${API_URL}/${id}`, serviceData);
+    const response = await axios.patch(`${API_URL}/${id}`, serviceData);
     return response.data;
 };
 
-
+//requiement 6
+export const getServiceStatusAPI = async (entryDate) => {
+    const response = await axios.get(`${API_URL}/status`, {
+        params: { entry_date: entryDate},
+    });
+    return response.data;
+}
 // --- Custom Requirement Operations ---
 
 /**
