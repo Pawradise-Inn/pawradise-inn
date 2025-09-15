@@ -6,19 +6,20 @@ import { updateUserAPI } from "../../hooks/userAPI";
 const Profile_comp = () => {
     const {user, setUser} = useOutletContext();
     const [newUser, setNewUser] = useState([]);
-    
     useEffect(() => {
         if(user){
-            setNewUser(user)
+            console.log(user);
+            setNewUser({id: user.id, ...user.user})
         }   
     }, [user])
     const handleCancel = () => {
         const cancel = window.confirm('Are you sure?');
         if(cancel){
-            setNewUser({...user});
+            setNewUser({...(user.user)});
         }
     }
     const handleConfirm = async () => {
+        console.log(newUser)
         if (!newUser.id) return;
         const confirmUpdate = window.confirm('Are you sure to update the data?');
         if (!confirmUpdate) return;
