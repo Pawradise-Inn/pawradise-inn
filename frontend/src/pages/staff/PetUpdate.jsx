@@ -5,12 +5,13 @@ import { fetchPetAPI, updatePetAPI } from "../../hooks/petAPI";
 const PetUpdate = () => {
     const { id } = useParams();
     const [pet, setPet] = useState({});
-    const [status, setStatus] = useState('Completed');
+    const [status, setStatus] = useState('');
     const fetchPet = async () => {
         try{
             const response = await fetchPetAPI(id);
             console.log(response)
             setPet(response.data);
+            setStatus(response.data.status)
         } catch(err) {
             console.err(err)
         }
@@ -86,8 +87,10 @@ const PetUpdate = () => {
     const handleSave = () => {
         const confirm = window.confirm('Confirm the status?')
         if(confirm){
-            const updatePet = {...pet, status: status}
-            updatePetAPI(id, {...pet, status: status});
+            const {scheduled, stayed, ...updatePet} = pet
+            updatePet.status = status;
+            console.log("update pet", updatePet)
+            updatePetAPI(id, updatePet);
             setPet(updatePet)
             alert('update complete');
             navigate('/staff/pet status')
@@ -105,7 +108,6 @@ const PetUpdate = () => {
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-[var(--dark-brown-color)]">
-                    Pet status
                 </h1>
             </div>
             <div></div>
@@ -123,7 +125,7 @@ const PetUpdate = () => {
                     {/* Room Booking */}
                     <div className="mt-8">
                         <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
-                            <StatusUpdate handleSave={handleSave} handleCancel={handleCancel} status={pet.status} setStatus={setStatus}/>
+                            <StatusUpdate handleSave={handleSave} handleCancel={handleCancel} status={status} setStatus={setStatus}/>
                         </div>
                     </div>
                 </div>
@@ -190,10 +192,12 @@ const StatusUpdate = ({handleSave, handleCancel, status, setStatus}) => {
                         value={status}
                         onChange={handleStatusChange}
                     >
-                        <option>COMPLETED</option>
+                        <option>IDLE</option>
+                        <option>CHECKED_IN</option>
+                        <option>CHECKED_OUT</option>
+                        <option>QUEUE</option>
                         <option>IN_PROGRESS</option>
-                        <option>AVAILABLE</option>
-                        <option>UNAVAILABLE</option>
+                        <option>COMPLETED</option>
                     </select>
                 </div>
 
