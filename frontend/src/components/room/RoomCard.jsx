@@ -17,11 +17,11 @@ const RoomCard = ({ data, onClick, compact = false, actionLabel }) => {
         <div className="flex flex-col justify-between h-full">
           {/* Top info */}
           <div className="space-y-1">
-            <p className="font-semibold">Room_{data.roomId}</p>
+            <p className="font-semibold">{`Room_${data.roomId.toString().padStart(3, 0)}`}</p>
             <p>Status : {data.status}</p>
 
             {/* Hide these in compact mode */}
-            {!compact && <p>Suitable for {data.forwhich}</p>}
+            {!compact && <p>Suitable for {data.forWhich}</p>}
           </div>
 
           {/* Capacity - hide in compact mode */}
@@ -39,7 +39,7 @@ const RoomCard = ({ data, onClick, compact = false, actionLabel }) => {
             {/* Review - hide in compact mode */}
             {!compact && (
               <p className="inline-block">
-                {data.review} / 5.0{" "}
+                {data.reviewStar} / 5.0{" "}
                 <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
               </p>
             )}

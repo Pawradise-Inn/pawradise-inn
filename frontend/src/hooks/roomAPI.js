@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5050/api/v1/room";
+const API_URL = "http://localhost:5000/api/v1/room";
 
 export const fetchAllRoomsAPI = async () => {
   const response = await axios.get(API_URL);
@@ -47,6 +47,13 @@ export const fetchRoomStatusAPI = async (id, entry_date, exit_date) => {
 
 export const fetchAllRoomsWithReviewsAPI = async () => {
   const response = await axios.get(`${API_URL}/reviews`);
+  return response.data;
+};
+
+export const fetchRoomWithCommentAPI = async (roomId, NSP) => {
+  const response = await axios.get(`${API_URL}/comments`,{
+    params: { roomId, NSP },
+  });
   return response.data;
 };
 

@@ -13,6 +13,7 @@ const {protect, authorize} = require('../middleware/auth');
 const router = express.Router();
 
 router.post('/register', protect, authorize('CUSTOMER'),register);
+router.get('/available', getCustomerPetNamesWithAvailable);
 router.get("/:id", getPet);
 router.get("/", getAllPets)
 // router.get("/", getCustomerPets);
@@ -20,6 +21,6 @@ router.put("/:id", updatePet);
 router.delete("/:id", deletePet);
 
 router.patch('/:id', updatePetStatus);
-router.get('/:id/available', getCustomerPetNamesWithAvailable);
+
 
 module.exports = router;

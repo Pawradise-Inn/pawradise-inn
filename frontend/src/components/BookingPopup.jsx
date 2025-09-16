@@ -32,7 +32,7 @@ const BookingPopup = ({ status, data, onClick }) => {
 					alt="serviceImg"
 					className="w-1/2 h-[580px] rounded-2xl object-center"
 				/>
-				<BookingBar data={data} />
+				<BookingBar data={data} popupStatus={status} />
 				<i
 					onClick={() => onClick([], false)}
 					className="bi bi-x-lg flex justify-center items-center absolute top-0 right-0 -translate-x-1/2 translate-y-1/2 text-3xl cursor-pointer transition-all duration-200 hover:scale-125"
