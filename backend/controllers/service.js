@@ -106,8 +106,7 @@ const getAllServiceComments = async (req, res)=>{ //requirement: 1
     try{
         const services = await prisma.service.findMany({
             include: {
-                reviews: true,
-                petType: true
+                reviews: true
             }
         });
 
@@ -118,7 +117,7 @@ const getAllServiceComments = async (req, res)=>{ //requirement: 1
                 image: service.picture,
                 name: service.name,
                 reviewStar: avgRating,
-                forWhich: service.petType.map((p) => p.name),
+                forWhich: service.petType.map((p) => p),
                 price: service.price,
                 commentPages: Math.ceil(totalReviews/3)
             }
@@ -156,10 +155,12 @@ const getServiceReviews = async (req, res) => { //requirement: 5
     if (!name) {
       return res.status(400).json({ success: false, msg: "name is required" });
     }
-
+    const service = await prisma.service.findFirst({
+        where: {name: name}
+    });
     const reviews = await prisma.chatLog.findMany({
       where: {
-        name: name,
+        serviceId: service.id,
         review: { not: null }
       },
       skip,
@@ -169,13 +170,18 @@ const getServiceReviews = async (req, res) => { //requirement: 5
         rating: true,
         review_date: true,
         customer: {
-          select: { name: true }
+          include:{
+            user:{
+                select: {
+                    user_name: true
+            }}
+          }
         }
       }
     });
 
     if (!reviews || reviews.length === 0) {
-      return res.status(404).json({ success: false, msg: "No reviews found" });
+      return res.status(200).json({ success: false, msg: "No reviews found" });
     }
 
     const formattedReviews = reviews.map(r => ({

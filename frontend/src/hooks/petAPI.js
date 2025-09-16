@@ -19,9 +19,9 @@ export const fetchPetAPI = async (id) => {
 };
 
 // 3. Fetch only available pets for a user
-export const fetchAvailablePetAPI = async (userId) => {
+export const fetchAvailablePetAPI = async (customerId) => {
   const response = await axios.get(`${API_URL}/available`, {
-    params: { userId },
+    params: { customerId },
   });
   return response.data;
 };

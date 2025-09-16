@@ -82,7 +82,6 @@ const ServiceEdit = () => {
       closePopup();
     } catch (err) {
       console.error("Failed to save service:", err);
-      // Here you could add state to show an error message in the popup
       alert("Failed to save service.");
     }
   };

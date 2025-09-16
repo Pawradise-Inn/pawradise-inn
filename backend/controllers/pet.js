@@ -185,13 +185,13 @@ const getCustomerPets = async (req, res) => {
 
 const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
     try {
-        const userId = Number(req.query.userId);
+        const customerId = Number(req.query.customerId);
         const bookingDate = new Date();
 
         const pets = await prisma.pet.findMany({
             where: {
-                customerId: {userId: userId},
-                bookedRooms: {
+                customerId: customerId,
+                stayed: {
                     none: {
                         checkIn: { lte: bookingDate },
                         checkOut: { gte: bookingDate } 
