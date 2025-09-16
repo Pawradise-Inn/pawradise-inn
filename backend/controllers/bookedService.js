@@ -1,5 +1,5 @@
 const prisma = require('../prisma/prisma');
-const {findBookedServiceById, overlappingService, isDuplicatedBooking} = require('./logics/bookedService');
+const {findBookedServiceById, overlappingService, isDuplicatedBooking, createBookedServiceWithCondition} = require('./logics/bookedService');
 
 const getBookedServices = async (req, res) => {
     try {
@@ -25,21 +25,16 @@ const getBookedService = async (req, res) => { //requirement: 13
 
 const createBookedService = async (req, res) => {
     try {
-        const {serviceId, petId, scheduled, bookingId} = req.body;
-        const count = await overlappingService(serviceId, scheduled);
-        if (count >= 3) {
-            return res.status(400).json({success: false, msg: 'Service is not available'});
-        }
-        const check = await isDuplicatedBooking(serviceId, petId, scheduled);
-        if (check) return res.status(400).json({success: false, msg: 'Your pet had already schedule in this day'});
-        const bookedService = await prisma.bookedService.create({
-            data: {
-                serviceId: serviceId,
-                petId: petId,
-                bookingId: bookingId,
-                checkIn: new Date(scheduled)
-            }
+        const {serviceId, pet_name, scheduled, bookingId} = req.body;
+        const pet = await prisma.pet.findFirst({
+            where:{name: pet_name}
         });
+        const bookedService = await createBookedServiceWithCondition(
+            serviceId,
+            Number(pet.id),
+            bookingId,
+            scheduled
+        );
         res.status(201).json({success: true, data: bookedService});
     } catch(err){
         res.status(400).json({success: false, error: err.message});
