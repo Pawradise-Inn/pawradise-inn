@@ -2,11 +2,11 @@ const prisma = require('../prisma/prisma');
 
 const register = async (req, res) => {
   try {
-    const userId = req.user.id; // from protect middleware
-    console.log(userId);
+    const customerId = Number(req.body.customerId); // from protect middleware
+    console.log(customerId);
     // find the customer record that belongs to this user
     const customer = await prisma.customer.findUnique({
-      where: { userId : userId } // requires Customer.userId to be unique
+      where: { id : customerId } // requires Customer.userId to be unique
     });
     console.log(customer);
     if (!customer) {
@@ -17,9 +17,15 @@ const register = async (req, res) => {
       name, sex, age, type, status, breed,
       disease, allergic, picture
     } = req.body;
+    const lastPet = await prisma.pet.findFirst({
+      orderBy: { id: 'desc' }, // descending order, highest id first
+    });
+
+    const newId = lastPet ? lastPet.id + 1 : 1; // if no pets exist, start from 1
 
     const pet = await prisma.pet.create({
       data: {
+        id: newId,
         name,
         sex,
         age: Number(age),
@@ -29,11 +35,7 @@ const register = async (req, res) => {
         disease,
         allergic,
         customerId: customer.id,
-        ...(picture ? { picture: Buffer.from(picture, "base64") } : {}),
-      },
-      select: {
-        id: true, name: true, sex: true, age: true, type: true, status: true,
-        breed: true, disease: true, allergic: true, customerId: true,
+        picture,
       },
     });
     console.log(pet);
