@@ -1,62 +1,105 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import registerImg from "../../assets/register.png";
-import {
-  handleChange as createHandleChange,
-  validateForm,
-} from "../../utils/HandleRegisterPage";
+import { addUserAPI } from "../../hooks/authAPI";
+import { validateFormPassword, validateFormTel } from "../../utils/HandleForm";
 
 const fields = [
-  { label: "Firstname", name: "Firstname", type: "text", placeholder: "First Name" },
-  { label: "Lastname", name: "Lastname", type: "text", placeholder: "Last Name" },
-  { label: "Email", name: "Email", type: "email", placeholder: "Email" },
-  { label: "Username", name: "Username", type: "text", placeholder: "Username (For Login)" },
-  { label: "Password", name: "Password", type: "password", placeholder: "Password" },
-  { label: "*Confirm Password", name: "ConfirmPassword", type: "password", placeholder: "Confirm Password" },
-  { label: "Phone Number", name: "PhoneNumber", type: "text", placeholder: "0xxxxxxxxx" },
+  {
+    label: "Firstname",
+    name: "firstname",
+    type: "text",
+    placeholder: "First Name",
+  },
+  {
+    label: "Lastname",
+    name: "lastname",
+    type: "text",
+    placeholder: "Last Name",
+  },
+  { label: "Email", name: "email", type: "email", placeholder: "Email" },
+  {
+    label: "Username",
+    name: "userName",
+    type: "text",
+    placeholder: "Username (For Login)",
+  },
+  {
+    label: "Password",
+    name: "password",
+    type: "password",
+    placeholder: "Password",
+  },
+  {
+    label: "Confirm Password *",
+    name: "confirmPassword",
+    type: "password",
+    placeholder: "Confirm Password",
+  },
+  {
+    label: "Phone Number",
+    name: "phoneNumber",
+    type: "tel",
+    placeholder: "0xxxxxxxxx",
+  },
 ];
 
 const Registration = () => {
   const [form, setForm] = useState({
-    Firstname: "",
-    Lastname: "",
-    Username: "",
-    Email: "",
-    Password: "",
-    ConfirmPassword: "",
-    PhoneNumber: "",
-    Address: "",
+    firstname: "",
+    lastname: "",
+    userName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phoneNumber: "",
   });
 
   const [consentChecked, setConsentChecked] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
   const navigate = useNavigate();
-  const handleChange = createHandleChange(form, setForm);
 
-  const isFormValid =
-    Object.values(form).every((field) => field.trim() !== "") && consentChecked;
-
+  // post Customer data to database
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validateForm(form)) return;
-    alert("Registration Successful");
-    navigate("/room");
+    if (isFormValid && validateFormPassword(form) && validateFormTel(form)) {
+      addUserAPI(form).then((res) => {
+        if (res.success) {
+          navigate("/room");
+        } else {
+          alert("you userName, email and phoneNumber must be unique");
+        }
+      });
+    }
   };
+
+  //  changing data in form according to input
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // setIsFormValid when every input is filled and consent is checked
+  useEffect(() => {
+    setIsFormValid(
+      Object.values(form).every((field) => field.trim() !== "") &&
+        consentChecked
+    );
+  }, [form, consentChecked]);
 
   return (
     <>
-      <div className="flex flex-col md:flex-row w-full min-h-screen overflow-hidden">
-        <div className="w-full md:w-3/5 h-64 md:h-auto flex-shrink-0">
+      <div className="flex flex-row w-full overflow-auto">
+        <div className="w-3/5">
           <img
-            className="w-full h-full object-cover"
+            className="object-cover w-full h-full "
             src={registerImg}
             alt="Registration"
           />
         </div>
 
-
-        <div className="w-full md:w-2/5 h-full bg-[var(--cream-color)] flex flex-col items-center justify-center p-4">
+        <div className="w-2/5 bg-(--cream-color) flex flex-col items-center justify-center py-8">
           <h1
-            className="text-center pt-2 text-[60px] md:text-3xl text-[var(--brown-color)] font-semibold"
+            className="text-center pt-2 text-[60px] md:text-3xl text-(--brown-color) font-semibold"
             style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)" }}
           >
             Registration
@@ -69,39 +112,22 @@ const Registration = () => {
             {fields.map((field) => (
               <div key={field.name} className="flex flex-col w-full">
                 <label
-                  className="text-[var(--brown-color)] font-semibold text-left mb-1"
+                  className="text-(--brown-color) font-semibold text-left mb-1"
                   htmlFor={field.name}
                 >
                   {field.label}
                 </label>
                 <input
-                  className="border-2 border-[var(--dark-brown-color)] bg-white opacity-65 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] shadow-lg w-full"
+                  className="border-2 border-(--dark-brown-color) bg-white opacity-65 rounded-md p-2 outline-none focus:ring-2 focus:ring-(--light-brown-color) focus:border-transparent shadow-lg w-full transition-all duration-200"
                   type={field.type}
                   name={field.name}
                   placeholder={field.placeholder}
                   value={form[field.name]}
                   onChange={handleChange}
+                  required
                 />
               </div>
             ))}
-
-            <div className="flex flex-col w-full">
-              <label
-                className="text-[var(--brown-color)] font-semibold text-left mb-1"
-                htmlFor="Address"
-              >
-                Address
-              </label>
-              <textarea
-                id="Address"
-                name="Address"
-                placeholder="Address"
-                value={form.Address}
-                onChange={handleChange}
-                rows="2"
-                className="border-2 border-[var(--dark-brown-color)] bg-white opacity-65 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] shadow-lg w-full"
-              />
-            </div>
 
             <div className="flex items-center mt-2">
               <input
@@ -109,21 +135,16 @@ const Registration = () => {
                 id="consent"
                 checked={consentChecked}
                 onChange={() => setConsentChecked(!consentChecked)}
-                className="mr-2 accent-[var(--dark-brown-color)] w-5 h-5 cursor-pointer"
+                className="mr-2 accent-(--dark-brown-color) w-5 h-5 cursor-pointer"
               />
-              <label htmlFor="consent" className="text-[var(--brown-color)]">
+
+              <label htmlFor="consent" className="text-(--brown-color)">
                 I agree to the{" "}
-                <a
-                  href="/"
-                  className="text-[var(--dark-brown-color)] underline"
-                >
+                <a href="/" className="text-(--dark-brown-color) underline">
                   Terms of Service
                 </a>{" "}
                 and{" "}
-                <a
-                  href="/"
-                  className="text-[var(--dark-brown-color)] underline"
-                >
+                <a href="/" className="text-(--dark-brown-color) underline">
                   Privacy Policy
                 </a>
               </label>
@@ -133,7 +154,7 @@ const Registration = () => {
               <NavLink to="/login" className="w-full md:w-40">
                 <button
                   type="button"
-                  className="w-full h-10 text-[var(--dark-brown-color)] bg-[var(--light-brown-color)] rounded shadow px-4 py-1 hover:bg-[var(--brown-color)] hover:!text-[var(--beige-cream-color)] transition-colors cursor-pointer "
+                  className="w-full h-10 bg-(--dark-brown-color) !text-(--cream-color) rounded shadow px-4 py-1 hover:scale-105 transition-all duration-200 cursor-pointer "
                 >
                   Cancel
                 </button>
@@ -142,10 +163,10 @@ const Registration = () => {
               <button
                 type="submit"
                 disabled={!isFormValid}
-                className={`w-full md:w-40 h-10 rounded shadow px-4 py-1 hover:bg-[var(--brown-color)] hover:!text-[var(--beige-cream-color)] transition-colors  cursor-pointer ${
+                className={`w-full md:w-40 h-10 rounded shadow px-4 py-1 transition-all duration-200  ${
                   isFormValid
-                    ? "bg-[var(--dark-brown-color)] !text-[var(--beige-cream-color)]"
-                    : "bg-[var(--light-brown-color)] cursor-not-allowed"
+                    ? "bg-(--dark-brown-color) !text-(--cream-color) cursor-pointer hover:scale-105"
+                    : "bg-(--light-brown-color) cursor-not-allowed"
                 }`}
               >
                 Done
