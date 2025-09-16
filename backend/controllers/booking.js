@@ -182,7 +182,11 @@ const getMyBookings = async (req, res) => {
 const cancelBooking = async(req, res) =>{
     try {
     const id = Number(req.params.id);
-    const booking = req.body;
+    const booking = await prisma.booking.findUnique({
+        where: {
+            id: id
+        }
+    });
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });

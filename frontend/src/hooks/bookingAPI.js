@@ -23,9 +23,9 @@ export const fetchMyBookingAPI = async (id) => {
     };
 
 // 2. Cancel a specific booking by ID
-    export const cancelBooking = async (id, book) => {
+    export const cancelBooking = async (id) => {
         try {
-        const response = await axios.patch(`${API_URL}/cancel/${id}`, book);
+        const response = await axios.patch(`${API_URL}/cancel/${id}`);
         return response.data;
         } catch (error) {
         console.error('Error canceling booking:', error);
