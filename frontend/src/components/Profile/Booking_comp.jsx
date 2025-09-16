@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import SuccessMessage from "./SuccessMessage";
 import CancelModal from "./CancelModal";
 import { useOutletContext } from "react-router-dom";
-import { fetchMyBookings, cancelBooking } from "../../hooks/bookingAPI"; // Import cancelBooking
+import { fetchMyBookings, cancelBooking, updateBooking } from "../../hooks/bookingAPI"; // Import cancelBooking
 
 const Booking_comp = () => {
   const { user, setUser } = useOutletContext();
@@ -26,7 +26,7 @@ const Booking_comp = () => {
     getMyBookings();
   }, []);
 
-  useEffect(() => {console.log(my_booking)}, [my_booking]);
+  console.log("my booking: ", my_booking)
   const handleCancelClick = (book) => {
     setSelectedBooking(book);
     setShowModal(true);
@@ -34,13 +34,12 @@ const Booking_comp = () => {
 
   const handleConfirmCancel = async () => {
     try {
-      await cancelBooking(selectedBooking.id); // Call the API to cancel the booking
+      cancelBooking(selectedBooking.id);
       setCanceledBooking(selectedBooking);
-      setMyBooking(my_booking.filter((book) => book.id !== selectedBooking.id));
       setShowModal(false);
       setSelectedBooking(null);
       setShowSuccessMessage(true);
-
+      console.log(my_booking)
       setTimeout(() => {
         setShowSuccessMessage(false);
       }, 3000);
@@ -60,6 +59,8 @@ const Booking_comp = () => {
   const handleCloseSuccessMessage = () => {
     setShowSuccessMessage(false);
   };
+
+  const filteredBook = my_booking.filter(book => book.status != "CANCELLED")
 
   return (
     <div>
@@ -93,10 +94,11 @@ const Booking_comp = () => {
 };
 
 const BookingCard = ({ book, onCancelClick }) => {
+  console.log("book: ", book)
   return (
     <div className="flex items-center bg-[var(--cream-color)] rounded-lg p-4 shadow-lg mb-6">
       <img
-        src={book.img || ""}
+        src={book.img }
         alt={book.pet.name || ""}
         className="w-50 h-50 rounded object-cover shadow mr-10"
       />

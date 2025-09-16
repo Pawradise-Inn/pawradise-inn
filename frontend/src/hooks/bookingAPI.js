@@ -23,9 +23,9 @@ export const fetchMyBookingAPI = async (id) => {
     };
 
 // 2. Cancel a specific booking by ID
-    export const cancelBooking = async (id) => {
+    export const cancelBooking = async (id, book) => {
         try {
-        const response = await axios.delete(`${API_URL}/${id}/cancel`);
+        const response = await axios.patch(`${API_URL}/cancel/${id}`, book);
         return response.data;
         } catch (error) {
         console.error('Error canceling booking:', error);
@@ -43,3 +43,23 @@ export const fetchMyBookingAPI = async (id) => {
         throw error;
         }
     };
+
+    export const updateBooking = async (id, book) => {
+        try{
+            const response = await axios.put(`${API_URL}/${id}`, book);
+            return response.data;
+        } catch (error){
+            console.log("Error: ",error)
+            throw error;
+        }
+    }
+
+    export const updateBookingStatus = async (id, status) => {
+        try{
+            const response = await axios.put(`${API_URL}/${id}`, status);
+            return response.data;
+        } catch (error){
+            console.log("Error: ",error)
+            throw error;
+        }
+    }

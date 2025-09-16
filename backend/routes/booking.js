@@ -8,22 +8,27 @@ const {
     createBooking,
     deleteBooking,
     getMyBookings,
-    cancelBooking
+    cancelBooking,
+    putBooking
 } = require('../controllers/booking');
 
 router.route('/mine')
     .get(getMyBookings);
 
+router.route('/cancel/:id')
+    .patch(cancelBooking);
+
 router.route('/')
     .get(getBookings)
     .post(createBooking);
 
+
+
 router.route('/:id')
     .get(getBooking)
     .delete(deleteBooking)
-    .patch(updateBookingStatus);
+    .patch(updateBookingStatus)
+    .put(putBooking);
 
-router.route('/:id/cancel')
-    .patch(cancelBooking);
 
 module.exports = router;
