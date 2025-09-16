@@ -32,6 +32,12 @@ export const addPetAPI = async (pet) => {
   return response.data;
 };
 
+export const registerPetAPI = async (id, pet) => {
+  const response = await axios.post(`${API_URL}/register`, pet);
+  return response.data;
+};
+
+
 // 5. Delete pet
 export const deletePetAPI = async (id) => {
   const response = await axios.delete(`${API_URL}/${id}`);

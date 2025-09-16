@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { addPetAPI } from "../../hooks/petAPI";
+import { addPetAPI, registerPetAPI } from "../../hooks/petAPI";
 import { updateCustomerAPI } from "../../hooks/customerAPI";
 
 const PetInput = ({data, setData, name}) => {
@@ -57,15 +57,16 @@ const NewPet = () => {
                 type: petType,
                 status: "IDLE",
                 breed: petBreed,
-                disease: medicalCondition,
-                allergic: foodAllergy,
-                picture: 'test.img'
+                disease: [medicalCondition],
+                allergic: [foodAllergy],
+                picture: 'test.img',
+                customerId: user.id
             }
             const newPetsArr = user.pets;
             newPetsArr.push(newPet)
             const newUser = {...user, pets: newPetsArr}
             setUser(newUser);
-            addPetAPI(newPet);
+            registerPetAPI(user.id, newPet);
             updateCustomerAPI(user.id, newUser)
             navigate('/profile/pet')
             
@@ -107,18 +108,19 @@ const NewPet = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Pet name */}
                         <PetInput data={petName} setData={setPetName} name='Pet name'/>
-                        {/* Pet gender */}
-                        <PetInput data={petGender} setData={setPetGender} name='Pet gender'/>
                         {/* { Pet age} */}
                         <PetInput data={petAge} setData={setPetAge} name='Pet age'/>
-                        {/* Pet type */}
-                        <PetInput data={petType} setData={setPetType} name='Pet type'/>
+
                         {/* Food allergy */}
                         <PetInput data={foodAllergy} setData={setFoodAllergy} name='Food allergy'/>
                         {/* Pet breed */}
                         <PetInput data={petBreed} setData={setPetBreed} name='Pet breed'/>
                         {/* Medical condition */}
                         <PetInput data={medicalCondition} setData={setMedicalCondition} name='Medical condition'/>
+                        {/* Pet gender */}
+                        <PetInput data={petGender} setData={setPetGender} name='Pet gender'/>
+                        {/* Pet type */}
+                        <PetInput data={petType} setData={setPetType} name='Pet type'/>
                     </div>
 
                     {/* Buttons - Right aligned within the input section */}
