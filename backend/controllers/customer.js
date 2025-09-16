@@ -40,13 +40,13 @@ const updateCustomerProfile = async(req, res)=>{
                 email,
                 phone_number,
                 user_name} = req.body;
-        const user = await prisma.customer.findUnique({
+        const customer = await prisma.customer.findUnique({
             where: {
                 id: customerId
             }
         });
-        const customer = await prisma.user.update({
-            where: {id: user.id},
+        const user = await prisma.user.update({
+            where: {id: customer.userId},
             data: {
                 firstname,
                 lastname,
@@ -55,7 +55,7 @@ const updateCustomerProfile = async(req, res)=>{
                 user_name,
             }
         });
-        res.status(200).json({success: true, data: customer});
+        res.status(200).json({success: true, data: user});
     }catch(err){
         res.status(400).json({success: false, error: err.message});
     }

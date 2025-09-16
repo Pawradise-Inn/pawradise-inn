@@ -86,7 +86,9 @@ const PetUpdate = () => {
     const handleSave = () => {
         const confirm = window.confirm('Confirm the status?')
         if(confirm){
+            const updatePet = {...pet, status: status}
             updatePetAPI(id, {...pet, status: status});
+            setPet(updatePet)
             alert('update complete');
             navigate('/staff/pet status')
         }
@@ -121,7 +123,7 @@ const PetUpdate = () => {
                     {/* Room Booking */}
                     <div className="mt-8">
                         <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
-                            <StatusUpdate handleSave={handleSave} handleCancel={handleCancel} status={status} setStatus={setStatus}/>
+                            <StatusUpdate handleSave={handleSave} handleCancel={handleCancel} status={pet.status} setStatus={setStatus}/>
                         </div>
                     </div>
                 </div>
@@ -188,10 +190,10 @@ const StatusUpdate = ({handleSave, handleCancel, status, setStatus}) => {
                         value={status}
                         onChange={handleStatusChange}
                     >
-                        <option>Completed</option>
-                        <option>In Progress</option>
-                        <option>Available</option>
-                        <option>Unavailable</option>
+                        <option>COMPLETED</option>
+                        <option>IN_PROGRESS</option>
+                        <option>AVAILABLE</option>
+                        <option>UNAVAILABLE</option>
                     </select>
                 </div>
 
