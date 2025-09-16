@@ -1,84 +1,103 @@
-const prisma = require('../../prisma/prisma');
+const prisma = require("../../prisma/prisma");
 
-const findBookedServiceById = async(id)=>{
-    const bookedId = Number(id);
-    if(isNaN(bookedId)){
-        throw new Error("Invalid booked service ID");
-    }
-    const bookedService = await prisma.bookedService.findUnique({
-        where: {id: bookedId}
-    });
+const findBookedServiceById = async (id) => {
+  const bookedId = Number(id);
+  if (isNaN(bookedId)) {
+    throw new Error("Invalid booked service ID");
+  }
+  const bookedService = await prisma.bookedService.findUnique({
+    where: { id: bookedId },
+  });
 
-    return bookedService;
+  return bookedService;
 };
 
-const overlappingService = async(serviceId, scheduled)=>{
-    const count = await prisma.bookedService.count({
-        where: {
-            serviceId: serviceId,
-            scheduled: new Date(scheduled)
-        }
-    });
+const overlappingService = async (serviceId, scheduled) => {
+  const count = await prisma.bookedService.count({
+    where: {
+      serviceId: serviceId,
+      scheduled: new Date(scheduled),
+    },
+  });
 
-    return count;
-}
-
-const isDuplicatedBooking = async(serviceId, petId, scheduled)=>{
-
-    const startOfDay = new Date(scheduled);
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(scheduled);
-    endOfDay.setHours(23, 59, 59, 999);
-
-    const check = await prisma.bookedService.findFirst({
-        where:{
-            serviceId: serviceId,
-            petId: petId,
-            scheduled: {
-                gte: startOfDay,
-                lte: endOfDay
-            }
-        }
-    });
-
-    return !!existing;
+  return count;
 };
 
-const createBookedServiceWithCondition = async (serviceId, petId, bookingId, scheduled) => {
-    const count = await overlappingService(serviceId, scheduled);
+const isDuplicatedBooking = async (serviceId, petId, scheduled) => {
+  const startOfDay = new Date(scheduled);
+  startOfDay.setHours(0, 0, 0, 0);
 
-    if (count >= 3) {
-        const error = new Error('Service is not available');
-        error.code = 'SERVICE_FULL';
-        throw error;
-    }
+  const endOfDay = new Date(scheduled);
+  endOfDay.setHours(23, 59, 59, 999);
 
-    const overlapping = await duplicatedRoom(roomId, petId, scheduled);
-    if (overlapping) {
-        const error = new Error('Service is not available for the selected dates');
-        error.duplicatedDates = overlapping.map(b => ({
-            scheduled: b.scheduled
-        }));
-        error.code = 'SERVICE_DUPLICATE';
-        throw error;
-    }
+  const check = await prisma.bookedService.findFirst({
+    where: {
+      serviceId: serviceId,
+      petId: petId,
+      scheduled: {
+        gte: startOfDay,
+        lte: endOfDay,
+      },
+    },
+  });
 
-    const bookedService = await prisma.bookedService.create({
-        data: {
-            roomId,
-            petId,
-            bookingId,
-            scheduled
-        }
-    });
+  return !!check;
+};
 
-    return bookedService;
+const isFreeThisTime = async (petId, scheduled) => {
+  const pet = await prisma.bookedService.findFirst({
+    where: {
+      petId: petId,
+      scheduled: new Date(scheduled),
+    },
+  });
+
+  return !pet;
+};
+
+const createBookedServiceWithCondition = async (
+  serviceId,
+  petId,
+  bookingId,
+  scheduled
+) => {
+  const count = await overlappingService(serviceId, scheduled);
+
+  if (count >= 3) {
+    const error = new Error("Service is not available");
+    error.code = "SERVICE_FULL";
+    throw error;
+  }
+
+  const overlapping = await isDuplicatedBooking(serviceId, petId, scheduled);
+  if (overlapping) {
+    const error = new Error("Service is not available for the selected dates");
+    error.code = "SERVICE_DUPLICATE";
+    throw error;
+  }
+
+  const free = await isFreeThisTime(petId, scheduled);
+  if (!free) {
+    const error = new Error("Pet is not available for the selected dates");
+    error.code = "PET_NOT_FREE";
+    throw error;
+  }
+
+  const bookedService = await prisma.bookedService.create({
+    data: {
+      serviceId: serviceId,
+      petId: petId,
+      scheduled: new Date(scheduled),
+      booking_id: bookingId,
+    },
+  });
+
+  return bookedService;
 };
 
 module.exports = {
-    findBookedServiceById,
-    overlappingService,
-    isDuplicatedBooking,
-    createBookedServiceWithCondition
+  findBookedServiceById,
+  overlappingService,
+  isDuplicatedBooking,
+  createBookedServiceWithCondition,
 };

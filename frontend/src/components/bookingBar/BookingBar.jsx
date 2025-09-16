@@ -5,39 +5,35 @@ import "../../styles/bookingBarStyle.css";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import CommentStarSelector from "./CommentStarSelector";
 import Pagination from "./Pagination";
-import { getWarningTextForDateValidation } from "../../utils/HandleValidation";
+import { getDateValidation } from "../../utils/HandleValidation";
 import { handleFormDataChange } from "../../utils/HandleForm";
 import { fetchAllPetAPI, fetchAvailablePetAPI } from "../../hooks/petAPI";
 import { fetchServiceReviewAPI } from "../../hooks/serviceAPI";
 import { fetchRoomWithCommentAPI } from "../../hooks/roomAPI";
+import { createBookedRoom } from "../../hooks/bookedRoomAPI";
+import { createBookedService } from "../../hooks/bookedServiceAPI";
 
 // data: { image, name, review, forwhich, price, size, maxsize, headerType } of service and room
 
 const BookingBar = ({ data, popupStatus }) => {
+  const selectableTime = ["08:00", "10:00", "12:00", "14:00", "16:00"];
 
   const [commentStarSelect, setCommentStarSelect] = useState(6);
   const [currentPage, setCurrentPage] = useState(data.currentPage);
   const [comments, setComments] = useState([]);
   const [commentStatus, setCommentStatus] = useState(false);
   const [status, setStatus] = useState("--");
+  const [currentPet, setCurrentPet] = useState(null);
   const [petData, setPetData] = useState([]);
   const [formData, setFormData] = useState({
     entryDate: " ",
     exitDate: "z",
-    entryTime: "13:00",
-    exitTime: "10:00",
+    entryTime: "",
   });
 
   //  status using for display error when meet constraint
   const validDateStatus = useMemo(() => {
-    if (
-      getWarningTextForDateValidation(formData.entryDate, formData.exitDate) !==
-      ""
-    ) {
-      return false;
-    } else {
-      return true;
-    }
+    return getDateValidation(formData.entryDate, formData.exitDate);
   }, [formData]);
 
   const handleCommentStarSelect = useCallback((star) => {
@@ -47,31 +43,55 @@ const BookingBar = ({ data, popupStatus }) => {
   // handle form submit and check availability and validation
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    let entryDataWithTime;
-    let exitDataWithTime;
-
-    if (data.headerType === "Service") {
-      entryDataWithTime = new Date(
-        `${formData.entryDate}T${formData.entryTime}`
-      );
-    } else {
-      if (validDateStatus) {
-        entryDataWithTime = new Date(
-          `${formData.entryDate}T${formData.entryTime}`
-        );
-        exitDataWithTime = new Date(
-          `${formData.exitDate}T${formData.exitTime}`
-        );
-      }
+    if (!validDateStatus.status) {
+      alert("Invalid date detecting");
+      return;
     }
 
-    console.log("Entry =", entryDataWithTime, "Exit =", exitDataWithTime);
-    // fetch new data from backend API here and validate form data
-    // fetch new data from backend API here and validate form data
-    // fetch new data from backend API here and validate form data
-    // fetch new data from backend API here and validate form data
-    // fetch new data from backend API here and validate form data
-    // fetch new data from backend API here and validate form data
+    if (!currentPet) {
+      alert("Please select your pet before booking");
+      return;
+    }
+
+    let body;
+    if (data.headerType === "Service") {
+      if (!formData.entryTime) {
+        alert("Please select time before booking");
+        return;
+      }
+      body = {
+        service_name: data.name,
+        pet_name: currentPet,
+        bookingId: 1,
+        scheduled: new Date(
+          `${formData.entryDate}T${formData.entryTime}:00.00Z`
+        ),
+      };
+
+      createBookedService(body).then((res) => {
+        if (res.success) {
+          alert("Create reservation successfully");
+        } else {
+          alert(res.msg);
+        }
+      });
+    } else {
+      body = {
+        roomId: data.roomId,
+        pet_name: currentPet,
+        bookingId: 1,
+        checkIn: new Date(`${formData.entryDate}T00:00:00.00Z`),
+        checkOut: new Date(`${formData.exitDate}T00:00:00.00Z`),
+      };
+
+      createBookedRoom(body).then((res) => {
+        if (res.success) {
+          alert("Create reservation successfully");
+        } else {
+          alert(res.msg);
+        }
+      });
+    }
   };
 
   // fetch new status when date or time change
@@ -87,9 +107,9 @@ const BookingBar = ({ data, popupStatus }) => {
   // fetch API to get petname
   useEffect(() => {
     if (data.headerType == "Service") {
-      fetchAllPetAPI(2, "name").then((pets) => setPetData(pets.data));
+      fetchAllPetAPI(9, "name").then((pets) => setPetData(pets.data));
     } else {
-      fetchAvailablePetAPI(2, "name").then((pets) => setPetData(pets.data));
+      fetchAvailablePetAPI(9, "name").then((pets) => setPetData(pets.data));
     }
   }, []);
 
@@ -98,35 +118,33 @@ const BookingBar = ({ data, popupStatus }) => {
     if (data.length != 0) {
       if (data.headerType == "Service") {
         fetchServiceReviewAPI(data.name, currentPage).then((comments) => {
-        if (comments.success) {
-          setCommentStatus(true);
-          comments.data.forEach((comment) => {
-            comment.comment_star = comment.comment_star.toFixed(1);
-          });
-          setComments(comments.data);
-        } else {
-          setCommentStatus(false);
-          setComments([]);
-        }
-      });
+          if (comments.success) {
+            setCommentStatus(true);
+            comments.data.forEach((comment) => {
+              comment.comment_star = comment.comment_star.toFixed(1);
+            });
+            setComments(comments.data);
+          } else {
+            setCommentStatus(false);
+            setComments([]);
+          }
+        });
       } else {
         fetchRoomWithCommentAPI(data.roomId, currentPage).then((comments) => {
-        if (comments.success) {
-          setCommentStatus(true);
-          comments.data.forEach((comment) => {
-            comment.comment_star = comment.comment_star.toFixed(1);
-          });
-          setComments(comments.data);
-        } else {
-          setCommentStatus(false);
-          setComments([]);
-        }
-      });
+          if (comments.success) {
+            setCommentStatus(true);
+            comments.data.forEach((comment) => {
+              comment.comment_star = comment.comment_star.toFixed(1);
+            });
+            setComments(comments.data);
+          } else {
+            setCommentStatus(false);
+            setComments([]);
+          }
+        });
       }
     }
   }, [data, currentPage]);
-
-  useEffect(() => {}, [formData]);
 
   // reset currentPage to 1 when this bookingBar data is change(reopen)
   useEffect(() => {
@@ -172,9 +190,17 @@ const BookingBar = ({ data, popupStatus }) => {
       <section className="py-5 px-4">
         <b className="text-3xl block mb-2">Your pet</b>
         <div className="relative">
-          <select className="inline-block mb-4 w-full rounded-xl px-4 py-2 text-2xl my-2 outline-0 bg-(--light-brown-color) appearance-none cursor-pointer">
+          <select
+            onChange={(e) => setCurrentPet(e.target.value)}
+            className="inline-block mb-4 w-full rounded-xl px-4 py-2 text-2xl my-2 outline-0 bg-(--light-brown-color) appearance-none cursor-pointer"
+          >
+            <option value={null}>Pick pet</option>
             {petData.map((data, idx) => {
-              return <option key={idx}>{data.name}</option>;
+              return (
+                <option key={idx} value={data.name}>
+                  {data.name}
+                </option>
+              );
             })}
           </select>
           <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-2/3 flex justify-center items-center text-2xl !text-white cursor-pointer pointer-events-none"></i>
@@ -206,11 +232,14 @@ const BookingBar = ({ data, popupStatus }) => {
                   name="entryTime"
                   onChange={(e) => handleFormDataChange(e, setFormData)}
                 >
-                  <option value={"08:00"}>08 : 00</option>
-                  <option value={"10:00"}>10 : 00</option>
-                  <option value={"12:00"}>12 : 00</option>
-                  <option value={"14:00"}>14 : 00</option>
-                  <option value={"16:00"}>16 : 00</option>
+                  <option value="">Pick time</option>
+                  {selectableTime.map((time, idx) => {
+                    return (
+                      <option key={idx} value={time}>
+                        {time}
+                      </option>
+                    );
+                  })}
                 </select>
               </>
             ) : (
@@ -231,34 +260,20 @@ const BookingBar = ({ data, popupStatus }) => {
           {/* validation for booking */}
           <span className="text-center block w-full mt-8">
             <i className="!text-(--warning-color)">
-              {getWarningTextForDateValidation(
-                formData.entryDate,
-                formData.exitDate
-              )}
+              {validDateStatus.warningText}
             </i>
           </span>
           {/* validation for booking */}
 
           <button
+            type="submit"
             className={`${
-              validDateStatus ? "mt-13" : "mt-2"
-            } block w-full bg-(--dark-brown-color) rounded !text-white text-center py-1 text-3xl mb-4 cursor-pointer hover:bg-(--brown-color) transition-all duration-200`}
+              validDateStatus.status ? "mt-13" : "mt-2"
+            } block w-full bg-(--dark-brown-color) rounded !text-white text-center py-1 text-3xl mb-4 cursor-pointer hover:scale-105 transition-all duration-200`}
           >
             BOOK
           </button>
         </form>
-        <div className="flex justify-center gap-4 pr-5">
-          <span>
-            <a className="underline cursor-pointer hover:!text-(--light-brown-color) transition-all duration-200">
-              Terms of Service
-            </a>
-          </span>
-          <span>
-            <a className="underline cursor-pointer hover:!text-(--light-brown-color) transition-all duration-200">
-              Privacy Policy
-            </a>
-          </span>
-        </div>
       </section>
       <hr />
 
