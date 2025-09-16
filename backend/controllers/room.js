@@ -200,7 +200,7 @@ const getAllRoomsWithReviews = async (req, res) => { //requirement: 9
     });
 
     if (!rooms || rooms.length === 0) {
-      return res.status(404).json({ success: false, msg: "No rooms found" });
+      return res.status(200).json({ success: false, msg: "No rooms found" });
     }
     
 
