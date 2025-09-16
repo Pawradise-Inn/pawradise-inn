@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { updateUserAPI } from "../../hooks/userAPI";
-
+import {updateCustomerAPI} from "../../hooks/customerAPI"
 const Profile_comp = () => {
   const outletCtx = useOutletContext();
   const user = outletCtx?.user;
@@ -21,6 +20,7 @@ const Profile_comp = () => {
       setNewUser({ id: user.id, ...user.user });
     }
   }, [user]);
+  console.log(user)
 
   const handleCancel = () => {
     const cancel = window.confirm("Are you sure?");
@@ -29,14 +29,21 @@ const Profile_comp = () => {
     }
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (e) => {
+    e.preventDefault()
     if (!newUser.id) return;
     const confirmUpdate = window.confirm("Are you sure to update the data?");
     if (!confirmUpdate) return;
 
     try {
-      const updatedUser = await updateUserAPI(newUser.id, newUser);
-      if (typeof setUser === "function") setUser(updatedUser);
+      const {id, ...userObjected} = newUser
+      // const response = await updateCustomerAPI(id, userObjected);
+      console.log(newUser)
+      // setUser(response.data); 
+       updateCustomerAPI(id, userObjected).then((data) => {
+        setUser({...user, user: data.data});
+        console.log(data.data);
+       });
       alert("Profile updated successfully!");
     } catch (err) {
       console.error(err);
@@ -49,104 +56,108 @@ const Profile_comp = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold">My Profile</h1>
       </div>
-      <div className="max-w-2xk bg-white rounded shadow-lg p-8">
-        <div className="space-y-6">
-          {/* Firstname */}
-          <div>
-            <label className="block text-sm font-semibold mb-2">Firstname</label>
-            <input
-              type="text"
-              value={newUser.firstname || ""}
-              onChange={(e) =>
-                setNewUser({ ...newUser, firstname: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
-                border-[var(--brown-color)] bg-[var(--cream-color)] 
-                focus:border-[var(--dark-brown-color)] focus:outline-none"
-            />
+      <form onSubmit={handleConfirm}>
+        <div className="max-w-2xk bg-white rounded shadow-lg p-8">
+          <div className="space-y-6">
+            {/* Firstname */}
+            <div>
+              <label className="block text-sm font-semibold mb-2">Firstname</label>
+              <input
+                type="text"
+                value={newUser.firstname || ""}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, firstname: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
+                  border-[var(--brown-color)] bg-[var(--cream-color)] 
+                  focus:border-[var(--dark-brown-color)] focus:outline-none"
+              />
+            </div>
+
+            {/* Lastname */}
+            <div>
+              <label className="block text-sm font-semibold mb-2">Lastname</label>
+              <input
+                type="text"
+                value={newUser.lastname || ""}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, lastname: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
+                  border-[var(--brown-color)] bg-[var(--cream-color)] 
+                  focus:border-[var(--dark-brown-color)] focus:outline-none"
+              />
+            </div>
+
+            {/* Username */}
+            <div>
+              <label className="block text-sm font-semibold mb-2">Username</label>
+              <input
+                type="text"
+                value={newUser.user_name || ""}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, user_name: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
+                  border-[var(--brown-color)] bg-[var(--cream-color)] 
+                  focus:border-[var(--dark-brown-color)] focus:outline-none"
+              />
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                Phone number
+              </label>
+              <input
+                type="tel"
+                value={newUser.phone_number || ""}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, phone_number: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
+                  border-[var(--brown-color)] bg-[var(--cream-color)] 
+                  focus:border-[var(--dark-brown-color)] focus:outline-none"
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-semibold mb-2">Email</label>
+              <input
+                type="email"
+                value={newUser.email || ""}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, email: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
+                  border-[var(--brown-color)] bg-[var(--cream-color)] 
+                  focus:border-[var(--dark-brown-color)] focus:outline-none"
+              />
+            </div>
           </div>
 
-          {/* Lastname */}
-          <div>
-            <label className="block text-sm font-semibold mb-2">Lastname</label>
-            <input
-              type="text"
-              value={newUser.lastname || ""}
-              onChange={(e) =>
-                setNewUser({ ...newUser, lastname: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
-                border-[var(--brown-color)] bg-[var(--cream-color)] 
-                focus:border-[var(--dark-brown-color)] focus:outline-none"
-            />
-          </div>
-
-          {/* Username */}
-          <div>
-            <label className="block text-sm font-semibold mb-2">Username</label>
-            <input
-              type="text"
-              value={newUser.user_name || ""}
-              onChange={(e) =>
-                setNewUser({ ...newUser, user_name: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
-                border-[var(--brown-color)] bg-[var(--cream-color)] 
-                focus:border-[var(--dark-brown-color)] focus:outline-none"
-            />
-          </div>
-
-          {/* Phone */}
-          <div>
-            <label className="block text-sm font-semibold mb-2">
-              Phone number
-            </label>
-            <input
-              type="tel"
-              value={newUser.phone_number || ""}
-              onChange={(e) =>
-                setNewUser({ ...newUser, phone_number: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
-                border-[var(--brown-color)] bg-[var(--cream-color)] 
-                focus:border-[var(--dark-brown-color)] focus:outline-none"
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-semibold mb-2">Email</label>
-            <input
-              type="email"
-              value={newUser.email || ""}
-              onChange={(e) =>
-                setNewUser({ ...newUser, email: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
-                border-[var(--brown-color)] bg-[var(--cream-color)] 
-                focus:border-[var(--dark-brown-color)] focus:outline-none"
-            />
+          {/* actions */}
+          <div className="flex justify-end items-center mt-8 pt-6 border-t border-[var(--brown-color)]">
+            <div className="flex space-x-8">
+              <button
+                type="button"
+                onClick={() => handleCancel()}
+                className="px-6 py-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-300 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="!text-white px-6 py-2 bg-[var(--dark-brown-color)] rounded hover:bg-[var(--light-brown-color)] transition-colors duration-300 cursor-pointer"
+              >
+                Done
+              </button>
+            </div>
           </div>
         </div>
+      </form>
 
-        {/* actions */}
-        <div className="flex justify-end items-center mt-8 pt-6 border-t border-[var(--brown-color)]">
-          <div className="flex space-x-8">
-            <button
-              onClick={handleCancel}
-              className="px-6 py-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-300 cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleConfirm}
-              className="!text-white px-6 py-2 bg-[var(--dark-brown-color)] rounded hover:bg-[var(--light-brown-color)] transition-colors duration-300 cursor-pointer"
-            >
-              Done
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

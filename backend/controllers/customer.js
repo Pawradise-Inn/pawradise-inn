@@ -5,7 +5,7 @@ const getCustomerProfile = async(req, res)=>{ //requirement: 2
         const customerId = req.params.id;
         const customerWithPets = await prisma.customer.findUnique({
             where: {
-                userId: Number(customerId)
+                id: Number(customerId)
             },
             include:{
                 user: {
@@ -34,29 +34,25 @@ const getCustomerProfile = async(req, res)=>{ //requirement: 2
 
 const updateCustomerProfile = async(req, res)=>{
     try{
-        const customerId = req.params.id;
+        const customerId = Number(req.params.id);
         const {firstname,
                 lastname,
                 email,
                 phone_number,
-                user_name,
-                password,
-                role} = req.body;
-        const userId = await prisma.customer.findUnique({
+                user_name} = req.body;
+        const user = await prisma.customer.findUnique({
             where: {
                 id: customerId
             }
         });
         const customer = await prisma.user.update({
-            where: {id: userId},
-            date: {
+            where: {id: user.id},
+            data: {
                 firstname,
                 lastname,
                 email,
                 phone_number,
                 user_name,
-                password,
-                role
             }
         });
         res.status(200).json({success: true, data: customer});
