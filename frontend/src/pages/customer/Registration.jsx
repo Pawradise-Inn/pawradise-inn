@@ -10,37 +10,43 @@ const fields = [
     name: "firstname",
     type: "text",
     placeholder: "First Name",
+    autoComplete: "true"
   },
   {
     label: "Lastname",
     name: "lastname",
     type: "text",
     placeholder: "Last Name",
+    autoComplete: "true"
   },
-  { label: "Email", name: "email", type: "email", placeholder: "Email" },
+  { label: "Email", name: "email", type: "email", placeholder: "Email", autoComplete: "true" },
   {
     label: "Username",
     name: "userName",
     type: "text",
     placeholder: "Username (For Login)",
+    autoComplete: "true"
   },
   {
     label: "Password",
     name: "password",
     type: "password",
     placeholder: "Password",
+    autoComplete: "false"
   },
   {
     label: "Confirm Password *",
     name: "confirmPassword",
     type: "password",
     placeholder: "Confirm Password",
+    autoComplete: "false"
   },
   {
     label: "Phone Number",
     name: "phoneNumber",
     type: "tel",
     placeholder: "0xxxxxxxxx",
+    autoComplete: "true"
   },
 ];
 
@@ -118,12 +124,14 @@ const Registration = () => {
                   {field.label}
                 </label>
                 <input
+                  id={field.name}
                   className="border-2 border-(--dark-brown-color) bg-white opacity-65 rounded-md p-2 outline-none focus:ring-2 focus:ring-(--light-brown-color) focus:border-transparent shadow-lg w-full transition-all duration-200"
                   type={field.type}
                   name={field.name}
                   placeholder={field.placeholder}
                   value={form[field.name]}
                   onChange={handleChange}
+                  autoComplete={field.autoComplete}
                   required
                 />
               </div>
