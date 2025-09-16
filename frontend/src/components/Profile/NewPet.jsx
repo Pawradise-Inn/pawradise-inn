@@ -17,6 +17,58 @@ const PetInput = ({data, setData, name}) => {
     )
 }
 
+const RadioInput = ({ name, options, selected, onChange }) => {
+  return (
+    <div className="flex my-6 space-x-6">
+      {options.map((opt) => (
+        <label
+          key={opt}
+          className="relative flex items-center space-x-2 cursor-pointer font-semibold"
+        >
+          <input
+            type="radio"
+            name={name}
+            value={opt}
+            checked={selected === opt}
+            onChange={() => onChange(opt)}
+            className="hidden peer"
+          />
+
+          <div
+            className="relative w-10 h-10 border-2 border-[var(--brown-color)] rounded transition-all bg-[var(--cream-color)]
+              before:absolute before:top-1/2 before:left-1/2 before:w-8 before:h-0.5 before:bg-[var(--dark-brown-color)]
+              before:origin-center before:-translate-x-1/2 before:-translate-y-1/2 before:rotate-135 before:transform
+              before:transition-all before:scale-0 peer-checked:before:scale-100"
+          ></div>
+
+          <span>{opt}</span>
+        </label>
+      ))}
+    </div>
+  );
+};
+
+
+
+const SelectInput = ({ data, setData, name, options }) => {
+  return (
+    <div>
+      <label className="block text-sm font-semibold mb-2">{name}</label>
+      <select
+        value={data}
+        onChange={(e) => setData(e.target.value)}
+        className="w-full shadow-md px-6 py-4.5  rounded-lg border-2 transition-all duration-300 border-[var(--dark-brown-color)] bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none transition-all duration-300"
+      >
+        <option value="">Select {name}</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
+
 const NewPet = () => {
     const {user, setUser} = useOutletContext();
     const [petName, setPetName] = useState("")
@@ -105,22 +157,34 @@ const NewPet = () => {
 
                 {/* Pet Details and Buttons Section - Right aligned */}
                 <div className="flex-1 flex flex-col"> {/* Takes up remaining space */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                        {/* Pet gender */}
+
+                        <RadioInput
+                                name="gender"
+                                options={["MALE", "FEMALE"]}
+                                selected={petGender}
+                                onChange={setPetGender}
+                        />
+                       
+                    </div>
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Pet name */}
                         <PetInput data={petName} setData={setPetName} name='Pet name'/>
                         {/* { Pet age} */}
                         <PetInput data={petAge} setData={setPetAge} name='Pet age'/>
-
                         {/* Food allergy */}
                         <PetInput data={foodAllergy} setData={setFoodAllergy} name='Food allergy'/>
                         {/* Pet breed */}
                         <PetInput data={petBreed} setData={setPetBreed} name='Pet breed'/>
                         {/* Medical condition */}
                         <PetInput data={medicalCondition} setData={setMedicalCondition} name='Medical condition'/>
-                        {/* Pet gender */}
-                        <PetInput data={petGender} setData={setPetGender} name='Pet gender'/>
-                        {/* Pet type */}
-                        <PetInput data={petType} setData={setPetType} name='Pet type'/>
+                         {/* Pet type */}
+                        <SelectInput data={petType} setData={setPetType} name='Pet type' options={['DOG','CAT','BIRD', "MOUSE", "RABBIT"]} />  
+                 
+                        
+
                     </div>
 
                     {/* Buttons - Right aligned within the input section */}
