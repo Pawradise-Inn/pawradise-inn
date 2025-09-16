@@ -4,37 +4,45 @@ import SuccessMessage from "./SuccessMessage";
 import CancelModal from "./CancelModal";
 import { useOutletContext } from "react-router-dom";
 import { fetchMyBookings, cancelBooking, updateBooking } from "../../hooks/bookingAPI"; // Import cancelBooking
+import { deleteBookedService } from "../../hooks/bookedServiceAPI";
 
 const Booking_comp = () => {
   const { user, setUser } = useOutletContext();
   const [my_booking, setMyBooking] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [allBookedService, setAllBookedService] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [cancelledBooking, setCanceledBooking] = useState(null);
 
   useEffect(() => {
     const getMyBookings = async () => {
-      
-        try {
-          fetchMyBookings(1).then((data) => setMyBooking(data.data));
-        } catch (error) {
-          console.error("Failed to fetch bookings:", error);
-        }
+      try {
+        const data = await fetchMyBookings(1);
+        setMyBooking(data.data);
 
+        // Flatten all booked_service into one array
+        const allServices = data.data.flatMap(book => book.booked_service);
+        setAllBookedService(allServices);
+      } catch (error) {
+        console.error("Failed to fetch bookings:", error);
+      }
     };
     getMyBookings();
   }, []);
 
-  console.log("my booking: ", my_booking)
+  console.log("all booked service: ", allBookedService)
   const handleCancelClick = (book) => {
     setSelectedBooking(book);
+    console.log(book.id)
     setShowModal(true);
   };
 
-  const handleConfirmCancel = async () => {
+  const handleConfirmCancel = () => {
     try {
-      cancelBooking(selectedBooking.id);
+      deleteBookedService(selectedBooking.id);
+      const filterBookingService = allBookedService.filter(ab => ab.id != selectedBooking.id);
+      setAllBookedService(filterBookingService)
       setCanceledBooking(selectedBooking);
       setShowModal(false);
       setSelectedBooking(null);
@@ -60,8 +68,6 @@ const Booking_comp = () => {
     setShowSuccessMessage(false);
   };
 
-  const filteredBook = my_booking.filter(book => book.status != "CANCELLED")
-
   return (
     <div>
       <SuccessMessage
@@ -70,16 +76,9 @@ const Booking_comp = () => {
         onClose={handleCloseSuccessMessage}
       />
 
-      {my_booking.map((book) => {
-        return book.booked_service.map((data) => {
-        return (<BookingCard
-          key={data.id} // It's better to use a unique ID for the key, like book.id
-          book={data}
-          onCancelClick={handleCancelClick}
-        />)
-    })
-  })}
-
+    {allBookedService.map((book) => {
+      return(<BookingCard key={book.id} book={book} onCancelClick={handleCancelClick} />)
+    })};
 
       {/* Cancel Popup */}
       {showModal && (
@@ -93,7 +92,7 @@ const Booking_comp = () => {
   );
 };
 
-const BookingCard = ({ book, onCancelClick }) => {
+const BookingCard = ({ book, onCancelClick}) => {
   console.log("book: ", book)
   return (
     <div className="flex items-center bg-[var(--cream-color)] rounded-lg p-4 shadow-lg mb-6">
