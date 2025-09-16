@@ -37,12 +37,12 @@ const CancelModal = ({ booking, onConfirm, onCancel }) => {
                                 <div className="flex items-center">
                                     <img 
                                         src={booking.img} 
-                                        alt={booking.pet_name}
+                                        alt={booking.pet.name}
                                         className="w-16 h-16 rounded-lg object-cover mr-4"
                                     />
                                     <div>
-                                        <p className="font-semibold text-gray-800">{booking.service_name}</p>
-                                        <p className="text-sm text-gray-600">Pet: {booking.pet_name} ({booking.pet_type})</p>
+                                        <p className="font-semibold text-gray-800">{booking.service.name}</p>
+                                        <p className="text-sm text-gray-600">Pet: {booking.pet.name} ({booking.pet.type})</p>
                                         <p className="text-sm text-gray-600">Status: {booking.statuse}</p>
                                     </div>
                                 </div>
