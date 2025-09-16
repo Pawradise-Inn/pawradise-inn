@@ -182,10 +182,7 @@ const getMyBookings = async (req, res) => {
 const cancelBooking = async(req, res) =>{
     try {
     const id = Number(req.params.id);
-
-    const booking = await prisma.booking.findUnique({
-      where: { id: id }
-    });
+    const booking = req.body;
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
@@ -209,6 +206,87 @@ const cancelBooking = async(req, res) =>{
   }
 };
 
+
+const putBooking = async (req, res) => {
+    try {
+        const bookingId = Number(req.params.id);
+        const {
+            date,
+            status,
+            customerName,
+            customerEmail,
+            customerNumber,
+            ...otherData // Catch any other unexpected fields
+        } = req.body;
+
+        // Fetch the existing booking with its customer
+        const existingBooking = await prisma.booking.findUnique({
+            where: { id: bookingId },
+            include: { customer: true }
+        });
+
+        if (!existingBooking) {
+            return res.status(404).json({ success: false, error: 'Booking not found' });
+        }
+
+        // Prepare the data to update the Booking model
+        const updateBookingData = {};
+        if (date) {
+            updateBookingData.date = new Date(date);
+        }
+        if (status) {
+            updateBookingData.status = status;
+        }
+        // Prepare the data to update the Customer model
+        const updateCustomerData = {};
+        if (customerName) {
+            updateCustomerData.name = customerName;
+        }
+        if (customerEmail) {
+            updateCustomerData.email = customerEmail;
+        }
+        if (customerNumber) {
+            updateCustomerData.number = customerNumber;
+        }
+
+        // Use a Prisma transaction to ensure both updates succeed or fail together
+        const [updatedBooking, updatedCustomer] = await prisma.$transaction([
+            // Update the Booking record with the new booking data
+            prisma.booking.update({
+                where: { id: bookingId },
+                data: updateBookingData,
+            }),
+            // Update the related Customer record if there's customer data to update
+            Object.keys(updateCustomerData).length > 0 ?
+                prisma.customer.update({
+                    where: { id: existingBooking.customerId },
+                    data: updateCustomerData,
+                }) :
+                prisma.customer.findUnique({ where: { id: existingBooking.customerId } }) // A no-op to keep transaction consistent
+        ]);
+
+        // Reconstruct the response object in the desired format
+        const responseData = {
+            id: updatedBooking.id,
+            date: updatedBooking.date,
+            status: updatedBooking.status,
+            customerId: updatedBooking.customerId,
+            customerName: updatedCustomer.name,
+            customerEmail: updatedCustomer.email,
+            customerNumber: updatedCustomer.number
+        };
+
+        res.status(200).json({ success: true, data: responseData });
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
+};
+
+module.exports = {
+    // ... other exports
+    putBooking,
+};
+
 module.exports = {
     getBookings,
     getBooking,
@@ -216,5 +294,6 @@ module.exports = {
     createBooking,
     deleteBooking,
     getMyBookings,
-    cancelBooking
+    cancelBooking,
+    putBooking
 };
