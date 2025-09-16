@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import { fetchAllPetAPI } from "../../hooks/petAPI";
 
 const Pet_card = ({pet}) => {
-    console.log(pet)
     return (
         <div>
             <NavLink to={`/staff/pet/${pet.id}`}>

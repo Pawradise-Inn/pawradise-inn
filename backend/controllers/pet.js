@@ -110,7 +110,7 @@ const updatePet = async (req, res) => {
         const pet = await prisma.pet.update({
             where: {id: Number(req.params.id)},
             data: req.body
-        });
+          });
         if (!pet) {
             return res.status(404).json({success: false, error: 'Pet not found'});
         }
