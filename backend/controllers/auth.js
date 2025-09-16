@@ -48,7 +48,7 @@ exports.register = async (req, res, next) => {
     //res.status(200).json({success: true, token});
     sendTokenResponse(user, 200, res);
   } catch (error) {
-    res.status(200).json({ success: false });
+    res.status(200).json({ success: false});
   }
 };
 

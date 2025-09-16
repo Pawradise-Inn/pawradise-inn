@@ -48,7 +48,7 @@ const BookingService = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto py-12">
-      <b className="text-7xl text-center block m-8 mt-0">Our Service</b>
+      <b className="text-7xl text-center block m-8 mt-0">Service Reservation</b>
       <div className="flex my-8 mx-auto w-5/10 border-2 rounded-4xl px-4 py-2 text-3xl">
         <i className="bi bi-search opacity-50 pr-2 flex justify-center item-center -bottom-1 relative "></i>
         <input
