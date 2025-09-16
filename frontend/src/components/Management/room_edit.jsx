@@ -5,6 +5,7 @@ import RoomCard from "../room/RoomCard";
 import AddRoomPopup from "./add_room";
 
 import {
+  fetchAllRoomsAPI,
   fetchAllRoomsWithReviewsAPI,
   addRoomAPI,
   updateRoomAPI,
@@ -13,17 +14,43 @@ import {
 
 const RoomEdit = () => {
   const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  
   const [search, setSearch] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [timeoutReached, setTimeoutReached] = useState(false);
 
   useEffect(() => {
-    if (!loading) return;
-    const t = setTimeout(() => setTimeoutReached(true), 15000);
-    return () => clearTimeout(t);
-  }, [loading]);
+    const loadRooms = async () => {
+      try {
+        const response = await fetchAllRoomsAPI();
+        setRooms(response.data);
+      } catch (err) {
+        console.error("Failed to fetch rooms:", err);
+        setError("Could not load Rooms. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadRooms();
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (!search) return rooms;
+    const q = search.toLowerCase();
+    return rooms.filter(
+      (r) => String(r.roomId).includes(q) ||
+      (r.status ?? "").toLowerCase().includes(q) ||
+      (r.forwhich ?? "").toLowerCase().includes(q)
+    );
+  }, [rooms, search]);
+
+  const openAdd = () => { setSelected(null); setIsPopupOpen(true); };
+  const openEdit = (room) => { setSelected(room); setIsPopupOpen(true); };
+  const closePopup = () => { setIsPopupOpen(false); setSelected(null); };
+
 
   useEffect(() => {
     let mounted = true;
@@ -41,21 +68,6 @@ const RoomEdit = () => {
     return () => { mounted = false; };
   }, []);
 
-  const filtered = useMemo(() => {
-    if (!search) return rooms;
-    const q = search.toLowerCase();
-    return rooms.filter(
-      (r) =>
-        String(r.roomId).includes(q) ||
-        (r.status ?? "").toLowerCase().includes(q) ||
-        (r.forwhich ?? "").toLowerCase().includes(q)
-    );
-  }, [rooms, search]);
-
-  const openAdd = () => { setSelected(null); setIsPopupOpen(true); };
-  const openEdit = (room) => { setSelected(room); setIsPopupOpen(true); };
-  const closePopup = () => { setIsPopupOpen(false); setSelected(null); };
-
   // Map popup payload -> backend fields
   const mapPayloadToBackend = (p) => ({
     // UI fields: { forwhich, price, maxsize, image }
@@ -67,46 +79,49 @@ const RoomEdit = () => {
   });
 
   const handleSaveRoom = async (payload) => {
-    if (selected) {
-      // EDIT: your backend only allows { price, petType } in PATCH
-      const update = {
-        price: payload.price,
-        petType: payload.forwhich,
-        // capacity/picture NOT supported by your updateRoom controller
-      };
-      await updateRoomAPI(selected.roomId, update);
+    try {
+      if (selected) {
+        // EDIT MODE
+        const response = await updateRoomAPI(selected.id, payload);
+        const updatedRoom = response.data;
+        setServices((prev) =>
+          prev.map((item) =>
+            item.id === updatedRoom.id ? updatedRooom : item
+          )
+        );
+      } else {
+        // ADD MODE
+        const response = await addServiceAPI(payload);
+        const newService = response.data;
+        setServices((prev) => [newService, ...prev]);
+      }
+      closePopup();
+    } catch (err) {
+      console.error("Failed to save service:", err);
+      alert("Failed to save service.");
 
-      // Optimistic local update
-      setRooms((prev) =>
-        prev.map((it) =>
-          it.roomId === selected.roomId
-            ? { ...it, price: update.price, forwhich: update.petType }
-            : it
-        )
-      );
-    } else {
-      // ADD
-      const body = mapPayloadToBackend(payload);
-      const created = await addRoomAPI(body);
-      const newRoom = {
-        image: created.picture,
-        roomId: created.id,
-        review: 5,                          // default if you want
-        forwhich: created.petType,
-        price: created.price,
-        size: created.capacity,
-        maxsize: created.capacity,
-      };
-      setRooms((prev) => [newRoom, ...prev]);
-    }
-    closePopup();
+}
   };
 
   const handleDeleteRoom = async (roomId) => {
-    await deleteRoomAPI(roomId);
-    setRooms((prev) => prev.filter((r) => r.roomId !== roomId));
-    closePopup();
+    try {
+      await deleteRoomAPI(roomId);
+      setRooms((prev) => prev.filter((r) => r.roomId !== roomId));
+      closePopup();
+    } catch (err) {
+      console.error("Failed to delete room:", err);
+      alert("Failed to delete room.");
+    }
   };
+
+  if (loading) {
+    return <p className="text-2xl w-full text-center mt-32">Loading services...</p>;
+  }
+
+  if (error) {
+    return <p className="text-2xl w-full text-center mt-32 text-red-500">{error}</p>;
+  }
+
 
   return (
     <main className="flex-1">
