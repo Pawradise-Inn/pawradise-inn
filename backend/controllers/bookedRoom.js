@@ -25,10 +25,13 @@ const getBookedRoom = async (req, res) => {
 
 const createBookedRoom = async (req, res) => {
     try {
-        const {roomId, petId, bookingId, checkIn, checkOut} = req.body;
+        const {roomId, pet_name, bookingId, checkIn, checkOut} = req.body;
+        const pet = await prisma.pet.findFirst({
+            where:{name: pet_name}
+        });
         const bookedRoom = await createBookedRoomWithCondition(
              roomId, 
-             petId, 
+             pet.id, 
              bookingId, 
              checkIn, 
              checkOut

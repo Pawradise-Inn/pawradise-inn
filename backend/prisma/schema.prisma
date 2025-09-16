@@ -236,13 +236,14 @@ enum PaymentStatus {
 enum BookingStatus {
   PENDING
   BOOKED
-  CHECKED_IN
-  CHECKED_OUT
+  COMPLETED
   CANCELLED
 }
 
 enum PetStatus {
   IDLE
+  CHECKED_IN
+  CHECKED_OUT
   QUEUE
   IN_PROGRESS
   COMPLETED

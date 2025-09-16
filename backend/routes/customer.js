@@ -2,9 +2,12 @@ const express = require('express');
 const router = express.Router();
 
 const {
-    getCustomerProfile
+    getCustomerProfile,
+    updateCustomerProfile
 } = require('../controllers/customer')
 
-router.get('/:id', getCustomerProfile)
+router.route("/:id")
+    .get(getCustomerProfile)
+    .put(updateCustomerProfile);
 
 module.exports = router;

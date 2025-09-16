@@ -1,6 +1,6 @@
 const prisma = require('../prisma/prisma');
-const {createBookedRoom} = require('./bookedRoom');
-const {createBookedService} = require('./bookedService');
+const {createBookedRoomWithCondition} = require('./logics/bookedRoom');
+const {createBookedServiceWithCondition} = require('./logics/bookedService');
 
 const getBookings = async (req, res) => {
     try {
@@ -55,6 +55,10 @@ const updateBookingStatus = async (req, res) => {
     try {
         const bookingId = req.params.id;
         const status = req.body.status;
+        const allowedStatuses = ["BOOKED", "CANCELLED", "COMPLETED"];
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({ success: false, error: "Invalid status" });
+        }
         const booking = await prisma.booking.update({
             where: {
                 id: Number(bookingId)
@@ -64,40 +68,30 @@ const updateBookingStatus = async (req, res) => {
             }
         });
 
-        if (status === 'BOOKED'){
-            const {bookedRoomData, bookedServiceData} = req.body;
-
-            if (bookedRoomData && bookedRoomData.length > 0){
-                for (const room of bookedRoomData){
-                    await createBookedRoom({
-                        body: {
-                            roomId: room.roomId,
-                            petId: room.petId,
-                            bookingId: booking.id,
-                            checkIn: room.checkIn,
-                            checkOut: room.checkOut
-                        }
-                    },{
-                        status: () => {},
-                        json: () => {}
-                    });
-                }
+        if (status === "BOOKED") {
+            if (bookedRoomData?.length > 0) {
+                await Promise.all(
+                    bookedRoomData.map(room =>
+                    createBookedRoomWithCondition({
+                        roomId: room.roomId,
+                        petId: room.petId,
+                        bookingId: booking.id,
+                        checkIn: room.checkIn,
+                        checkOut: room.checkOut
+                    })
+                ));
             }
 
-            if (bookedServiceData && bookedServiceData.length > 0){
-                for (const service of bookedServiceData){
-                    await createBookedService({
-                        body: {
-                            serviceId: service.serviceId,
-                            petId: service.petId,
-                            bookingId: booking.id,
-                            scheduled: service.scheduled
-                        }
-                    },{
-                        status: () => {},
-                        json: () => {}
-                    });
-                }
+            if (bookedServiceData?.length > 0) {
+                await Promise.all(
+                    bookedServiceData.map(service =>
+                    createBookedServiceWithCondition({
+                        serviceId: service.serviceId,
+                        petId: service.petId,
+                        bookingId: booking.id,
+                        scheduled: service.scheduled
+                    })
+                ));
             }
         }
         res.status(200).json({success: true, data: booking});
