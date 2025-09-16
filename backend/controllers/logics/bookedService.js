@@ -43,10 +43,42 @@ const isDuplicatedBooking = async(serviceId, petId, scheduled)=>{
     });
 
     return !!existing;
-}
+};
+
+const createBookedServiceWithCondition = async (serviceId, petId, bookingId, scheduled) => {
+    const count = await overlappingService(serviceId, scheduled);
+
+    if (count >= 3) {
+        const error = new Error('Service is not available');
+        error.code = 'SERVICE_FULL';
+        throw error;
+    }
+
+    const overlapping = await duplicatedRoom(roomId, petId, scheduled);
+    if (overlapping) {
+        const error = new Error('Service is not available for the selected dates');
+        error.duplicatedDates = overlapping.map(b => ({
+            scheduled: b.scheduled
+        }));
+        error.code = 'SERVICE_DUPLICATE';
+        throw error;
+    }
+
+    const bookedService = await prisma.bookedService.create({
+        data: {
+            roomId,
+            petId,
+            bookingId,
+            scheduled
+        }
+    });
+
+    return bookedService;
+};
 
 module.exports = {
     findBookedServiceById,
     overlappingService,
-    isDuplicatedBooking
+    isDuplicatedBooking,
+    createBookedServiceWithCondition
 };
