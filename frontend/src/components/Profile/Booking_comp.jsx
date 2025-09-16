@@ -79,8 +79,6 @@ const Booking_comp = () => {
     })
   })}
 
-  
-
 
       {/* Cancel Popup */}
       {showModal && (
