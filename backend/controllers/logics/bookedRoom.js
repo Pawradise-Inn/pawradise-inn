@@ -51,6 +51,16 @@ const isFreeThisTime = async(petId, checkIn, checkOut)=>{
     return !pet;
 }
 
+const isSuitable = async(roomId, petId)=>{
+    const room = await prisma.room.findUnique({
+        where: {id: Number(roomId)}
+    })
+    const pet = await prisma.pet.findUnique({
+        where: {id: Number(petId)}
+    })
+    return pet.type === room.petType;
+}
+
 const createBookedRoomWithCondition = async (roomId, petId, bookingId, checkIn, checkOut) => {
     const count = await overlappingRoom(roomId, checkIn, checkOut);
     const cap = await getRoomCap(roomId);
@@ -60,6 +70,7 @@ const createBookedRoomWithCondition = async (roomId, petId, bookingId, checkIn, 
         error.code = 'ROOM_FULL';
         throw error;
     }
+
 
     const overlapping = await duplicatedRoom(roomId, petId, checkIn, checkOut);
     if (overlapping.length > 0) {
@@ -76,6 +87,13 @@ const createBookedRoomWithCondition = async (roomId, petId, bookingId, checkIn, 
     if(!pet){
         const error = new Error('Pet is not available for the selected dates');
         error.code = 'PET_NOT_FREE';
+        throw error;
+    }
+
+    const isSuit = await isSuitable(roomId, petId);
+    if(!isSuit){
+        const error = new Error('Pet is not suitable for this room');
+        error.code = 'PET_NOT_SUIT';
         throw error;
     }
 
