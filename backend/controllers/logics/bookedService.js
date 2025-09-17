@@ -55,6 +55,16 @@ const isFreeThisTime = async (petId, scheduled) => {
   return !pet;
 };
 
+const isSuitable = async(serviceId, petId)=>{
+    const service = await prisma.service.findUnique({
+        where: {id: Number(serviceId)}
+    })
+    const pet = await prisma.pet.findUnique({
+        where: {id: Number(petId)}
+    })
+    return service.petType.includes(pet.type);
+}
+
 const createBookedServiceWithCondition = async (
   serviceId,
   petId,
@@ -81,6 +91,13 @@ const createBookedServiceWithCondition = async (
     const error = new Error("Pet is not available for the selected dates");
     error.code = "PET_NOT_FREE";
     throw error;
+  }
+
+  const isSuit = await isSuitable(serviceId, petId);
+  if(!isSuit){
+    const error = new Error("Pet is not suitable for this service");
+    error.code = "PET_NOT_SUIT";
+    throw error; 
   }
 
   const bookedService = await prisma.bookedService.create({
