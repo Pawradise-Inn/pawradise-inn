@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import RoomCard from "../../components/room/RoomCard";
 import BookingPopup from "../../components/BookingPopup";
+import { motion, AnimatePresence } from "motion/react";
+import {overlay, popUP, startUpVariants } from "../../styles/animation"
 import { getDateValidation } from "../../utils/HandleValidation";
 import { handleFormDataChange } from "../../utils/HandleForm";
 import { fetchAllRoomsWithReviewsAPI } from "../../hooks/roomAPI";
+import Overlay from "../../components/Overlay";
 
 const BookingRoom = () => {
   const petType = ["Dog", "Cat", "Bird", "Raccoon", "Fish  :)"];
@@ -44,10 +47,39 @@ const BookingRoom = () => {
     setPopUpData(data);
   }, []);
 
+  // hide scroll bar when popup occur
+  useEffect(() => {
+    if (popUpStatus) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [popUpStatus]);
+
   return (
     <div className="w-full max-w-6xl mx-auto py-12">
-      <b className="text-7xl text-center block m-8 mt-0">Room Reservation</b>
-      <form className="m-8 relative flex justify-center content-between border-2 border-(--brown-color) rounded-xl mx-auto w-6/10 max-w-[720px] pb-4 before:content-[''] before:w-px before:h-3/4 before:absolute before:top-1/2 before:left-3/10 before:-translate-x-1/2 before:-translate-y-1/2 before:border-1 before:border-(--brown-color)">
+      <b className="text-7xl text-center block m-8 mt-0">
+        {"Room Reservation".split(" ").map((word, idx) => {
+          return (
+            <motion.p
+              variants={startUpVariants}
+              initial="hidden"
+              animate="firstRender"
+              custom={idx}
+              key={idx}
+            >
+              {word}
+            </motion.p>
+          );
+        })}
+      </b>
+      <motion.form
+        variants={startUpVariants}
+        initial="hidden"
+        animate="firstRender"
+        custom={2}
+        className="m-8 relative flex justify-center content-between border-2 border-(--brown-color) rounded-xl mx-auto w-6/10 max-w-[720px] pb-4 before:content-[''] before:w-px before:h-3/4 before:absolute before:top-1/2 before:left-3/10 before:-translate-x-1/2 before:-translate-y-1/2 before:border-1 before:border-(--brown-color)"
+      >
         <div className="flex flex-col justify-start items-center gap-6 w-3/10 py-4 px-8">
           <p className="text-xl font-bold">Pet type</p>
           <div className="relative mx-auto text-xl bg-(--brown-color) rounded-lg w-full">
@@ -82,12 +114,10 @@ const BookingRoom = () => {
             />
           </div>
           <span className="text-center block w-full">
-            <i className="!text-(--warning-color)">
-              {noResult.warningText}
-            </i>
+            <i className="!text-(--warning-color)">{noResult.warningText}</i>
           </span>
         </div>
-      </form>
+      </motion.form>
 
       {!noResult.status ? (
         <p className="text-2xl w-full text-center mt-32 italic">
@@ -96,18 +126,43 @@ const BookingRoom = () => {
       ) : (
         <div className="m-8 grid grid-cols-2 gap-y-4 gap-x-8">
           {room.map((data, idx) => {
-            return <RoomCard key={idx} data={data} onClick={handlePopUpData} />;
+            return (
+              <RoomCard
+                variants={startUpVariants}
+                initial="hidden"
+                animate="firstRender"
+                whileHover={{ scale: 1.05 }}
+                custom={idx/2 + 2}
+                key={idx}
+                data={data}
+                onClick={handlePopUpData}
+              />
+            );
           })}
         </div>
       )}
 
-      {
-        <BookingPopup
-          status={popUpStatus}
-          data={popUpData}
-          onClick={handlePopUpData}
-        />
-      }
+      <AnimatePresence initial={true}>
+        {popUpStatus ? (
+          <>
+            <Overlay
+              variants={overlay}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+            />
+            <BookingPopup
+              variants={popUP}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              status={popUpStatus}
+              data={popUpData}
+              onClick={handlePopUpData}
+            />
+          </>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 };

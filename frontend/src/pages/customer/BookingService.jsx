@@ -3,9 +3,12 @@ import ServiceCard from "../../components/service/ServiceCard";
 import BookingPopup from "../../components/BookingPopup";
 import { filteredObjectByType } from "../../utils/HandleSearch";
 import { fetchServiceCommentsAPI } from "../../hooks/serviceAPI";
+import { motion, AnimatePresence } from "motion/react";
+import {overlay, popUP, startUpVariants } from "../../styles/animation"
+import Overlay from "../../components/Overlay";
 
 const BookingService = () => {
-
+  const [mounted, setMounted] = useState(false);
   const [service, setService] = useState([]);
   const [filter, setFilter] = useState("");
   const [noResult, setNoResult] = useState(false);
@@ -17,9 +20,9 @@ const BookingService = () => {
   useEffect(() => {
     fetchServiceCommentsAPI().then((data) => {
       data.data.forEach((service) => {
-		  service.headerType = "Service";
-		  service.reviewStar = service.reviewStar.toFixed(1);
-		  service.commentPages = Math.max(1, service.commentPages);
+        service.headerType = "Service";
+        service.reviewStar = service.reviewStar.toFixed(1);
+        service.commentPages = Math.max(1, service.commentPages);
       });
 
       setService(data.data);
@@ -29,6 +32,7 @@ const BookingService = () => {
   // set filterService with name filtering
   useEffect(() => {
     setFilterService(filteredObjectByType(service, filter, "name"));
+    console.log(noResult);
   }, [filter, service]);
 
   // check if there is no result after filtering
@@ -46,37 +50,106 @@ const BookingService = () => {
     setPopUpData(data);
   }, []);
 
+  // hide scroll bar when popup occur
+  useEffect(() => {
+    if (popUpStatus) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [popUpStatus]);
+
   return (
     <div className="w-full max-w-6xl mx-auto py-12">
-      <b className="text-7xl text-center block m-8 mt-0">Service Reservation</b>
-      <div className="flex my-8 mx-auto w-5/10 border-2 rounded-4xl px-4 py-2 text-3xl">
+      <b className="text-7xl text-center block m-8 mt-0">
+        {"Service Reservation".split(" ").map((word, idx) => {
+          return (
+            <motion.p
+              variants={startUpVariants}
+              initial="hidden"
+              animate="firstRender"
+              custom={idx}
+              key={idx}
+            >
+              {word}
+            </motion.p>
+          );
+        })}
+      </b>
+      <motion.div
+        variants={startUpVariants}
+        initial="hidden"
+        animate="firstRender"
+        custom={2}
+        className="flex my-8 mx-auto w-5/10 border-2 rounded-4xl px-4 py-2 text-3xl"
+      >
         <i className="bi bi-search opacity-50 pr-2 flex justify-center item-center -bottom-1 relative "></i>
         <input
           className="w-full outline-0 placeholder:opacity-75"
           placeholder="search"
+          onFocus={() => setMounted(true)}
           onChange={(e) => setFilter(e.target.value)}
         />
-      </div>
+      </motion.div>
 
       {noResult ? (
-        <p className="text-2xl w-full text-center mt-32 italic">
+        <motion.p
+          variants={startUpVariants}
+          initial="hidden"
+          animate={mounted ? "found" : "firstRender"}
+          className="text-2xl w-full text-center mt-32 italic"
+        >
           Sorry, your desired services is not on operation now.
-        </p>
+        </motion.p>
       ) : (
-        <div className="grid grid-cols-4 gap-x-8 gap-y-4">
-          {filterService.map((data, idx) => {
-            return (
-              <ServiceCard key={idx} data={data} onClick={handlePopUpData} />
-            );
-          })}
-        </div>
+        <motion.div
+          variants={startUpVariants}
+          initial="hidden"
+          animate={mounted ? "found" : "firstRender"}
+          className="grid grid-cols-4 gap-x-8 gap-y-4"
+        >
+          <AnimatePresence>
+            {filterService.map((data, idx) => {
+              return (
+                <ServiceCard
+                  variants={startUpVariants}
+                  initial="hidden"
+                  animate={mounted ? "found" : "firstRender"}
+                  exit="exit"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 1 }}
+                  custom={idx / 4 + 2}
+                  key={idx}
+                  data={data}
+                  onClick={handlePopUpData}
+                />
+              );
+            })}
+          </AnimatePresence>
+        </motion.div>
       )}
 
-      <BookingPopup
-        status={popUpStatus}
-        data={popUpData}
-        onClick={handlePopUpData}
-      />
+      <AnimatePresence initial={true}>
+        {popUpStatus ? (
+          <>
+            <Overlay
+              variants={overlay}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+            />
+            <BookingPopup
+              variants={popUP}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              status={popUpStatus}
+              data={popUpData}
+              onClick={handlePopUpData}
+            />
+          </>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 };

@@ -13,13 +13,13 @@ const Footer = () => {
                 {/* Right Section */}
                     <div className="w-1/2">
                         <h2 className="text-lg text-right font-semibold ">Follow us</h2>
-                        <p className="text-sm text-right mt-1 cursor-pointer">Facebook</p>
-                        <p className="text-sm text-right mt-1 cursor-pointer">X</p>
-                        <p className="text-sm text-right mt-1 cursor-pointer">Instagram</p>
-                        <p className="text-sm text-right mt-1 cursor-pointer">Email</p>
+                        <p className="text-xl text-right mt-1"><i className="bi bi-facebook inline-flex justify-center items-center cursor-pointer"></i></p>
+                        <p className="text-xl text-right mt-1"><i className="bi bi-twitter-x inline-flex justify-center items-center cursor-pointer"></i></p>
+                        <p className="text-xl text-right mt-1"><i className="bi bi-instagram inline-flex justify-center items-center cursor-pointer"></i></p>
+                        <p className="text-xl text-right mt-1"><i className="bi bi-envelope inline-flex justify-center items-center cursor-pointer"></i></p>
                     </div>
                 </div>
-            <div className="bg-[var(--dark-brown-color)] py-4 ">
+            <div className="bg-[var(--dark-brown-color)] py-2 ">
                 <div className="max-w-7xl mx-auto px-4 text-center">
                     <p className="text-sm !text-[var(--cream-color)]">&copy; 2025 Pawradise Inn. All rights reserved.</p>
                 </div>
