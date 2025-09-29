@@ -9,4 +9,4 @@ const Overlay = ({ ...motionProps }) => {
   );
 };
 
-export default motion(Overlay);
+export default motion.create(Overlay);

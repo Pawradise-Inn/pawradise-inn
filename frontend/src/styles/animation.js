@@ -10,10 +10,10 @@ const popUP = {
 
 const startUpVariants = {
   hidden: { opacity: 0, y: 50 },
-  firstRender: (index) => ({
+  visible: (index) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: index * 0.3, duration: 0.7 },
+    transition: { delay: index * 0.3, duration: 0.35},
   }),
   found: {
     y: 0,

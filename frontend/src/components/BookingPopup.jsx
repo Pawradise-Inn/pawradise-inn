@@ -26,4 +26,4 @@ const BookingPopup = ({ status, data, onClick, ...motionProps }) => {
   );
 };
 
-export default motion(BookingPopup);
+export default motion.create(BookingPopup);

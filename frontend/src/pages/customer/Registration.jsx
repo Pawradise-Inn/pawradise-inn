@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import registerImg from "../../assets/register.png";
 import { addUserAPI } from "../../hooks/authAPI";
-import { validateFormPassword, validateFormTel } from "../../utils/HandleForm";
+import { validateFormPassword, validateFormTel } from "../../utils/handleForm";
 
 const fields = [
   {
@@ -10,43 +10,49 @@ const fields = [
     name: "firstname",
     type: "text",
     placeholder: "First Name",
-    autoComplete: "true"
+    autoComplete: "true",
   },
   {
     label: "Lastname",
     name: "lastname",
     type: "text",
     placeholder: "Last Name",
-    autoComplete: "true"
+    autoComplete: "true",
   },
-  { label: "Email", name: "email", type: "email", placeholder: "Email", autoComplete: "true" },
+  {
+    label: "Email",
+    name: "email",
+    type: "email",
+    placeholder: "Email",
+    autoComplete: "true",
+  },
   {
     label: "Username",
     name: "userName",
     type: "text",
     placeholder: "Username (For Login)",
-    autoComplete: "true"
+    autoComplete: "true",
   },
   {
     label: "Password",
     name: "password",
     type: "password",
     placeholder: "Password",
-    autoComplete: "false"
+    autoComplete: "false",
   },
   {
     label: "Confirm Password *",
     name: "confirmPassword",
     type: "password",
     placeholder: "Confirm Password",
-    autoComplete: "false"
+    autoComplete: "false",
   },
   {
     label: "Phone Number",
     name: "phoneNumber",
     type: "tel",
     placeholder: "0xxxxxxxxx",
-    autoComplete: "true"
+    autoComplete: "true",
   },
 ];
 

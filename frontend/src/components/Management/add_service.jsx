@@ -36,7 +36,7 @@ const AddServicePopup = ({ title = "Add service", initialData = null, onClose, o
   return (
     <div className="fixed inset-0 bg-black/60 z-10 grid place-items-center p-4">
       <div className="bg-white rounded-3xl p-8 w-[600px] flex flex-col space-y-6 shadow-lg">
-        <h2 className="text-3xl font-bold text-[var(--dark-brown-color)]">{title}</h2>
+        <h2 className="text-3xl font-bold text-(--dark-brown-color)">{title}</h2>
 
         <form onSubmit={handleSubmit} className="flex gap-6">
           <div className="flex flex-col flex-1 space-y-4">
@@ -117,7 +117,7 @@ const AddServicePopup = ({ title = "Add service", initialData = null, onClose, o
             <button
               type="button"
               onClick={handleSubmit}
-              className="px-4 py-2 rounded-md bg-[var(--light-brown-color)]"
+              className="px-4 py-2 rounded-md bg-(--light-brown-color)"
             >
               Save
             </button>

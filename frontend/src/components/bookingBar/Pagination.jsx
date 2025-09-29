@@ -3,7 +3,7 @@
 // onClick: function to handle page change, takes the new page number as argument
 
 import { memo, useMemo } from "react";
-import { getArrayWithRangeWithMid } from "../../utils/HandleArray";
+import { getArrayWithRangeWithMid } from "../../utils/handleArray";
 
 const Pagination = ({ id, pageAmount, currentPage, onClick }) => {
 

@@ -107,7 +107,7 @@ const PetUpdate = () => {
         <div className="p-6 max-w-8xl">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-[var(--dark-brown-color)]">
+                <h1 className="text-3xl font-bold text-(--dark-brown-color)">
                 </h1>
             </div>
             <div></div>
@@ -131,7 +131,7 @@ const PetUpdate = () => {
                 </div>
                  {/* Right Column */}
                 <div className="flex-1 flex flex-col">
-                    <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
+                    <div className="bg-(--cream-color) p-10 rounded-lg shadow-md flex-1 flex flex-col">
                         <h2 className="text-2xl font-bold mb-6">History</h2>
                         <div className="space-y-6 overflow-y-auto pr-2 scrollbar-sleek" >
                             {serviceData.map(service => (<ServiceCard key={service.id} service={service} getStatusText={getStatusText} getStatusColor={getRoomStatusColor} />))}
@@ -147,7 +147,7 @@ const PetUpdate = () => {
 
 const PetCard = ({pet}) => {
     return(
-        <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
+        <div className="bg-(--cream-color) rounded-lg p-6 shadow-lg">
             <div className="flex items-start space-x-6">
                 <div className="w-64 h-64 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
                     <img 
@@ -175,10 +175,10 @@ const StatusUpdate = ({handleSave, handleCancel, status, setStatus}) => {
         setStatus(e.target.value);
     };
     return(
-        <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
+        <div className="bg-(--cream-color) rounded-lg p-6 shadow-lg">
             {/* Header */}
             <div className="flex items-center space-x-3 mb-6">
-                <h2 className="text-2xl font-bold text-[var(--dark-brown-color)]">
+                <h2 className="text-2xl font-bold text-(--dark-brown-color)">
                     Add Status
                 </h2>
             </div>
@@ -188,7 +188,7 @@ const StatusUpdate = ({handleSave, handleCancel, status, setStatus}) => {
                 {/* Status Dropdown */}
                 <div className="flex flex-row justify-start">
                     <label className="font-semibold mb-1 mr-4">Status:</label>
-                    <select className="py-1 px-1 text-center p-2 border rounded-lg focus:ring-2 focus:ring-[var(--dark-brown-color)] focus:outline-none"
+                    <select className="py-1 px-1 text-center p-2 border rounded-lg focus:ring-2 focus:ring-(--dark-brown-color) focus:outline-none"
                         value={status}
                         onChange={handleStatusChange}
                     >
@@ -207,13 +207,13 @@ const StatusUpdate = ({handleSave, handleCancel, status, setStatus}) => {
                     <textarea 
                         rows="4"
                         placeholder="Write a note here..."
-                        className="p-2 border rounded-lg focus:ring-2 focus:ring-[var(--dark-brown-color)] focus:outline-none resize-none"
+                        className="p-2 border rounded-lg focus:ring-2 focus:ring-(--dark-brown-color) focus:outline-none resize-none"
                     ></textarea>
                 </div>
 
                 {/* Submit Button */}
                 <div className="flex-1">
-                    <button className="bg-[var(--dark-brown-color)] !text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition cursor-pointer" onClick={() => handleSave()}>
+                    <button className="bg-(--dark-brown-color) !text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition cursor-pointer" onClick={() => handleSave()}>
                         Save
                     </button>
                     <button className="px-5 py-2 rounded-lg hover:bg-opacity-90 transition cursor-pointer" onClick={() => handleCancel()}>
@@ -228,7 +228,7 @@ const StatusUpdate = ({handleSave, handleCancel, status, setStatus}) => {
 
 const ServiceCard = ({ service, getStatusText, getStatusColor }) => {
   return (
-    <div className="bg-[var(--light-brown-color)] rounded-lg p-4 shadow-lg flex items-center justify-between">
+    <div className="bg-(--light-brown-color) rounded-lg p-4 shadow-lg flex items-center justify-between">
       {/* Left section: image + details */}
       <div className="flex items-center space-x-4">
         <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
