@@ -1,8 +1,12 @@
+import {motion} from "motion/react"
 import { NavLink } from "react-router-dom";
 import Logo from "../assets/logo.png";
+import { useState } from "react";
 
 const Navbar = () => {
     const pages = ["room", "service", "review", "profile"];
+    const [page, setPage] = useState(pages[0]);
+
   return (
     <nav className="bg-white shadow-md px-10 py-4 flex items-center justify-between">
       {/* Logo */}
@@ -16,18 +20,27 @@ const Navbar = () => {
       </div>
 
       {/* Nav Links */}
-      <div className="flex space-x-6">
+      <div className="flex gap-x-6 z-0">
         {pages.map((link) => (
           <NavLink
             key={link}
             to={`/${link}`}
+            onClick={() => setPage(link)}
             className={({ isActive }) =>
-              `px-7 py-3 rounded-sm font-medium transition-all duration-300 ease-in-out ${
-                isActive ? "bg-[var(--light-brown-color)] !text-[var(--dark-brown-color)]" : ""
+              `relative px-7 py-3 font-medium rounded-sm transition-all duration-300 ease-in-out${
+                isActive ? "" : ""
               }`
             }
           >
-            {link}
+            {/* Background highlight */}
+            {link === page ? (
+              <motion.div
+                layoutId="hover"
+                className="block w-full h-full absolute top-0 left-0 bg-(--light-brown-color) rounded-sm -z-10"
+              />
+            ) : null}
+            {/* NavLink text */}
+            <span className="relative z-10">{link}</span>
           </NavLink>
         ))}
       </div>

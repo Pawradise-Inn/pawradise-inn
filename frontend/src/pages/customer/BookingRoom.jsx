@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import RoomCard from "../../components/room/RoomCard";
 import BookingPopup from "../../components/BookingPopup";
 import { motion, AnimatePresence } from "motion/react";
-import {overlay, popUP, startUpVariants } from "../../styles/animation"
+import { overlay, popUP, startUpVariants } from "../../styles/animation";
 import { getDateValidation } from "../../utils/HandleValidation";
 import { handleFormDataChange } from "../../utils/HandleForm";
 import { fetchAllRoomsWithReviewsAPI } from "../../hooks/roomAPI";
@@ -11,6 +11,7 @@ import Overlay from "../../components/Overlay";
 const BookingRoom = () => {
   const petType = ["Dog", "Cat", "Bird", "Raccoon", "Fish  :)"];
 
+  const [mounted, setMounted] = useState(false);
   const [room, setRoom] = useState([]);
   const [formData, setFormData] = useState({
     entryDate: " ",
@@ -38,7 +39,12 @@ const BookingRoom = () => {
 
   // check if there is no result after filtering
   const noResult = useMemo(() => {
-    return getDateValidation(formData.entryDate, formData.exitDate);
+    if (room.length === 0) {
+      return { status: false, warningText: "" };
+    } else {
+      return { status: true, warningText: "" };
+    }
+    // return getDateValidation(formData.entryDate, formData.exitDate);
   }, [formData, room]);
 
   // handle popup data and status
@@ -83,7 +89,10 @@ const BookingRoom = () => {
         <div className="flex flex-col justify-start items-center gap-6 w-3/10 py-4 px-8">
           <p className="text-xl font-bold">Pet type</p>
           <div className="relative mx-auto text-xl bg-(--brown-color) rounded-lg w-full">
-            <select className="!text-white w-full  px-4 py-2 outline-0 appearance-none cursor-pointer">
+            <select
+              onFocus={() => setMounted(true)}
+              className="!text-white w-full  px-4 py-2 outline-0 appearance-none cursor-pointer"
+            >
               {petType.map((type, idx) => {
                 return (
                   <option className="bg-(--light-brown-color)" key={idx}>
@@ -103,6 +112,7 @@ const BookingRoom = () => {
               type="date"
               className="relative w-1/2 !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer"
               onChange={(e) => handleFormDataChange(e, setFormData)}
+              onFocus={() => setMounted(true)}
               name="entryDate"
             />
             <input
@@ -110,6 +120,7 @@ const BookingRoom = () => {
               type="date"
               className="relative w-1/2 !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer"
               onChange={(e) => handleFormDataChange(e, setFormData)}
+              onFocus={() => setMounted(true)}
               name="exitDate"
             />
           </div>
@@ -120,27 +131,39 @@ const BookingRoom = () => {
       </motion.form>
 
       {!noResult.status ? (
-        <p className="text-2xl w-full text-center mt-32 italic">
-          Sorry, no available rooms match your desire.
-        </p>
+        <AnimatePresence>
+          <motion.p
+            variants={startUpVariants}
+            initial="hidden"
+            animate={mounted ? "found" : "firstRender"}
+            exit="exit"
+            className="text-2xl w-full text-center mt-32 italic"
+          >
+            Sorry, no available rooms match your desire.
+          </motion.p>
+        </AnimatePresence>
       ) : (
         <div className="m-8 grid grid-cols-2 gap-y-4 gap-x-8">
-          {room.map((data, idx) => {
-            return (
-              <RoomCard
-                variants={startUpVariants}
-                initial="hidden"
-                animate="firstRender"
-                whileHover={{ scale: 1.05 }}
-                custom={idx/2 + 2}
-                key={idx}
-                data={data}
-                onClick={handlePopUpData}
-              />
-            );
-          })}
+          <AnimatePresence mode="popLayout">
+            {room.map((data, idx) => {
+              return (
+                <RoomCard
+                  layout
+                  variants={startUpVariants}
+                  initial="hidden"
+                  animate="firstRender"
+                  whileHover={{ scale: 1.05 }}
+                  custom={idx / 2 + 2}
+                  key={idx}
+                  data={data}
+                  onClick={handlePopUpData}
+                />
+              );
+            })}
+          </AnimatePresence>
         </div>
       )}
+
 
       <AnimatePresence initial={true}>
         {popUpStatus ? (

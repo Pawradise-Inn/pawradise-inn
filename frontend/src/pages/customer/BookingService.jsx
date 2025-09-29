@@ -4,7 +4,7 @@ import BookingPopup from "../../components/BookingPopup";
 import { filteredObjectByType } from "../../utils/HandleSearch";
 import { fetchServiceCommentsAPI } from "../../hooks/serviceAPI";
 import { motion, AnimatePresence } from "motion/react";
-import {overlay, popUP, startUpVariants } from "../../styles/animation"
+import { overlay, popUP, startUpVariants } from "../../styles/animation";
 import Overlay from "../../components/Overlay";
 
 const BookingService = () => {
@@ -32,7 +32,6 @@ const BookingService = () => {
   // set filterService with name filtering
   useEffect(() => {
     setFilterService(filteredObjectByType(service, filter, "name"));
-    console.log(noResult);
   }, [filter, service]);
 
   // check if there is no result after filtering
@@ -93,25 +92,24 @@ const BookingService = () => {
       </motion.div>
 
       {noResult ? (
-        <motion.p
-          variants={startUpVariants}
-          initial="hidden"
-          animate={mounted ? "found" : "firstRender"}
-          className="text-2xl w-full text-center mt-32 italic"
-        >
-          Sorry, your desired services is not on operation now.
-        </motion.p>
+        <AnimatePresence>
+          <motion.p
+            variants={startUpVariants}
+            initial="hidden"
+            animate={mounted ? "found" : "firstRender"}
+            exit="exit"
+            className="text-2xl w-full text-center mt-32 italic"
+          >
+            Sorry, your desired services is not on operation now.
+          </motion.p>
+        </AnimatePresence>
       ) : (
-        <motion.div
-          variants={startUpVariants}
-          initial="hidden"
-          animate={mounted ? "found" : "firstRender"}
-          className="grid grid-cols-4 gap-x-8 gap-y-4"
-        >
-          <AnimatePresence>
+        <div className="grid grid-cols-4 gap-x-8 gap-y-4">
+          <AnimatePresence mode="popLayout">
             {filterService.map((data, idx) => {
               return (
                 <ServiceCard
+                  layout
                   variants={startUpVariants}
                   initial="hidden"
                   animate={mounted ? "found" : "firstRender"}
@@ -119,14 +117,14 @@ const BookingService = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 1 }}
                   custom={idx / 4 + 2}
-                  key={idx}
+                  key={`service-${data.name}`}
                   data={data}
                   onClick={handlePopUpData}
                 />
               );
             })}
           </AnimatePresence>
-        </motion.div>
+        </div>
       )}
 
       <AnimatePresence initial={true}>
