@@ -6,6 +6,7 @@ import { fetchServiceCommentsAPI } from "../../hooks/serviceAPI";
 import { motion, AnimatePresence } from "motion/react";
 import { overlay, popUP, startUpVariants } from "../../styles/animation";
 import Overlay from "../../components/Overlay";
+import { removeWindowScroll } from "../../utils/handlePopup";
 
 const BookingService = () => {
   const [mounted, setMounted] = useState(false);
@@ -49,14 +50,7 @@ const BookingService = () => {
     setPopUpData(data);
   }, []);
 
-  // hide scroll bar when popup occur
-  useEffect(() => {
-    if (popUpStatus) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-  }, [popUpStatus]);
+  removeWindowScroll(popUpStatus);
 
   return (
     <div className="w-full max-w-6xl mx-auto py-12">
@@ -66,7 +60,7 @@ const BookingService = () => {
             <motion.p
               variants={startUpVariants}
               initial="hidden"
-              animate="firstRender"
+              animate="visible"
               custom={idx}
               key={idx}
             >
@@ -78,7 +72,7 @@ const BookingService = () => {
       <motion.div
         variants={startUpVariants}
         initial="hidden"
-        animate="firstRender"
+        animate="visible"
         custom={2}
         className="flex my-8 mx-auto w-5/10 border-2 rounded-4xl px-4 py-2 text-3xl"
       >
@@ -96,7 +90,7 @@ const BookingService = () => {
           <motion.p
             variants={startUpVariants}
             initial="hidden"
-            animate={mounted ? "found" : "firstRender"}
+            animate={mounted ? "found" : "visible"}
             exit="exit"
             className="text-2xl w-full text-center mt-32 italic"
           >
@@ -112,11 +106,11 @@ const BookingService = () => {
                   layout
                   variants={startUpVariants}
                   initial="hidden"
-                  animate={mounted ? "found" : "firstRender"}
+                  animate={mounted ? "found" : "visible"}
                   exit="exit"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 1 }}
-                  custom={idx / 4 + 2}
+                  custom={idx / 3 + 2}
                   key={`service-${data.name}`}
                   data={data}
                   onClick={handlePopUpData}

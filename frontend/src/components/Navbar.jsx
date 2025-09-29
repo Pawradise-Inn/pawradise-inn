@@ -1,11 +1,13 @@
-import {motion} from "motion/react"
-import { NavLink } from "react-router-dom";
+import { motion } from "motion/react";
+import { NavLink, useLocation } from "react-router-dom";
 import Logo from "../assets/logo.png";
 import { useState } from "react";
+import { startUpVariants } from "../styles/animation";
 
 const Navbar = () => {
-    const pages = ["room", "service", "review", "profile"];
-    const [page, setPage] = useState(pages[0]);
+  const location = useLocation();
+  const pages = ["room", "service", "review", "profile"];
+  const [page, setPage] = useState(location.pathname.split("/")[1]);
 
   return (
     <nav className="bg-white shadow-md px-10 py-4 flex items-center justify-between">
@@ -26,11 +28,8 @@ const Navbar = () => {
             key={link}
             to={`/${link}`}
             onClick={() => setPage(link)}
-            className={({ isActive }) =>
-              `relative px-7 py-3 font-medium rounded-sm transition-all duration-300 ease-in-out${
-                isActive ? "" : ""
-              }`
-            }
+            className="relative px-7 py-3 font-medium rounded-sm"
+            end
           >
             {/* Background highlight */}
             {link === page ? (
@@ -40,7 +39,14 @@ const Navbar = () => {
               />
             ) : null}
             {/* NavLink text */}
-            <span className="relative z-10">{link}</span>
+            <motion.span
+              variants={startUpVariants}
+                    initial="hidden"
+                    animate="found"
+              className="relative z-10"
+            >
+              {link}
+            </motion.span>
           </NavLink>
         ))}
       </div>

@@ -8,11 +8,11 @@ import Login from "./pages/Login";
 
 import StaffNavbar from "./components/StaffNavbar"; 
 import Footer from "./components/Footer"; 
-import Profile_comp from "./components/Profile/Profile_comp"; 
-import Booking_comp from "./components/Profile/Booking_comp"; 
-import Pet_comp from "./components/Profile/Pet_comp"; 
-import PetOverall from "./components/Profile/PetOverall"; 
-import NewPet from "./components/Profile/NewPet"; 
+import ProfileComp from "./components/profile/myProfile/ProfileComp"; 
+import BookingComp from "./components/profile/myBooking/BookingComp"; 
+import PetComp from "./components/profile/myPet/PetComp"; 
+import PetOverall from "./components/profile/myPet/petOverAll/PetOverall"; 
+import NewPet from "./components/profile/myPet/newPet/NewPet"; 
 import Management from "./pages/Management"; 
 import ServiceEdit from "./components/Management/Service_edit"; 
 import RoomEdit from "./components/Management/room_edit";
@@ -43,10 +43,10 @@ const App = () => {
                 <Route path="/service" element={<><BookingService /><Footer/></>} /> 
                 <Route path="/review" element={<><div>Review Page</div><Footer/></>} /> 
                 <Route path="/profile" element={<Profile />}> 
-                    <Route index element={<Profile_comp />} /> 
-                    <Route path="booking" element={<Booking_comp />} /> 
-                    <Route path="pet" element={<Pet_comp />} /> 
-                    <Route path="pet/:id" element={<PetOverall />} /> 
+                <Route index element={<ProfileComp />} />
+                    <Route path="booking" element={<BookingComp />} />
+                    <Route path="pet" element={<PetComp />} />
+                    <Route path="pet/:id" element={<PetOverall />} />
                     <Route path="pet/new" element={<NewPet />} /> 
                 </Route>
                 <Route path="*" element={<Navigate to="/room" replace/>} />
@@ -64,7 +64,7 @@ const App = () => {
                 <Route path="/staff/review" element={<div>Staff Review Page</div>} /> 
                 <Route path="/staff/management" element={<Management />}> 
                     <Route index element={<ServiceEdit />} /> 
-                    <Route path="profile" element={<Profile_comp />} /> 
+                    <Route path="profile" element={<ProfileComp />} /> 
                     <Route path="payment" element={<div>Manage Payment Page</div>} /> 
                     <Route path="room" element={<RoomEdit />} /> 
                 </Route> 

@@ -17,8 +17,8 @@ const Dashboard = () => {
                text-base sm:text-lg md:text-2xl font-semibold
                ${
                  isActive
-                   ? "bg-[var(--light-brown-color)] font-bold text-gray-800 shadow-lg"
-                   : "bg-transparent text-gray-800 hover:bg-[var(--light-brown-color)]"
+                   ? "bg-(--light-brown-color) font-bold text-gray-800 shadow-lg"
+                   : "bg-transparent text-gray-800 hover:bg-(--light-brown-color)"
                }`
             }
             end
@@ -34,8 +34,8 @@ const Dashboard = () => {
                text-base sm:text-lg md:text-2xl font-semibold
                ${
                  isActive
-                   ? "bg-[var(--light-brown-color)] font-bold text-gray-800 shadow-lg"
-                   : "bg-transparent text-gray-800 hover:bg-[var(--light-brown-color)]"
+                   ? "bg-(--light-brown-color) font-bold text-gray-800 shadow-lg"
+                   : "bg-transparent text-gray-800 hover:bg-(--light-brown-color)"
                }`
             }
             end
@@ -51,8 +51,8 @@ const Dashboard = () => {
                text-base sm:text-lg md:text-2xl font-semibold
                ${
                  isActive
-                   ? "bg-[var(--light-brown-color)] font-bold text-gray-800 shadow-lg"
-                   : "bg-transparent text-gray-800 hover:bg-[var(--light-brown-color)]"
+                   ? "bg-(--light-brown-color) font-bold text-gray-800 shadow-lg"
+                   : "bg-transparent text-gray-800 hover:bg-(--light-brown-color)"
                }`
             }
             end
@@ -68,8 +68,8 @@ const Dashboard = () => {
                text-base sm:text-lg md:text-2xl font-semibold
                ${
                  isActive
-                   ? "bg-[var(--light-brown-color)] font-bold text-gray-800 shadow-lg"
-                   : "bg-transparent text-gray-800 hover:bg-[var(--light-brown-color)]"
+                   ? "bg-(--light-brown-color) font-bold text-gray-800 shadow-lg"
+                   : "bg-transparent text-gray-800 hover:bg-(--light-brown-color)"
                }`
             }
             end

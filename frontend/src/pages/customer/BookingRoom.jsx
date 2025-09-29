@@ -3,10 +3,11 @@ import RoomCard from "../../components/room/RoomCard";
 import BookingPopup from "../../components/BookingPopup";
 import { motion, AnimatePresence } from "motion/react";
 import { overlay, popUP, startUpVariants } from "../../styles/animation";
-import { getDateValidation } from "../../utils/HandleValidation";
-import { handleFormDataChange } from "../../utils/HandleForm";
+import { getDateValidation } from "../../utils/handleValidation";
+import { handleFormDataChange } from "../../utils/handleForm";
 import { fetchAllRoomsWithReviewsAPI } from "../../hooks/roomAPI";
 import Overlay from "../../components/Overlay";
+import { removeWindowScroll } from "../../utils/handlePopup";
 
 const BookingRoom = () => {
   const petType = ["Dog", "Cat", "Bird", "Raccoon", "Fish  :)"];
@@ -53,14 +54,7 @@ const BookingRoom = () => {
     setPopUpData(data);
   }, []);
 
-  // hide scroll bar when popup occur
-  useEffect(() => {
-    if (popUpStatus) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-  }, [popUpStatus]);
+  removeWindowScroll(popUpStatus);
 
   return (
     <div className="w-full max-w-6xl mx-auto py-12">
@@ -70,7 +64,7 @@ const BookingRoom = () => {
             <motion.p
               variants={startUpVariants}
               initial="hidden"
-              animate="firstRender"
+              animate="visible"
               custom={idx}
               key={idx}
             >
@@ -82,7 +76,7 @@ const BookingRoom = () => {
       <motion.form
         variants={startUpVariants}
         initial="hidden"
-        animate="firstRender"
+        animate="visible"
         custom={2}
         className="m-8 relative flex justify-center content-between border-2 border-(--brown-color) rounded-xl mx-auto w-6/10 max-w-[720px] pb-4 before:content-[''] before:w-px before:h-3/4 before:absolute before:top-1/2 before:left-3/10 before:-translate-x-1/2 before:-translate-y-1/2 before:border-1 before:border-(--brown-color)"
       >
@@ -135,7 +129,7 @@ const BookingRoom = () => {
           <motion.p
             variants={startUpVariants}
             initial="hidden"
-            animate={mounted ? "found" : "firstRender"}
+            animate={mounted ? "found" : "visible"}
             exit="exit"
             className="text-2xl w-full text-center mt-32 italic"
           >
@@ -151,9 +145,9 @@ const BookingRoom = () => {
                   layout
                   variants={startUpVariants}
                   initial="hidden"
-                  animate="firstRender"
+                  animate="visible"
                   whileHover={{ scale: 1.05 }}
-                  custom={idx / 2 + 2}
+                  custom={idx / 3 + 2}
                   key={idx}
                   data={data}
                   onClick={handlePopUpData}
@@ -163,7 +157,6 @@ const BookingRoom = () => {
           </AnimatePresence>
         </div>
       )}
-
 
       <AnimatePresence initial={true}>
         {popUpStatus ? (
