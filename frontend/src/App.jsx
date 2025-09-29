@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Profile from "./pages/customer/Profile";
 import BookingRoom from "./pages/customer/BookingRoom";
@@ -38,7 +38,7 @@ const App = () => {
             {isRegistrationPath||isLogin ? null : isStaffPath ? <StaffNavbar /> : <Navbar /> } 
                 <Routes> {/* Public Routes */} <Route path="/login" element={<Login/>} /> 
                 <Route path="/register" element={<Registration />} /> 
-                <Route path="/" element={<div>Home Page</div>} /> 
+                {/* <Route path="/" element={<><BookingRoom/><Footer/></>} />  */}
                 <Route path="/room" element={<><BookingRoom/><Footer/></>} /> 
                 <Route path="/service" element={<><BookingService /><Footer/></>} /> 
                 <Route path="/review" element={<><div>Review Page</div><Footer/></>} /> 
@@ -49,6 +49,7 @@ const App = () => {
                     <Route path="pet/:id" element={<PetOverall />} /> 
                     <Route path="pet/new" element={<NewPet />} /> 
                 </Route>
+                <Route path="*" element={<Navigate to="/room" replace/>} />
 
                 {/* Staff Routes */} 
                 <Route path="/staff" element={<div>Staff log in</div>} /> 
