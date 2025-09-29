@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import ServiceCard from "../../components/service/ServiceCard";
 import BookingPopup from "../../components/BookingPopup";
-import { filteredObjectByType } from "../../utils/HandleSearch";
+import { filteredObjectByType } from "../../utils/handleSearch";
 import { fetchServiceCommentsAPI } from "../../hooks/serviceAPI";
 import { motion, AnimatePresence } from "motion/react";
 import { overlay, popUP, startUpVariants } from "../../styles/animation";
