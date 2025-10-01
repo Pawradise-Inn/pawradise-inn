@@ -13,6 +13,7 @@ const NotificationProvider = ({ children }) => {
   //  header: header text
   //  text: body text
   //  onClick: function want to pass for warning notification when user agree
+  //                  only neccessary with warning status
 
   const createNotification = (status, header, text, onClick, duration = 5000) => {
     const id = Date.now();
