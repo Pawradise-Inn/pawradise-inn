@@ -12,6 +12,7 @@ import { removeWindowScroll } from "../../utils/handlePopup";
 const BookingRoom = () => {
   const petType = ["Dog", "Cat", "Bird", "Raccoon", "Fish  :)"];
 
+  const [counti, setCount] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [room, setRoom] = useState([]);
   const [formData, setFormData] = useState({
@@ -56,6 +57,10 @@ const BookingRoom = () => {
 
   removeWindowScroll(popUpStatus);
 
+  const test = () => {
+    alert("hi");
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto py-12">
       <b className="text-7xl text-center block m-8 mt-0">
@@ -78,18 +83,18 @@ const BookingRoom = () => {
         initial="hidden"
         animate="visible"
         custom={2}
-        className="m-8 relative flex justify-center content-between border-2 border-(--brown-color) rounded-xl mx-auto w-6/10 max-w-[720px] pb-4 before:content-[''] before:w-px before:h-3/4 before:absolute before:top-1/2 before:left-3/10 before:-translate-x-1/2 before:-translate-y-1/2 before:border-1 before:border-(--brown-color)"
+        className="m-8 relative flex justify-center content-between border-2 border-[var(--brown-color)] rounded-xl mx-auto w-6/10 max-w-[720px] pb-4 before:content-[''] before:w-px before:h-3/4 before:absolute before:top-1/2 before:left-3/10 before:-translate-x-1/2 before:-translate-y-1/2 before:border-1 before:border-[var(--brown-color)]"
       >
         <div className="flex flex-col justify-start items-center gap-6 w-3/10 py-4 px-8">
           <p className="text-xl font-bold">Pet type</p>
-          <div className="relative mx-auto text-xl bg-(--brown-color) rounded-lg w-full">
+          <div className="relative mx-auto text-xl bg-[var(--brown-color)] rounded-lg w-full">
             <select
               onFocus={() => setMounted(true)}
               className="!text-white w-full  px-4 py-2 outline-0 appearance-none cursor-pointer"
             >
               {petType.map((type, idx) => {
                 return (
-                  <option className="bg-(--light-brown-color)" key={idx}>
+                  <option className="bg-[var(--light-brown-color)]" key={idx}>
                     {type}
                   </option>
                 );
@@ -100,7 +105,7 @@ const BookingRoom = () => {
         </div>
         <div className="flex flex-col justify-start items-center gap-6 w-7/10 py-4 px-8">
           <p className="text-xl font-bold">Booking date</p>
-          <div className="relative w-full rounded-xl bg-(--brown-color) before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1 before:border-white">
+          <div className="relative w-full rounded-xl bg-[var(--brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1 before:border-white">
             <input
               required
               type="date"
@@ -119,7 +124,7 @@ const BookingRoom = () => {
             />
           </div>
           <span className="text-center block w-full">
-            <i className="!text-(--warning-color)">{noResult.warningText}</i>
+            <i className="!text-[var(--fail-color)]">{noResult.warningText}</i>
           </span>
         </div>
       </motion.form>

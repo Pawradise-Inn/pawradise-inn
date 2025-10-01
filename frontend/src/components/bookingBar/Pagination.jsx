@@ -34,8 +34,8 @@ const Pagination = ({ id, pageAmount, currentPage, onClick }) => {
 			{getArrayWithRangeWithMid(5, currentPage, pageAmount).map((pageNum) => (
 				<button
 					key={`${id}${pageNum}`}
-					className={`px-3 py-1 cursor-pointer hover:bg-(--light-brown-color) transition-all duration-200 rounded-full ${
-						checkCurrentPage(pageNum) ? "bg-(--light-brown-color)" : null
+					className={`px-3 py-1 cursor-pointer hover:bg-[var(--light-brown-color)] transition-all duration-200 rounded-full ${
+						checkCurrentPage(pageNum) ? "bg-[var(--light-brown-color)]" : null
 					}`}
 					onClick={() => onClick(pageNum)}
 				>

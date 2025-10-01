@@ -99,7 +99,7 @@ const AddRoomPopup = ({
     <div className="fixed inset-0 bg-black/60 z-10 grid place-items-center p-4">
       <div className="bg-white rounded-3xl p-8 w-[680px] max-w-full flex flex-col gap-6 shadow-lg">
         <div className="flex items-start justify-between">
-          <h2 className="text-3xl font-bold text-(--dark-brown-color)">{title}</h2>
+          <h2 className="text-3xl font-bold text-[var(--dark-brown-color)]">{title}</h2>
           <button
             className="text-2xl px-3 py-1 rounded hover:bg-gray-100"
             aria-label="Close"
@@ -230,7 +230,7 @@ const AddRoomPopup = ({
             <button
               type="submit"
               form="room-form"
-              className="px-4 py-2 rounded-md bg-(--light-brown-color)"
+              className="px-4 py-2 rounded-md bg-[var(--light-brown-color)]"
             >
               Save
             </button>

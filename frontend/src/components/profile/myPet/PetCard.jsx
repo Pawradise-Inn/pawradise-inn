@@ -5,7 +5,7 @@ const PetCard = ({ pet, ...motionProps }) => {
   return (
     <motion.div {...motionProps}>
       <NavLink to={`/profile/pet/${pet.id}`}>
-        <div className="bg-(--cream-color) rounded p-4 shadow-lg flex flex-col space-y-4 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
+        <div className="bg-[var(--cream-color)] rounded p-4 shadow-lg flex flex-col space-y-4 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
           <div className="w-full h-full bg-gray-200 rounded mb-4 flex items-center justify-center overflow-hidden">
             <img
               src={pet.picture}
@@ -14,7 +14,7 @@ const PetCard = ({ pet, ...motionProps }) => {
             />
           </div>
           <div className="flex justify-between mb-3">
-            <span className="px-5 py-1 !text-white text-xs rounded-full bg-(--dark-brown-color) font-semibold">
+            <span className="px-5 py-1 !text-white text-xs rounded-full bg-[var(--dark-brown-color)] font-semibold">
               {pet.status}
             </span>
             <div className="text-center">

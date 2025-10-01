@@ -7,7 +7,7 @@ const Footer = () => {
       initial={{ opacity: 0, y: -20 }}
       whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
       viewport={{ once: true, amount: 0.8 }}
-      className="bg-(--cream-color) mt-10"
+      className="bg-[var(--cream-color)] mt-10"
     >
       {/* Top Layer */}
       <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center border-b w-full">
@@ -41,9 +41,9 @@ const Footer = () => {
           </p>
         </div>
       </div>
-      <div className="bg-(--dark-brown-color) py-2 ">
+      <div className="bg-[var(--dark-brown-color)] py-2 ">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-sm !text-(--cream-color)">
+          <p className="text-sm !text-[var(--cream-color)]">
             &copy; 2025 Pawradise Inn. All rights reserved.
           </p>
         </div>

@@ -35,7 +35,7 @@ const Navbar = () => {
             {link === page ? (
               <motion.div
                 layoutId="hover"
-                className="block w-full h-full absolute top-0 left-0 bg-(--light-brown-color) rounded-sm -z-10"
+                className="block w-full h-full absolute top-0 left-0 bg-[var(--light-brown-color)] rounded-sm -z-10"
               />
             ) : null}
             {/* NavLink text */}

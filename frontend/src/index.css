@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 * {
-	box-sizing: border-box;
-	color: var(--dark-brown-color);
-	font-family: Roboto, sans-serif;
+  box-sizing: border-box;
+  color: var(--dark-brown-color);
+  font-family: Roboto, sans-serif;
 }
 
 html {
-	scroll-behavior: smooth;
-	overflow-x: hidden;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
-	background-color: #FFFFFF;
-	height: 100vh;
-	width: 100vw;
+  background-color: #ffffff;
+  height: 100vh;
+  width: 100vw;
 }
 
 /* Minimal sleek scrollbar */
@@ -48,7 +48,7 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 8px; 
+  width: 8px;
 }
 
 /* Track (background) */
@@ -69,28 +69,39 @@ body {
 }
 
 :root {
-	/* color */
-	--dark-brown-color: #38220E;
-	--brown-color: #654225;
-	--light-brown-color: #D9C4AF;
-	--cream-color: #FDFAEE;
-	--warning-color: #FF6467;
-	--beige-cream-color: #FEF7DB;
+  /* color */
+  --dark-brown-color: rgb(56, 34, 14);
+  --brown-color: rgb(101, 66, 37);
+  --light-brown-color: rgb(217, 196, 175);
+  --cream-color: rgb(253, 250, 238);
+
+  --service-complete-color: rgb(117, 158, 60);
+  --service-available-color: rgb(117, 187, 240);
+  --service-inprogress-color: rgb(245, 194, 54);
+  --service-unavailable-color: rgb(46, 25, 22);
+
+  --room-available-color: rgb(117, 158, 60);
+  --room-reserved-color: rgb(245, 194, 54);
+  --room-full-color-color: rgb(186, 30, 7);
+
+  --success-color: rgb(117, 158, 60);
+  --warning-color: rgb(245, 194, 54);
+  --fail-color: rgb(186, 30, 7);
+
+  --success-color-alpha: rgb(158, 187, 118);
+  --warning-color-alpha: rgb(248, 212, 114);
+  --fail-color-alpha: rgb(206, 97, 81);
+
+  --beige-cream-color: rgb(254, 247, 219);
 }
 
 @font-face {
-	font-family: 'Roboto';
-	src: url(../src/assets/Roboto-VariableFont_wdth\,wght.ttf);
+  font-family: "Roboto";
+  src: url(../src/assets/Roboto-VariableFont_wdth\wght.ttf);
 }
 
 @font-face {
-	font-family: 'Roboto';
-	src: url(../src//assets/Roboto-Italic-VariableFont_wdth\,wght.ttf);
-	font-style: italic;
-}
-
-* {
-	box-sizing: border-box;
-	color: var(--dark-brown-color);
-	font-family: Roboto, sans-serif;
+  font-family: "Roboto";
+  src: url(../src//assets/Roboto-Italic-VariableFont_wdth\wght.ttf);
+  font-style: italic;
 }

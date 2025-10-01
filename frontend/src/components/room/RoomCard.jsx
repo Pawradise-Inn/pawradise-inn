@@ -13,7 +13,7 @@ const RoomCard = ({
 }) => {
   return (
     <motion.div
-      className="bg-(--cream-color) border border-(--brown-color) rounded-2xl p-4 flex justify-start gap-4"
+      className="bg-[var(--cream-color)] border border-[var(--brown-color)] rounded-2xl p-4 flex justify-start gap-4"
       {...motionProps}
     >
       <img
@@ -37,7 +37,7 @@ const RoomCard = ({
 
           {/* Capacity - hide in compact mode */}
           {!compact && (
-            <div className="text-center py-2 px-4 bg-(--light-brown-color) rounded">
+            <div className="text-center py-2 px-4 bg-[var(--light-brown-color)] rounded">
               {data.size} / {data.maxsize}
             </div>
           )}
@@ -57,7 +57,7 @@ const RoomCard = ({
 
             <button
               onClick={() => onClick(data, true)}
-              className="py-2 px-8 bg-(--dark-brown-color) rounded !text-white font-bold active:scale-90 cursor-pointer transition-transform duration-200"
+              className="py-2 px-8 bg-[var(--dark-brown-color)] rounded !text-white font-bold active:scale-90 cursor-pointer transition-transform duration-200"
             >
               {actionLabel || (compact ? "EDIT" : "BOOK")}
             </button>

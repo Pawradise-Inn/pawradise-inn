@@ -38,13 +38,13 @@ const Login = ()=>{
                 />
             </div>
 
-            <div className="bg-[var(--beige-cream-color)] w-full md:w-2/5 flex flex-col items-center justify-center p-6">
+            <div className="bg-[var(--cream-color)] w-full md:w-2/5 flex flex-col items-center justify-center p-6">
                 <img 
                     src={PawLogo} 
                     alt="Logo" 
                     className="h-28 w-48 md:h-48 md:w-96 object-contain mt-4 md:mt-8" 
                 />
-                <h1 className="text-2xl md:text-4xl text-(--dark-brown-color) font-bold mt-4 md:mt-6">
+                <h1 className="text-2xl md:text-4xl text-[var(--dark-brown-color)] font-bold mt-4 md:mt-6">
                     Pawradise In
                 </h1>
 
@@ -55,13 +55,13 @@ const Login = ()=>{
                     {fields.map((field) => (
                         <div key={field.name} className="flex flex-col w-full items-center mx-auto">
                             <label
-                                className="text-(--brown-color) font-semibold text-left w-full"
+                                className="text-[var(--brown-color)] font-semibold text-left w-full"
                                 htmlFor={field.name}
                             >
                                 {field.label}
                             </label>
                             <input
-                                className="border-(--brown-color) border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-(--light-brown-color) w-full"
+                                className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full"
                                 type={field.type}
                                 name={field.name}
                                 placeholder={field.placeholder}
@@ -76,26 +76,26 @@ const Login = ()=>{
                         disabled={!isFormValid}
                         className={`w-full md:w-40 h-10 mt-5 rounded shadow px-4 py-2 mx-auto ${
                             isFormValid
-                                ? "!text-[var(--beige-cream-color)] bg-(--dark-brown-color) hover:bg-(--brown-color) hover:!text-[var(--beige-cream-color)] transition-colors cursor-pointer"
-                                : "bg-(--light-brown-color)"
+                                ? "!text-[var(--cream-color)] bg-[var(--dark-brown-color)] hover:bg-[var(--brown-color)] hover:!text-[var(--cream-color)] transition-colors cursor-pointer"
+                                : "bg-[var(--light-brown-color)]"
                         }`}
                     >
                         Login
                     </button>
 
-                    <hr className="border-t-2 border-(--brown-color) w-3/4 my-4 mx-auto" />
+                    <hr className="border-t-2 border-[var(--brown-color)] w-3/4 my-4 mx-auto" />
 
-                    <p className="text-(--brown-color) font-medium text-center text-sm md:text-base">
+                    <p className="text-[var(--brown-color)] font-medium text-center text-sm md:text-base">
                         Don't have an account?
                         <NavLink 
                             to="/register" 
-                            className="text-l ml-2 !text-[var(--warning-color)] font-bold hover:underline "
+                            className="text-l ml-2 !text-[var(--fail-color)] font-bold hover:underline "
                         >
                             Register here
                         </NavLink>
                     </p>
 
-                    <p className="text-center text-xs md:text-sm font-normal !text-(--brown-color) mt-4">
+                    <p className="text-center text-xs md:text-sm font-normal !text-[var(--brown-color)] mt-4">
                         <a href="/" className="underline">Terms of Service</a>
                         <a href="/" className="ml-3 underline">Privacy Policy</a>
                     </p>

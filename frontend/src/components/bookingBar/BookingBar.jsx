@@ -152,7 +152,7 @@ const BookingBar = ({ data, popupStatus }) => {
   }, [data]);
 
   return (
-    <div className="w-1/2 bg-white rounded-3xl p-8 border-2 border-(--brown-color) ">
+    <div className="w-1/2 bg-white rounded-3xl p-8 border-2 border-[var(--brown-color)] ">
       {/* header dataial section */}
       <section className="my-5 flex justify-between">
         <div className="w-1/2">
@@ -192,7 +192,7 @@ const BookingBar = ({ data, popupStatus }) => {
         <div className="relative">
           <select
             onChange={(e) => setCurrentPet(e.target.value)}
-            className="inline-block mb-4 w-full rounded-xl px-4 py-2 text-2xl my-2 outline-0 bg-(--light-brown-color) appearance-none cursor-pointer"
+            className="inline-block mb-4 w-full rounded-xl px-4 py-2 text-2xl my-2 outline-0 bg-[var(--light-brown-color)] appearance-none cursor-pointer"
           >
             <option value={null}>Pick pet</option>
             {petData.map((data, idx) => {
@@ -216,7 +216,7 @@ const BookingBar = ({ data, popupStatus }) => {
               <b className="mb-2 text-3xl inline-block w-1/2">Exit date</b>
             </>
           )}
-          <div className="relative mb-4 w-full rounded-xl text-2xl bg-(--light-brown-color) before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1  before:border-(--dark-brown-color)">
+          <div className="relative mb-4 w-full rounded-xl text-2xl bg-[var(--light-brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1  before:border-[var(--dark-brown-color)]">
             <input
               required
               type="date"
@@ -259,7 +259,7 @@ const BookingBar = ({ data, popupStatus }) => {
 
           {/* validation for booking */}
           <span className="text-center block w-full mt-8">
-            <i className="!text-(--warning-color)">
+            <i className="!text-[var(--fail-color)]">
               {validDateStatus.warningText}
             </i>
           </span>
@@ -269,7 +269,7 @@ const BookingBar = ({ data, popupStatus }) => {
             type="submit"
             className={`${
               validDateStatus.status ? "mt-13" : "mt-2"
-            } block w-full bg-(--dark-brown-color) rounded !text-white text-center py-1 text-3xl mb-4 cursor-pointer hover:scale-105 transition-all duration-200`}
+            } block w-full bg-[var(--dark-brown-color)] rounded !text-white text-center py-1 text-3xl mb-4 cursor-pointer hover:scale-105 transition-all duration-200`}
           >
             BOOK
           </button>
@@ -283,13 +283,13 @@ const BookingBar = ({ data, popupStatus }) => {
           {data.reviewStar}/5.0{" "}
           <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
         </b>
-        <div className="my-5 grid grid-cols-5 gap-2 bg-(--light-brown-color)  p-2">
+        <div className="my-5 grid grid-cols-5 gap-2 bg-[var(--light-brown-color)]  p-2">
           {[6, 5, 4, 3, 2, 1, 0].map((star) => {
             return (
               <CommentStarSelector
                 style={`${
                   commentStarSelect === star
-                    ? "bg-(--cream-color) outline-2"
+                    ? "bg-[var(--cream-color)] outline-2"
                     : "bg-white"
                 }`}
                 key={star}
@@ -321,7 +321,7 @@ const BookingBar = ({ data, popupStatus }) => {
               />
             </>
           ) : (
-            <p className="text-xl w-full my-10 text-center !text-(--brown-color) italic">
+            <p className="text-xl w-full my-10 text-center !text-[var(--brown-color)] italic">
               No reviews found.
             </p>
           )}

@@ -19,8 +19,8 @@ const RadioInput = ({ name, options, selected, onChange, ...motionProps }) => {
             />
 
             <div
-              className="relative w-10 h-10 border-2 border-(--brown-color) rounded transition-all bg-(--cream-color)
-              before:absolute before:top-1/2 before:left-1/2 before:w-8 before:h-0.5 before:bg-(--dark-brown-color)
+              className="relative w-10 h-10 border-2 border-[var(--brown-color)] rounded transition-all bg-[var(--cream-color)]
+              before:absolute before:top-1/2 before:left-1/2 before:w-8 before:h-0.5 before:bg-[var(--dark-brown-color)]
               before:origin-center before:-translate-x-1/2 before:-translate-y-1/2 before:rotate-135 before:transform
               before:transition-all before:scale-0 peer-checked:before:scale-100"
             ></div>

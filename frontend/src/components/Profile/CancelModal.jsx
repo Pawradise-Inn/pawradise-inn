@@ -7,9 +7,9 @@ const CancelModal = ({ booking, onConfirm, onCancel, ...motionProps }) => {
       <div className="w-full h-full flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100">
           {/* Modal Header */}
-          <div className="bg-(--brown-color) p-6 rounded-t-2xl">
+          <div className="bg-[var(--brown-color)] p-6 rounded-t-2xl">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold flex items-center !text-(--cream-color)">
+              <h2 className="text-2xl font-bold flex items-center !text-[var(--cream-color)]">
                 <span className="mr-3 text-3xl">⚠️</span>
                 Cancel Booking
               </h2>
@@ -43,7 +43,7 @@ const CancelModal = ({ booking, onConfirm, onCancel, ...motionProps }) => {
               </p>
 
               {/* Booking Details */}
-              <div className="bg-(--cream-color) rounded-lg p-4 space-y-2">
+              <div className="bg-[var(--cream-color)] rounded-lg p-4 space-y-2">
                 <div className="flex items-center">
                   <img
                     src={booking.img}

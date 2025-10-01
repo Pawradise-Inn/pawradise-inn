@@ -193,13 +193,13 @@ const NewPet = () => {
           <div className="flex justify-end mt-8 pt-6 border-t border-gray-200 space-x-4">
             <button
               onClick={handleCancel}
-              className=" px-6 py-2 rounded hover:bg-(--light-brown-color) hover:scale-90 transition-all duration-300 cursor-pointer"
+              className=" px-6 py-2 rounded hover:bg-[var(--light-brown-color)] hover:scale-90 transition-all duration-300 cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirm}
-              className="!text-white px-6 py-2 bg-(--dark-brown-color) rounded hover:scale-90 transition-all duration-300 cursor-pointer"
+              className="!text-white px-6 py-2 bg-[var(--dark-brown-color)] rounded hover:scale-90 transition-all duration-300 cursor-pointer"
             >
               Done
             </button>

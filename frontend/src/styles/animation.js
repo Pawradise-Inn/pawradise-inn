@@ -8,6 +8,12 @@ const popUP = {
   hidden: { opacity: 0, transform: "translateY(100%)" },
 };
 
+const notification = {
+  hidden: {opacity:0, y: 50},
+  visible: {opacity: 1, y: 0 , transition: {type: "spring", bounce: 0.4}},
+  exit: {opacity: 0, x: 50, transition: {type: "spring", bounce: 0.4}}
+}
+
 const startUpVariants = {
   hidden: { opacity: 0, y: 50 },
   visible: (index) => ({
@@ -27,4 +33,4 @@ const startUpVariants = {
   },
 };
 
-export { overlay, popUP, startUpVariants };
+export { overlay, popUP, notification, startUpVariants };
