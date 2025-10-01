@@ -4,7 +4,7 @@
 
 const CommentCard = ({ user, star, detail }) => {
 	return (
-		<div className="bg-(--cream-color) p-2 rounded-xl border-2 border-(--brown-color)">
+		<div className="bg-[var(--cream-color)] p-2 rounded-xl border-2 border-[var(--brown-color)]">
 			<b className="inline-block mb-4">
 				{star}/5.0{" "}
 				<i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>

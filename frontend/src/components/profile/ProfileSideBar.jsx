@@ -37,13 +37,13 @@ const ProfileSideBar = () => {
                 <>
                   <motion.div
                     layoutId="myProfileSelecting"
-                    className="block w-full h-full absolute top-0 left-0 bg-(--dark-brown-color) rounded -z-10"
+                    className="block w-full h-full absolute top-0 left-0 bg-[var(--dark-brown-color)] rounded -z-10"
                   />
                   <motion.span
                     variants={startUpVariants}
                     initial="hidden"
                     animate="found"
-                    className="!text-(--cream-color) relative z-10"
+                    className="!text-[var(--cream-color)] relative z-10"
                   >
                     {data.text}
                   </motion.span>

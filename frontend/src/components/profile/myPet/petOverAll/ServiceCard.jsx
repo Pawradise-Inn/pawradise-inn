@@ -1,6 +1,6 @@
 const ServiceCard = ({ service, getStatusText, getStatusColor, pet }) => {
   return (
-    <div className="bg-(--light-brown-color) rounded-lg p-4 shadow-lg flex items-center justify-between">
+    <div className="bg-[var(--light-brown-color)] rounded-lg p-4 shadow-lg flex items-center justify-between">
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-4">
           <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden ">

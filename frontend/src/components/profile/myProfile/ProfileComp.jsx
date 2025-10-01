@@ -3,8 +3,10 @@ import { useOutletContext } from "react-router-dom";
 import { updateCustomerAPI } from "../../../hooks/customerAPI";
 import { startUpVariants } from "../../../styles/animation";
 import { motion } from "motion/react";
+import { useNotification } from "../../notification/NotificationProvider";
 
 const ProfileComp = () => {
+  const { createNotification } = useNotification();
   const outletCtx = useOutletContext();
   const user = outletCtx?.user;
   const setUser = outletCtx?.setUser;
@@ -68,23 +70,36 @@ const ProfileComp = () => {
   const handleConfirm = async (e) => {
     e.preventDefault();
     if (!newUser.id) return;
-    const confirmUpdate = window.confirm("Are you sure to update the data?");
-    if (!confirmUpdate) return;
-
-    try {
-      const { id, ...userObjected } = newUser;
-      // const response = await updateCustomerAPI(id, userObjected);
-      console.log(newUser);
-      // setUser(response.data);
-      updateCustomerAPI(id, userObjected).then((data) => {
-        setUser({ ...user, user: data.data });
-        console.log(data.data);
-      });
-      alert("Profile updated successfully!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update profile. Please try again.");
-    }
+    createNotification(
+      "warning",
+      "Confirmation.",
+      "Are you sure to update the data?",
+      () => {
+        try {
+          const { id, ...userObjected } = newUser;
+          // const response = await updateCustomerAPI(id, userObjected);
+          console.log(newUser);
+          // setUser(response.data);
+          updateCustomerAPI(id, userObjected).then((data) => {
+            setUser({ ...user, user: data.data });
+            console.log(data.data);
+            createNotification(
+              "success",
+              "Profile updated successfully!",
+              "Your update has been saved."
+            );
+          });
+        } catch (err) {
+          alert("broke");
+          console.error(err);
+          createNotification(
+            "fail",
+            "Fail to update.",
+            "Failed to update profile. Please try again."
+          );
+        }
+      }
+    );
   };
 
   return (
@@ -110,6 +125,7 @@ const ProfileComp = () => {
         >
           <div className="space-y-6">
             {fields.map((data, idx) => {
+              console.log(`${data.name}`);
               return (
                 <motion.div
                   variants={startUpVariants}
@@ -126,11 +142,11 @@ const ProfileComp = () => {
                     value={newUser[`${data.name}`] || ""}
                     autoComplete={data.autoComplete}
                     onChange={(e) =>
-                      setNewUser({ ...newUser, firstname: e.target.value })
+                      setNewUser({ ...newUser, [data.name]: e.target.value })
                     }
                     className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
-                  border-(--brown-color) bg-(--cream-color) 
-                  focus:border-(--dark-brown-color) focus:outline-none"
+                  border-[var(--brown-color)] bg-[var(--cream-color)] 
+                  focus:border-[var(--dark-brown-color)] focus:outline-none"
                   />
                 </motion.div>
               );
@@ -138,18 +154,18 @@ const ProfileComp = () => {
           </div>
 
           {/* actions */}
-          <div className="flex justify-end items-center mt-8 pt-6 border-t border-(--brown-color)">
+          <div className="flex justify-end items-center mt-8 pt-6 border-t border-[var(--brown-color)]">
             <div className="flex space-x-8">
               <button
                 type="button"
                 onClick={() => handleCancel()}
-                className="px-6 py-2 rounded hover:bg-(--light-brown-color) hover:scale-90 transition-all duration-300 cursor-pointer"
+                className="px-6 py-2 rounded hover:bg-[var(--light-brown-color)] hover:scale-90 transition-all duration-300 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="!text-white px-6 py-2 bg-(--dark-brown-color) rounded hover:scale-90 transition-all duration-300 cursor-pointer"
+                className="!text-white px-6 py-2 bg-[var(--dark-brown-color)] rounded hover:scale-90 transition-all duration-300 cursor-pointer"
               >
                 Done
               </button>

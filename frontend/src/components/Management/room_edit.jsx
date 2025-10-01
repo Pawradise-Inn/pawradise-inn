@@ -141,7 +141,7 @@ const RoomEdit = () => {
           <div className="flex gap-6 ml-8">
             <button
               onClick={openAdd}
-              className="px-12 py-4 font-semibold bg-(--light-brown-color) rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 text-xl w-40"
+              className="px-12 py-4 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 text-xl w-40"
             >
               add
             </button>

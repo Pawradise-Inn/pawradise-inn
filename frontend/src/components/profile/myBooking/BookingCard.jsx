@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 const BookingCard = ({ book, onCancelClick, ...motionProps }) => {
   return (
     <motion.div
-      className="flex items-center bg-(--cream-color) rounded-lg p-4 shadow-lg mb-6"
+      className="flex items-center bg-[var(--cream-color)] rounded-lg p-4 shadow-lg mb-6"
       {...motionProps}
     >
       <img
@@ -29,8 +29,8 @@ const BookingCard = ({ book, onCancelClick, ...motionProps }) => {
       {/* {Action Button} */}
       <button
         onClick={() => onCancelClick(book)}
-        className="px-4 py-2 bg-(--dark-brown-color) text-lg rounded !text-(--cream-color)
-                        shadow cursor-pointer transition-transform duration-200 hover:scale-110 active:bg-(--brown-color) active:scale-100"
+        className="px-4 py-2 bg-[var(--dark-brown-color)] text-lg rounded !text-[var(--cream-color)]
+                        shadow cursor-pointer transition-transform duration-200 hover:scale-110 active:bg-[var(--brown-color)] active:scale-100"
       >
         cancel
       </button>

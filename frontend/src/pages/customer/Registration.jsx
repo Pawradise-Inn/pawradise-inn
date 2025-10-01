@@ -109,9 +109,9 @@ const Registration = () => {
           />
         </div>
 
-        <div className="w-2/5 bg-(--cream-color) flex flex-col items-center justify-center py-8">
+        <div className="w-2/5 bg-[var(--cream-color)] flex flex-col items-center justify-center py-8">
           <h1
-            className="text-center pt-2 text-[60px] md:text-3xl text-(--brown-color) font-semibold"
+            className="text-center pt-2 text-[60px] md:text-3xl text-[var(--brown-color)] font-semibold"
             style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)" }}
           >
             Registration
@@ -124,14 +124,14 @@ const Registration = () => {
             {fields.map((field) => (
               <div key={field.name} className="flex flex-col w-full">
                 <label
-                  className="text-(--brown-color) font-semibold text-left mb-1"
+                  className="text-[var(--brown-color)] font-semibold text-left mb-1"
                   htmlFor={field.name}
                 >
                   {field.label}
                 </label>
                 <input
                   id={field.name}
-                  className="border-2 border-(--dark-brown-color) bg-white opacity-65 rounded-md p-2 outline-none focus:ring-2 focus:ring-(--light-brown-color) focus:border-transparent shadow-lg w-full transition-all duration-200"
+                  className="border-2 border-[var(--dark-brown-color)] bg-white opacity-65 rounded-md p-2 outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] focus:border-transparent shadow-lg w-full transition-all duration-200"
                   type={field.type}
                   name={field.name}
                   placeholder={field.placeholder}
@@ -149,16 +149,16 @@ const Registration = () => {
                 id="consent"
                 checked={consentChecked}
                 onChange={() => setConsentChecked(!consentChecked)}
-                className="mr-2 accent-(--dark-brown-color) w-5 h-5 cursor-pointer"
+                className="mr-2 accent-[var(--dark-brown-color)] w-5 h-5 cursor-pointer"
               />
 
-              <label htmlFor="consent" className="text-(--brown-color)">
+              <label htmlFor="consent" className="text-[var(--brown-color)]">
                 I agree to the{" "}
-                <a href="/" className="text-(--dark-brown-color) underline">
+                <a href="/" className="text-[var(--dark-brown-color)] underline">
                   Terms of Service
                 </a>{" "}
                 and{" "}
-                <a href="/" className="text-(--dark-brown-color) underline">
+                <a href="/" className="text-[var(--dark-brown-color)] underline">
                   Privacy Policy
                 </a>
               </label>
@@ -168,7 +168,7 @@ const Registration = () => {
               <NavLink to="/login" className="w-full md:w-40">
                 <button
                   type="button"
-                  className="w-full h-10 bg-(--dark-brown-color) !text-(--cream-color) rounded shadow px-4 py-1 hover:scale-105 transition-all duration-200 cursor-pointer "
+                  className="w-full h-10 bg-[var(--dark-brown-color)] !text-[var(--cream-color)] rounded shadow px-4 py-1 hover:scale-105 transition-all duration-200 cursor-pointer "
                 >
                   Cancel
                 </button>
@@ -179,8 +179,8 @@ const Registration = () => {
                 disabled={!isFormValid}
                 className={`w-full md:w-40 h-10 rounded shadow px-4 py-1 transition-all duration-200  ${
                   isFormValid
-                    ? "bg-(--dark-brown-color) !text-(--cream-color) cursor-pointer hover:scale-105"
-                    : "bg-(--light-brown-color) cursor-not-allowed"
+                    ? "bg-[var(--dark-brown-color)] !text-[var(--cream-color)] cursor-pointer hover:scale-105"
+                    : "bg-[var(--light-brown-color)] cursor-not-allowed"
                 }`}
               >
                 Done

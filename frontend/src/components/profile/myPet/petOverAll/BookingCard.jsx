@@ -9,7 +9,7 @@ const BookingCard = ({ room, getRoomStatusColor, pet, checkIn, checkOut }) => {
   const formattedCheckOut = formatDate(checkOut);
 
   return (
-    <div className="bg-(--cream-color) rounded-lg p-6 shadow-lg">
+    <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
       <div className="flex items-center space-x-3 mb-4">
         <h2 className="text-2xl font-bold">Room Status</h2>
         <span

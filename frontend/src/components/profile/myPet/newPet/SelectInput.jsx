@@ -9,7 +9,7 @@ const SelectInput = ({ setData, name, label, options, ...motionProps }) => {
         <select
           name={name}
           onChange={(e) => handleFormDataChange(e, setData)}
-          className="w-full shadow-md px-6 py-4.5  rounded-lg border-2 transition-all duration-300 border-(--dark-brown-color) bg-(--cream-color) focus:border-gray-400 focus:outline-none"
+          className="w-full shadow-md px-6 py-4.5  rounded-lg border-2 transition-all duration-300 border-[var(--dark-brown-color)] bg-[var(--cream-color)] focus:border-gray-400 focus:outline-none"
         >
           <option value="">Select {name}</option>
           {options.map((opt) => (

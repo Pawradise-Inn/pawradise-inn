@@ -9,7 +9,7 @@ const ServiceCard = ({ data, onClick, ...motionProps }) => {
   return (
     <motion.div
       onClick={() => onClick(data, true)}
-      className="bg-(--cream-color) border-1  border-(--dark-brown-color) rounded-2xl px-4 py-2 cursor-pointer"
+      className="bg-[var(--cream-color)] border-1  border-[var(--dark-brown-color)] rounded-2xl px-4 py-2 cursor-pointer"
       {...motionProps}
     >
       <img
@@ -19,7 +19,7 @@ const ServiceCard = ({ data, onClick, ...motionProps }) => {
       />
       <div className="flex flex-wrap justify-between items-center">
         <p>{data.name}</p>
-        <p className="block bg-(--light-brown-color) rounded py-1 px-3">
+        <p className="block bg-[var(--light-brown-color)] rounded py-1 px-3">
           {data.reviewStar}/5.0{" "}
           <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
         </p>

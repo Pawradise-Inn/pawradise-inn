@@ -82,7 +82,7 @@ const PetOverall = () => {
           initial="hidden"
           animate="visible"
           custom={1}
-          className="text-3xl font-bold text-(--dark-brown-color)"
+          className="text-3xl font-bold text-[var(--dark-brown-color)]"
         >
           Pawradise/My Profile
         </motion.h1>
@@ -135,7 +135,7 @@ const PetOverall = () => {
           custom={2}
           className="flex-1 flex flex-col"
         >
-          <div className="bg-(--cream-color) p-10 rounded-lg shadow-md flex-1 flex flex-col">
+          <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
             <h2 className="text-2xl font-bold mb-6">Service status</h2>
             <div className="space-y-6 overflow-y-auto pr-2 scrollbar-sleek">
               {scheduled.map((sch) => (
