@@ -11,7 +11,8 @@ const popUP = {
 const notification = {
   hidden: {opacity:0, y: 50},
   visible: {opacity: 1, y: 0 , transition: {type: "spring", bounce: 0.4}},
-  exit: {opacity: 0, x: 50, transition: {type: "spring", bounce: 0.4}}
+  exit: {opacity: 0, x: 50, transition: {type: "spring", bounce: 0.4}},
+  shaking: {x: [0, -10, 10, -10, 10, 0], transition: {duration:0.5}}
 }
 
 const startUpVariants = {
@@ -21,14 +22,14 @@ const startUpVariants = {
     y: 0,
     transition: { delay: index * 0.3, duration: 0.35},
   }),
-  found: {
-    y: 0,
-    opacity: 1,
-    transition: { type: "spring", bounce: 0.4 },
-  },
   exit: {
     y: 50,
     opacity: 0,
+    transition: { type: "spring", bounce: 0.4 },
+  },
+  found: {
+    y: 0,
+    opacity: 1,
     transition: { type: "spring", bounce: 0.4 },
   },
 };

@@ -8,11 +8,12 @@ import { handleFormDataChange } from "../../utils/handleForm";
 import { fetchAllRoomsWithReviewsAPI } from "../../hooks/roomAPI";
 import Overlay from "../../components/Overlay";
 import { removeWindowScroll } from "../../utils/handlePopup";
+import { useNotification } from "../../components/notification/NotificationProvider";
 
 const BookingRoom = () => {
   const petType = ["Dog", "Cat", "Bird", "Raccoon", "Fish  :)"];
 
-  const [counti, setCount] = useState(0);
+  const { createNotification } = useNotification(); 
   const [mounted, setMounted] = useState(false);
   const [room, setRoom] = useState([]);
   const [formData, setFormData] = useState({
@@ -58,11 +59,15 @@ const BookingRoom = () => {
   removeWindowScroll(popUpStatus);
 
   const test = () => {
-    alert("hi");
-  };
+     alert("hi")
+  }
+
 
   return (
     <div className="w-full max-w-6xl mx-auto py-12">
+      {/* <button onClick={() => createNotification("success", "test", "test", test)}>success</button>
+      <button onClick={() => createNotification("fail", "test", "test", test)}>fail</button>
+      <button onClick={() => createNotification("warning", "test", "test", test)}>warning</button> */}
       <b className="text-7xl text-center block m-8 mt-0">
         {"Room Reservation".split(" ").map((word, idx) => {
           return (
@@ -171,6 +176,7 @@ const BookingRoom = () => {
               initial="hidden"
               animate="visible"
               exit="hidden"
+              bgColor="black"
             />
             <BookingPopup
               variants={popUP}
