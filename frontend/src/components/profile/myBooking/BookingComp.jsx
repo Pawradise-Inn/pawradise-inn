@@ -106,6 +106,7 @@ const BookingComp = () => {
               initial="hidden"
               animate="visible"
               exit="hidden"
+              bgColor="black"
             />
             <CancelModal
               variants={popUP}

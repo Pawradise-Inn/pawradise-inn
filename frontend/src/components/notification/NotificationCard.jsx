@@ -38,7 +38,9 @@ const NotificationCard = ({
 
   return (
     <motion.div
-      className={"rounded-xl border-4 overflow-hidden relative"}
+      className={
+        "rounded-xl border-4 overflow-hidden relative w-full cursor-auto"
+      }
       {...motionProps}
     >
       <i
@@ -49,39 +51,45 @@ const NotificationCard = ({
         style={{
           backgroundColor: getStatusColor(notification.status),
         }}
-        className="py-2 px-4 w-full border-b-4 border-b-[var(--dark-brown-color)]"
+        className={`${notification.overflow ? "" : "border-b-4"} py-2 px-4 w-full border-b-[var(--dark-brown-color)]`}
       >
         <b className="flex justify-start items-center gap-2 text-xl">
           {getStutusIcon(notification.status)} {notification.header}
         </b>
       </section>
-      <section className="py-2 px-4 w-full bg-[var(--cream-color)]">
-        <b>{notification.text}</b>
-        {notification.status === "warning" ? (
-          <>
-            <hr className="my-3 scale-105" />
-            <div className="flex justify-end items-center gap-4">
-              <button
-                onClick={() => removeNotification(notification.id)}
-                style={{ backgroundColor: getStatusColor(notification.status) }}
-                className="py-1 px-2 rounded border-2 border-[var(--dark-brown-color)] cursor-pointer transition-all duration-200 active:scale-90"
-              >
-                Cancle
-              </button>
-              <button
-                onClick={() => {
-                  onClick();
-                  removeNotification(notification.id);
-                }}
-                style={{ backgroundColor: getStatusColor(notification.status) }}
-                className="py-1 px-2 rounded border-2 border-[var(--dark-brown-color)] cursor-pointer transition-all duration-200 active:scale-90"
-              >
-                Confirm
-              </button>
-            </div>
-          </>
-        ) : null}
-      </section>
+      {notification.overflow ? null : (
+        <section className="py-2 px-4 w-full bg-[var(--cream-color)]">
+          <b>{notification.text}</b>
+          {notification.status === "warning" ? (
+            <>
+              <hr className="my-3 scale-105" />
+              <div className="flex justify-end items-center gap-4">
+                <button
+                  onClick={() => removeNotification(notification.id)}
+                  style={{
+                    backgroundColor: getStatusColor(notification.status),
+                  }}
+                  className="py-1 px-2 rounded border-2 border-[var(--dark-brown-color)] cursor-pointer transition-all duration-200 active:scale-90"
+                >
+                  Cancle
+                </button>
+                <button
+                  onClick={() => {
+                    onClick();
+                    removeNotification(notification.id);
+                  }}
+                  style={{
+                    backgroundColor: getStatusColor(notification.status),
+                  }}
+                  className="py-1 px-2 rounded border-2 border-[var(--dark-brown-color)] cursor-pointer transition-all duration-200 active:scale-90"
+                >
+                  Confirm
+                </button>
+              </div>
+            </>
+          ) : null}
+        </section>
+      )}
     </motion.div>
   );
 };

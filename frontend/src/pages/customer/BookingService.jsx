@@ -129,6 +129,7 @@ const BookingService = () => {
               initial="hidden"
               animate="visible"
               exit="hidden"
+              bgColor="black"
             />
             <BookingPopup
               variants={popUP}
