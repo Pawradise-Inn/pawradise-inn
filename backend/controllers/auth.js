@@ -135,6 +135,13 @@ exports.deleteMe = async (req, res) => {
     const user = await prisma.user.delete({
       where: { id: Number(idParam) },
     });
+    res.cookie('token', '', {
+        httpOnly: true,
+        expires: new Date(0),
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+    });
+    res.status(200).json({ success: true, message: 'Logged out' });
     if (!user)
       return res.status(404).json({ success: false, error: "User not found" });
     res.status(200).json({ success: true, data: {} });
