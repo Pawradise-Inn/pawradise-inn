@@ -1,6 +1,7 @@
 const prisma = require('../prisma/prisma');
+//const { findUserByUsername, matchPassword, getSignedJwtToken } = require("./logics/auth");
 
-const updateMyProfile = async (req, res) => {
+exports.updateMyProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     if (!userId) {
@@ -43,7 +44,7 @@ const updateMyProfile = async (req, res) => {
   }
 };
 
-const getStaffProfile = async(req, res)=>{ //requirement: 17
+exports.getStaffProfile = async(req, res)=>{ //requirement: 17
     try{
         const staffId = req.params.id;
         const staffWithInformation = await prisma.staff.findUnique({
@@ -68,8 +69,3 @@ const getStaffProfile = async(req, res)=>{ //requirement: 17
         res.status(400).json({success: false, error: err.message});
     }
 };
-
-module.exports = {
-    updateMyProfile,
-    getStaffProfile
-}

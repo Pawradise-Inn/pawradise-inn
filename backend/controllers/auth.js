@@ -1,6 +1,7 @@
 const prisma = require("../prisma/prisma");
 const bcrypt = require("../node_modules/bcryptjs/umd/index.js");
 const jwt = require("jsonwebtoken");
+const { sendTokenResponse } = require("../utils/sendTokenResponse.js");
 const {
   hashPassword,
   matchPassword,
@@ -51,25 +52,6 @@ exports.register = async (req, res, next) => {
   } catch (error) {
     res.status(500).json({ success: false});
   }
-};
-
-const sendTokenResponse = (user, statusCode, res) => {
-  const token = getSignedJwtToken(user.id);
-
-  const days = Number(process.env.JWT_COOKIE_EXPIRE || 7);
-  const options = {
-    expires: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
-    httpOnly: true,
-    sameSite: "lax",
-  };
-
-  if (process.env.NODE_ENV === "production") {
-    options.secure = true;
-  }
-  res
-    .status(statusCode)
-    .cookie("token", token, options)
-    .json({ success: true, token });
 };
 
 exports.getMe = async (req, res) => {
@@ -164,7 +146,6 @@ exports.deleteMe = async (req, res) => {
 exports.login = async (req, res, next) => {
     const { userName, password } = req.body;
 
-    // Validate userName & password
     if (!userName || !password) {
         return res.status(400).json({ success: false, message: 'Please provide an email and password' });
     }
