@@ -1,10 +1,12 @@
 const prisma = require("../prisma/prisma");
 const bcrypt = require("../node_modules/bcryptjs/umd/index.js");
 const jwt = require("jsonwebtoken");
+const { sendTokenResponse } = require("../utils/sendTokenResponse.js");
 const {
   hashPassword,
   matchPassword,
   getSignedJwtToken,
+  findUserByUsername
 } = require("./logics/auth.js");
 
 exports.register = async (req, res, next) => {
@@ -48,27 +50,8 @@ exports.register = async (req, res, next) => {
     //res.status(200).json({success: true, token});
     sendTokenResponse(user, 200, res);
   } catch (error) {
-    res.status(200).json({ success: false});
+    res.status(500).json({ success: false});
   }
-};
-
-const sendTokenResponse = (user, statusCode, res) => {
-  const token = getSignedJwtToken(user.id);
-
-  const days = Number(process.env.JWT_COOKIE_EXPIRE || 7);
-  const options = {
-    expires: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
-    httpOnly: true,
-    sameSite: "lax",
-  };
-
-  if (process.env.NODE_ENV === "production") {
-    options.secure = true;
-  }
-  res
-    .status(statusCode)
-    .cookie("token", token, options)
-    .json({ success: true, token });
 };
 
 exports.getMe = async (req, res) => {
@@ -152,6 +135,13 @@ exports.deleteMe = async (req, res) => {
     const user = await prisma.user.delete({
       where: { id: Number(idParam) },
     });
+    res.cookie('token', '', {
+        httpOnly: true,
+        expires: new Date(0),
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+    });
+    res.status(200).json({ success: true, message: 'Logged out' });
     if (!user)
       return res.status(404).json({ success: false, error: "User not found" });
     res.status(200).json({ success: true, data: {} });
@@ -160,32 +150,28 @@ exports.deleteMe = async (req, res) => {
   }
 };
 
-/*exports.login = async (req, res, next) => {
-    const { email, password } = req.body;
+exports.login = async (req, res, next) => {
+    const { userName, password } = req.body;
 
-    // Validate email & password
-    if (!email || !password) {
+    if (!userName || !password) {
         return res.status(400).json({ success: false, message: 'Please provide an email and password' });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await findUserByUsername(userName);
     if (!user) {
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Match password
-    const isMatch = await user.matchPassword(password);
+    const isMatch = await matchPassword(password, user.password);
     if (!isMatch) {
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
-
     // Create token
-    //const token = user.getSignedJwtToken();
-    //res.status(200).json({ success: true, token });
     sendTokenResponse(user, 200, res);
-};*/
+};
 
-/*exports.logout = async (req, res, next) => {
+exports.logout = async (req, res, next) => {
     res.cookie('token', '', {
         httpOnly: true,
         expires: new Date(0),
@@ -193,4 +179,4 @@ exports.deleteMe = async (req, res) => {
         secure: process.env.NODE_ENV === 'production',
     });
     res.status(200).json({ success: true, message: 'Logged out' });
-};*/
+};
