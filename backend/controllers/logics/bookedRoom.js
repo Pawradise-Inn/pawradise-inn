@@ -65,16 +65,17 @@ const createBookedRoomWithCondition = async (roomId, petId, bookingId, checkIn, 
     const count = await overlappingRoom(roomId, checkIn, checkOut);
     const cap = await getRoomCap(roomId);
 
+    // 1. Check room capacity
     if (count >= cap) {
-        const error = new Error('Room is not available');
+        const error = new Error('This room has reached its maximum capacity for the selected dates.');
         error.code = 'ROOM_FULL';
         throw error;
     }
 
-
+    // 2. Check if the same pet is already booked in this room during that period
     const overlapping = await duplicatedRoom(roomId, petId, checkIn, checkOut);
     if (overlapping.length > 0) {
-        const error = new Error('Room is not available for the selected dates');
+        const error = new Error('This pet already has a booking in this room during the selected dates.');
         error.duplicatedDates = overlapping.map(b => ({
             checkIn: b.checkIn,
             checkOut: b.checkOut
@@ -83,16 +84,18 @@ const createBookedRoomWithCondition = async (roomId, petId, bookingId, checkIn, 
         throw error;
     }
 
+    // 3. Check if the pet is free during that time (not in another room)
     const pet = await isFreeThisTime(petId, checkIn, checkOut);
-    if(!pet){
-        const error = new Error('Pet is not available for the selected dates');
+    if (!pet) {
+        const error = new Error('This pet is already booked in another room during the selected dates.');
         error.code = 'PET_NOT_FREE';
         throw error;
     }
 
+    // 4. Check if the room is suitable for the pet type
     const isSuit = await isSuitable(roomId, petId);
-    if(!isSuit){
-        const error = new Error('Pet is not suitable for this room');
+    if (!isSuit) {
+        const error = new Error('This pet is not eligible for the selected room.');
         error.code = 'PET_NOT_SUIT';
         throw error;
     }

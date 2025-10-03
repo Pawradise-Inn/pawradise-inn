@@ -38,4 +38,4 @@ const BookingCard = ({ book, onCancelClick, ...motionProps }) => {
   );
 };
 
-export default motion.create(BookingCard);
+export default BookingCard;
