@@ -5,6 +5,7 @@ const {
   hashPassword,
   matchPassword,
   getSignedJwtToken,
+  findUserByUsername
 } = require("./logics/auth.js");
 
 exports.register = async (req, res, next) => {
@@ -48,7 +49,7 @@ exports.register = async (req, res, next) => {
     //res.status(200).json({success: true, token});
     sendTokenResponse(user, 200, res);
   } catch (error) {
-    res.status(200).json({ success: false});
+    res.status(500).json({ success: false});
   }
 };
 
@@ -160,32 +161,29 @@ exports.deleteMe = async (req, res) => {
   }
 };
 
-/*exports.login = async (req, res, next) => {
-    const { email, password } = req.body;
+exports.login = async (req, res, next) => {
+    const { userName, password } = req.body;
 
-    // Validate email & password
-    if (!email || !password) {
+    // Validate userName & password
+    if (!userName || !password) {
         return res.status(400).json({ success: false, message: 'Please provide an email and password' });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await findUserByUsername(userName);
     if (!user) {
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Match password
-    const isMatch = await user.matchPassword(password);
+    const isMatch = await matchPassword(password, user.password);
     if (!isMatch) {
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
-
     // Create token
-    //const token = user.getSignedJwtToken();
-    //res.status(200).json({ success: true, token });
     sendTokenResponse(user, 200, res);
-};*/
+};
 
-/*exports.logout = async (req, res, next) => {
+exports.logout = async (req, res, next) => {
     res.cookie('token', '', {
         httpOnly: true,
         expires: new Date(0),
@@ -193,4 +191,4 @@ exports.deleteMe = async (req, res) => {
         secure: process.env.NODE_ENV === 'production',
     });
     res.status(200).json({ success: true, message: 'Logged out' });
-};*/
+};
