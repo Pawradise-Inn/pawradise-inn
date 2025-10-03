@@ -27,4 +27,4 @@ const ServiceCard = ({ data, onClick, ...motionProps }) => {
     </motion.div>
   );
 };
-export default memo(motion.create(ServiceCard));
+export default memo(ServiceCard);

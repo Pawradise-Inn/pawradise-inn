@@ -68,4 +68,4 @@ const RoomCard = ({
   );
 };
 
-export default memo(motion.create(RoomCard));
+export default memo(RoomCard);

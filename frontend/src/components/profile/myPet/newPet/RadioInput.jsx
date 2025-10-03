@@ -33,4 +33,4 @@ const RadioInput = ({ name, options, selected, onChange, ...motionProps }) => {
   );
 };
 
-export default motion.create(RadioInput);
+export default RadioInput;

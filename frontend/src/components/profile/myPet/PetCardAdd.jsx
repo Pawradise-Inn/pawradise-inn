@@ -15,4 +15,4 @@ const PetCardAdd = ({ ...motionProps }) => {
   );
 };
 
-export default motion.create(PetCardAdd);
+export default PetCardAdd;

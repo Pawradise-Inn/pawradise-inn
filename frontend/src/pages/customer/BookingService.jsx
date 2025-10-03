@@ -12,10 +12,10 @@ const BookingService = () => {
   const [mounted, setMounted] = useState(false);
   const [service, setService] = useState([]);
   const [filter, setFilter] = useState("");
+  const [filterService, setFilterService] = useState([]);
   const [noResult, setNoResult] = useState(false);
   const [popUpStatus, setPopUpStatus] = useState(false);
   const [popUpData, setPopUpData] = useState([]);
-  const [filterService, setFilterService] = useState([]);
 
   // fetch service data from backend and setService
   useEffect(() => {
@@ -92,7 +92,7 @@ const BookingService = () => {
             initial="hidden"
             animate={mounted ? "found" : "visible"}
             exit="exit"
-            className="text-2xl w-full text-center mt-32 italic"
+            className="text-2xl w-full text-center min-h-[320px] italic flex justify-center items-center"
           >
             Sorry, your desired services is not on operation now.
           </motion.p>

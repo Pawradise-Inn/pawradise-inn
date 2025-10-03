@@ -105,4 +105,4 @@ const CancelModal = ({ booking, onConfirm, onCancel, ...motionProps }) => {
   );
 };
 
-export default motion.create(CancelModal);
+export default CancelModal;

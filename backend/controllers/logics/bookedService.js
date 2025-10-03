@@ -74,30 +74,30 @@ const createBookedServiceWithCondition = async (
   const count = await overlappingService(serviceId, scheduled);
 
   if (count >= 3) {
-    const error = new Error("Service is not available");
+    const error = new Error("This service is fully booked for the selected date and time.");
     error.code = "SERVICE_FULL";
     throw error;
   }
 
   const overlapping = await isDuplicatedBooking(serviceId, petId, scheduled);
   if (overlapping) {
-    const error = new Error("Service is not available for the selected dates");
+    const error = new Error("This pet has already booked this service on the selected date.");
     error.code = "SERVICE_DUPLICATE";
     throw error;
   }
 
   const free = await isFreeThisTime(petId, scheduled);
   if (!free) {
-    const error = new Error("Pet is not available for the selected dates");
+    const error = new Error("This pet already has another service booked at the selected date and time.");
     error.code = "PET_NOT_FREE";
     throw error;
   }
 
   const isSuit = await isSuitable(serviceId, petId);
-  if(!isSuit){
-    const error = new Error("Pet is not suitable for this service");
+  if (!isSuit) {
+    const error = new Error("This pet is not eligible for the selected service.");
     error.code = "PET_NOT_SUIT";
-    throw error; 
+    throw error;
   }
 
   const bookedService = await prisma.bookedService.create({
