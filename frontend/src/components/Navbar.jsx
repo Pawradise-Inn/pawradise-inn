@@ -43,7 +43,7 @@ const Navbar = () => {
               variants={startUpVariants}
                     initial="hidden"
                     animate="found"
-              className="relative z-10"
+              className="relative z-10 font-semibold "
             >
               {link}
             </motion.span>
