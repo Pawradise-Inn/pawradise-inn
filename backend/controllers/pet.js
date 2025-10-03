@@ -201,7 +201,8 @@ const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
                 }
             },
             select: {
-                name: true
+                name: true,
+                type: true
             }
         });
 
