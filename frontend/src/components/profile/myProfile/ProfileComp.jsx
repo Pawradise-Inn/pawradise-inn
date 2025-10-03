@@ -70,27 +70,22 @@ const ProfileComp = () => {
   const handleConfirm = async (e) => {
     e.preventDefault();
     if (!newUser.id) return;
+
     createNotification(
       "warning",
       "Confirmation.",
       "Are you sure to update the data?",
-      () => {
+      async () => {   // ⬅ make callback async too
         try {
           const { id, ...userObjected } = newUser;
-          // const response = await updateCustomerAPI(id, userObjected);
-          console.log(newUser);
-          // setUser(response.data);
-          updateCustomerAPI(id, userObjected).then((data) => {
-            setUser({ ...user, user: data.data });
-            console.log(data.data);
-            createNotification(
-              "success",
-              "Profile updated successfully!",
-              "Your update has been saved."
-            );
-          });
+          const data = await updateCustomerAPI(id, userObjected);  // ⬅ use await
+          setUser({ ...user, user: data });
+          createNotification(
+            "success",
+            "Profile updated successfully!",
+            "Your update has been saved."
+          );
         } catch (err) {
-          alert("broke");
           console.error(err);
           createNotification(
             "fail",
@@ -101,6 +96,7 @@ const ProfileComp = () => {
       }
     );
   };
+
 
   return (
     <div>
