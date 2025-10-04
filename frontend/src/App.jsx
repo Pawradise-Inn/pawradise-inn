@@ -23,6 +23,7 @@ import DashboardTab1 from "./pages/staff/dashboard/DashboardTab1";
 import DashboardTab2 from "./pages/staff/dashboard/DashboardTab2"; 
 import DashboardTab3 from "./pages/staff/dashboard/DashboardTab3"; 
 import DashboardTab4 from "./pages/staff/dashboard/DashboardTab4"; 
+import StaffReview from "./pages/staff/StaffReview";
 
 const App = () => { 
     const location = useLocation(); 
@@ -61,7 +62,7 @@ const App = () => {
                 </Route>
                 <Route path="/staff/pet status" element={<PetStatus />} /> 
                 <Route path="/staff/pet/:id" element={<PetUpdate />} /> 
-                <Route path="/staff/review" element={<div>Staff Review Page</div>} /> 
+                <Route path="/staff/review" element={<StaffReview />} /> 
                 <Route path="/staff/management" element={<Management />}> 
                     <Route index element={<ServiceEdit />} /> 
                     <Route path="profile" element={<ProfileComp />} /> 
