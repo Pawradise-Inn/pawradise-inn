@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { updateCustomerAPI } from "../../../hooks/customerAPI";
 import { startUpVariants } from "../../../styles/animation";
 import { motion } from "motion/react";
@@ -10,6 +10,9 @@ const ProfileComp = () => {
   const outletCtx = useOutletContext();
   const user = outletCtx?.user;
   const setUser = outletCtx?.setUser;
+  const navigate = useNavigate();
+
+  const activeBookingCount = outletCtx?.activeBookingCount;
 
   const [newUser, setNewUser] = useState({
     id: undefined,
@@ -20,86 +23,68 @@ const ProfileComp = () => {
     email: "",
   });
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [password, setPassword] = useState("");
+  const [submitErr, setSubmitErr] = useState("");
+
   const fields = [
-    {
-      label: "Firstname",
-      name: "firstname",
-      type: "text",
-      autoComplete: "true",
-    },
-    {
-      label: "Lastname",
-      name: "lastname",
-      type: "text",
-      autoComplete: "true",
-    },
-    {
-      label: "Username",
-      name: "user_name",
-      type: "text",
-      autoComplete: "true",
-    },
-    {
-      label: "Phone Number",
-      name: "phone_number",
-      type: "tel",
-      autoComplete: "true",
-    },
-    {
-      label: "Email",
-      name: "email",
-      type: "email",
-      autoComplete: "true",
-    },
+    { label: "Firstname", name: "firstname", type: "text", autoComplete: "true" },
+    { label: "Lastname", name: "lastname", type: "text", autoComplete: "true" },
+    { label: "Username", name: "user_name", type: "text", autoComplete: "true" },
+    { label: "Phone Number", name: "phone_number", type: "tel", autoComplete: "true" },
+    { label: "Email", name: "email", type: "email", autoComplete: "true" },
   ];
 
   useEffect(() => {
-    if (user) {
-      setNewUser({ id: user.id, ...user.user });
-    }
+    if (user) setNewUser({ id: user.id, ...user.user });
   }, [user]);
-  console.log(user);
 
   const handleCancel = () => {
     const cancel = window.confirm("Are you sure?");
-    if (cancel && user) {
-      setNewUser({ id: user.id, ...user.user });
-    }
+    if (cancel && user) setNewUser({ id: user.id, ...user.user });
   };
 
   const handleConfirm = async (e) => {
     e.preventDefault();
     if (!newUser.id) return;
-    createNotification(
-      "warning",
-      "Confirmation.",
-      "Are you sure to update the data?",
-      () => {
-        try {
-          const { id, ...userObjected } = newUser;
-          // const response = await updateCustomerAPI(id, userObjected);
-          console.log(newUser);
-          // setUser(response.data);
-          updateCustomerAPI(id, userObjected).then((data) => {
-            setUser({ ...user, user: data.data });
-            console.log(data.data);
-            createNotification(
-              "success",
-              "Profile updated successfully!",
-              "Your update has been saved."
-            );
-          });
-        } catch (err) {
-          alert("broke");
-          console.error(err);
-          createNotification(
-            "fail",
-            "Fail to update.",
-            "Failed to update profile. Please try again."
-          );
-        }
+    createNotification("warning", "Confirmation.", "Are you sure to update the data?", () => {
+      try {
+        const { id, ...userObjected } = newUser;
+        updateCustomerAPI(id, userObjected).then((data) => {
+          setUser?.((prev) => ({ ...(prev || {}), user: data.data }));
+          createNotification("success", "Profile updated successfully!", "Your update has been saved.");
+        });
+      } catch (err) {
+        console.error(err);
+        createNotification("fail", "Fail to update.", "Failed to update profile. Please try again.");
       }
+    });
+  };
+
+  const openDeleteModal = () => {
+    setPassword("");
+    setSubmitErr("");
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    if (!password) {
+      setSubmitErr("Please enter your password.");
+      return;
+    }
+
+    setShowDeleteModal(false);
+    setUser?.(null);
+    try {
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+    } catch {}
+    createNotification(
+      "success",
+      "Account deletion confirmed",
+      "Your account would be deleted. Any active bookings (if any) would be automatically declined."
     );
+    navigate("/", { replace: true });
   };
 
   return (
@@ -115,6 +100,7 @@ const ProfileComp = () => {
           My Profile
         </motion.h1>
       </div>
+
       <form onSubmit={handleConfirm}>
         <motion.div
           variants={startUpVariants}
@@ -124,41 +110,43 @@ const ProfileComp = () => {
           className="max-w-2xk bg-white rounded shadow-lg p-8"
         >
           <div className="space-y-6">
-            {fields.map((data, idx) => {
-              console.log(`${data.name}`);
-              return (
-                <motion.div
-                  variants={startUpVariants}
-                  initial="hidden"
-                  animate="visible"
-                  custom={idx / 3 + 2}
-                  key={idx}
-                >
-                  <label className="block text-sm font-semibold mb-2">
-                    {data.label}
-                  </label>
-                  <input
-                    type={data.type}
-                    value={newUser[`${data.name}`] || ""}
-                    autoComplete={data.autoComplete}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, [data.name]: e.target.value })
-                    }
-                    className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
+            {fields.map((data, idx) => (
+              <motion.div
+                variants={startUpVariants}
+                initial="hidden"
+                animate="visible"
+                custom={idx / 3 + 2}
+                key={data.name}
+              >
+                <label className="block text-sm font-semibold mb-2">{data.label}</label>
+                <input
+                  type={data.type}
+                  value={newUser[data.name] || ""}
+                  autoComplete={data.autoComplete}
+                  onChange={(e) => setNewUser({ ...newUser, [data.name]: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
                   border-[var(--brown-color)] bg-[var(--cream-color)] 
                   focus:border-[var(--dark-brown-color)] focus:outline-none"
-                  />
-                </motion.div>
-              );
-            })}
+                />
+              </motion.div>
+            ))}
           </div>
 
           {/* actions */}
-          <div className="flex justify-end items-center mt-8 pt-6 border-t border-[var(--brown-color)]">
+          <div className="flex justify-between items-center mt-8 pt-6 border-t border-[var(--brown-color)]">
+            <button
+              type="button"
+              onClick={openDeleteModal}
+              className="px-6 py-2 font-bold bg-white rounded shadow 
+                         transition-all duration-300 !text-red-600 hover:bg-red-400 hover:!text-white"
+            >
+              Delete account
+            </button>
+
             <div className="flex space-x-8">
               <button
                 type="button"
-                onClick={() => handleCancel()}
+                onClick={handleCancel}
                 className="px-6 py-2 rounded hover:bg-[var(--light-brown-color)] hover:scale-90 transition-all duration-300 cursor-pointer"
               >
                 Cancel
@@ -173,6 +161,64 @@ const ProfileComp = () => {
           </div>
         </motion.div>
       </form>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowDeleteModal(false)} />
+          <div className="relative z-10 w-[min(680px,90vw)] rounded-2xl bg-white p-8 shadow-2xl">
+            <button
+              onClick={() => setShowDeleteModal(false)}
+              className="absolute right-4 top-3 text-2xl leading-none hover:opacity-70"
+              aria-label="Close"
+            >
+              ×
+            </button>
+
+            <h2 className="text-center text-3xl font-extrabold mb-6">Are you sure ?</h2>
+
+            <div className="px-2">
+              <h3 className="text-lg font-semibold mb-2">Delete account</h3>
+
+              <p className="text-[var(--brown-color)]/80 mb-4">
+                Deleting your account is permanent.&nbsp;
+                <span className="font-semibold">
+                  {typeof activeBookingCount === "number"
+                    ? `You currently have ${activeBookingCount} active booking${
+                        activeBookingCount > 1 ? "s" : ""
+                      }; they will be automatically declined.`
+                    : "Any active bookings (if any) will be automatically declined."}
+                </span>
+              </p>
+
+              <div className="space-y-3">
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border-2 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none"
+                />
+                {submitErr && <p className="text-[var(--fail-color)] text-sm">{submitErr}</p>}
+              </div>
+
+              <div className="flex items-center justify-center gap-6 mt-8">
+                <button
+                  onClick={confirmDelete}
+                  className="px-8 py-2 rounded-lg !text-white bg-[var(--dark-brown-color)] hover:opacity-90 transition"
+                >
+                  confirm
+                </button>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="px-8 py-2 rounded-lg text-[var(--dark-brown-color)] bg-[var(--light-brown-color)] hover:opacity-90 transition"
+                >
+                  cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
