@@ -2,6 +2,7 @@ const prisma = require("../prisma/prisma");
 const {
   findBookedRoomById,
   overlappingRoom,
+  duplicatedRoom,
   createBookedRoomWithCondition,
 } = require("./logics/bookedRoom");
 const { getRoomCap } = require("./logics/room");
@@ -48,7 +49,7 @@ const createBookedRoom = async (req, res) => {
     );
     res.status(201).json({ success: true, data: bookedRoom });
   } catch (err) {
-    if (err.code === "ROOM_DUPLICATE" || err.code === "ROOM_FULL" || err.code === "PET_NOT_FREE" || err.code === "PET_NOT_SUIT") {
+    if (err.code === "BOOKING_DUPLICATE" || err.code === "ROOM_FULL" || err.code === "PET_NOT_SUIT") {
         return res.status(200).json({success: false, msg: err.message});
     }
     //   if (err.duplicatedDates) {
@@ -75,6 +76,17 @@ const updateBookedRoom = async (req, res) => {
     const cap = await getRoomCap(roomId);
     if (count >= cap) {
       res.status(400).json({ success: false, msg: "Room is not available" });
+    }
+
+    const check = await duplicatedRoom(
+      bookedRoom.petId,
+      checkIn,
+      checkOut
+    );
+    if (check.length > 0) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "This pet already has a booking during the selected dates." });
     }
 
     const updateBookedRoom = await prisma.bookedRoom.update({

@@ -15,25 +15,29 @@ const {
 } = require('../controllers/service');
 
 router.route('/status')
-    .get(getServiceStatus); //
+    .get(getServiceStatus);
 
 router.route('/comments')
-    .get(getAllServiceComments); //
+    .get(getAllServiceComments);
 
 router.route('/reviews')
     .get(getServiceReviews);
 
+const chatlogs = require('./chatlog.js');
+router.use('/comments', chatlogs);
+router.use('/:serviceId/comments', chatlogs);
+
 router.route('/')
-    .get(getServices)       //
-    .post(createService);   //
+    .get(getServices)      
+    .post(createService);  
 
 router.route('/:id')
-    .get(getService)        //
-    .patch(updateService)   //
+    .get(getService)        
+    .patch(updateService)  
     .delete(deleteService);
 
 router.route('/:id/pictures')
-    .post(addPicturesToService) //
-    .delete(deletePicturesFromService); //
+    .post(addPicturesToService) 
+    .delete(deletePicturesFromService); 
 
 module.exports = router;

@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NavLink, useOutletContext } from "react-router-dom";
 import PetCard from "./PetCard";
 import { AnimatePresence, motion } from "motion/react";
 import { startUpVariants } from "../../../styles/animation";
 import PetCardAdd from "./PetCardAdd";
+import { AuthContext } from "../../../context/AuthContext";
 
 const PetComp = () => {
-  const { user, setUser } = useOutletContext();
+  const { user, setUser } = useContext(AuthContext);
   const [pets, setPets] = useState([]);
 
   useEffect(() => {
     if (user) {
-      setPets(user.pets || "");
+      setPets(user.customer.pets || "");
     }
   }, [user]);
 

@@ -23,4 +23,4 @@ const SelectInput = ({ setData, name, label, options, ...motionProps }) => {
   );
 };
 
-export default motion.create(SelectInput);
+export default SelectInput;

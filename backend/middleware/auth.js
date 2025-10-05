@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 const prisma = require('../prisma/prisma');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
+
 // Protect routes
-exports.protect = async (req, res, next) => {
+const protect = async (req, res, next) => {
   let token;
 
   // Check header first
@@ -38,13 +40,16 @@ exports.protect = async (req, res, next) => {
     return res.status(401).json({ success: false, message: 'Not authorized to access this route' });
   }
 };
+module.exports = { protect };
 
-// Restrict routes to specific roles
-exports.authorize = (...roles) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ success: false, message: 'User role not authorized to access this route' });
-    }
-    next();
-  };
-};
+
+// // Restrict routes to specific roles
+// exports.authorize = (...roles) => {
+//   return (req, res, next) => {
+//     if (!roles.includes(req.user.role)) {
+//       return res.status(403).json({ success: false, message: 'User role not authorized to access this route' });
+//     }
+//     next();
+//   };
+// };
+
