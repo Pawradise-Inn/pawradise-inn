@@ -18,4 +18,4 @@ const PetInput = ({ data, setData, name, label, ...motionProps }) => {
   );
 };
 
-export default motion.create(PetInput);
+export default PetInput;

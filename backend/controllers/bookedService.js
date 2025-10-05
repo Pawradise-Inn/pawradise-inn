@@ -2,7 +2,7 @@ const prisma = require("../prisma/prisma");
 const {
   findBookedServiceById,
   overlappingService,
-  isDuplicatedBooking,
+  duplicatedService,
   createBookedServiceWithCondition,
 } = require("./logics/bookedService");
 
@@ -21,7 +21,6 @@ const getBookedServices = async (req, res) => {
 
 const getBookedService = async (req, res) => {
   //requirement: 13
-  console.log("ROTI1");
   try {
     const bookedServiceId = Number(req.params.id);
     const bookedService = await findBookedServiceById(bookedServiceId);
@@ -77,7 +76,7 @@ const updateBookedService = async (req, res) => {
         .status(400)
         .json({ success: false, msg: "Service is not available" });
     }
-    const check = await isDuplicatedBooking(
+    const check = await duplicatedService(
       bookedService.serviceId,
       bookedService.petId,
       updateScheduled

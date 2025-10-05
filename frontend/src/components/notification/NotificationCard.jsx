@@ -94,4 +94,4 @@ const NotificationCard = ({
   );
 };
 
-export default motion.create(NotificationCard);
+export default NotificationCard;

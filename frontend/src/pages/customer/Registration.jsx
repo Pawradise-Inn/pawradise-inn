@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import registerImg from "../../assets/register.png";
-import { addUserAPI } from "../../hooks/authAPI";
+import {  registerAPI } from "../../hooks/authAPI";
 import { validateFormPassword, validateFormTel } from "../../utils/handleForm";
 
 const fields = [
@@ -75,11 +75,14 @@ const Registration = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isFormValid && validateFormPassword(form) && validateFormTel(form)) {
-      addUserAPI(form).then((res) => {
-        if (res.success) {
+      const {confirmPassword, ...formData} = form;
+      registerAPI(formData).then((res) => {
+        if (res.token) {
+          localStorage.setItem('token', res.token);
+          localStorage.setItem('user', JSON.stringify(res.user))
           navigate("/room");
         } else {
-          alert("you userName, email and phoneNumber must be unique");
+          alert("you username, email and phonenumber must be unique");
         }
       });
     }

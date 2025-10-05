@@ -8,57 +8,99 @@ import Pagination from "./Pagination";
 import { getDateValidation } from "../../utils/handleValidation";
 import { handleFormDataChange } from "../../utils/handleForm";
 import { fetchAllPetAPI, fetchAvailablePetAPI } from "../../hooks/petAPI";
-import { fetchServiceReviewAPI } from "../../hooks/serviceAPI";
-import { fetchRoomWithCommentAPI } from "../../hooks/roomAPI";
+import {
+  fetchServiceReviewAPI,
+  getServiceStatusAPI,
+} from "../../hooks/serviceAPI";
+import {
+  fetchRoomStatusAPI,
+  fetchRoomWithCommentAPI,
+} from "../../hooks/roomAPI";
 import { createBookedRoom } from "../../hooks/bookedRoomAPI";
 import { createBookedService } from "../../hooks/bookedServiceAPI";
+import { useNotification } from "../notification/NotificationProvider";
+import { motion } from "motion/react";
+import { startUpVariants } from "../../styles/animation";
 
 // data: { image, name, review, forwhich, price, size, maxsize, headerType } of service and room
-
 const BookingBar = ({ data, popupStatus }) => {
-  const selectableTime = ["08:00", "10:00", "12:00", "14:00", "16:00"];
+  const { createNotification } = useNotification();
 
+  const selectableTime = ["08:00", "10:00", "12:00", "14:00", "16:00"];
   const [commentStarSelect, setCommentStarSelect] = useState(6);
   const [currentPage, setCurrentPage] = useState(data.currentPage);
   const [comments, setComments] = useState([]);
   const [commentStatus, setCommentStatus] = useState(false);
-  const [status, setStatus] = useState("--");
+  const [status, setStatus] = useState("date is invalid");
   const [currentPet, setCurrentPet] = useState(null);
   const [petData, setPetData] = useState([]);
   const [formData, setFormData] = useState({
-    entryDate: " ",
-    exitDate: "z",
+    entryDate: "",
+    exitDate: "",
     entryTime: "",
   });
 
-  //  status using for display error when meet constraint
+  useEffect(() => {
+    console.log(petData)
+  }, [petData])
+
+  //  calculate date is valid or not
+  //  @return: validDateStatus which contain 1)status, 2)warningText
   const validDateStatus = useMemo(() => {
     return getDateValidation(formData.entryDate, formData.exitDate);
   }, [formData]);
 
-  const handleCommentStarSelect = useCallback((star) => {
-    setCommentStarSelect(star);
-  }, []);
-
-  // handle form submit and check availability and validation
+  //  handle form submit and check availability and validation
+  //  @params: e -> form itself
+  //  @constraint: if this is room and EntryDate and ExitDate is not fully filled Notify fail
+  //  @constraint: if this is service and EntryDate and EntryTime is not fully filled Notify fail
+  //  @constraint: if date is not valid Notify fail
+  //  @constraint: if pet is not selected Notify faile
+  //  @constraint: if this is room and all constraint pass call CreateRoomAPI and Notify according to status
+  //  @constraint: if this is service and all constraint pass call CreateServiceAPI and Notify according to status
   const handleFormSubmit = (e) => {
     e.preventDefault();
+
+    if (
+      data.headerType === "Room" &&
+      (!formData.entryDate || !formData.exitDate)
+    ) {
+      createNotification(
+        "fail",
+        "Date is missing",
+        "Please select your dates."
+      );
+      return;
+    }
+
+    if (
+      data.headerType === "Service" &&
+      (!formData.entryDate || !formData.entryTime)
+    ) {
+      createNotification(
+        "fail",
+        "Date or time is missing",
+        "Please select your date and time."
+      );
+      return;
+    }
+
     if (!validDateStatus.status) {
-      alert("Invalid date detecting");
+      createNotification(
+        "fail",
+        "Date is invalid",
+        validDateStatus.warningText
+      );
       return;
     }
 
     if (!currentPet) {
-      alert("Please select your pet before booking");
+      createNotification("fail", "Pet is missing", "Please select your pet.");
       return;
     }
 
     let body;
     if (data.headerType === "Service") {
-      if (!formData.entryTime) {
-        alert("Please select time before booking");
-        return;
-      }
       body = {
         service_name: data.name,
         pet_name: currentPet,
@@ -70,11 +112,15 @@ const BookingBar = ({ data, popupStatus }) => {
 
       createBookedService(body).then((res) => {
         if (res.success) {
-          alert("Create reservation successfully");
+          createNotification(
+            "success",
+            "Booking success",
+            "Create booking successfully."
+          );
         } else {
-          alert(res.msg);
+          createNotification("fail", "Booking fail", res.msg);
         }
-      });
+      }).then(() => changeBookingBarStatus());
     } else {
       body = {
         roomId: data.roomId,
@@ -86,23 +132,63 @@ const BookingBar = ({ data, popupStatus }) => {
 
       createBookedRoom(body).then((res) => {
         if (res.success) {
-          alert("Create reservation successfully");
+          createNotification(
+            "success",
+            "Booking success",
+            "Create booking successfully."
+          );
         } else {
-          alert(res.msg);
+          createNotification("fail", "Booking fail", res.msg);
         }
+      }).then(() => changeBookingBarStatus());
+    }
+  };
+
+  //  change BookingStatus when formData and currentPet is changed
+  //  @constraint: if data is not fully filled Notify warning
+  //  @constraint: if available Notify success
+  //  @constraint: if not available Notify fail
+  const changeBookingBarStatus = () => {
+    if (
+      !formData.entryDate ||
+      (!formData.exitDate && !formData.entryTime) ||
+      !validDateStatus.status
+    ) {
+      setStatus("date is invalid");
+      return;
+    }
+
+    if (data.headerType == "Service") {
+      getServiceStatusAPI(
+        data.name,
+        `${formData.entryDate}T${formData.entryTime}:00.00Z`
+      ).then((data) => {
+        data.available
+          ? setStatus("room available")
+          : setStatus("room not available");
+      });
+    } else {
+      fetchRoomStatusAPI(
+        data.roomId,
+        formData.entryDate,
+        formData.exitDate
+      ).then((data) => {
+        data.available
+          ? setStatus("room available")
+          : setStatus("room not available");
       });
     }
   };
 
-  // fetch new status when date or time change
-  const fetchNewStatus = () => {
-    // fetch new data from backend API here
-    // fetch new data from backend API here
-    // fetch new data from backend API here
-    // fetch new data from backend API here
-    // fetch new data from backend API here
-    // fetch new data from backend API here
-  };
+  //  handleStarSelect changed
+  const handleCommentStarSelect = useCallback((star) => {
+    setCommentStarSelect(star);
+  }, []);
+
+  // call changeBookingBarStatus when formData is changed
+  useEffect(() => {
+    changeBookingBarStatus();
+  }, [formData]);
 
   // fetch API to get petname
   useEffect(() => {
@@ -111,6 +197,7 @@ const BookingBar = ({ data, popupStatus }) => {
     } else {
       fetchAvailablePetAPI(9, "name").then((pets) => setPetData(pets.data));
     }
+    setCurrentPage(1);
   }, []);
 
   // fetch new comment data when currentPage change
@@ -146,16 +233,11 @@ const BookingBar = ({ data, popupStatus }) => {
     }
   }, [data, currentPage]);
 
-  // reset currentPage to 1 when this bookingBar data is change(reopen)
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [data]);
-
   return (
     <div className="w-1/2 bg-white rounded-3xl p-8 border-2 border-[var(--brown-color)] ">
       {/* header dataial section */}
       <section className="my-5 flex justify-between">
-        <div className="w-1/2">
+        <div className="w-2/3">
           <p className="text-2xl mb-2 font-bold">
             {data.headerType}{" "}
             {popupStatus
@@ -164,7 +246,24 @@ const BookingBar = ({ data, popupStatus }) => {
                 : data.roomId.toString().padStart(3, 0)
               : null}
           </p>
-          <p className="text-xl mb-2">Status {status}</p>
+          <div className="text-xl mb-2 flex gap-1 items-center">
+            Status{" "}
+            <motion.div
+              layout
+              animate={{
+                backgroundColor:
+                  status == "date is invalid"
+                    ? "var(--warning-color)"
+                    : status == "room available"
+                    ? "var(--success-color)"
+                    : "var(--fail-color)",
+              }}
+              className={`inline-block rounded-full h-4 w-4 ml-1 border-2`}
+            ></motion.div>
+            <motion.span layout className="text-sm italic">
+              {status}
+            </motion.span>
+          </div>
           {popupStatus ? (
             data.headerType == "Service" ? (
               data.forWhich.map((type, idx) => {
@@ -179,7 +278,7 @@ const BookingBar = ({ data, popupStatus }) => {
             )
           ) : null}
         </div>
-        <div className="w-1/2 flex flex-col justify-end items-end">
+        <div className="w-1/3 flex flex-col justify-end items-end">
           <p className="text-2xl font-bold">{data.price} ฿</p>
         </div>
       </section>
@@ -194,11 +293,11 @@ const BookingBar = ({ data, popupStatus }) => {
             onChange={(e) => setCurrentPet(e.target.value)}
             className="inline-block mb-4 w-full rounded-xl px-4 py-2 text-2xl my-2 outline-0 bg-[var(--light-brown-color)] appearance-none cursor-pointer"
           >
-            <option value={null}>Pick pet</option>
+            <option value="">Pick pet</option>
             {petData.map((data, idx) => {
               return (
                 <option key={idx} value={data.name}>
-                  {data.name}
+                  {data.name} ({data.type})
                 </option>
               );
             })}
@@ -218,7 +317,6 @@ const BookingBar = ({ data, popupStatus }) => {
           )}
           <div className="relative mb-4 w-full rounded-xl text-2xl bg-[var(--light-brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1  before:border-[var(--dark-brown-color)]">
             <input
-              required
               type="date"
               className="relative w-1/2 rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
               onChange={(e) => handleFormDataChange(e, setFormData)}
@@ -245,7 +343,6 @@ const BookingBar = ({ data, popupStatus }) => {
             ) : (
               <>
                 <input
-                  required
                   type="date"
                   className="relative w-1/2 rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
                   onChange={(e) => handleFormDataChange(e, setFormData)}
@@ -257,19 +354,11 @@ const BookingBar = ({ data, popupStatus }) => {
           </div>
           {/* booking detail section */}
 
-          {/* validation for booking */}
-          <span className="text-center block w-full mt-8">
-            <i className="!text-[var(--fail-color)]">
-              {validDateStatus.warningText}
-            </i>
-          </span>
-          {/* validation for booking */}
-
           <button
             type="submit"
-            className={`${
-              validDateStatus.status ? "mt-13" : "mt-2"
-            } block w-full bg-[var(--dark-brown-color)] rounded !text-white text-center py-1 text-3xl mb-4 cursor-pointer hover:scale-105 transition-all duration-200`}
+            className={
+              "mt-2 block w-full bg-[var(--dark-brown-color)] rounded !text-white text-center py-1 text-3xl mb-4 cursor-pointer hover:scale-105 transition-all duration-200"
+            }
           >
             BOOK
           </button>

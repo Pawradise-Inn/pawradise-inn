@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { addPetAPI, registerPetAPI } from "../../../../hooks/petAPI";
 import { updateCustomerAPI } from "../../../../hooks/customerAPI";
@@ -8,9 +8,10 @@ import SelectInput from "./SelectInput";
 import { motion } from "motion/react";
 import { startUpVariants } from "../../../../styles/animation";
 import { handleFormDataChange } from "../../../../utils/handleForm";
+import { AuthContext } from "../../../../context/AuthContext";
 
 const NewPet = () => {
-  const { user, setUser } = useOutletContext();
+  const { user, setUser } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     petName: "",
     petType: "",

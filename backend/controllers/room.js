@@ -146,7 +146,7 @@ const getAvailableRooms = async (req, res) => { //requirement: 7
   try {
     const { pet_type, entry_date_with_time, exit_date_with_time } = req.query;
 
-    if (!pet_type || !entry_date_with_time || !exit_date_with_time) {
+    if (!entry_date_with_time || !exit_date_with_time) {
       return res.status(400).json({ success: false, msg: "Missing required parameters" });
     }
 
@@ -157,22 +157,28 @@ const getAvailableRooms = async (req, res) => { //requirement: 7
       return res.status(400).json({ success: false, msg: "entry_date must be before exit_date" });
     }
 
-    const availableRooms = await prisma.room.findMany({
-      where: {
-        petType: pet_type,
-        bookings: {
-          none: {
-            OR: [
-              { checkIn: { lt: exitDate }, checkOut: { gt: entryDate } } 
-            ]
-          }
+    // Build where clause based on pet_type
+    const whereClause = {
+      bookings: {
+        none: {
+          OR: [
+            { checkIn: { lt: exitDate }, checkOut: { gt: entryDate } }
+          ]
         }
-      },
+      }
+    };
+    if (pet_type) {
+      whereClause.petType = pet_type;
+    }
+
+    const availableRooms = await prisma.room.findMany({
+      where: whereClause,
       select: {
         id: true,
         picture: true,
         price: true,
         capacity: true,
+        petType: true,
         ChatLog: {
           select: {
             rating: true
@@ -181,12 +187,8 @@ const getAvailableRooms = async (req, res) => { //requirement: 7
       }
     });
 
-    if (!availableRooms || availableRooms.length === 0) {
-      return res.status(404).json({ success: false, msg: "No rooms available" });
-    }
-
     const formattedRooms = await Promise.all(
-      rooms.map(async (r) => {
+      availableRooms.map(async (r) => {
         const totalReviews = r.ChatLog.length;
         const ratings = r.ChatLog.map(c => c.rating ?? 5);
         const avgRating = ratings.length

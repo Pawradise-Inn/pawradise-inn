@@ -25,7 +25,7 @@ const NotificationProvider = ({ children }) => {
     header,
     text,
     onClick,
-    duration = 50000
+    duration = 5000
   ) => {
     const id = Date.now();
     if (status === "warning") {

@@ -27,4 +27,4 @@ const PetCard = ({ pet, ...motionProps }) => {
   );
 };
 
-export default motion.create(PetCard);
+export default PetCard;

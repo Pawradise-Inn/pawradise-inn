@@ -2,6 +2,7 @@ import React,{useState} from 'react';
 import { NavLink, useNavigate } from "react-router-dom"; 
 import Login_Image from "../assets/login.png"; 
 import PawLogo from "../assets/logo.png";
+import { loginAPI } from '../hooks/authAPI';
 
 const fields = [
     { label: "Username", name: "Username", type: "text", placeholder: "Username (For Login)" },
@@ -20,7 +21,13 @@ const Login = ()=>{
     };
     const handleSubmit = (e) => {
         e.preventDefault();
-        navigate("/room");
+        loginAPI(form.Username, form.Password).then((res) => {
+            if(res.token){
+                localStorage.setItem('token', res.token)
+                localStorage.setItem('user', res.user)
+                navigate("/room");
+            }
+        })
     };
     
     const onChange = handleChange(form, setForm);
