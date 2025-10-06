@@ -37,16 +37,13 @@ exports.register = async (req, res, next) => {
       },
     });
 
-  try {
     if (user.role === "CUSTOMER") {
       await prisma.customer.create({ data: { userId: user.id } });
       }
     if (user.role === "STAFF") {
       await prisma.staff.create({ data: { userId: user.id, wages: 0, bank_account: "TBD" } });
     }
-  } catch (err) {
-    console.warn("Warning: Could not create associated role record", err.message);
-  }
+
     console.log("User created:", user)
     sendTokenResponse(user, 200, res);
   } catch (error) {
