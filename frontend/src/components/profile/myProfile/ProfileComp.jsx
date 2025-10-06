@@ -1,15 +1,15 @@
+import { motion } from "motion/react";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import { AuthContext } from "../../../context/AuthContext";
 import { updateCustomerAPI } from "../../../hooks/customerAPI";
 import { startUpVariants } from "../../../styles/animation";
-import { motion } from "motion/react";
 import { useNotification } from "../../notification/NotificationProvider";
-import { AuthContext } from "../../../context/AuthContext";
 
 const ProfileComp = () => {
   const { createNotification } = useNotification();
   const outletCtx = useOutletContext();
-  const {user, setUser} = useContext(AuthContext)
+  const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const activeBookingCount = outletCtx?.activeBookingCount;
@@ -28,18 +28,33 @@ const ProfileComp = () => {
   const [submitErr, setSubmitErr] = useState("");
 
   const fields = [
-    { label: "Firstname", name: "firstname", type: "text", autoComplete: "true" },
+    {
+      label: "Firstname",
+      name: "firstname",
+      type: "text",
+      autoComplete: "true",
+    },
     { label: "Lastname", name: "lastname", type: "text", autoComplete: "true" },
-    { label: "Username", name: "user_name", type: "text", autoComplete: "true" },
-    { label: "Phone Number", name: "phone_number", type: "tel", autoComplete: "true" },
+    {
+      label: "Username",
+      name: "user_name",
+      type: "text",
+      autoComplete: "true",
+    },
+    {
+      label: "Phone Number",
+      name: "phone_number",
+      type: "tel",
+      autoComplete: "true",
+    },
     { label: "Email", name: "email", type: "email", autoComplete: "true" },
   ];
 
   useEffect(() => {
     if (user) {
-      console.log(user)
-      setNewUser({ id: user.id, ...user })
-    };
+      console.log(user);
+      setNewUser({ id: user.id, ...user });
+    }
   }, [user]);
 
   const handleCancel = () => {
@@ -50,18 +65,31 @@ const ProfileComp = () => {
   const handleConfirm = async (e) => {
     e.preventDefault();
     if (!newUser.id) return;
-    createNotification("warning", "Confirmation.", "Are you sure to update the data?", () => {
-      try {
-        const { id, ...userObjected } = newUser;
-        updateCustomerAPI(id, userObjected).then((data) => {
-          setUser?.((prev) => ({ ...(prev || {}), user: data.data }));
-          createNotification("success", "Profile updated successfully!", "Your update has been saved.");
-        });
-      } catch (err) {
-        console.error(err);
-        createNotification("fail", "Fail to update.", "Failed to update profile. Please try again.");
+    createNotification(
+      "warning",
+      "Confirmation.",
+      "Are you sure to update the data?",
+      () => {
+        try {
+          const { id, ...userObjected } = newUser;
+          updateCustomerAPI(id, userObjected).then((data) => {
+            setUser?.((prev) => ({ ...(prev || {}), user: data.data }));
+            createNotification(
+              "success",
+              "Profile updated successfully!",
+              "Your update has been saved."
+            );
+          });
+        } catch (err) {
+          console.error(err);
+          createNotification(
+            "fail",
+            "Fail to update.",
+            "Failed to update profile. Please try again."
+          );
+        }
       }
-    });
+    );
   };
 
   const openDeleteModal = () => {
@@ -89,7 +117,6 @@ const ProfileComp = () => {
     );
     navigate("/", { replace: true });
   };
-
 
   return (
     <div>
@@ -122,12 +149,16 @@ const ProfileComp = () => {
                 custom={idx / 3 + 2}
                 key={data.name}
               >
-                <label className="block text-sm font-semibold mb-2">{data.label}</label>
+                <label className="block text-sm font-semibold mb-2">
+                  {data.label}
+                </label>
                 <input
                   type={data.type}
                   value={newUser[data.name] || ""}
                   autoComplete={data.autoComplete}
-                  onChange={(e) => setNewUser({ ...newUser, [data.name]: e.target.value })}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, [data.name]: e.target.value })
+                  }
                   className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
                   border-[var(--brown-color)] bg-[var(--cream-color)] 
                   focus:border-[var(--dark-brown-color)] focus:outline-none"
@@ -168,7 +199,10 @@ const ProfileComp = () => {
 
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setShowDeleteModal(false)} />
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setShowDeleteModal(false)}
+          />
           <div className="relative z-10 w-[min(680px,90vw)] rounded-2xl bg-white p-8 shadow-2xl">
             <button
               onClick={() => setShowDeleteModal(false)}
@@ -178,7 +212,9 @@ const ProfileComp = () => {
               ×
             </button>
 
-            <h2 className="text-center text-3xl font-extrabold mb-6">Are you sure ?</h2>
+            <h2 className="text-center text-3xl font-extrabold mb-6">
+              Are you sure ?
+            </h2>
 
             <div className="px-2">
               <h3 className="text-lg font-semibold mb-2">Delete account</h3>
@@ -202,7 +238,11 @@ const ProfileComp = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg border-2 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none"
                 />
-                {submitErr && <p className="text-[var(--fail-color)] text-sm">{submitErr}</p>}
+                {submitErr && (
+                  <p className="text-[var(--fail-color)] text-sm">
+                    {submitErr}
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center justify-center gap-6 mt-8">
