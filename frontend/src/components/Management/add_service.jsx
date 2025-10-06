@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
-import testImg from "../../assets/test.png";
 
-const AddServicePopup = ({ title = "Add service", initialData = null, onClose, onSave, onDelete }) => {
+const AddServicePopup = ({
+  title = "Add service",
+  initialData = null,
+  onClose,
+  onSave,
+  onDelete,
+}) => {
   const [name, setName] = useState(initialData?.name || "");
   const [petType, setPetType] = useState(initialData?.petType || "");
   const [price, setPrice] = useState(initialData?.price ?? "");
@@ -36,12 +41,16 @@ const AddServicePopup = ({ title = "Add service", initialData = null, onClose, o
   return (
     <div className="fixed inset-0 bg-black/60 z-10 grid place-items-center p-4">
       <div className="bg-white rounded-3xl p-8 w-[600px] flex flex-col space-y-6 shadow-lg">
-        <h2 className="text-3xl font-bold text-[var(--dark-brown-color)]">{title}</h2>
+        <h2 className="text-3xl font-bold text-[var(--dark-brown-color)]">
+          {title}
+        </h2>
 
         <form onSubmit={handleSubmit} className="flex gap-6">
           <div className="flex flex-col flex-1 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Service name</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Service name
+              </label>
               <input
                 type="text"
                 value={name}
@@ -52,7 +61,9 @@ const AddServicePopup = ({ title = "Add service", initialData = null, onClose, o
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Pet type</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Pet type
+              </label>
               <select
                 value={petType}
                 onChange={(e) => setPetType(e.target.value)}
@@ -67,7 +78,9 @@ const AddServicePopup = ({ title = "Add service", initialData = null, onClose, o
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Price</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Price
+              </label>
               <input
                 type="number"
                 value={price}
@@ -82,13 +95,24 @@ const AddServicePopup = ({ title = "Add service", initialData = null, onClose, o
             <label className="cursor-pointer">
               <div className="w-40 h-40 flex items-center justify-center border-2 border-dashed rounded-md bg-gray-200 relative">
                 {image ? (
-                  <img src={image} alt="preview" className="w-full h-full object-cover rounded-md" />
+                  <img
+                    src={image}
+                    alt="preview"
+                    className="w-full h-full object-cover rounded-md"
+                  />
                 ) : (
                   <span className="text-4xl text-gray-500">+</span>
                 )}
-                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
               </div>
-              <p className="text-xs text-center mt-1 text-gray-500">click to change pic</p>
+              <p className="text-xs text-center mt-1 text-gray-500">
+                click to change pic
+              </p>
             </label>
           </div>
         </form>
@@ -104,7 +128,9 @@ const AddServicePopup = ({ title = "Add service", initialData = null, onClose, o
             >
               Delete
             </button>
-          ) : <span />}
+          ) : (
+            <span />
+          )}
 
           <div className="flex gap-3">
             <button

@@ -15,7 +15,7 @@ const validateFormTel = (form) => {
   const cleanPhone = form.phoneNumber.replace(/\D/g, "");
 
   if (!/^\d{10}$/.test(cleanPhone)) {
-	alert("Phone number is invalid");
+    alert("Phone number is invalid");
     return false;
   }
   return true;

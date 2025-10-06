@@ -3,12 +3,13 @@ import { NavLink, Outlet } from "react-router-dom";
 const Dashboard = () => {
   return (
     <div className="flex flex-col items-center mt-16 px-4 sm:px-8">
-      <h2 className="w-full text-5xl font-extrabold mb-8 text-left">Dashboard</h2>
+      <h2 className="w-full text-5xl font-extrabold mb-8 text-left">
+        Dashboard
+      </h2>
 
       {/* Centered Tabs Wrapper */}
       <div className="relative w-full max-w-5xl mx-auto">
         <div className="flex justify-center overflow-x-auto space-x-4 pb-2">
-          
           {/* NavLink for Today's Booking */}
           <NavLink
             to="/staff/dashboard"
@@ -76,7 +77,6 @@ const Dashboard = () => {
           >
             Service booked
           </NavLink>
-
         </div>
 
         {/* Extended Underline */}
