@@ -69,12 +69,12 @@ const NewPet = () => {
   console.log(user);
 
   const handleConfirm = () => {
-    if(!formData.petName &&
-      !formData.petGender &&
-      !formData.petAge &&
-      !formData.petType &&
-      !formData.petBreed &&
-      !formData.medicalCondition &&
+    if(!formData.petName ||
+      !formData.petGender ||
+      !formData.petAge ||
+      !formData.petType ||
+      !formData.petBreed ||
+      !formData.medicalCondition ||
       !formData.foodAllergy){
         createNotification("fail", "Fail to create a pet", "Please provide all information.")
       }
