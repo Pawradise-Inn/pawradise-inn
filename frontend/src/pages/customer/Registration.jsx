@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import registerImg from "../../assets/register.png";
-import {  registerAPI } from "../../hooks/authAPI";
+import { useNotification } from "../../components/notification/NotificationProvider";
+import { registerAPI } from "../../hooks/authAPI";
 import { validateFormPassword, validateFormTel } from "../../utils/handleForm";
 
 const fields = [
@@ -57,6 +58,7 @@ const fields = [
 ];
 
 const Registration = () => {
+  const { createNotification } = useNotification();
   const [form, setForm] = useState({
     firstname: "",
     lastname: "",
@@ -75,14 +77,18 @@ const Registration = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isFormValid && validateFormPassword(form) && validateFormTel(form)) {
-      const {confirmPassword, ...formData} = form;
+      const { confirmPassword, ...formData } = form;
       registerAPI(formData).then((res) => {
         if (res.token) {
-          localStorage.setItem('token', res.token);
-          localStorage.setItem('user', JSON.stringify(res.user))
+          localStorage.setItem("token", res.token);
+          localStorage.setItem("user", JSON.stringify(res.user));
           navigate("/room");
         } else {
-          alert("you username, email and phonenumber must be unique");
+          createNotification(
+            "fail",
+            "Invalid username and phone number",
+            "your username, email and phone number must be unique."
+          );
         }
       });
     }
@@ -157,11 +163,17 @@ const Registration = () => {
 
               <label htmlFor="consent" className="text-[var(--brown-color)]">
                 I agree to the{" "}
-                <a href="/" className="text-[var(--dark-brown-color)] underline">
+                <a
+                  href="/"
+                  className="text-[var(--dark-brown-color)] underline"
+                >
                   Terms of Service
                 </a>{" "}
                 and{" "}
-                <a href="/" className="text-[var(--dark-brown-color)] underline">
+                <a
+                  href="/"
+                  className="text-[var(--dark-brown-color)] underline"
+                >
                   Privacy Policy
                 </a>
               </label>
