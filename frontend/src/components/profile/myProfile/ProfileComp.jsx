@@ -61,7 +61,6 @@ const ProfileComp = () => {
       if(user) setNewUser({id: user.id, ... user})
     })
   };
-
   const handleConfirm = async (e) => {
     e.preventDefault();
     if (!newUser.id) return;
