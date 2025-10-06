@@ -44,7 +44,7 @@ const Login = () => {
   const isFormValid = Object.values(form).every((field) => field.trim() !== "");
 
   return (
-    <div className="flex flex-col md:flex-row w-full min-h-screen overflow-hidden">
+    <div className="flex flex-col md:flex-row w-full h-dvh overflow-hidden">
       <div className="w-full md:w-3/5 h-64 md:h-auto flex-shrink-0">
         <img
           className="w-full h-full object-cover"
