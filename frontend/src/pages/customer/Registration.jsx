@@ -1,10 +1,29 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import registerImg from "../../assets/register.png";
-import { useNotification } from "../../components/notification/NotificationProvider";
+import { useNotification } from "../../context/notification/NotificationProvider";
 import { registerAPI } from "../../hooks/authAPI";
 import { validateFormPassword, validateFormTel } from "../../utils/handleForm";
 
+const Registration = () => {
+
+  const { createNotification } = useNotification();
+  const [form, setForm] = useState({
+    firstname: "",
+    lastname: "",
+    userName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phoneNumber: "",
+  });
+  
+
+  const [consentChecked, setConsentChecked] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+  const navigate = useNavigate();
+
+  
 const fields = [
   {
     label: "Firstname",
@@ -57,26 +76,10 @@ const fields = [
   },
 ];
 
-const Registration = () => {
-  const { createNotification } = useNotification();
-  const [form, setForm] = useState({
-    firstname: "",
-    lastname: "",
-    userName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phoneNumber: "",
-  });
-
-  const [consentChecked, setConsentChecked] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(false);
-  const navigate = useNavigate();
-
   // post Customer data to database
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isFormValid && validateFormPassword(form) && validateFormTel(form)) {
+    if (isFormValid && validateFormPassword(form, createNotification) && validateFormTel(form, createNotification)) {
       const { confirmPassword, ...formData } = form;
       registerAPI(formData).then((res) => {
         if (res.token) {

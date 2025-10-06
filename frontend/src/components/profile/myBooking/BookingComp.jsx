@@ -1,7 +1,7 @@
 // BookingComp.js
 import { AnimatePresence } from "motion/react";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../../context/AuthContext";
+import {  useEffect, useState } from "react";
+import { useAuth } from "../../../context/AuthProvider";
 import { deleteBookedService } from "../../../hooks/bookedServiceAPI";
 import { fetchMyBookings } from "../../../hooks/bookingAPI"; // Import cancelBooking
 import { overlay, popUP, startUpVariants } from "../../../styles/animation";
@@ -12,7 +12,7 @@ import SuccessMessage from "../SuccessMessage";
 import BookingCard from "./BookingCard";
 
 const BookingComp = () => {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [allBookedService, setAllBookedService] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);

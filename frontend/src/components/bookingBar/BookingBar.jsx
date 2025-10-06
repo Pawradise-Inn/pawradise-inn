@@ -16,7 +16,7 @@ import {
 import "../../styles/bookingBarStyle.css";
 import { handleFormDataChange } from "../../utils/handleForm";
 import { getDateValidation } from "../../utils/handleValidation";
-import { useNotification } from "../notification/NotificationProvider";
+import { useNotification } from "../../context/notification/NotificationProvider";
 import CommentCard from "./CommentCard";
 import CommentStarSelector from "./CommentStarSelector";
 import Pagination from "./Pagination";

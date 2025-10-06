@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNotification } from "../notification/NotificationProvider";
+import { useNotification } from "../../context/notification/NotificationProvider";
 
 const AddRoomPopup = ({
   title = "Add room",

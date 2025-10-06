@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
-import { useContext, useRef, useState } from "react";
+import {  useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../../../context/AuthContext";
+import { useAuth } from "../../../../context/AuthProvider";
 import { updateCustomerAPI } from "../../../../hooks/customerAPI";
 import { registerPetAPI } from "../../../../hooks/petAPI";
 import { startUpVariants } from "../../../../styles/animation";
@@ -11,7 +11,7 @@ import RadioInput from "./RadioInput";
 import SelectInput from "./SelectInput";
 
 const NewPet = () => {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser } = useAuth();
   const [formData, setFormData] = useState({
     petName: "",
     petType: "",

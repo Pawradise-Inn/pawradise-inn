@@ -1,15 +1,15 @@
 import { motion } from "motion/react";
-import { useContext, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { AuthContext } from "../../../context/AuthContext";
+import { useAuth } from "../../../context/AuthProvider";
 import { updateCustomerAPI } from "../../../hooks/customerAPI";
 import { startUpVariants } from "../../../styles/animation";
-import { useNotification } from "../../notification/NotificationProvider";
+import { useNotification } from "../../../context/notification/NotificationProvider";
 
 const ProfileComp = () => {
   const { createNotification } = useNotification();
   const outletCtx = useOutletContext();
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
 
   const activeBookingCount = outletCtx?.activeBookingCount;
