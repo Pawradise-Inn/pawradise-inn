@@ -1,6 +1,30 @@
 const prisma = require('../prisma/prisma')
 
 const getChatLogs = async (req, res) => {
+    let query;
+
+    //wait testing 1
+    // if(req.params.serviceId){
+    //     query = chatlogs.findMany({
+    //         where: {serviceId: Number(req.params.serviceId)},
+    //         include: { customer: true, staff: true },
+    //         orderBy: { review_date: 'desc' },
+    //     });
+    // }else if (req.params.roomId){
+    //     query = chatlogs.findMany({
+    //         where: {
+    //             roomId: Number(req.params.roomId),
+    //         },
+    //         include: { customer: true, staff: true },
+    //     });
+    // } else if (req.params.customerId && req.user.role === 'STAFF') {
+    //     query = chatlogs.findMany({
+    //         where: {customerId : Number(req.params.customerId)}
+    //     })
+    // } else {
+    //     query = chatlogs.findMany();
+    // }
+
     try {
         const { customerId, serviceId, staffId } = req.query;
         const filters = {};
@@ -14,7 +38,8 @@ const getChatLogs = async (req, res) => {
             orderBy: { review_date: 'desc' },
         });
 
-        res.status(200).json({ success: true, data: chatlogs });
+
+        res.status(200).json({ success: true, data: query });
     } catch (err) {
         res.status(400).json({ success: true, error: err.message});
     }
