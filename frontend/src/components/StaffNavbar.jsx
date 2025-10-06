@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import Logo from "../assets/logo.png";
 
 const Navbar = () => {
-    const pages = ["dashboard", "pet status", "review", "management"];
+  const pages = ["dashboard", "pet status", "review", "management"];
   return (
     <nav className="bg-white shadow-md px-10 py-4 flex items-center justify-between">
       {/* Logo */}
@@ -23,7 +23,9 @@ const Navbar = () => {
             to={`/staff/${link}`}
             className={({ isActive }) =>
               `px-7 py-3 rounded-sm font-medium transition font-semibold transition-all duration-300 ease-in-out ${
-                isActive ? "bg-[var(--light-brown-color)] !text-[var(--dark-brown-color)]" : ""
+                isActive
+                  ? "bg-[var(--light-brown-color)] !text-[var(--dark-brown-color)]"
+                  : ""
               }`
             }
           >

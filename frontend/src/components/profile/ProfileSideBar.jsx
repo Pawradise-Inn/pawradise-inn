@@ -1,14 +1,14 @@
-import { motion, useTransform } from "motion/react";
+import { motion } from "motion/react";
+import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { startUpVariants } from "../../styles/animation";
-import { useState } from "react";
 
 const ProfileSideBar = () => {
   const location = useLocation();
-  const pathList = location.pathname.split("/")
+  const pathList = location.pathname.split("/");
   const link = [
     { text: "My Profile", to: "/profile", path: "me" },
-    { text: "My Booking", to: "/profile/booking", path:"booking" },
+    { text: "My Booking", to: "/profile/booking", path: "booking" },
     { text: "My Pet", to: "/profile/pet", path: "pet" },
   ];
   const [page, setPage] = useState(pathList[2] ? pathList[2] : "me");

@@ -1,7 +1,6 @@
 import { motion } from "motion/react";
 
 const Footer = () => {
-
   return (
     <motion.footer
       initial={{ opacity: 0, y: -20 }}
