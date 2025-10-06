@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = 'http://localhost:5000/api/v1/auth';
+const API_URL = "http://localhost:5000/api/v1/auth";
 
 // Register
 export const registerAPI = async (user) => {
@@ -32,8 +32,12 @@ export const updateMeAPI = async (user, token) => {
 
 // Logout
 export const logoutAPI = async (token) => {
-  const res = await axios.post(`${API_URL}/logout`, {}, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await axios.post(
+    `${API_URL}/logout`,
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return res.data;
 };
