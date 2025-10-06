@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = 'http://localhost:5000/api/v1/bookedRoom';
+const API_URL = "http://localhost:5000/api/v1/bookedRoom";
 
 export const getTodayRoom = async () => {
   const response = await axios.get(`${API_URL}/dashboard`);
@@ -20,4 +20,4 @@ export const deleteBookedRoom = async (id) => {
 export const fetchAllBookedRoomsAPI = async () => {
   const response = await axios.get(API_URL);
   return response.data;
-}
+};

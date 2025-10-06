@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
+import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import Logo from "../assets/logo.png";
-import { useState } from "react";
 import { startUpVariants } from "../styles/animation";
 
 const Navbar = () => {
@@ -41,8 +41,8 @@ const Navbar = () => {
             {/* NavLink text */}
             <motion.span
               variants={startUpVariants}
-                    initial="hidden"
-                    animate="found"
+              initial="hidden"
+              animate="found"
               className="relative z-10 font-semibold "
             >
               {link}

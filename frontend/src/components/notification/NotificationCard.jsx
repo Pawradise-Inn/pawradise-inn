@@ -51,7 +51,9 @@ const NotificationCard = ({
         style={{
           backgroundColor: getStatusColor(notification.status),
         }}
-        className={`${notification.overflow ? "" : "border-b-4"} py-2 px-4 w-full border-b-[var(--dark-brown-color)]`}
+        className={`${
+          notification.overflow ? "" : "border-b-4"
+        } py-2 px-4 w-full border-b-[var(--dark-brown-color)]`}
       >
         <b className="flex justify-start items-center gap-2 text-xl">
           {getStutusIcon(notification.status)} {notification.header}

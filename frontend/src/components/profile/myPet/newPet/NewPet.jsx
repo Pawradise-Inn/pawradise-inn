@@ -1,14 +1,14 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
-import { addPetAPI, registerPetAPI } from "../../../../hooks/petAPI";
-import { updateCustomerAPI } from "../../../../hooks/customerAPI";
-import RadioInput from "./RadioInput";
-import PetInput from "./PetInput";
-import SelectInput from "./SelectInput";
 import { motion } from "motion/react";
+import { useContext, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../../context/AuthContext";
+import { updateCustomerAPI } from "../../../../hooks/customerAPI";
+import { registerPetAPI } from "../../../../hooks/petAPI";
 import { startUpVariants } from "../../../../styles/animation";
 import { handleFormDataChange } from "../../../../utils/handleForm";
-import { AuthContext } from "../../../../context/AuthContext";
+import PetInput from "./PetInput";
+import RadioInput from "./RadioInput";
+import SelectInput from "./SelectInput";
 
 const NewPet = () => {
   const { user, setUser } = useContext(AuthContext);

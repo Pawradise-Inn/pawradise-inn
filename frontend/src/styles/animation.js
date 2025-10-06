@@ -9,18 +9,18 @@ const popUP = {
 };
 
 const notification = {
-  hidden: {opacity:0, y: 50},
-  visible: {opacity: 1, y: 0 , transition: {type: "spring", bounce: 0.4}},
-  exit: {opacity: 0, x: 50, transition: {type: "spring", bounce: 0.4}},
-  shaking: {x: [0, -10, 10, -10, 10, 0], transition: {duration:0.5}}
-}
+  hidden: { opacity: 0, y: 50 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } },
+  exit: { opacity: 0, x: 50, transition: { type: "spring", bounce: 0.4 } },
+  shaking: { x: [0, -10, 10, -10, 10, 0], transition: { duration: 0.5 } },
+};
 
 const startUpVariants = {
   hidden: { opacity: 0, y: 50 },
   visible: (index) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: index * 0.3, duration: 0.35},
+    transition: { delay: index * 0.3, duration: 0.35 },
   }),
   exit: {
     y: 50,
@@ -34,4 +34,4 @@ const startUpVariants = {
   },
 };
 
-export { overlay, popUP, notification, startUpVariants };
+export { notification, overlay, popUP, startUpVariants };

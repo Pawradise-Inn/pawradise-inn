@@ -2,7 +2,10 @@ import { motion } from "motion/react";
 
 const CancelModal = ({ booking, onConfirm, onCancel, ...motionProps }) => {
   return (
-    <motion.div className="fixed w-dvw h-dvh top-0 left-0  z-20 overflow-auto" {...motionProps}>
+    <motion.div
+      className="fixed w-dvw h-dvh top-0 left-0  z-20 overflow-auto"
+      {...motionProps}
+    >
       {/* Modal Box */}
       <div className="w-full h-full flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100">
