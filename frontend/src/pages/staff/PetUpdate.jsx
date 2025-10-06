@@ -99,22 +99,22 @@ const PetUpdate = () => {
   const navigate = useNavigate();
 
   const handleSave = () => {
-    const confirm = window.confirm("Confirm the status?");
-    if (confirm) {
+    createNotification("warning", "Confirmation", "Are you sure?", () => {
       const { scheduled, stayed, ...updatePet } = pet;
-      updatePet.status = status;
+      updatePet.status = status; 
       console.log("update pet", updatePet);
       updatePetAPI(id, updatePet);
       setPet(updatePet);
       createNotification("success", "Update Successful", "Update Complete.");
       navigate("/staff/pet status");
-    }
+
+    })
   };
   const handleCancel = () => {
-    const confirm = window.confirm("Back to status page ?");
-    if (confirm) {
+    createNotification("warning", "Confirmation", "Back to status page?", () => {
       navigate("/staff/pet status");
-    }
+
+    })
   };
 
   return (
