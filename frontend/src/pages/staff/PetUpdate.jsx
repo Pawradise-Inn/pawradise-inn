@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useNotification } from "../../components/notification/NotificationProvider";
+import { useNotification } from "../../context/notification/NotificationProvider";
 import { fetchPetAPI, updatePetAPI } from "../../hooks/petAPI";
 
 const PetUpdate = () => {

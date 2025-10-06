@@ -1,7 +1,7 @@
 // src/pages/room/RoomEdit.jsx
 import { useEffect, useMemo, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { useNotification } from "../notification/NotificationProvider";
+import { useNotification } from "../../context/notification/NotificationProvider";
 import RoomCard from "../room/RoomCard";
 import AddRoomPopup from "./add_room";
 

@@ -1,11 +1,11 @@
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../../context/AuthContext";
+import {  useEffect, useState } from "react";
+import { useAuth } from "../../../context/AuthProvider";
 import { startUpVariants } from "../../../styles/animation";
 import PetCard from "./PetCard";
 import PetCardAdd from "./PetCardAdd";
 
 const PetComp = () => {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser } = useAuth();
   const [pets, setPets] = useState([]);
 
   useEffect(() => {

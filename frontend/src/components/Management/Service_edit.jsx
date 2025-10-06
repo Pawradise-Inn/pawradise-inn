@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Outlet } from "react-router-dom";
 import testImg from "../../assets/test.png";
-import { useNotification } from "../notification/NotificationProvider";
+import { useNotification } from "../../context/notification/NotificationProvider";
 import ServiceCard from "../service/ServiceCard";
 import AddServicePopup from "./add_service";
 // 1. Import all the necessary API functions
