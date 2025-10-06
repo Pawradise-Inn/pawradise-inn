@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { fetchCustomerAPI } from "../../hooks/customerAPI";
 import ProfileSideBar from "../../components/Profile/ProfileSideBar";
 import { getMeAPI } from "../../hooks/authAPI";
 
@@ -9,14 +8,12 @@ const Profile = () => {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if(token){
-        getMeAPI(token).then(res => {
-          setUser(res.data)
-        })
-        
-      }      
-
+      const token = localStorage.getItem("token");
+      if (token) {
+        getMeAPI(token).then((res) => {
+          setUser(res.data);
+        });
+      }
     } catch (err) {
       console.error(err);
     }
