@@ -68,6 +68,7 @@ exports.getMe = async (req, res) => {
         role: true,
         customer: {
           select: {
+            id: true,
             pets: {
               include: {
                 stayed: true,
