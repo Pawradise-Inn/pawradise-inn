@@ -23,9 +23,9 @@ router.route('/comments')
 router.route('/reviews')
     .get(getServiceReviews);
 
-const chatlogs = require('./chatlog.js');
-router.use('/comments', chatlogs);
-router.use('/:serviceId/comments', chatlogs);
+// const chatlogs = require('./chatlog.js');
+// router.use('/comments', chatlogs);
+// router.use('/:serviceId/comments', chatlogs);
 
 router.route('/')
     .get(getServices)      

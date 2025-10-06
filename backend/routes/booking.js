@@ -22,8 +22,6 @@ router.route('/')
     .get(getBookings)
     .post(createBooking);
 
-
-
 router.route('/:id')
     .get(getBooking)
     .delete(deleteBooking)

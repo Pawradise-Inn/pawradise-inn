@@ -24,9 +24,9 @@ router.route('/comments')
 router.route('/reviews')
     .get(getAllRoomsWithReviews);
 
-const chatlogs = require('./chatlog.js');
-router.use('/comments', chatlogs);
-router.use('/:roomId/comments', chatlogs);
+// const chatlogs = require('./chatlog.js');
+// router.use('/comments', chatlogs);
+// router.use('/:roomId/comments', chatlogs);
 
 router.route('/')
     .get(getRooms)
