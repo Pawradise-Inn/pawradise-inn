@@ -4,6 +4,7 @@ import registerImg from "../../assets/register.png";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { registerAPI } from "../../hooks/authAPI";
 import { validateFormPassword, validateFormTel } from "../../utils/handleForm";
+import { useAuth } from "../../context/AuthProvider";
 
 const Registration = () => {
 
@@ -22,6 +23,7 @@ const Registration = () => {
   const [consentChecked, setConsentChecked] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const navigate = useNavigate();
+  const {setUser} = useAuth();
 
   
 const fields = [
@@ -83,9 +85,11 @@ const fields = [
       const { confirmPassword, ...formData } = form;
       registerAPI(formData).then((res) => {
         if (res.token) {
+          localStorage.removeItem("token");
           localStorage.setItem("token", res.token);
           localStorage.setItem("user", JSON.stringify(res.user));
           navigate("/room");
+          setUser(res.user);
         } else {
           createNotification(
             "fail",
