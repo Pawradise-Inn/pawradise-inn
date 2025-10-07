@@ -1,22 +1,23 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import RoomCard from "../../components/room/RoomCard";
+import { AnimatePresence, motion } from "motion/react";
+import { useCallback, useEffect, useState } from "react";
 import BookingPopup from "../../components/BookingPopup";
-import { motion, AnimatePresence } from "motion/react";
-import { overlay, popUP, startUpVariants } from "../../styles/animation";
-import { getDateValidation } from "../../utils/handleValidation";
-import { handleFormDataChange } from "../../utils/handleForm";
+import { useNotification } from "../../context/notification/NotificationProvider";
+import Overlay from "../../components/Overlay";
+import RoomCard from "../../components/room/RoomCard";
 import {
   fetchAllRoomsWithReviewsAPI,
   fetchAvailableRoomsAPI,
 } from "../../hooks/roomAPI";
-import Overlay from "../../components/Overlay";
+import { overlay, popUP, startUpVariants } from "../../styles/animation";
+import { handleFormDataChange } from "../../utils/handleForm";
 import { removeWindowScroll } from "../../utils/handlePopup";
-import { useNotification } from "../../components/notification/NotificationProvider";
+import { getDateValidation } from "../../utils/handleValidation";
 
 const BookingRoom = () => {
   const petTypes = ["DOG", "CAT", "MOUSE", "RABBIT", "BIRD"];
 
   const { createNotification } = useNotification();
+  // const { user, setUser } = 
   const [mounted, setMounted] = useState(false);
   const [room, setRoom] = useState([]);
   const [filter, setFilter] = useState({

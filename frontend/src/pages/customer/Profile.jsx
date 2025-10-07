@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { fetchCustomerAPI } from "../../hooks/customerAPI";
 import ProfileSideBar from "../../components/Profile/ProfileSideBar";
+import { getMeAPI } from "../../hooks/authAPI";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
 
   const fetchData = async () => {
     try {
-      const response = await fetchCustomerAPI(1);
-      setUser(response.data);
+      const token = localStorage.getItem("token");
+      if (token) {
+        getMeAPI(token).then((res) => {
+          setUser(res.data);
+        });
+      }
     } catch (err) {
       console.error(err);
     }

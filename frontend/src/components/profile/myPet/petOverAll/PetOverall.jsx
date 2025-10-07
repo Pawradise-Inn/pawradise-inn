@@ -1,14 +1,11 @@
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
-import { fetchAllServicesAPI } from "../../../../hooks/serviceAPI";
-import { fetchAllBookedServiceAPI } from "../../../../hooks/bookedServiceAPI";
-import { fetchMyBookingAPI } from "../../../../hooks/bookingAPI";
 import { fetchPetAPI } from "../../../../hooks/petAPI";
-import PetCard from "../PetCard";
-import BookingCard from "../../myBooking/BookingCard";
-import ServiceCard from "../../../service/ServiceCard";
-import { motion } from "motion/react";
 import { startUpVariants } from "../../../../styles/animation";
+import ServiceCard from "../../../service/ServiceCard";
+import BookingCard from "../../myBooking/BookingCard";
+import PetCard from "../PetCard";
 
 const PetOverall = () => {
   const { id } = useParams();

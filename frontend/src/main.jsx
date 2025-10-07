@@ -1,16 +1,18 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
+import App from "./App.jsx";
+import { NotificationProvider } from "./context/notification/NotificationProvider.jsx";
+import { AuthProvider } from "./context/AuthProvider.jsx";
 import "./index.css";
-import { NotificationProvider } from "./components/notification/NotificationProvider.jsx";
-
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
-      <NotificationProvider>
-        <App />
-      </NotificationProvider>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <NotificationProvider>
+          <App />
+        </NotificationProvider>
+      </BrowserRouter>
+    </AuthProvider>
   </StrictMode>
 );

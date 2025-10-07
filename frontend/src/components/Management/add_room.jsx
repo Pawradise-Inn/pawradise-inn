@@ -1,39 +1,40 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNotification } from "../../context/notification/NotificationProvider";
 
 const AddRoomPopup = ({
   title = "Add room",
-  initialData = null,          
+  initialData = null,
   onClose,
-  onSave,                       
-  onDelete,                      
+  onSave,
+  onDelete,
 }) => {
-
-  const [status, setStatus]     = useState(initialData?.status   ?? "available");
+  const { createNotification } = useNotification();
+  const [status, setStatus] = useState(initialData?.status ?? "available");
   const [forwhich, setForwhich] = useState(initialData?.forwhich ?? "small");
-  const [price, setPrice]       = useState(
+  const [price, setPrice] = useState(
     initialData?.price !== undefined ? String(initialData.price) : ""
   );
-  const [size, setSize]         = useState(
-    initialData?.size  !== undefined ? String(initialData.size)  : ""
+  const [size, setSize] = useState(
+    initialData?.size !== undefined ? String(initialData.size) : ""
   );
-  const [maxsize, setMaxsize]   = useState(
+  const [maxsize, setMaxsize] = useState(
     initialData?.maxsize !== undefined ? String(initialData.maxsize) : ""
   );
-  const [image, setImage]       = useState(initialData?.image || null);
+  const [image, setImage] = useState(initialData?.image || null);
 
   const createdObjectUrl = useRef(null);
   const isEdit = useMemo(() => Boolean(initialData?.roomId), [initialData]);
-
 
   useEffect(() => {
     setStatus(initialData?.status ?? "available");
     setForwhich(initialData?.forwhich ?? "small");
     setPrice(initialData?.price !== undefined ? String(initialData.price) : "");
     setSize(initialData?.size !== undefined ? String(initialData.size) : "");
-    setMaxsize(initialData?.maxsize !== undefined ? String(initialData.maxsize) : "");
+    setMaxsize(
+      initialData?.maxsize !== undefined ? String(initialData.maxsize) : ""
+    );
     setImage(initialData?.image || null);
   }, [initialData]);
-
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -70,12 +71,39 @@ const AddRoomPopup = ({
     e.preventDefault();
     // Basic validations
     const nPrice = Number(price);
-    const nSize  = Number(size);
-    const nMax   = Number(maxsize);
-    if (!Number.isFinite(nPrice) || nPrice < 0) return alert("Price must be a non-negative number.");
-    if (!Number.isFinite(nSize)  || nSize  < 0) return alert("Current size must be a non-negative number.");
-    if (!Number.isFinite(nMax)   || nMax   < 0) return alert("Max size must be a non-negative number.");
-    if (nSize > nMax) return alert("Current size cannot exceed max size.");
+    const nSize = Number(size);
+    const nMax = Number(maxsize);
+    if (!Number.isFinite(nPrice) || nPrice < 0) {
+      return createNotification(
+        "fail",
+        "Invalid price",
+        "Price must be a non-negative number."
+      );
+    }
+
+    if (!Number.isFinite(nSize) || nSize < 0) {
+      return createNotification(
+        "fail",
+        "Invalid current size",
+        "Current size must be a non-negative number."
+      );
+    }
+
+    if (!Number.isFinite(nMax) || nMax < 0) {
+      return createNotification(
+        "fail",
+        "Invalid max size",
+        "Max size must be a non-negative number."
+      );
+    }
+
+    if (nSize > nMax) {
+      return createNotification(
+        "fail",
+        "Invalid current size",
+        "Current size cannot exceed max size."
+      );
+    }
 
     const payload = {
       status,
@@ -83,7 +111,7 @@ const AddRoomPopup = ({
       price: nPrice,
       size: nSize,
       maxsize: nMax,
-      image,  // preview URL; replace with uploaded URL when integrating storage
+      image, // preview URL; replace with uploaded URL when integrating storage
       // review & pageAmount stay unchanged in parent on edit
     };
     onSave?.(payload);
@@ -91,7 +119,9 @@ const AddRoomPopup = ({
 
   const handleDelete = () => {
     if (!isEdit) return;
-    const ok = window.confirm(`Delete Room #${initialData.roomId}? This cannot be undone.`);
+    const ok = window.confirm(
+      `Delete Room #${initialData.roomId}? This cannot be undone.`
+    );
     if (ok) onDelete?.(initialData.roomId);
   };
 
@@ -99,7 +129,9 @@ const AddRoomPopup = ({
     <div className="fixed inset-0 bg-black/60 z-10 grid place-items-center p-4">
       <div className="bg-white rounded-3xl p-8 w-[680px] max-w-full flex flex-col gap-6 shadow-lg">
         <div className="flex items-start justify-between">
-          <h2 className="text-3xl font-bold text-[var(--dark-brown-color)]">{title}</h2>
+          <h2 className="text-3xl font-bold text-[var(--dark-brown-color)]">
+            {title}
+          </h2>
           <button
             className="text-2xl px-3 py-1 rounded hover:bg-gray-100"
             aria-label="Close"
@@ -113,7 +145,9 @@ const AddRoomPopup = ({
           <div className="flex flex-col flex-1 space-y-4">
             {/* Status */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Status</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Status
+              </label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
@@ -128,7 +162,9 @@ const AddRoomPopup = ({
 
             {/* For which (pet size/type) */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">For which</label>
+              <label className="block text-sm font-medium text-gray-700">
+                For which
+              </label>
               <select
                 value={forwhich}
                 onChange={(e) => setForwhich(e.target.value)}
@@ -142,7 +178,9 @@ const AddRoomPopup = ({
 
             {/* Price */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Price</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Price
+              </label>
               <input
                 type="number"
                 min="0"
@@ -157,7 +195,9 @@ const AddRoomPopup = ({
             {/* Size / Max size */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Current size</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Current size
+                </label>
                 <input
                   type="number"
                   min="0"
@@ -169,7 +209,9 @@ const AddRoomPopup = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Max size</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Max size
+                </label>
                 <input
                   type="number"
                   min="0"
@@ -188,18 +230,30 @@ const AddRoomPopup = ({
             <label className="cursor-pointer">
               <div className="w-40 h-40 flex items-center justify-center border-2 border-dashed rounded-md bg-gray-100 relative overflow-hidden">
                 {image ? (
-                  <img src={image} alt="preview" className="w-full h-full object-cover rounded-md" />
+                  <img
+                    src={image}
+                    alt="preview"
+                    className="w-full h-full object-cover rounded-md"
+                  />
                 ) : (
                   <span className="text-4xl text-gray-500">+</span>
                 )}
-                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
               </div>
-              <p className="text-xs text-center mt-1 text-gray-500">click to change pic</p>
+              <p className="text-xs text-center mt-1 text-gray-500">
+                click to change pic
+              </p>
             </label>
 
             {isEdit && (
               <p className="text-xs text-gray-500 mt-3">
-                Editing: <span className="font-mono">Room #{initialData.roomId}</span>
+                Editing:{" "}
+                <span className="font-mono">Room #{initialData.roomId}</span>
               </p>
             )}
           </div>

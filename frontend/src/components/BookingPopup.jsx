@@ -1,5 +1,5 @@
-import BookingBar from "./bookingBar/BookingBar";
 import { motion } from "motion/react";
+import BookingBar from "./bookingBar/BookingBar";
 
 // data: data to be shown in popup
 // onClick: function to close popup

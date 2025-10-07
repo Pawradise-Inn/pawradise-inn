@@ -1,23 +1,23 @@
 // src/pages/room/RoomEdit.jsx
 import { useEffect, useMemo, useState } from "react";
 import { Outlet } from "react-router-dom";
+import { useNotification } from "../../context/notification/NotificationProvider";
 import RoomCard from "../room/RoomCard";
 import AddRoomPopup from "./add_room";
 
 import {
+  deleteRoomAPI,
   fetchAllRoomsAPI,
   fetchAllRoomsWithReviewsAPI,
-  addRoomAPI,
   updateRoomAPI,
-  deleteRoomAPI,
 } from "../../hooks/roomAPI";
 
 const RoomEdit = () => {
+  const { createNotification } = useNotification();
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  
   const [search, setSearch] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -41,16 +41,25 @@ const RoomEdit = () => {
     if (!search) return rooms;
     const q = search.toLowerCase();
     return rooms.filter(
-      (r) => String(r.roomId).includes(q) ||
-      (r.status ?? "").toLowerCase().includes(q) ||
-      (r.forwhich ?? "").toLowerCase().includes(q)
+      (r) =>
+        String(r.roomId).includes(q) ||
+        (r.status ?? "").toLowerCase().includes(q) ||
+        (r.forwhich ?? "").toLowerCase().includes(q)
     );
   }, [rooms, search]);
 
-  const openAdd = () => { setSelected(null); setIsPopupOpen(true); };
-  const openEdit = (room) => { setSelected(room); setIsPopupOpen(true); };
-  const closePopup = () => { setIsPopupOpen(false); setSelected(null); };
-
+  const openAdd = () => {
+    setSelected(null);
+    setIsPopupOpen(true);
+  };
+  const openEdit = (room) => {
+    setSelected(room);
+    setIsPopupOpen(true);
+  };
+  const closePopup = () => {
+    setIsPopupOpen(false);
+    setSelected(null);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -65,17 +74,19 @@ const RoomEdit = () => {
       }
     };
     load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Map popup payload -> backend fields
   const mapPayloadToBackend = (p) => ({
     // UI fields: { forwhich, price, maxsize, image }
     // createRoom requires: { capacity, price, petType, picture }
-    capacity: p.maxsize ?? p.size,   // UI uses maxsize = capacity
+    capacity: p.maxsize ?? p.size, // UI uses maxsize = capacity
     price: p.price,
-    petType: p.forwhich,             // "small"/"big"
-    picture: p.image,                // URL or string per your backend
+    petType: p.forwhich, // "small"/"big"
+    picture: p.image, // URL or string per your backend
   });
 
   const handleSaveRoom = async (payload) => {
@@ -85,9 +96,7 @@ const RoomEdit = () => {
         const response = await updateRoomAPI(selected.id, payload);
         const updatedRoom = response.data;
         setServices((prev) =>
-          prev.map((item) =>
-            item.id === updatedRoom.id ? updatedRooom : item
-          )
+          prev.map((item) => (item.id === updatedRoom.id ? updatedRooom : item))
         );
       } else {
         // ADD MODE
@@ -98,9 +107,8 @@ const RoomEdit = () => {
       closePopup();
     } catch (err) {
       console.error("Failed to save service:", err);
-      alert("Failed to save service.");
-
-}
+      createNotification("fail", "Save Failed", "Failed to save service.");
+    }
   };
 
   const handleDeleteRoom = async (roomId) => {
@@ -110,18 +118,21 @@ const RoomEdit = () => {
       closePopup();
     } catch (err) {
       console.error("Failed to delete room:", err);
-      alert("Failed to delete room.");
+      createNotification("fail", "Delete Failed", "Failed to delete room.");
     }
   };
 
   if (loading) {
-    return <p className="text-2xl w-full text-center mt-32">Loading services...</p>;
+    return (
+      <p className="text-2xl w-full text-center mt-32">Loading services...</p>
+    );
   }
 
   if (error) {
-    return <p className="text-2xl w-full text-center mt-32 text-red-500">{error}</p>;
+    return (
+      <p className="text-2xl w-full text-center mt-32 text-red-500">{error}</p>
+    );
   }
-
 
   return (
     <main className="flex-1">

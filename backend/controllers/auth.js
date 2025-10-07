@@ -10,61 +10,54 @@ const {
 } = require("./logics/auth.js");
 
 exports.register = async (req, res, next) => {
-  //requirement: 10
   try {
-    // Accept either camelCase or snake_case keys from frontend
-    const firstname = req.body.firstname ?? req.body.firstname;
-    const lastname = req.body.lastname ?? req.body.lastname;
+    const firstname = req.body.firstname ?? req.body.first_name;
+    const lastname = req.body.lastname ?? req.body.last_name;
     const email = (req.body.email || "").trim();
-    const phone = req.body.phoneNumber ?? req.body.phoneNumber;
-    const username = req.body.userName ?? req.body.userName;
+    const phone = req.body.phoneNumber ?? req.body.phone_number;
+    const username = req.body.userName ?? req.body.user_name;
     const password = req.body.password;
-    const role = (req.body.role ?? "CUSTOMER").toUpperCase(); // if Role is enum
+    const role = (req.body.role ?? "CUSTOMER").toUpperCase();
+
+    if (!firstname || !lastname || !email || !phone || !username || !password) {
+      return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
 
     const hashed = await hashPassword(password);
 
     const user = await prisma.user.create({
       data: {
-        firstname: firstname,
-        lastname: lastname,
-        email: email,
+        firstname,
+        lastname,
+        email,
         phone_number: phone,
         user_name: username,
         password: hashed,
-        role: role,
+        role,
       },
     });
 
     if (user.role === "CUSTOMER") {
       await prisma.customer.create({ data: { userId: user.id } });
-    }
-
+      }
     if (user.role === "STAFF") {
-      await prisma.staff.create({
-        data: { userId: user.id, wages: 0, bank_account: "TBD" },
-      });
+      await prisma.staff.create({ data: { userId: user.id, wages: 0, bank_account: "TBD" } });
     }
 
-    // Create token
-    //const token = user.getSignedJwtToken();
-    //res.status(200).json({success: true, token});
+    console.log("User created:", user)
     sendTokenResponse(user, 200, res);
   } catch (error) {
-    res.status(500).json({ success: false});
+    console.error(error); // 👈 log it
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
 exports.getMe = async (req, res) => {
-  //requirement: 11
   try {
-    const idParam = req.params.id;
-    if (!idParam)
-      return res
-        .status(400)
-        .json({ success: false, error: "Missing id param" });
+    const userId = req.user.id;
 
     const user = await prisma.user.findUnique({
-      where: { id: Number(idParam) },
+      where: { id: Number(userId) },
       select: {
         id: true,
         firstname: true,
@@ -73,13 +66,26 @@ exports.getMe = async (req, res) => {
         phone_number: true,
         user_name: true,
         role: true,
+        customer: {
+          select: {
+            id: true,
+            pets: {
+              include: {
+                stayed: true,
+                scheduled: true,
+              },
+            },
+          },
+        },
       },
     });
 
     if (!user)
       return res.status(404).json({ success: false, error: "User not found" });
+
     res.status(200).json({ success: true, data: user });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false, error: err.message });
   }
 };
