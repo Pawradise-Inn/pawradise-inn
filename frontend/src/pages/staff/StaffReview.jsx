@@ -44,139 +44,132 @@ const demoReviews = [
   { id: 40, serviceName: 'Vet Check-up', petName: 'Teddy', reviewDate: 'September 1, 2025', customerName: 'Angela Sanchez', rating: 5.0, reviewText: 'The best vet in town. I wouldn\'t trust anyone else with Teddy.', staffReply: 'Angela, that means the world to us. Thank you.', image: '' }
 ];
 
-// --- Helper Component: ReviewCard (Updated) ---
-const ReviewCard = ({ review, onDelete }) => { 
-    const cardStyle = { backgroundColor: 'white', borderRadius: '16px', padding: '1.5rem', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.07)', display: 'flex', gap: '1.5rem', marginBottom: '1.5rem' }; 
-    const imagePlaceholderStyle = { width: '120px', height: '120px', backgroundColor: '#f0f0f0', borderRadius: '12px', flexShrink: 0 }; 
-    const serviceInfoStyle = { flexShrink: 0, paddingTop: '0.25rem' }; 
-    const separatorStyle = { width: '1px', backgroundColor: '#e5e7eb' }; 
-    const reviewContentStyle = { flexGrow: 1, display: 'flex', flexDirection: 'column' }; 
-    const staffReplyContainerStyle = { backgroundColor: '#f7f7f7', borderRadius: '8px', padding: '1rem', marginTop: '0.5rem' }; 
-    const buttonContainerStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '1.5rem' }; 
-    const rightButtonsStyle = { display: 'flex', gap: '1rem' }; 
-    const baseButtonStyle = { padding: '0.6rem 1.75rem', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem' }; 
-    
-    return ( 
-        <div style={cardStyle}> 
-            <div style={imagePlaceholderStyle}></div> 
-            <div style={serviceInfoStyle}> 
-                <p style={{ fontWeight: 'bold', margin: 0, fontSize: '1rem' }}>{review.serviceName}</p> 
-                <p style={{ margin: '0.25rem 0', color: '#555' }}>{review.petName}</p> <p style={{ margin: 0, color: '#888', fontSize: '0.9rem' }}>{review.reviewDate}</p> 
-            </div> 
-            <div style={separatorStyle} /> 
-            <div style={reviewContentStyle}> 
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}> 
-                    <p style={{ fontWeight: 'bold', margin: 0 }}>{review.customerName}</p> 
-                    <p style={{ margin: 0, color: '#555' }}>{review.rating.toFixed(1)}/5.0 <span style={{color: '#f5b32a'}}>★</span></p> 
-                </div> 
-                <p style={{ fontStyle: 'italic', color: '#444', marginTop: '0.5rem', marginBottom: '1rem' }}>"{review.reviewText}"</p> 
-                {review.staffReply && ( 
-                    <div> 
-                        <p style={{ fontWeight: 'bold', margin: '0 0 0.5rem 0' }}>Staff reply</p> 
-                        <div style={staffReplyContainerStyle}> 
-                            <p style={{ margin: 0, fontStyle: 'italic', color: '#444' }}>"{review.staffReply}"</p> 
-                        </div> 
-                    </div> 
-                )} 
-                <div style={buttonContainerStyle}> 
-                    <button 
-                        style={{ ...baseButtonStyle, backgroundColor: '#6F4E37', color: 'white' }} 
-                        onClick={() => onDelete(review.id)} // Pass the review's ID to the delete function
-                    >
-                        Delete
-                    </button> 
-                    <div style={rightButtonsStyle}> 
-                        <button style={{ ...baseButtonStyle, backgroundColor: '#EADDCA', color: '#6F4E37' }}>Hide</button> 
-                        <button style={{ ...baseButtonStyle, backgroundColor: '#6F4E37', color: 'white' }}>Reply</button> 
-                    </div> 
-                </div> 
-            </div> 
-        </div> 
-    ); 
+// --- Helper Component: ReviewCard ---
+const ReviewCard = ({ review, onDelete }) => {
+  return (
+    <div className="mb-6 flex gap-6 rounded-2xl bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.07)]">
+      <div className="h-[120px] w-[120px] flex-shrink-0 rounded-xl bg-gray-100"></div>
+      <div className="flex-shrink-0 pt-1">
+        <p className="text-base font-bold">{review.serviceName}</p>
+        <p className="my-1 text-gray-600">{review.petName}</p>
+        <p className="text-sm text-gray-500">{review.reviewDate}</p>
+      </div>
+      <div className="w-px bg-gray-200" />
+      <div className="flex flex-grow flex-col">
+        <div className="flex justify-between">
+          <p className="font-bold">{review.customerName}</p>
+          <p className="text-gray-600">{review.rating.toFixed(1)}/5.0 <span className="text-[#f5b32a]">★</span></p>
+        </div>
+        <p className="mb-4 mt-2 italic text-gray-700">"{review.reviewText}"</p>
+        {review.staffReply && (
+          <div>
+            <p className="mb-2 font-bold">Staff reply</p>
+            <div className="mt-2 rounded-lg bg-gray-50 p-4">
+              <p className="italic text-gray-700">"{review.staffReply}"</p>
+            </div>
+          </div>
+        )}
+        <div className="mt-auto flex items-center justify-between pt-6">
+          <button
+            className="cursor-pointer rounded-lg bg-[#6F4E37] px-7 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            onClick={() => onDelete(review.id)}
+          >
+            Delete
+          </button>
+          <div className="flex gap-4">
+            <button className="cursor-pointer rounded-lg bg-[#EADDCA] px-7 py-2.5 text-sm font-semibold text-[#6F4E37] transition-opacity hover:opacity-90">Hide</button>
+            <button className="cursor-pointer rounded-lg bg-[#6F4E37] px-7 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90">Reply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-
 // --- Helper Component: StarFilterDropdown ---
-const StarFilterDropdown = ({ onFilterChange }) => { const dropdownStyle = { position: 'absolute', top: '100%', right: 0, backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', zIndex: 10, marginTop: '0.5rem', overflow: 'hidden' }; const itemStyle = { padding: '0.75rem 1.5rem', cursor: 'pointer', whiteSpace: 'nowrap' }; const options = [ { label: 'All Stars', value: null }, { label: '5 Stars ★★★★★', value: 5 }, { label: '4 Stars ★★★★☆', value: 4 }, { label: '3 Stars ★★★☆☆', value: 3 }, { label: '2 Stars ★★☆☆☆', value: 2 }, { label: '1 Star ★☆☆☆☆', value: 1 } ]; return ( <div style={dropdownStyle}> {options.map(option => ( <div key={option.label} style={itemStyle} onClick={() => onFilterChange(option.value)} onMouseEnter={(e) => e.target.style.backgroundColor='#f0f0f0'} onMouseLeave={(e) => e.target.style.backgroundColor='white'}> {option.label} </div> ))} </div> ); };
-
+const StarFilterDropdown = ({ onFilterChange }) => {
+  const options = [
+    { label: 'All Stars', value: null },
+    { label: '5 Stars ★★★★★', value: 5 },
+    { label: '4 Stars ★★★★☆', value: 4 },
+    { label: '3 Stars ★★★☆☆', value: 3 },
+    { label: '2 Stars ★★☆☆☆', value: 2 },
+    { label: '1 Star ★☆☆☆☆', value: 1 }
+  ];
+  return (
+    <div className="absolute right-0 top-full z-10 mt-2 overflow-hidden rounded-lg bg-white shadow-lg">
+      {options.map(option => (
+        <div
+          key={option.label}
+          className="cursor-pointer whitespace-nowrap px-6 py-3 transition-colors hover:bg-gray-100"
+          onClick={() => onFilterChange(option.value)}
+        >
+          {option.label}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 // --- Helper Component: Pagination ---
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  
-  // This function robustly generates the page numbers and ellipses
   const getPageNumbers = () => {
-    const pageNeighbours = 1; // How many pages to show on each side of the current page
-    const totalNumbersToShow = pageNeighbours * 2 + 3; // e.g., 1, ..., 4, 5, 6, ..., 10
-    const totalBlocks = totalNumbersToShow + 2; // Including the ellipses
+    const pageNeighbours = 1;
+    const totalNumbersToShow = pageNeighbours * 2 + 3;
+    const totalBlocks = totalNumbersToShow + 2;
 
-    // Case 1: Not enough pages to need ellipses
     if (totalPages <= totalBlocks) {
-      const pages = [];
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-      return pages;
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
 
     const pages = [];
     const startPage = Math.max(2, currentPage - pageNeighbours);
     const endPage = Math.min(totalPages - 1, currentPage + pageNeighbours);
 
-    // Always show the first page
     pages.push(1);
-
-    // Show left ellipsis if needed
     if (currentPage > pageNeighbours + 2) {
       pages.push('...');
     }
-    
-    // Show the middle page numbers
     for (let i = startPage; i <= endPage; i++) {
-      if ( (pages.indexOf(i) === -1) ) pages.push(i);
+      if (!pages.includes(i)) pages.push(i);
     }
-    
-    // Show right ellipsis if needed
-    if (currentPage < totalPages - (pageNeighbours + 1) ) {
+    if (currentPage < totalPages - (pageNeighbours + 1)) {
       pages.push('...');
     }
-
-    // Always show the last page
     pages.push(totalPages);
-    
     return pages;
   };
   
   const pageNumbers = getPageNumbers();
-
-  const containerStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', padding: '2rem 0' };
-  const buttonStyle = { border: 'none', backgroundColor: 'transparent', color: '#6F4E37', fontWeight: 'bold', fontSize: '1.2rem', cursor: 'pointer', padding: '0.5rem', minWidth: '30px' };
-  const numberStyle = (number) => ({ ...buttonStyle, fontWeight: currentPage === number ? 'bold' : 'normal', textDecoration: currentPage === number ? 'underline' : 'none', color: currentPage === number ? '#333' : '#6F4E37' });
-  const ellipsisStyle = { ...buttonStyle, cursor: 'default', color: '#6F4E37' };
-  const disabledStyle = { color: '#cccccc', cursor: 'not-allowed' };
+  const baseButtonClass = "cursor-pointer bg-transparent p-2 text-xl font-bold text-[#6F4E37] transition-colors disabled:cursor-not-allowed disabled:text-gray-300";
 
   return (
-    <div style={containerStyle}>
-      <button style={{ ...buttonStyle, ...(currentPage === 1 && disabledStyle) }} onClick={() => onPageChange(1)} disabled={currentPage === 1}>{'<<'}</button>
-      <button style={{ ...buttonStyle, ...(currentPage === 1 && disabledStyle) }} onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>{'<'}</button>
+    <div className="flex items-center justify-center gap-2 py-8">
+      <button className={baseButtonClass} onClick={() => onPageChange(1)} disabled={currentPage === 1}>{'<<'}</button>
+      <button className={baseButtonClass} onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>{'<'}</button>
       
-      {pageNumbers.map((number, index) => 
+      {pageNumbers.map((number, index) =>
         typeof number === 'number' ? (
-          <button key={index} style={numberStyle(number)} onClick={() => onPageChange(number)}>
+          <button
+            key={index}
+            className={`${baseButtonClass} ${currentPage === number ? 'font-bold text-gray-800 underline' : 'font-normal'}`}
+            onClick={() => onPageChange(number)}
+          >
             {number}
           </button>
         ) : (
-          <span key={index} style={ellipsisStyle}>...</span>
+          <span key={index} className="cursor-default p-2 text-xl font-bold text-[#6F4E37]">...</span>
         )
       )}
 
-      <button style={{ ...buttonStyle, ...(currentPage === totalPages && disabledStyle) }} onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>{'>'}</button>
-      <button style={{ ...buttonStyle, ...(currentPage === totalPages && disabledStyle) }} onClick={() => onPageChange(totalPages)} disabled={currentPage === totalPages}>{'>>'}</button>
+      <button className={baseButtonClass} onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>{'>'}</button>
+      <button className={baseButtonClass} onClick={() => onPageChange(totalPages)} disabled={currentPage === totalPages}>{'>>'}</button>
     </div>
   );
 };
 
 // --- Main Component ---
-const StaffReviewPage = ({/* ...props... */}) => {
+const StaffReviewPage = () => {
   const [reviews, setReviews] = useState([]);
   const [search, setSearch] = useState("");
   const [starFilter, setStarFilter] = useState(null);
@@ -187,15 +180,9 @@ const StaffReviewPage = ({/* ...props... */}) => {
   
   useEffect(() => { setReviews(demoReviews); }, []);
 
-  // --- NEW: Function to handle deleting a review ---
-  const handleDeleteReview = (reviewId) => {
-    // THIS IS THE FUNCTION FOR THE API IMPLEMENTATION.
-    // YOU WILL MAKE A 'DELETE' REQUEST TO YOUR BACKEND ENDPOINT PASSING THE 'reviewId'.
-    // ONCE THE API CALL IS SUCCESSFUL, THE STATE UPDATE BELOW WILL REMOVE IT FROM THE UI.
-    // EXAMPLE: await api.deleteReview(reviewId);
-    
-    setReviews(prevReviews => prevReviews.filter(review => review.id !== reviewId));
-  };
+  const handleDeleteReview = (reviewId) => {
+    setReviews(prevReviews => prevReviews.filter(review => review.id !== reviewId));
+  };
 
   const filteredReviews = reviews
     .filter(review => {
@@ -204,12 +191,12 @@ const StaffReviewPage = ({/* ...props... */}) => {
     })
     .filter(review => {
       if (!dateFilter) return true;
+      // Create date objects at midnight UTC to avoid timezone issues
       const reviewDate = new Date(review.reviewDate);
-      const year = reviewDate.getFullYear();
-      const month = String(reviewDate.getMonth() + 1).padStart(2, '0');
-      const day = String(reviewDate.getDate()).padStart(2, '0');
-      const formattedReviewDate = `${year}-${month}-${day}`;
-      return formattedReviewDate === dateFilter;
+      reviewDate.setUTCHours(0, 0, 0, 0);
+      const filterDate = new Date(dateFilter);
+      filterDate.setUTCHours(0, 0, 0, 0);
+      return reviewDate.getTime() === filterDate.getTime();
     });
 
   const indexOfLastReview = currentPage * reviewsPerPage;
@@ -219,80 +206,39 @@ const StaffReviewPage = ({/* ...props... */}) => {
 
   const handleStarFilterChange = (starValue) => { setStarFilter(starValue); setCurrentPage(1); setIsStarDropdownOpen(false); };
   const handleDateChange = (e) => { setDateFilter(e.target.value); setCurrentPage(1); };
-  
-  const clearDateFilter = () => {
-    setDateFilter('');
-    setCurrentPage(1);
-  };
-
-  const noReviewsStyle = { textAlign: 'center', marginTop: '4rem', fontSize: '1.25rem', color: '#6b7280', fontStyle: 'italic' };
-  
-  const dateInputContainerStyle = { 
-    position: 'relative',
-    padding: '0.75rem 1.5rem', 
-    backgroundColor: '#6F4E37', 
-    border: 'none', 
-    borderRadius: '12px', 
-    fontSize: '1.125rem', 
-    height: '100%', 
-    display: 'flex', 
-    alignItems: 'center' 
-  };
-  
-  const clearButtonStyle = {
-    position: 'absolute',
-    right: '10px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: 'rgba(255, 255, 255, 0.2)',
-    color: 'white',
-    border: 'none',
-    borderRadius: '50%',
-    width: '20px',
-    height: '20px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    lineHeight: '1',
-    fontWeight: 'bold',
-  };
+  const clearDateFilter = () => { setDateFilter(''); setCurrentPage(1); };
 
   return (
-    <div className="px-4 py-8 sm:px-6 lg-px-8">
-      <div className="relative max-w-7xl mx-auto pb-4">
-        <h1 className="text-center text-5xl sm:text-6xl font-bold text-gray-800">Review</h1>
-        <div style={{ position: 'absolute', bottom: 0, height: '2px', backgroundColor: '#374151', width: '100%', left: '50%', transform: 'translateX(-50%)' }} />
+    <div className="px-4 py-8 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-7xl pb-4">
+        <h1 className="text-center text-5xl font-bold text-gray-800 sm:text-6xl">Review</h1>
+        <div className="absolute bottom-0 left-1/2 h-0.5 w-full -translate-x-1/2 bg-gray-800" />
       </div>
 
-      <div className="max-w-7xl mx-auto">
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', margin: '2rem 0', width: '100%', gap: '1rem' }}>
-          <div className="flex flex-1 border-2 rounded-4xl px-4 py-3 text-xl min-w-[300px]">
-            <i className="bi bi-search opacity-50 pr-2 flex justify-center items-center -bottom-1 relative"></i>
-            <input style={{ width: '100%', outline: 0, backgroundColor: 'transparent' }} placeholder="search" onChange={(e) => setSearch(e.target.value)} value={search} />
+      <div className="mx-auto max-w-7xl">
+        <div className="my-8 flex w-full flex-wrap items-center gap-4">
+          <div className="min-w-[300px] flex-1 rounded-full border-2 px-4 py-3 text-xl">
+            <div className="flex items-center">
+              <i className="bi bi-search pr-2 opacity-50"></i>
+              <input className="w-full bg-transparent outline-none" placeholder="search" onChange={(e) => setSearch(e.target.value)} value={search} />
+            </div>
           </div>
 
-          <div style={dateInputContainerStyle}>
+          <div className="relative flex h-full items-center rounded-xl bg-[#6F4E37] px-6 py-3 text-lg">
             <input 
               type="date" 
               value={dateFilter} 
               onChange={handleDateChange} 
-              style={{ 
-                backgroundColor: 'transparent', 
-                color: 'white', 
-                border: 'none', 
-                outline: 'none', 
-                cursor: 'pointer' 
-              }}
+              className="cursor-pointer border-none bg-transparent text-white outline-none"
             />
             {dateFilter && (
-              <button onClick={clearDateFilter} style={clearButtonStyle}>
+              <button onClick={clearDateFilter} className="absolute right-2.5 top-1/2 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-none bg-white/20 font-bold leading-none text-white transition-opacity hover:opacity-80">
                 &times;
               </button>
             )}
           </div>
-          <div style={{ position: 'relative' }}>
-            <button onClick={() => setIsStarDropdownOpen(prev => !prev)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#6F4E37', color: 'white', border: 'none', borderRadius: '12px', cursor: 'pointer', fontSize: '1.125rem', whiteSpace: 'nowrap', height: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="relative">
+            <button onClick={() => setIsStarDropdownOpen(prev => !prev)} className="flex h-full cursor-pointer items-center gap-2 whitespace-nowrap rounded-xl bg-[#6F4E37] px-6 py-3 text-lg text-white transition-opacity hover:opacity-90">
               star <span>▼</span>
             </button>
             {isStarDropdownOpen && <StarFilterDropdown onFilterChange={handleStarFilterChange} />}
@@ -300,22 +246,22 @@ const StaffReviewPage = ({/* ...props... */}) => {
         </div>
       </div>
       
-      <div className="max-w-7xl mx-auto mt-8">
+      <div className="mx-auto mt-8 max-w-7xl">
         {currentReviews.length > 0 ? (
           currentReviews.map(review => ( 
-            <ReviewCard 
-                key={review.id} 
-                review={review} 
-                onDelete={handleDeleteReview} 
-            /> 
-        ))
+            <ReviewCard 
+              key={review.id} 
+              review={review} 
+              onDelete={handleDeleteReview} 
+            /> 
+        ))
         ) : (
-          <p style={noReviewsStyle}>No reviews available.</p>
+          <p className="mt-16 text-center text-xl italic text-gray-500">No reviews available.</p>
         )}
       </div>
 
       {totalPages > 1 && (
-        <div className="max-w-7xl mx-auto">
+        <div className="mx-auto max-w-7xl">
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
       )}
