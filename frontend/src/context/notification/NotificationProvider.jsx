@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect, useState } from "react";
 import { AnimatePresence } from "motion/react";
+import { createContext, useContext,  useState } from "react";
 import { notification, overlay } from "../../styles/animation";
+import Overlay from "../../components/Overlay";
 import NotificationCard from "./NotificationCard";
-import Overlay from "../Overlay";
 
 const NotificationContext = createContext([]);
 
@@ -107,7 +107,11 @@ const NotificationProvider = ({ children }) => {
                   layout
                   variants={notification}
                   initial={useAnimation ? null : "hidden"}
-                  animate={useAnimation && notif.status === "warning" ? "shaking" : "visible"}
+                  animate={
+                    useAnimation && notif.status === "warning"
+                      ? "shaking"
+                      : "visible"
+                  }
                   exit="exit"
                   onClick={notif.onClick}
                   removeNotification={removeNotification}

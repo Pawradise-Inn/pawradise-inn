@@ -1,12 +1,12 @@
+import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
-import ServiceCard from "../../components/service/ServiceCard";
 import BookingPopup from "../../components/BookingPopup";
-import { filteredObjectByType } from "../../utils/handleSearch";
-import { fetchServiceCommentsAPI } from "../../hooks/serviceAPI";
-import { motion, AnimatePresence } from "motion/react";
-import { overlay, popUP, startUpVariants } from "../../styles/animation";
 import Overlay from "../../components/Overlay";
+import ServiceCard from "../../components/service/ServiceCard";
+import { fetchServiceCommentsAPI } from "../../hooks/serviceAPI";
+import { overlay, popUP, startUpVariants } from "../../styles/animation";
 import { removeWindowScroll } from "../../utils/handlePopup";
+import { filteredObjectByType } from "../../utils/handleSearch";
 
 const BookingService = () => {
   const [mounted, setMounted] = useState(false);

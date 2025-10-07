@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
 
 // --- Mock Data ---
 const demoReviews = [
@@ -43,7 +43,6 @@ const demoReviews = [
   { id: 39, serviceName: 'Cat Boarding', petName: 'Oreo', reviewDate: 'September 1, 2025', customerName: 'Gary Morris', rating: 3.9, reviewText: 'Oreo seemed fine when he got home. The facility is clean.', staffReply: 'Thank you for the feedback, Gary.', image: '' },
   { id: 40, serviceName: 'Vet Check-up', petName: 'Teddy', reviewDate: 'September 1, 2025', customerName: 'Angela Sanchez', rating: 5.0, reviewText: 'The best vet in town. I wouldn\'t trust anyone else with Teddy.', staffReply: 'Angela, that means the world to us. Thank you.', image: '' }
 ];
-
 
 // --- Helper Component: ReviewCard (Updated) ---
 const ReviewCard = ({ review, onDelete }) => { 
@@ -175,7 +174,6 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     </div>
   );
 };
-
 
 // --- Main Component ---
 const StaffReviewPage = ({/* ...props... */}) => {

@@ -7,48 +7,31 @@ const findBookedRoomById = async(id)=>{
         throw new Error("Invalid booked room ID");
     }
     const bookedRoom = await prisma.bookedRoom.findUnique({
-        where: {id: bookedId}
+        where: { id: bookedId }
     });
 
     return bookedRoom;
 };
 
-const overlappingRoom = async(roomId, checkIn, checkOut)=>{
-    const count = await prisma.bookedRoom.findMany({
+const overlappingRoom = async(checkIn, checkOut)=>{
+    const count = await prisma.bookedRoom.count({
         where: {
-            roomId: roomId,
             checkIn: {lte: new Date(checkOut)},
             checkOut: {gte: new Date(checkIn)}
         }
     });
-    return count.length;
+    return count;
 };
 
-const duplicatedRoom = async(roomId, petId, checkIn, checkOut)=>{
-    const overlapping = await prisma.bookedRoom.findMany({
+const duplicatedRoom = async(petId, checkIn, checkOut)=>{
+    const duplicated = await prisma.bookedRoom.findMany({
         where: {
-            roomId: roomId,
             petId: petId,
             checkIn: { lte: new Date(checkOut) },
             checkOut: { gte: new Date(checkIn) }
-        },
-        select: {
-            checkIn: true,
-            checkOut: true
         }
     });
-    return overlapping;
-}
-
-const isFreeThisTime = async(petId, checkIn, checkOut)=>{
-    const pet = await prisma.bookedRoom.findFirst({
-        where: {
-            petId: petId,
-            checkIn: { lte: new Date(checkOut) },
-            checkOut: { gte: new Date(checkIn) } 
-        }
-    });
-    return !pet;
+    return duplicated;
 }
 
 const isSuitable = async(roomId, petId)=>{
@@ -72,27 +55,19 @@ const createBookedRoomWithCondition = async (roomId, petId, bookingId, checkIn, 
         throw error;
     }
 
-    // 2. Check if the same pet is already booked in this room during that period
-    const overlapping = await duplicatedRoom(roomId, petId, checkIn, checkOut);
+    // 2. Check if the same pet is already booked during that period
+    const overlapping = await duplicatedRoom(petId, checkIn, checkOut);
     if (overlapping.length > 0) {
-        const error = new Error('This pet already has a booking in this room during the selected dates.');
+        const error = new Error('This pet already has a booking during the selected dates.');
         error.duplicatedDates = overlapping.map(b => ({
             checkIn: b.checkIn,
             checkOut: b.checkOut
         }));
-        error.code = 'ROOM_DUPLICATE';
+        error.code = 'BOOKING_DUPLICATE';
         throw error;
     }
 
-    // 3. Check if the pet is free during that time (not in another room)
-    const pet = await isFreeThisTime(petId, checkIn, checkOut);
-    if (!pet) {
-        const error = new Error('This pet is already booked in another room during the selected dates.');
-        error.code = 'PET_NOT_FREE';
-        throw error;
-    }
-
-    // 4. Check if the room is suitable for the pet type
+    // 3. Check if the room is suitable for the pet type
     const isSuit = await isSuitable(roomId, petId);
     if (!isSuit) {
         const error = new Error('This pet is not eligible for the selected room.');

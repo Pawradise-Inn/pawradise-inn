@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = 'http://localhost:5000/api/v1/pet'
+const API_URL = "http://localhost:5000/api/v1/pet";
 
 // 1. Fetch all pets (optional userId + fields)
 export const fetchAllPetAPI = async (userId, fields) => {
@@ -36,7 +36,6 @@ export const registerPetAPI = async (id, pet) => {
   const response = await axios.post(`${API_URL}/register`, pet);
   return response.data;
 };
-
 
 // 5. Delete pet
 export const deletePetAPI = async (id) => {

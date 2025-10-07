@@ -1,18 +1,19 @@
-import { Outlet } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
+import { Outlet } from "react-router-dom";
+import testImg from "../../assets/test.png";
+import { useNotification } from "../../context/notification/NotificationProvider";
 import ServiceCard from "../service/ServiceCard";
 import AddServicePopup from "./add_service";
-import testImg from "../../assets/test.png";
-
 // 1. Import all the necessary API functions
 import {
-  fetchAllServicesAPI,
   addServiceAPI,
-  updateServiceAPI,
   deleteServiceAPI,
+  fetchAllServicesAPI,
+  updateServiceAPI,
 } from "../../hooks/serviceAPI"; // Assuming your hook file is at this path
 
 const ServiceEdit = () => {
+  const { createNotification } = useNotification();
   // 2. Initialize services as an empty array and add loading/error states
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +83,7 @@ const ServiceEdit = () => {
       closePopup();
     } catch (err) {
       console.error("Failed to save service:", err);
-      alert("Failed to save service.");
+      createNotification("fail", "Save Failed", "Failed to save service.");
     }
   };
 
@@ -94,17 +95,21 @@ const ServiceEdit = () => {
       closePopup();
     } catch (err) {
       console.error("Failed to delete service:", err);
-      alert("Failed to delete service.");
+      createNotification("fail", "Delete Failed", "Failed to delete service.");
     }
   };
 
   // 6. Add conditional rendering for loading and error states
   if (loading) {
-    return <p className="text-2xl w-full text-center mt-32">Loading services...</p>;
+    return (
+      <p className="text-2xl w-full text-center mt-32">Loading services...</p>
+    );
   }
 
   if (error) {
-    return <p className="text-2xl w-full text-center mt-32 text-red-500">{error}</p>;
+    return (
+      <p className="text-2xl w-full text-center mt-32 text-red-500">{error}</p>
+    );
   }
 
   return (
@@ -138,7 +143,11 @@ const ServiceEdit = () => {
           {filtered.map((s) => (
             <ServiceCard
               key={s.id}
-              data={{ image: s.picture || testImg, name: s.name, review: s.review || 0 }}
+              data={{
+                image: s.picture || testImg,
+                name: s.name,
+                review: s.review || 0,
+              }}
               onClick={() => openEdit(s)}
             />
           ))}

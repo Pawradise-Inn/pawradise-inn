@@ -1,22 +1,18 @@
 // BookingComp.js
-import { useEffect, useState } from "react";
-import SuccessMessage from "../SuccessMessage";
-import CancelModal from "../CancelModal";
-import { useOutletContext } from "react-router-dom";
-import {
-  fetchMyBookings,
-  cancelBooking,
-  updateBooking,
-} from "../../../hooks/bookingAPI"; // Import cancelBooking
+import { AnimatePresence } from "motion/react";
+import {  useEffect, useState } from "react";
+import { useAuth } from "../../../context/AuthProvider";
 import { deleteBookedService } from "../../../hooks/bookedServiceAPI";
-import { startUpVariants, overlay, popUP } from "../../../styles/animation";
-import BookingCard from "./BookingCard";
-import { motion, AnimatePresence } from "motion/react";
-import Overlay from "../../Overlay";
+import { fetchMyBookings } from "../../../hooks/bookingAPI"; // Import cancelBooking
+import { overlay, popUP, startUpVariants } from "../../../styles/animation";
 import { removeWindowScroll } from "../../../utils/handlePopup";
+import Overlay from "../../Overlay";
+import CancelModal from "../CancelModal";
+import SuccessMessage from "../SuccessMessage";
+import BookingCard from "./BookingCard";
 
 const BookingComp = () => {
-  const { user, setUser } = useOutletContext();
+  const { user, setUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [allBookedService, setAllBookedService] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
@@ -24,9 +20,11 @@ const BookingComp = () => {
   const [cancelledBooking, setCanceledBooking] = useState(null);
 
   useEffect(() => {
+    if (!user) return;
     const getMyBookings = async () => {
       try {
-        const data = await fetchMyBookings(1);
+        const data = await fetchMyBookings(user.id);
+        console.log(user.id);
         // Flatten all booked_service into one array
         const allServices = data.data.flatMap((book) => book.booked_service);
         setAllBookedService(allServices);

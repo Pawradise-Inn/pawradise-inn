@@ -51,7 +51,7 @@ export const fetchAllRoomsWithReviewsAPI = async () => {
 };
 
 export const fetchRoomWithCommentAPI = async (roomId, NSP) => {
-  const response = await axios.get(`${API_URL}/comments`,{
+  const response = await axios.get(`${API_URL}/comments`, {
     params: { roomId, NSP },
   });
   return response.data;

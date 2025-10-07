@@ -1,9 +1,29 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import registerImg from "../../assets/register.png";
-import { addUserAPI } from "../../hooks/authAPI";
+import { useNotification } from "../../context/notification/NotificationProvider";
+import { registerAPI } from "../../hooks/authAPI";
 import { validateFormPassword, validateFormTel } from "../../utils/handleForm";
 
+const Registration = () => {
+
+  const { createNotification } = useNotification();
+  const [form, setForm] = useState({
+    firstname: "",
+    lastname: "",
+    userName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phoneNumber: "",
+  });
+  
+
+  const [consentChecked, setConsentChecked] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+  const navigate = useNavigate();
+
+  
 const fields = [
   {
     label: "Firstname",
@@ -56,30 +76,22 @@ const fields = [
   },
 ];
 
-const Registration = () => {
-  const [form, setForm] = useState({
-    firstname: "",
-    lastname: "",
-    userName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phoneNumber: "",
-  });
-
-  const [consentChecked, setConsentChecked] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(false);
-  const navigate = useNavigate();
-
   // post Customer data to database
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isFormValid && validateFormPassword(form) && validateFormTel(form)) {
-      addUserAPI(form).then((res) => {
-        if (res.success) {
+    if (isFormValid && validateFormPassword(form, createNotification) && validateFormTel(form, createNotification)) {
+      const { confirmPassword, ...formData } = form;
+      registerAPI(formData).then((res) => {
+        if (res.token) {
+          localStorage.setItem("token", res.token);
+          localStorage.setItem("user", JSON.stringify(res.user));
           navigate("/room");
         } else {
-          alert("you userName, email and phoneNumber must be unique");
+          createNotification(
+            "fail",
+            "Invalid username and phone number",
+            "your username, email and phone number must be unique."
+          );
         }
       });
     }
@@ -154,11 +166,17 @@ const Registration = () => {
 
               <label htmlFor="consent" className="text-[var(--brown-color)]">
                 I agree to the{" "}
-                <a href="/" className="text-[var(--dark-brown-color)] underline">
+                <a
+                  href="/"
+                  className="text-[var(--dark-brown-color)] underline"
+                >
                   Terms of Service
                 </a>{" "}
                 and{" "}
-                <a href="/" className="text-[var(--dark-brown-color)] underline">
+                <a
+                  href="/"
+                  className="text-[var(--dark-brown-color)] underline"
+                >
                   Privacy Policy
                 </a>
               </label>

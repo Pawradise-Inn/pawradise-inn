@@ -1,26 +1,25 @@
 // this file still have to fetch userId from token
 
-import CommentCard from "./CommentCard";
-import "../../styles/bookingBarStyle.css";
-import { useEffect, useState, useMemo, useCallback } from "react";
-import CommentStarSelector from "./CommentStarSelector";
-import Pagination from "./Pagination";
-import { getDateValidation } from "../../utils/handleValidation";
-import { handleFormDataChange } from "../../utils/handleForm";
+import { motion } from "motion/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { createBookedRoom } from "../../hooks/bookedRoomAPI";
+import { createBookedService } from "../../hooks/bookedServiceAPI";
 import { fetchAllPetAPI, fetchAvailablePetAPI } from "../../hooks/petAPI";
-import {
-  fetchServiceReviewAPI,
-  getServiceStatusAPI,
-} from "../../hooks/serviceAPI";
 import {
   fetchRoomStatusAPI,
   fetchRoomWithCommentAPI,
 } from "../../hooks/roomAPI";
-import { createBookedRoom } from "../../hooks/bookedRoomAPI";
-import { createBookedService } from "../../hooks/bookedServiceAPI";
-import { useNotification } from "../notification/NotificationProvider";
-import { motion } from "motion/react";
-import { startUpVariants } from "../../styles/animation";
+import {
+  fetchServiceReviewAPI,
+  getServiceStatusAPI,
+} from "../../hooks/serviceAPI";
+import "../../styles/bookingBarStyle.css";
+import { handleFormDataChange } from "../../utils/handleForm";
+import { getDateValidation } from "../../utils/handleValidation";
+import { useNotification } from "../../context/notification/NotificationProvider";
+import CommentCard from "./CommentCard";
+import CommentStarSelector from "./CommentStarSelector";
+import Pagination from "./Pagination";
 
 // data: { image, name, review, forwhich, price, size, maxsize, headerType } of service and room
 const BookingBar = ({ data, popupStatus }) => {

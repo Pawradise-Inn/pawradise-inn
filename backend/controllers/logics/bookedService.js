@@ -17,20 +17,20 @@ const overlappingService = async (serviceId, scheduled) => {
     where: {
       serviceId: serviceId,
       scheduled: new Date(scheduled),
-    },
+    }
   });
 
   return count;
 };
 
-const isDuplicatedBooking = async (serviceId, petId, scheduled) => {
+const duplicatedService = async (serviceId, petId, scheduled) => {
   const startOfDay = new Date(scheduled);
   startOfDay.setHours(0, 0, 0, 0);
 
   const endOfDay = new Date(scheduled);
   endOfDay.setHours(23, 59, 59, 999);
 
-  const check = await prisma.bookedService.findFirst({
+  const overlapping = await prisma.bookedService.findFirst({
     where: {
       serviceId: serviceId,
       petId: petId,
@@ -41,7 +41,7 @@ const isDuplicatedBooking = async (serviceId, petId, scheduled) => {
     },
   });
 
-  return !!check;
+  return overlapping;
 };
 
 const isFreeThisTime = async (petId, scheduled) => {
@@ -65,12 +65,7 @@ const isSuitable = async(serviceId, petId)=>{
     return service.petType.includes(pet.type);
 }
 
-const createBookedServiceWithCondition = async (
-  serviceId,
-  petId,
-  bookingId,
-  scheduled
-) => {
+const createBookedServiceWithCondition = async (serviceId, petId, bookingId, scheduled) => {
   const count = await overlappingService(serviceId, scheduled);
 
   if (count >= 3) {
@@ -79,8 +74,8 @@ const createBookedServiceWithCondition = async (
     throw error;
   }
 
-  const overlapping = await isDuplicatedBooking(serviceId, petId, scheduled);
-  if (overlapping) {
+  const duplicated = await duplicatedService(serviceId, petId, scheduled);
+  if (duplicated) {
     const error = new Error("This pet has already booked this service on the selected date.");
     error.code = "SERVICE_DUPLICATE";
     throw error;
@@ -115,6 +110,6 @@ const createBookedServiceWithCondition = async (
 module.exports = {
   findBookedServiceById,
   overlappingService,
-  isDuplicatedBooking,
+  duplicatedService,
   createBookedServiceWithCondition,
 };
