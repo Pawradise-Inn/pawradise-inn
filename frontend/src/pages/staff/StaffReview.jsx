@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
+import { startUpVariants } from "../../styles/animation";
 
 // --- Mock Data ---
 const demoReviews = [
