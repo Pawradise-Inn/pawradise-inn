@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import Login_Image from "../assets/login.png";
 import PawLogo from "../assets/logo.png";
 import { loginAPI } from "../hooks/authAPI";
+import { useAuth } from "../context/AuthProvider";
 
 const fields = [
   {
@@ -25,6 +26,7 @@ const Login = () => {
     Password: "",
   });
   const navigate = useNavigate();
+  const {setUser} = useAuth();
 
   const handleChange = (form, setForm) => (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -35,6 +37,7 @@ const Login = () => {
       if (res.token) {
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", res.user);
+        setUser(res.user);
         navigate("/room");
       }
     });
