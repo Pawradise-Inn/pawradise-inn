@@ -103,13 +103,18 @@ const updateBookingStatus = async (req, res) => {
 const createBooking = async (req, res) => {
     try {
         const bookingDate = req.body.date;
-        const customerId = req.body.customerId;
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id }
+        });
         const booking = await prisma.booking.create({
             data: {
-                customerId: customerId,
+                customerId: req.user.roleId,
                 date: new Date(bookingDate),
                 status: 'PENDING',
-                payment: 'PENDING'
+                // payment: 'PENDING',
+                customerName: user.firstname + ' ' + user.lastname,
+                customerEmail: user.email,
+                customerNumber: user.phone_number
             }
         });
         res.status(201).json({success: true, data: booking});
