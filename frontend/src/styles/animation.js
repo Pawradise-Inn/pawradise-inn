@@ -34,4 +34,53 @@ const startUpVariants = {
   },
 };
 
-export { notification, overlay, popUP, startUpVariants };
+// New animation variants for enhanced page transitions
+const slideInLeft = {
+  hidden: { x: -100, opacity: 0 },
+  visible: { x: 0, opacity: 1, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const slideInRight = {
+  hidden: { x: 100, opacity: 0 },
+  visible: { x: 0, opacity: 1, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const fadeInUp = {
+  hidden: { y: 60, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.3,
+    },
+  },
+};
+
+const staggerItem = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+    },
+  },
+};
+
+export { 
+  notification, 
+  overlay, 
+  popUP, 
+  startUpVariants,
+  slideInLeft,
+  slideInRight,
+  fadeInUp,
+  staggerContainer,
+  staggerItem
+};
