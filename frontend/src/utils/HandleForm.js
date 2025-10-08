@@ -3,19 +3,19 @@ const handleFormDataChange = (event, setFormData) => {
   setFormData((prevData) => ({ ...prevData, [name]: value }));
 };
 
-const validateFormPassword = (form) => {
+const validateFormPassword = (form, createNotification) => {
   if (form.password !== form.confirmPassword) {
-    alert("Password do not match");
+    createNotification("fail", "Register fail", "Password do not match.");
     return false;
   }
   return true;
 };
 
-const validateFormTel = (form) => {
+const validateFormTel = (form, createNotification) => {
   const cleanPhone = form.phoneNumber.replace(/\D/g, "");
 
   if (!/^\d{10}$/.test(cleanPhone)) {
-    alert("Phone number is invalid");
+    createNotification("fail", "Register fail", "Phone number is invalid.");
     return false;
   }
   return true;

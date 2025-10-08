@@ -20,7 +20,7 @@ exports.register = async (req, res, next) => {
     const role = (req.body.role ?? "CUSTOMER").toUpperCase();
 
     if (!firstname || !lastname || !email || !phone || !username || !password) {
-      return res.status(400).json({ success: false, message: "Missing required fields" });
+      return res.status(200).json({ success: false, message: "Missing required fields" });
     }
 
     const hashed = await hashPassword(password);
@@ -37,16 +37,13 @@ exports.register = async (req, res, next) => {
       },
     });
 
-  try {
     if (user.role === "CUSTOMER") {
       await prisma.customer.create({ data: { userId: user.id } });
       }
     if (user.role === "STAFF") {
       await prisma.staff.create({ data: { userId: user.id, wages: 0, bank_account: "TBD" } });
     }
-  } catch (err) {
-    console.warn("Warning: Could not create associated role record", err.message);
-  }
+
     console.log("User created:", user)
     sendTokenResponse(user, 200, res);
   } catch (error) {
@@ -71,6 +68,7 @@ exports.getMe = async (req, res) => {
         role: true,
         customer: {
           select: {
+            id: true,
             pets: {
               include: {
                 stayed: true,
@@ -135,11 +133,8 @@ exports.updateMe = async (req, res) => {
 
 exports.deleteMe = async (req, res) => {
   try {
-    const idParam = req.params.id;
-    if (!idParam)
-      return res
-        .status(400)
-        .json({ success: false, error: "Missing id param" });
+    const id = req.user.id;
+    
     const user = await prisma.user.delete({
       where: { id: Number(idParam) },
     });

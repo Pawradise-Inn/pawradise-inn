@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { useNotification } from "../../../components/notification/NotificationProvider";
+import { useNotification } from "../../../context/notification/NotificationProvider";
 
 // --- API Functions (adjust path as needed) ---
 // Change this in: src/pages/staff/dashboard/DashboardTab4.jsx

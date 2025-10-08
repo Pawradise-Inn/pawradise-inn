@@ -24,6 +24,7 @@ import DashboardTab4 from "./pages/staff/dashboard/DashboardTab4";
 import PetStatus from "./pages/staff/PetStatus";
 import PetUpdate from "./pages/staff/PetUpdate";
 import StaffReview from "./pages/staff/StaffReview";
+import RequireAuth from "./utils/RequireAuth";
 
 const App = () => {
   const location = useLocation();
@@ -83,7 +84,7 @@ const App = () => {
         <Route path="*" element={<Navigate to="/room" replace />} />
         {/* Staff Routes */}
         <Route path="/staff" element={<div>Staff log in</div>} />
-        <Route path="/staff/dashboard" element={<Dashboard />}>
+        <Route path="/staff/dashboard" element={ <Dashboard />}>
           <Route index element={<DashboardTab1 />} />
           <Route path="check-in" element={<DashboardTab2 />} />
           <Route path="check-out" element={<DashboardTab3 />} />

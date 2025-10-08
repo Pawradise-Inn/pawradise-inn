@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
-import { useContext, useRef, useState } from "react";
+import {  useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../../../context/AuthContext";
+import { useAuth } from "../../../../context/AuthProvider";
 import { updateCustomerAPI } from "../../../../hooks/customerAPI";
 import { registerPetAPI } from "../../../../hooks/petAPI";
 import { startUpVariants } from "../../../../styles/animation";
@@ -9,9 +9,11 @@ import { handleFormDataChange } from "../../../../utils/handleForm";
 import PetInput from "./PetInput";
 import RadioInput from "./RadioInput";
 import SelectInput from "./SelectInput";
+import { useNotification } from "../../../../context/notification/NotificationProvider";
 
 const NewPet = () => {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser } = useAuth();
+  const {createNotification} = useNotification();
   const [formData, setFormData] = useState({
     petName: "",
     petType: "",
@@ -67,35 +69,39 @@ const NewPet = () => {
   console.log(user);
 
   const handleConfirm = () => {
-    if (
-      window.confirm("are you sure?") &&
-      formData.petName &&
-      formData.petGender &&
-      formData.petAge &&
-      formData.petType &&
-      formData.petBreed &&
-      formData.medicalCondition &&
-      formData.foodAllergy
-    ) {
-      const newPet = {
-        name: formData.petName,
-        sex: formData.petGender,
-        age: Number(formData.petAge),
-        type: formData.petType,
-        status: "IDLE",
-        breed: formData.petBreed,
-        disease: [formData.medicalCondition],
-        allergic: [formData.foodAllergy],
-        picture: "test.img",
-        customerId: user.id,
-      };
-      const newPetsArr = user.pets;
-      newPetsArr.push(newPet);
-      const newUser = { ...user, pets: newPetsArr };
-      setUser(newUser);
-      registerPetAPI(user.id, newPet);
-      updateCustomerAPI(user.id, newUser);
-      navigate("/profile/pet");
+    if(!formData.petName ||
+      !formData.petGender ||
+      !formData.petAge ||
+      !formData.petType ||
+      !formData.petBreed ||
+      !formData.medicalCondition ||
+      !formData.foodAllergy){
+        createNotification("fail", "Fail to create a pet", "Please provide all information.")
+      }
+    else {
+        createNotification("warning", "Confirmation", "Create a pet?", () => {
+        const newPet = {
+          name: formData.petName,
+          sex: formData.petGender,
+          age: Number(formData.petAge),
+          type: formData.petType,
+          status: "IDLE",
+          breed: formData.petBreed,
+          disease: [formData.medicalCondition],
+          allergic: [formData.foodAllergy],
+          picture: "test.img",
+          customerId: user.customer.id,
+        };
+        const newPetsArr = user.customer.pets;
+        newPetsArr.push(newPet);
+        const newUser = { ...user, pets: newPetsArr };
+        setUser(newUser);
+        registerPetAPI(user.customer.id, newPet);
+        updateCustomerAPI(user.customer.id, newUser);
+        navigate("/profile/pet");
+        createNotification("success", "Pet has been created!", "Your pet has been saved.")
+        })
+
     }
   };
 
