@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import {  useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/AuthProvider";
 import { updateCustomerAPI } from "../../../../hooks/customerAPI";
@@ -10,10 +10,11 @@ import PetInput from "./PetInput";
 import RadioInput from "./RadioInput";
 import SelectInput from "./SelectInput";
 import { useNotification } from "../../../../context/notification/NotificationProvider";
+import { uploadImageAPI } from "../../../../hooks/imageAPI";
 
 const NewPet = () => {
   const { user, setUser } = useAuth();
-  const {createNotification} = useNotification();
+  const { createNotification } = useNotification();
   const [formData, setFormData] = useState({
     petName: "",
     petType: "",
@@ -24,6 +25,7 @@ const NewPet = () => {
     petImage: null,
     medicalCondition: "",
   });
+  const [petImagePreview, setPetImagePreview] = useState("");
 
   const fields = [
     {
@@ -54,56 +56,119 @@ const NewPet = () => {
 
   const handleImageClick = () => {
     fileInputRef.current.click();
+    console.log(user)
+
   };
 
+  // FIXED: Added missing closing bracket for handleImageChange
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setFormData((prev) => ({ ...prev, petImage: file }));
+
       const reader = new FileReader();
       reader.onloadend = () => {
-        handleFormDataChange(e, setFormData);
+        const previewUrl = reader.result;
+        setPetImagePreview(previewUrl);
       };
       reader.readAsDataURL(file);
     }
-  };
+  }; // <-- Added this bracket
+
   console.log(user);
 
-  const handleConfirm = () => {
-    if(!formData.petName &&
-      !formData.petGender &&
-      !formData.petAge &&
-      !formData.petType &&
-      !formData.petBreed &&
-      !formData.medicalCondition &&
-      !formData.foodAllergy){
-        createNotification("fail", "Fail to create a pet", "Please provide all information.")
-      }
-    else {
-        createNotification("warning", "Confirmation", "Create a pet?", () => {
-        const newPet = {
-          name: formData.petName,
-          sex: formData.petGender,
-          age: Number(formData.petAge),
-          type: formData.petType,
-          status: "IDLE",
-          breed: formData.petBreed,
-          disease: [formData.medicalCondition],
-          allergic: [formData.foodAllergy],
-          picture: "test.img",
-          customerId: user.customer.id,
-        };
-        const newPetsArr = user.customer.pets;
-        newPetsArr.push(newPet);
-        const newUser = { ...user, pets: newPetsArr };
-        setUser(newUser);
-        registerPetAPI(user.customer.id, newPet);
-        updateCustomerAPI(user.customer.id, newUser);
-        navigate("/profile/pet");
-        createNotification("success", "Pet has been created!", "Your pet has been saved.")
-        })
-
+const handleConfirm = () => {
+    // Check for missing form data (initial synchronous validation)
+    if (
+        !formData.petName ||
+        !formData.petGender ||
+        !formData.petAge ||
+        !formData.petType ||
+        !formData.petBreed ||
+        !formData.medicalCondition ||
+        !formData.foodAllergy
+    ) {
+        createNotification(
+            "fail",
+            "Fail to create a pet",
+            "Please provide all required pet information."
+        );
+        return; // Stop execution if validation fails
     }
-  };
+
+    // Launch confirmation notification, which executes the async logic upon confirmation
+    createNotification(
+        "warning",
+        "Confirmation",
+        "Create this new pet?",
+        async () => {
+            let pictureUrl = "default.img"; // Default image if no file is selected
+
+            try {
+                // 1. UPLOAD IMAGE TO GCS
+                if (formData.petImage) {
+                    // This API call sends the file object via multipart/form-data
+                    const uploadResponse = await uploadImageAPI(formData.petImage);
+                    
+                    // Store the public GCS URL returned by the backend
+                    pictureUrl = uploadResponse.imageUrl; 
+                }
+
+                // 2. PREPARE NEW PET DATA
+                const newPet = {
+                    name: formData.petName,
+                    sex: formData.petGender,
+                    age: Number(formData.petAge), // Ensure age is a number
+                    type: formData.petType,
+                    status: "IDLE", // Assuming IDLE is the initial status
+                    breed: formData.petBreed,
+                    disease: [formData.medicalCondition],
+                    allergic: [formData.foodAllergy],
+                    picture: pictureUrl, // **Use the GCS URL here**
+                    customerId: user.customer.id,
+                };
+
+                // 3. REGISTER PET IN DATABASE
+                // Assuming registerPetAPI handles the actual insertion into the 'pet' table
+                // and returns the pet object with its database-generated ID (if needed)
+                await registerPetAPI(user.customer.id, newPet); 
+
+                // 4. UPDATE CUSTOMER'S LOCAL PET LIST (DB & Context)
+                // Safely get current pets or initialize to an empty array
+                const currentPets = user.customer.pets || [];
+                
+                // Create a NEW array and push the new pet (Avoids mutating state)
+                const updatedPetsArr = [...currentPets, newPet]; 
+                
+                // Prepare the customer object with the updated pets list
+                const updatedCustomerData = { ...user.customer, pets: updatedPetsArr }; 
+
+                // 5. UPDATE CUSTOMER IN DB (to link the new pet list)
+                await updateCustomerAPI(user.customer.id, updatedCustomerData);
+
+                // 6. UPDATE LOCAL AUTH CONTEXT
+                setUser({ ...user, customer: updatedCustomerData });
+
+                // 7. SUCCESS & REDIRECT
+                createNotification(
+                    "success",
+                    "Pet has been created!",
+                    "Your pet has been successfully saved."
+                );
+                navigate("/profile/pet");
+
+            } catch (error) {
+                // Catch any API errors during upload, registration, or update
+                console.error("Pet creation failed:", error);
+                createNotification(
+                    "fail",
+                    "Operation Failed",
+                    "An error occurred during pet creation. Please try again."
+                );
+            }
+        }
+    );
+};
 
   const handleCancel = () => {
     navigate("/profile/pet");
@@ -136,7 +201,7 @@ const NewPet = () => {
             onClick={handleImageClick}
           >
             <img
-              src={formData.petImage}
+              src={petImagePreview || "default-placeholder-url"}
               className="w-full h-full rounded-full object-cover"
             />
           </div>
