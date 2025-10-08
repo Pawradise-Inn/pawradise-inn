@@ -1,8 +1,6 @@
 const express = require('express');
-const {storage} = require('@google-cloud/storage');
-const multur = require('multer');
-const path = require('path');
 const dotenv = require('dotenv');
+const multer = require('multer')
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { PrismaClient } = require("./generated/prisma/client");
@@ -10,20 +8,15 @@ const { PrismaClient } = require("./generated/prisma/client");
 dotenv.config({path: './config/config.env.local'});
 
 const app = express();
-const storage = new Storage({
-  projectId: 'sacred-epigram-471206-f5',
-  keyFilename: path.join(__dirname, '/config/keyfile.json');
-})
-const bucket = storage.bucket('paw_image');
+const prisma = new PrismaClient();
+const pet = require('./routes/pet');
+const staff = require('./routes/staff');
 const multerMid = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024,
   },
 })
-const prisma = new PrismaClient();
-const pet = require('./routes/pet');
-const staff = require('./routes/staff');z
 
 
 // Body parser & cookie parser
@@ -34,6 +27,7 @@ app.use(cors({
   origin: "http://localhost:5173",
   credentials: false,  
 }));
+
 
 const booking = require('./routes/booking');
 const bookedRoom = require('./routes/bookedRoom');

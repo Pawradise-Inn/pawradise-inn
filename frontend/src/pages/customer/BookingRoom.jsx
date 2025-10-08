@@ -102,6 +102,7 @@ const BookingRoom = () => {
       {/* <button onClick={() => createNotification("success", "test", "test", test)}>success</button>
       <button onClick={() => createNotification("fail", "test", "test", test)}>fail</button>
       <button onClick={() => createNotification("warning", "test", "test", test)}>warning</button> */}
+
       <b className="text-7xl text-center block m-8 mt-0">
         {"Room Reservation".split(" ").map((word, idx) => {
           return (
