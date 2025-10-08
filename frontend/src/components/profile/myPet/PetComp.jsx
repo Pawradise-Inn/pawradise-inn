@@ -9,8 +9,11 @@ const PetComp = () => {
   const [pets, setPets] = useState([]);
 
   useEffect(() => {
-    if (user) {
-      setPets(user.customer.pets || "");
+    if (user && user.customer) {
+      setPets(user.customer.pets || []);
+    }
+    else{
+      setPets([]);
     }
   }, [user]);
 
