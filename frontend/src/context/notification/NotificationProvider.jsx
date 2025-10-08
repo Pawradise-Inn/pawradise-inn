@@ -1,7 +1,7 @@
 import { AnimatePresence } from "motion/react";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext,  useState } from "react";
 import { notification, overlay } from "../../styles/animation";
-import Overlay from "../Overlay";
+import Overlay from "../../components/Overlay";
 import NotificationCard from "./NotificationCard";
 
 const NotificationContext = createContext([]);

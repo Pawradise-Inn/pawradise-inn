@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
 import BookingPopup from "../../components/BookingPopup";
-import { useNotification } from "../../components/notification/NotificationProvider";
+import { useNotification } from "../../context/notification/NotificationProvider";
 import Overlay from "../../components/Overlay";
 import RoomCard from "../../components/room/RoomCard";
 import {
@@ -17,6 +17,7 @@ const BookingRoom = () => {
   const petTypes = ["DOG", "CAT", "MOUSE", "RABBIT", "BIRD"];
 
   const { createNotification } = useNotification();
+  // const { user, setUser } = 
   const [mounted, setMounted] = useState(false);
   const [room, setRoom] = useState([]);
   const [filter, setFilter] = useState({

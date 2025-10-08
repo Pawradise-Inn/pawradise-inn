@@ -1,15 +1,15 @@
 import { motion } from "motion/react";
-import { useContext, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { AuthContext } from "../../../context/AuthContext";
+import { useAuth } from "../../../context/AuthProvider";
 import { updateCustomerAPI } from "../../../hooks/customerAPI";
 import { startUpVariants } from "../../../styles/animation";
-import { useNotification } from "../../notification/NotificationProvider";
+import { useNotification } from "../../../context/notification/NotificationProvider";
 
 const ProfileComp = () => {
   const { createNotification } = useNotification();
   const outletCtx = useOutletContext();
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
 
   const activeBookingCount = outletCtx?.activeBookingCount;
@@ -52,46 +52,40 @@ const ProfileComp = () => {
 
   useEffect(() => {
     if (user) {
-      console.log(user);
       setNewUser({ id: user.id, ...user });
     }
   }, [user]);
 
   const handleCancel = () => {
-    const cancel = window.confirm("Are you sure?");
-    if (cancel && user) setNewUser({ id: user.id, ...user.user });
+    createNotification("warning", "Confirmation", "Are you sure?", () => {
+      if(user) setNewUser({id: user.id, ... user})
+    })
   };
-
-  const handleConfirm = async (e) => {
-    e.preventDefault();
-    if (!newUser.id) return;
-    createNotification(
-      "warning",
-      "Confirmation.",
-      "Are you sure to update the data?",
-      () => {
-        try {
-          const { id, ...userObjected } = newUser;
-          updateCustomerAPI(id, userObjected).then((data) => {
-            setUser?.((prev) => ({ ...(prev || {}), user: data.data }));
-            createNotification(
-              "success",
-              "Profile updated successfully!",
-              "Your update has been saved."
-            );
-          });
-        } catch (err) {
-          console.error(err);
-          createNotification(
-            "fail",
-            "Fail to update.",
-            "Failed to update profile. Please try again."
-          );
-        }
-      }
-    );
-  };
-
+  const handleConfirm = async (e) => {
+    e.preventDefault();
+    if (!newUser.id) return;
+    createNotification(
+      "warning",
+      "Confirmation.",
+      "Are you sure to update the data?",
+      () => {
+        try {
+          const { id, ...userObjected } = newUser;
+          updateCustomerAPI(user.customer.id, userObjected).then((data) => {
+            console.log("data:",data)
+            setUser?.(data.data); 
+            createNotification(
+              "success",
+              "Profile updated successfully!",
+              "Your update has been saved."
+            );
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    );
+  };
   const openDeleteModal = () => {
     setPassword("");
     setSubmitErr("");
