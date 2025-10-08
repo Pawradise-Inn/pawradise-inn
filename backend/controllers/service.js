@@ -3,10 +3,74 @@ const {findServiceById, addServicePictures, removeServicePictures } = require('.
 const {overlappingService} = require('./logics/bookedService');
 
 const getServices = async (req, res) =>{
+    let options = {};
+
+    //Select Filter
+    if (req.query.filter){
+        let where = JSON.parse(req.query.filter)
+    if (where.name){
+        where.name.mode = 'insensitive';
+    }
+        options.where = where;
+    }
+
+    //Select fields
+    if (req.query.select){
+        const fields = req.query.select.split(",");
+        options.select = fields.reduce((acc, field) => {
+            acc[field.trim()] = true;
+            return acc;
+        }, {});
+    }
+
+    //Sort
+    if (req.query.sort){
+        const sortFields = req.query.sort.split(",");
+        options.orderBy = sortFields.map(sortField => {
+            const [field, direction = 'asc'] = sortField.split(":");
+            const dir = direction.trim().toLowerCase() === 'desc' ? 'desc' : 'asc';
+            return {[field.trim()] : dir};
+        });
+    } else {
+        options.orderBy = {id: 'asc'};
+    }
+
+    //Pagination
+    const page = parseInt(req.query.page,10) || 1;
+    const limit = parseInt(req.query.limit,10) || 10;
+    const startIndex = (page-1)*limit;
+    const endIndex = page*limit;
+
+    options.skip = startIndex;
+    options.take = limit;
+
     try {
-        const services = await prisma.service.findMany();
-        if(services.length === 0) return res.status(404).json({success: false, msg: "No service in database"});
-        res.status(200).json({success: true, data: services});
+        const total = await prisma.service.count({
+            where: options.where
+        });
+        if(total === 0) {
+            return res.status(200).json({
+                success: false, 
+                msg: "No service in database"
+            });
+        }
+
+        const services = await prisma.service.findMany(options);
+
+        const pagination = {};
+        if(endIndex < total){
+            pagination.next = {
+                page: page + 1,
+                limit: limit
+            }
+        }
+        if(startIndex > 0){
+            pagination.prev = {
+                page: page - 1,
+                limit: limit
+            }
+        }
+        res.status(200).json({success: true, pagination, data: services, count: total});
     } catch (err) {
         res.status(400).json({success: false, error: err.message});
     }
@@ -25,13 +89,13 @@ const getService = async (req, res) => {
 
 const createService = async (req, res) => { //requirement: 15
     try {
-        const {name, price, petType, picture} = req.body;
+        const {name, price, petType} = req.body;
         const service = await prisma.service.create({
             data: {
                 name: name,
                 price: price,
-                petType: [petType.toUpperCase()],
-                picture: "not done yet"
+                petType: petType,
+                picture: ""
             }
         });
         console.log(service.data);
