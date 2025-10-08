@@ -198,8 +198,8 @@ const getRoomStatus = async (req, res) => {
         .status(404)
         .json({ success: false, error: "Room is not found" });
 
-    const status = await overlappingRoom(id, checkIn, checkOut);
-    res.status(200).json({ success: true, available: status < room.capacity });
+    const count = await overlappingRoom(id, checkIn, checkOut);
+    res.status(200).json({ success: true, count: count });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
@@ -207,35 +207,12 @@ const getRoomStatus = async (req, res) => {
 
 const getAvailableRooms = async (req, res) => { //requirement: 7
   try {
-    const { pet_type, entry_date_with_time, exit_date_with_time } = req.query;
-
-    if (!entry_date_with_time || !exit_date_with_time) {
-      return res.status(400).json({ success: false, msg: "Missing required parameters" });
-    }
+    const { entry_date_with_time, exit_date_with_time } = req.query;
 
     const entryDate = new Date(entry_date_with_time);
     const exitDate = new Date(exit_date_with_time);
 
-    if (entryDate >= exitDate) {
-      return res.status(400).json({ success: false, msg: "entry_date must be before exit_date" });
-    }
-
-    // Build where clause based on pet_type
-    const whereClause = {
-      bookings: {
-        none: {
-          OR: [
-            { checkIn: { lt: exitDate }, checkOut: { gt: entryDate } }
-          ]
-        }
-      }
-    };
-    if (pet_type) {
-      whereClause.petType = pet_type;
-    }
-
-    const availableRooms = await prisma.room.findMany({
-      where: whereClause,
+    const allRooms = await prisma.room.findMany({
       select: {
         id: true,
         picture: true,
@@ -246,26 +223,42 @@ const getAvailableRooms = async (req, res) => { //requirement: 7
           select: {
             rating: true
           }
+        },
+        bookings: {
+          where: {
+            OR: [
+              { checkIn: { lt: exitDate }, checkOut: { gt: entryDate } }
+            ]
+          },
+          select: {
+            id: true
+          }
         }
       }
     });
 
+    // Filter rooms where overlapping bookings < capacity
+    const availableRooms = allRooms.filter(room => {
+      const overlappingBookings = room.bookings.length;
+      return overlappingBookings < room.capacity;
+    })
+
     const formattedRooms = await Promise.all(
       availableRooms.map(async (r) => {
+        const totalBookings = r.bookings.length;
         const totalReviews = r.ChatLog.length;
         const ratings = r.ChatLog.map(c => c.rating ?? 5);
         const avgRating = ratings.length
           ? ratings.reduce((a, b) => a + b, 0) / ratings.length
           : 5;
 
-        const count = await overlappingRoom(r.id, entryDate, exitDate);
         return {
           image: r.picture,
           roomId: r.id,
           reviewStar: avgRating,
           forWhich: r.petType,
           price: r.price,
-          size: count,
+          size: totalBookings,
           maxsize: r.capacity,
           commentPages: Math.ceil(totalReviews / 3),
         };
@@ -338,7 +331,7 @@ const getAllRoomsWithReviews = async (req, res) => { //requirement: 9
 const getRoomReviews = async (req, res) => {
   //requirement: 5
   try {
-    const { roomId, NSP } = req.query;
+    const { roomId, star, NSP } = req.query;
     const page = Number(NSP) || 1;
     const take = 3;
     const skip = (page - 1) * take;
@@ -352,10 +345,12 @@ const getRoomReviews = async (req, res) => {
       where: {
         roomId: Number(roomId),
         review: { not: null },
+        rating: star ? { equals: Number(star) } : undefined,
       },
       skip,
       take,
       select: {
+        id: true,
         review: true,
         rating: true,
         review_date: true,
@@ -376,6 +371,7 @@ const getRoomReviews = async (req, res) => {
     }
 
     const formattedReviews = reviews.map((r) => ({
+      id: r.id,
       commenter_name: r.customer?.name || "Anonymous",
       comment_detail: r.review,
       comment_star: r.rating,

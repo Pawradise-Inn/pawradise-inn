@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const multer = require('multer')
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { PrismaClient } = require("./generated/prisma/client");
@@ -10,9 +11,17 @@ const app = express();
 const prisma = new PrismaClient();
 const pet = require('./routes/pet');
 const staff = require('./routes/staff');
+const multerMid = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+})
+
 
 // Body parser & cookie parser
 app.use(express.json());
+app.use(multerMid.single('image'));
 app.use(cookieParser());
 app.use(cors({
   origin: "http://localhost:5173",
@@ -35,6 +44,7 @@ app.use(cors({
 // const swaggerDocs = swaggerJsDoc(swaggerOptions);
 // app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
+
 const booking = require('./routes/booking');
 const bookedRoom = require('./routes/bookedRoom');
 const bookedService = require('./routes/bookedService');
@@ -43,6 +53,7 @@ const service = require('./routes/service');
 const auth = require('./routes/auth');
 const chatlog = require('./routes/chatlog');
 const customer = require('./routes/customer')
+const picture = require('./routes/picture')
 
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/booking', booking);
@@ -54,6 +65,7 @@ app.use('/api/v1/pet', pet);
 app.use('/api/v1/staff', staff);
 app.use('/api/v1/chatlog', chatlog);
 app.use('/api/v1/customer', customer);
+app.use('/api/v1/image', picture)
 
 const PORT = process.env.PORT || 5000;
 

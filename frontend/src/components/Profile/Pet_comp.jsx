@@ -39,6 +39,7 @@ const Pet_comp = () => {
   return (
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-8xl">
+        
         {pets.map((pet) => (
           <Pet_card key={pet.id} pet={pet} />
         ))}

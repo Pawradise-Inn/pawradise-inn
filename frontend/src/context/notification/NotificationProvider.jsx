@@ -74,6 +74,7 @@ const NotificationProvider = ({ children }) => {
         {isBlock ? (
           <Overlay
             variants={overlay}
+            style={{ zIndex: 1000 }}
             initial="hidden"
             animate="visible"
             exit="hidden"

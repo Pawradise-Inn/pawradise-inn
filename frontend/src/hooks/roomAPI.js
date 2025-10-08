@@ -28,12 +28,11 @@ export const deleteRoomAPI = async (id) => {
 };
 
 export const fetchAvailableRoomsAPI = async (
-  pet_type,
   entry_date_with_time,
   exit_date_with_time
 ) => {
   const response = await axios.get(`${API_URL}/available`, {
-    params: { pet_type, entry_date_with_time, exit_date_with_time },
+    params: { entry_date_with_time, exit_date_with_time },
   });
   return response.data;
 };
@@ -50,9 +49,9 @@ export const fetchAllRoomsWithReviewsAPI = async () => {
   return response.data;
 };
 
-export const fetchRoomWithCommentAPI = async (roomId, NSP) => {
+export const fetchRoomWithCommentAPI = async (roomId, star, NSP) => {
   const response = await axios.get(`${API_URL}/comments`, {
-    params: { roomId, NSP },
+    params: { roomId, star, NSP },
   });
   return response.data;
 };

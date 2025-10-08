@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { motion } from "motion/react";
 import registerImg from "../../assets/register.png";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { registerAPI } from "../../hooks/authAPI";
 import { validateFormPassword, validateFormTel } from "../../utils/handleForm";
+import { useAuth } from "../../context/AuthProvider";
+import { startUpVariants } from "../../styles/animation";
 
 const Registration = () => {
 
@@ -22,6 +25,7 @@ const Registration = () => {
   const [consentChecked, setConsentChecked] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const navigate = useNavigate();
+  const {setUser} = useAuth();
 
   
 const fields = [
@@ -83,9 +87,11 @@ const fields = [
       const { confirmPassword, ...formData } = form;
       registerAPI(formData).then((res) => {
         if (res.token) {
+          localStorage.removeItem("token");
           localStorage.setItem("token", res.token);
           localStorage.setItem("user", JSON.stringify(res.user));
           navigate("/room");
+          setUser(res.user);
         } else {
           createNotification(
             "fail",
@@ -110,31 +116,60 @@ const fields = [
     );
   }, [form, consentChecked]);
 
+  // useEffect(() => {
+  //   localStorage.removeItem("token");
+  // }, [])
+
   return (
     <>
       <div className="flex flex-row w-full overflow-auto">
-        <div className="w-3/5">
+        <motion.div 
+          className="w-3/5"
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
           <img
             className="object-cover w-full h-full "
             src={registerImg}
             alt="Registration"
           />
-        </div>
+        </motion.div>
 
-        <div className="w-2/5 bg-[var(--cream-color)] flex flex-col items-center justify-center py-8">
-          <h1
+        <motion.div 
+          className="w-2/5 bg-[var(--cream-color)] flex flex-col items-center justify-center py-8"
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+        >
+          <motion.h1
             className="text-center pt-2 text-[60px] md:text-3xl text-[var(--brown-color)] font-semibold"
             style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)" }}
+            variants={startUpVariants}
+            initial="hidden"
+            animate="visible"
+            custom={0}
           >
             Registration
-          </h1>
+          </motion.h1>
 
-          <form
+          <motion.form
             className="flex flex-col space-y-2 p-2 w-full max-w-md"
             onSubmit={handleSubmit}
+            variants={startUpVariants}
+            initial="hidden"
+            animate="visible"
+            custom={1}
           >
-            {fields.map((field) => (
-              <div key={field.name} className="flex flex-col w-full">
+            {fields.map((field, index) => (
+              <motion.div 
+                key={field.name} 
+                className="flex flex-col w-full"
+                variants={startUpVariants}
+                initial="hidden"
+                animate="visible"
+                custom={index + 2}
+              >
                 <label
                   className="text-[var(--brown-color)] font-semibold text-left mb-1"
                   htmlFor={field.name}
@@ -143,7 +178,7 @@ const fields = [
                 </label>
                 <input
                   id={field.name}
-                  className="border-2 border-[var(--dark-brown-color)] bg-white opacity-65 rounded-md p-2 outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] focus:border-transparent shadow-lg w-full transition-all duration-200"
+                  className="border-2 border-[var(--dark-brown-color)] bg-white opacity-65 rounded-md p-2 outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] focus:border-transparent shadow-lg w-full transition-all duration-200 hover:shadow-xl focus:opacity-100"
                   type={field.type}
                   name={field.name}
                   placeholder={field.placeholder}
@@ -152,10 +187,16 @@ const fields = [
                   autoComplete={field.autoComplete}
                   required
                 />
-              </div>
+              </motion.div>
             ))}
 
-            <div className="flex items-center mt-2">
+            <motion.div 
+              className="flex items-center mt-2"
+              variants={startUpVariants}
+              initial="hidden"
+              animate="visible"
+              custom={9}
+            >
               <input
                 type="checkbox"
                 id="consent"
@@ -168,31 +209,39 @@ const fields = [
                 I agree to the{" "}
                 <a
                   href="/"
-                  className="text-[var(--dark-brown-color)] underline"
+                  className="text-[var(--dark-brown-color)] underline hover:text-[var(--brown-color)] transition-colors duration-200"
                 >
                   Terms of Service
                 </a>{" "}
                 and{" "}
                 <a
                   href="/"
-                  className="text-[var(--dark-brown-color)] underline"
+                  className="text-[var(--dark-brown-color)] underline hover:text-[var(--brown-color)] transition-colors duration-200"
                 >
                   Privacy Policy
                 </a>
               </label>
-            </div>
+            </motion.div>
 
-            <div className="flex flex-col md:flex-row gap-4 mt-2 w-full justify-end">
+            <motion.div 
+              className="flex flex-col md:flex-row gap-4 mt-2 w-full justify-end"
+              variants={startUpVariants}
+              initial="hidden"
+              animate="visible"
+              custom={10}
+            >
               <NavLink to="/login" className="w-full md:w-40">
-                <button
+                <motion.button
                   type="button"
                   className="w-full h-10 bg-[var(--dark-brown-color)] !text-[var(--cream-color)] rounded shadow px-4 py-1 hover:scale-105 transition-all duration-200 cursor-pointer "
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Cancel
-                </button>
+                </motion.button>
               </NavLink>
 
-              <button
+              <motion.button
                 type="submit"
                 disabled={!isFormValid}
                 className={`w-full md:w-40 h-10 rounded shadow px-4 py-1 transition-all duration-200  ${
@@ -200,12 +249,14 @@ const fields = [
                     ? "bg-[var(--dark-brown-color)] !text-[var(--cream-color)] cursor-pointer hover:scale-105"
                     : "bg-[var(--light-brown-color)] cursor-not-allowed"
                 }`}
+                whileHover={isFormValid ? { scale: 1.05 } : {}}
+                whileTap={isFormValid ? { scale: 0.95 } : {}}
               >
                 Done
-              </button>
-            </div>
-          </form>
-        </div>
+              </motion.button>
+            </motion.div>
+          </motion.form>
+        </motion.div>
       </div>
     </>
   );

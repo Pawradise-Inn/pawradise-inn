@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
-import BookingPopup from "../../components/BookingPopup";
+import BookingPopup from "../../components/booking/BookingPopup";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import Overlay from "../../components/Overlay";
 import RoomCard from "../../components/room/RoomCard";
@@ -17,7 +17,6 @@ const BookingRoom = () => {
   const petTypes = ["DOG", "CAT", "MOUSE", "RABBIT", "BIRD"];
 
   const { createNotification } = useNotification();
-  // const { user, setUser } = 
   const [mounted, setMounted] = useState(false);
   const [room, setRoom] = useState([]);
   const [filter, setFilter] = useState({
@@ -29,6 +28,16 @@ const BookingRoom = () => {
   const [noResult, setNoResult] = useState(false);
   const [popUpStatus, setPopUpStatus] = useState(false);
   const [popUpData, setPopUpData] = useState([]);
+
+  //   if filter.petType is not null return data with filter with petType else return data itself back
+  //   @params: filteredRoom -> data that want to filter
+  //  @return: filteredRoom with filtered with petType or not filter if petType is null
+  const filterWithPet = (filteredRoom) => {
+    if (filter.petType) {
+      return filteredRoom.filter((r) => r.forWhich === filter.petType);
+    }
+    return filteredRoom;
+  };
 
   // fetch room data from backend and setRoom
   useEffect(() => {
@@ -56,13 +65,11 @@ const BookingRoom = () => {
         filter.exitDate
       );
       if (validatedDate.status) {
-        fetchAvailableRoomsAPI(
-          filter.petType,
-          filter.entryDate,
-          filter.exitDate
-        ).then((data) => {
-          setFilterRoom(data.data);
-        });
+        fetchAvailableRoomsAPI(filter.entryDate, filter.exitDate).then(
+          (res) => {
+            setFilterRoom(filterWithPet(res.data));
+          }
+        );
       } else {
         createNotification(
           "fail",
@@ -72,7 +79,7 @@ const BookingRoom = () => {
         setFilterRoom([]);
       }
     } else {
-      setFilterRoom(room);
+      setFilterRoom(filterWithPet(room));
     }
   }, [filter, room]);
 
@@ -93,15 +100,8 @@ const BookingRoom = () => {
 
   removeWindowScroll(popUpStatus);
 
-  const test = () => {
-    alert("hi");
-  };
-
   return (
     <div className="w-full max-w-6xl mx-auto py-12">
-      {/* <button onClick={() => createNotification("success", "test", "test", test)}>success</button>
-      <button onClick={() => createNotification("fail", "test", "test", test)}>fail</button>
-      <button onClick={() => createNotification("warning", "test", "test", test)}>warning</button> */}
       <b className="text-7xl text-center block m-8 mt-0">
         {"Room Reservation".split(" ").map((word, idx) => {
           return (
