@@ -9,13 +9,15 @@ const {
     deleteChatLog
 } = require('../controllers/chatlog');
 
+const {protect, authorize} = require('../middleware/auth');
+
 router.route('/')
     .get(getChatLogs)
-    .post(createChatLog);
+    .post(protect, authorize("CUSTOMER"), createChatLog);
 
 router.route('/:id')
     .get(getChatLogById)
-    .post(replyToChatLog)
-    .delete(deleteChatLog);
+    .patch(protect, authorize("STAFF"), replyToChatLog)
+    .delete(protect, authorize("STAFF", "CUSTOMER"), deleteChatLog);
 
 module.exports = router;
