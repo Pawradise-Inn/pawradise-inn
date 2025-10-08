@@ -23,7 +23,7 @@ const RoomCard = ({
       />
 
       <div className="flex justify-between w-full pr-8">
-        <div className="flex flex-col justify-between h-full">
+        <div className="flex flex-col justify-between h-full w-5/12">
           {/* Top info */}
           <div className="space-y-1">
             <p className="font-semibold">{`Room_${data.roomId
@@ -57,7 +57,7 @@ const RoomCard = ({
 
             <button
               onClick={() => onClick(data, true)}
-              className="py-2 px-8 bg-[var(--dark-brown-color)] rounded !text-white font-bold active:scale-90 cursor-pointer transition-transform duration-200"
+              className= {"py-2 px-8 rounded !text-white font-bold active:scale-90 transition-transform duration-200 cursor-pointer bg-[var(--dark-brown-color)] "}
             >
               {actionLabel || (compact ? "EDIT" : "BOOK")}
             </button>

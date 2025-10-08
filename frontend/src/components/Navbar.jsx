@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import Logo from "../assets/logo.png";
 import { startUpVariants } from "../styles/animation";
@@ -8,6 +8,12 @@ const Navbar = () => {
   const location = useLocation();
   const pages = ["room", "service", "review", "profile"];
   const [page, setPage] = useState(location.pathname.split("/")[1]);
+
+  // Update page state when location changes
+  useEffect(() => {
+    const currentPage = location.pathname.split("/")[1];
+    setPage(currentPage);
+  }, [location.pathname]);
 
   return (
     <nav className="bg-white shadow-md px-10 py-4 flex items-center justify-between">

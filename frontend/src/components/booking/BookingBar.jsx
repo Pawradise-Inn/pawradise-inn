@@ -1,6 +1,6 @@
 // this file still have to fetch userId from token
 
-import { motion } from "motion/react";
+import { AnimatePresence, motion, useMotionValue, useTransform, animate } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createBookedRoom } from "../../hooks/bookedRoomAPI";
 import { createBookedService } from "../../hooks/bookedServiceAPI";
@@ -20,28 +20,30 @@ import { useNotification } from "../../context/notification/NotificationProvider
 import CommentCard from "./CommentCard";
 import CommentStarSelector from "./CommentStarSelector";
 import Pagination from "./Pagination";
+import { useAuth } from "../../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
+import { notification, startUpVariants } from "../../styles/animation";
 
 // data: { image, name, review, forwhich, price, size, maxsize, headerType } of service and room
-const BookingBar = ({ data, popupStatus }) => {
+const BookingBar = ({ data, popupStatus, onClick }) => {
+  const navigate = useNavigate();
   const { createNotification } = useNotification();
+  const { user } = useAuth();
 
   const selectableTime = ["08:00", "10:00", "12:00", "14:00", "16:00"];
-  const [commentStarSelect, setCommentStarSelect] = useState(6);
-  const [currentPage, setCurrentPage] = useState(data.currentPage);
+  const [commentStarSelect, setCommentStarSelect] = useState(null);
+  const [currentPage, setCurrentPage] = useState(data.currentPage || 1);
   const [comments, setComments] = useState([]);
   const [commentStatus, setCommentStatus] = useState(false);
   const [status, setStatus] = useState("date is invalid");
   const [currentPet, setCurrentPet] = useState(null);
   const [petData, setPetData] = useState([]);
+  const [size, setSize] = useState(0);
   const [formData, setFormData] = useState({
     entryDate: "",
     exitDate: "",
     entryTime: "",
   });
-
-  useEffect(() => {
-    console.log(petData)
-  }, [petData])
 
   //  calculate date is valid or not
   //  @return: validDateStatus which contain 1)status, 2)warningText
@@ -109,17 +111,19 @@ const BookingBar = ({ data, popupStatus }) => {
         ),
       };
 
-      createBookedService(body).then((res) => {
-        if (res.success) {
-          createNotification(
-            "success",
-            "Booking success",
-            "Create booking successfully."
-          );
-        } else {
-          createNotification("fail", "Booking fail", res.msg);
-        }
-      }).then(() => changeBookingBarStatus());
+      createBookedService(body)
+        .then((res) => {
+          if (res.success) {
+            createNotification(
+              "success",
+              "Booking success",
+              "Create booking successfully."
+            );
+          } else {
+            createNotification("fail", "Booking fail", res.msg);
+          }
+        })
+        .then(() => changeBookingBarStatus());
     } else {
       body = {
         roomId: data.roomId,
@@ -129,17 +133,19 @@ const BookingBar = ({ data, popupStatus }) => {
         checkOut: new Date(`${formData.exitDate}T00:00:00.00Z`),
       };
 
-      createBookedRoom(body).then((res) => {
-        if (res.success) {
-          createNotification(
-            "success",
-            "Booking success",
-            "Create booking successfully."
-          );
-        } else {
-          createNotification("fail", "Booking fail", res.msg);
-        }
-      }).then(() => changeBookingBarStatus());
+      createBookedRoom(body)
+        .then((res) => {
+          if (res.success) {
+            createNotification(
+              "success",
+              "Booking success",
+              "Create booking successfully."
+            );
+          } else {
+            createNotification("fail", "Booking fail", res.msg);
+          }
+        })
+        .then(() => changeBookingBarStatus());
     }
   };
 
@@ -161,8 +167,9 @@ const BookingBar = ({ data, popupStatus }) => {
       getServiceStatusAPI(
         data.name,
         `${formData.entryDate}T${formData.entryTime}:00.00Z`
-      ).then((data) => {
-        data.available
+      ).then((res) => {
+        setSize(res.count);
+        res.count < 3
           ? setStatus("room available")
           : setStatus("room not available");
       });
@@ -171,8 +178,9 @@ const BookingBar = ({ data, popupStatus }) => {
         data.roomId,
         formData.entryDate,
         formData.exitDate
-      ).then((data) => {
-        data.available
+      ).then((res) => {
+        setSize(res.count);
+        res.count < data.maxsize
           ? setStatus("room available")
           : setStatus("room not available");
       });
@@ -191,32 +199,44 @@ const BookingBar = ({ data, popupStatus }) => {
 
   // fetch API to get petname
   useEffect(() => {
+    if (!user) return;
+
     if (data.headerType == "Service") {
-      fetchAllPetAPI(9, "name").then((pets) => setPetData(pets.data));
+      fetchAllPetAPI(user.customer.id, "name").then((pets) =>
+        setPetData(pets.data)
+      );
     } else {
-      fetchAvailablePetAPI(9, "name").then((pets) => setPetData(pets.data));
+      fetchAvailablePetAPI(user.customer.id, "name").then((pets) =>
+        setPetData(pets.data)
+      );
     }
     setCurrentPage(1);
-  }, []);
+  }, [user]);
 
   // fetch new comment data when currentPage change
   useEffect(() => {
-    if (data.length != 0) {
+    if (data) {
       if (data.headerType == "Service") {
-        fetchServiceReviewAPI(data.name, currentPage).then((comments) => {
-          if (comments.success) {
-            setCommentStatus(true);
-            comments.data.forEach((comment) => {
-              comment.comment_star = comment.comment_star.toFixed(1);
-            });
-            setComments(comments.data);
-          } else {
-            setCommentStatus(false);
-            setComments([]);
+        fetchServiceReviewAPI(data.name, commentStarSelect, currentPage).then(
+          (comments) => {
+            if (comments.success) {
+              setCommentStatus(true);
+              comments.data.forEach((comment) => {
+                comment.comment_star = comment.comment_star.toFixed(1);
+              });
+              setComments(comments.data);
+            } else {
+              setCommentStatus(false);
+              setComments([]);
+            }
           }
-        });
+        );
       } else {
-        fetchRoomWithCommentAPI(data.roomId, currentPage).then((comments) => {
+        fetchRoomWithCommentAPI(
+          data.roomId,
+          commentStarSelect,
+          currentPage
+        ).then((comments) => {
           if (comments.success) {
             setCommentStatus(true);
             comments.data.forEach((comment) => {
@@ -230,10 +250,10 @@ const BookingBar = ({ data, popupStatus }) => {
         });
       }
     }
-  }, [data, currentPage]);
+  }, [data, currentPage, commentStarSelect]);
 
   return (
-    <div className="w-1/2 bg-white rounded-3xl p-8 border-2 border-[var(--brown-color)] ">
+    <div className="w-1/2 bg-white rounded-3xl p-8 border-2 border-[var(--brown-color)] overflow-hidden">
       {/* header dataial section */}
       <section className="my-5 flex justify-between">
         <div className="w-2/3">
@@ -277,7 +297,14 @@ const BookingBar = ({ data, popupStatus }) => {
             )
           ) : null}
         </div>
-        <div className="w-1/3 flex flex-col justify-end items-end">
+        <div className="w-1/3 flex flex-col justify-between items-end">
+          {data.headerType === "Service" ? (
+            <motion.p className="text-center py-2 px-4 bg-[var(--light-brown-color)] rounded">
+              {size} / 3
+            </motion.p>
+          ) : (
+            <div />
+          )}
           <p className="text-2xl font-bold">{data.price} ฿</p>
         </div>
       </section>
@@ -286,7 +313,22 @@ const BookingBar = ({ data, popupStatus }) => {
 
       {/* booking detail section */}
       <section className="py-5 px-4">
-        <b className="text-3xl block mb-2">Your pet</b>
+        <div className="flex items-center justify-start gap-4 mb-2">
+          <b className="text-3xl block ">Your pet </b>
+          <motion.i
+            whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+            whileTap={{
+              scale: 0.9,
+              transition: { duration: 0 },
+              backgroundColor: "var(--brown-color)",
+            }}
+            onClick={() => {
+              navigate("/profile/pet");
+              onClick([], false);
+            }}
+            className="text-xl bi bi-plus inline-flex justify-center items-center cursor-pointer bg-[var(--dark-brown-color)] rounded-full !text-white"
+          ></motion.i>
+        </div>
         <div className="relative">
           <select
             onChange={(e) => setCurrentPet(e.target.value)}
@@ -372,7 +414,7 @@ const BookingBar = ({ data, popupStatus }) => {
           <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
         </b>
         <div className="my-5 grid grid-cols-5 gap-2 bg-[var(--light-brown-color)]  p-2">
-          {[6, 5, 4, 3, 2, 1, 0].map((star) => {
+          {[null, 5, 4, 3, 2, 1].map((star) => {
             return (
               <CommentStarSelector
                 style={`${
@@ -388,31 +430,56 @@ const BookingBar = ({ data, popupStatus }) => {
             );
           })}
         </div>
-        <div className="my-5 flex gap-3 flex-col">
-          {commentStatus ? (
-            <>
-              {comments.map((comment, index) => {
-                return (
-                  <CommentCard
-                    key={index}
-                    user={comment.commenter_name}
-                    star={comment.comment_star}
-                    detail={comment.comment_detail}
-                  />
-                );
-              })}
-              <Pagination
-                id={data.headerType == "Service" ? data.name : data.roomId}
-                pageAmount={data.commentPages}
-                currentPage={currentPage}
-                onClick={setCurrentPage}
-              />
-            </>
-          ) : (
-            <p className="text-xl w-full my-10 text-center !text-[var(--brown-color)] italic">
-              No reviews found.
-            </p>
-          )}
+
+        <div className="my-5 flex gap-3 flex-col h-[400px]">
+          <AnimatePresence mode="popLayout">
+            {commentStatus ? (
+              <motion.div
+                key="comments-container"
+                variants={notification}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="h-full flex flex-col justify-between"
+              >
+                <div className="h-full flex flex-col gap-2">
+                  <AnimatePresence mode="popLayout">
+                    {comments.map((comment, index) => {
+                      return (
+                        <CommentCard
+                          variants={notification}
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                          key={`${new Date()}-${comment.id || index}`}
+                          user={comment.commenter_name}
+                          star={comment.comment_star}
+                          detail={comment.comment_detail}
+                        />
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
+                <Pagination
+                  id={data.headerType == "Service" ? data.name : data.roomId}
+                  pageAmount={data.commentPages}
+                  currentPage={currentPage}
+                  onClick={setCurrentPage}
+                />
+              </motion.div>
+            ) : (
+              <motion.p
+                key="no-reviews"
+                variants={startUpVariants}
+                initial="hidden"
+                animate="found"
+                exit="exit"
+                className="text-xl w-full text-center !text-[var(--brown-color)] italic my-auto"
+              >
+                No reviews found.
+              </motion.p>
+            )}
+          </AnimatePresence>
         </div>
       </section>
       {/* comment section */}

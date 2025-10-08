@@ -25,6 +25,9 @@ import PetStatus from "./pages/staff/PetStatus";
 import PetUpdate from "./pages/staff/PetUpdate";
 import StaffReview from "./pages/staff/StaffReview";
 import RequireAuth from "./utils/RequireAuth";
+import Review from "./pages/customer/Review";
+import ReviewComp from "./components/review/ReviewComp";
+import HistoryComp from "./components/review/history/HistoryComp";
 
 const App = () => {
   const location = useLocation();
@@ -65,15 +68,7 @@ const App = () => {
             </>
           }
         />
-        <Route
-          path="/review"
-          element={
-            <>
-              <div>Review Page</div>
-              <Footer />
-            </>
-          }
-        />
+
         <Route path="/profile" element={<Profile />}>
           <Route index element={<ProfileComp />} />
           <Route path="booking" element={<BookingComp />} />
@@ -81,10 +76,14 @@ const App = () => {
           <Route path="pet/:id" element={<PetOverall />} />
           <Route path="pet/new" element={<NewPet />} />
         </Route>
+        <Route path="/review" element={<Review />}>
+          <Route index element={<ReviewComp />} />
+          <Route path="history" element={<HistoryComp />} />
+        </Route>
         <Route path="*" element={<Navigate to="/room" replace />} />
         {/* Staff Routes */}
         <Route path="/staff" element={<div>Staff log in</div>} />
-        <Route path="/staff/dashboard" element={ <Dashboard />}>
+        <Route path="/staff/dashboard" element={<Dashboard />}>
           <Route index element={<DashboardTab1 />} />
           <Route path="check-in" element={<DashboardTab2 />} />
           <Route path="check-out" element={<DashboardTab3 />} />
