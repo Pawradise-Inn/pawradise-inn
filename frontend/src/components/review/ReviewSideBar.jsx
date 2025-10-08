@@ -11,12 +11,10 @@ const ReviewSideBar = ({ badge }) => {
       text: "History",
       to: "/review/history",
       path: "history",
-      badge: badge
+      badge: badge,
     },
   ];
-  const [currentPage, setCurrentPage] = useState(
-    pathList[2] ? pathList[2] : "me"
-  );
+  const [currentPage, setCurrentPage] = useState(pathList[2] || "me");
 
   return (
     <SideBar
