@@ -1,9 +1,17 @@
 
+
+const {Storage} = require('@google-cloud/storage');
+const path = require('path');
+const storage = new Storage({
+  projectId: 'sacred-epigram-471206-f5',
+  keyFilename: path.join(__dirname, '../config/keyfile.json')
+})
+const bucket = storage.bucket('paw_image');
 const uploadImage = async (req, res) => {
     if(!req.file){
         return res.status(400).send('No file uploaded.');
     }
-    const blob = bucket.file(Data.now(), path.extname(req.file.originalname));
+    const blob = bucket.file(Date.now(), path.extname(req.file.originalname));
     const blobStream = blob.createWriteStream({
     resumable: false,
     metadata: {
