@@ -13,9 +13,10 @@ const findBookedRoomById = async(id)=>{
     return bookedRoom;
 };
 
-const overlappingRoom = async(checkIn, checkOut)=>{
+const overlappingRoom = async(roomId, checkIn, checkOut)=>{
     const count = await prisma.bookedRoom.count({
         where: {
+            roomId,
             checkIn: {lte: new Date(checkOut)},
             checkOut: {gte: new Date(checkIn)}
         }
