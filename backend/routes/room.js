@@ -15,6 +15,8 @@ const {
     getAllRoomsWithReviews
 } = require('../controllers/room')
 
+const {protect, authorize} = require('../middleware/auth');
+
 router.route('/available')
     .get(getAvailableRooms);
 
@@ -30,18 +32,18 @@ router.route('/reviews')
 
 router.route('/')
     .get(getRooms)
-    .post(createRoom);
+    .post(protect, authorize("STAFF"),createRoom);
 
 router.route('/:id')
     .get(getRoom)
-    .patch(updateRoom)
-    .delete(deleteRoom);
+    .patch(protect, authorize("STAFF"),updateRoom)
+    .delete(protect, authorize("STAFF"),deleteRoom);
 
 router.route('/:id/pictures')
-    .post(addPicturesToRoom)
-    .delete(deletePicturesFromRoom);
+    .post(protect, authorize("STAFF"), addPicturesToRoom)
+    .delete(protect, authorize("STAFF"), deletePicturesFromRoom);
 
 router.route('/:id/status')
-    .get(getRoomStatus);
+    .get(protect, authorize("STAFF"), getRoomStatus);
 
 module.exports = router;

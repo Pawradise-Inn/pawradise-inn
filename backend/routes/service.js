@@ -14,6 +14,8 @@ const {
     getServiceReviews
 } = require('../controllers/service');
 
+const {protect, authorize} = require('../middleware/auth');
+
 router.route('/status')
     .get(getServiceStatus);
 
@@ -29,15 +31,15 @@ router.route('/reviews')
 
 router.route('/')
     .get(getServices)      
-    .post(createService);  
+    .post(protect, authorize("STAFF"), createService);  
 
 router.route('/:id')
     .get(getService)        
-    .patch(updateService)  
-    .delete(deleteService);
+    .patch(protect, authorize("STAFF"), updateService)  
+    .delete(protect, authorize("STAFF"), deleteService);
 
 router.route('/:id/pictures')
-    .post(addPicturesToService) 
-    .delete(deletePicturesFromService); 
+    .post(protect, authorize("STAFF"), addPicturesToService) 
+    .delete(protect, authorize("STAFF"), deletePicturesFromService); 
 
 module.exports = router;

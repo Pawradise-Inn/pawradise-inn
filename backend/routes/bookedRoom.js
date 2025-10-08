@@ -10,16 +10,16 @@ const {
     getTodayRooms
 } = require('../controllers/bookedRoom');
 
-router.route('/dashboard')
-    .get(getTodayRooms);
+const {protect, authorize} = require('../middleware/auth');
 
+// router.get('/dashboard', getTodayRooms);
 router.route('/')
-    .get(getBookedRooms)
-    .post(createBookedRoom);
+    .get(protect, authorize("STAFF", "CUSTOMER"), getBookedRooms)
+    .post(protect, authorize("STAFF", "CUSTOMER"),createBookedRoom);
 
 router.route('/:id')
-    .get(getBookedRoom)
-    .patch(updateBookedRoom)
-    .delete(deleteBookedRoom);
+    .get(protect, authorize("STAFF", "CUSTOMER"),getBookedRoom)
+    .patch(protect, authorize("STAFF", "CUSTOMER"),updateBookedRoom)
+    .delete(protect, authorize("STAFF", "CUSTOMER"),deleteBookedRoom);
 
 module.exports = router;
