@@ -7,13 +7,73 @@ const {
 const { overlappingRoom } = require("./logics/bookedRoom");
 
 const getRooms = async (req, res) => {
+  let options = {};
+  
+  //Select filter
+  if (req.query.filter){
+    let where = JSON.parse(req.query.filter)
+    if (where.name){
+      where.name.mode = 'insensitive';
+    }
+    options.where = where;
+  }
+
+  //Select fields
+  if (req.query.select){
+    const fields = req.query.select.split(",");
+    options.select = fields.reduce((acc, field) => {
+      acc[field.trim()] = true;
+      return acc;
+    }, {});
+  }
+
+  //Sort
+  if (req.query.sort){
+    const sortFields = req.query.sort.split(",");
+    options.orderBy = sortFields.map(sortField => {
+      const [field, direction = 'asc'] = sortField.split(":");
+      const dir = direction.trim().toLowerCase() === 'desc' ? 'desc' : 'asc';
+      return {[field.trim()] : dir};
+    });
+  } else {
+    options.orderBy = {id: 'asc'};
+  }
+
+  //Pagination
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const startIndex = (page - 1)*limit;
+  const endIndex = page*limit;
+
+  options.skip = startIndex;
+  options.take = limit;
+
   try {
-    const rooms = await prisma.room.findMany();
-    if (rooms.length === 0)
+    const total = await prisma.room.count({
+      where: options.where
+    });
+    if (total === 0){
       return res
-        .status(404)
+        .status(200)
         .json({ success: false, msg: "No room in database" });
-    res.status(200).json({ success: true, data: rooms });
+    }
+
+    const rooms = await prisma.room.findMany(options);
+
+    const pagination = {};
+    if (endIndex < total){
+      pagination.next = {
+        page: page + 1,
+        limit: limit
+      };
+    }
+    if (startIndex > 0){
+      pagination.prev = {
+        page: page - 1,
+        limit: limit
+      };
+    }
+    res.status(200).json({ success: true, pagination,data: rooms, count: total });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
@@ -33,13 +93,14 @@ const getRoom = async (req, res) => {
 
 const createRoom = async (req, res) => {
   try {
-    const { capacity, price, petType, picture } = req.body;
+    const { number, name, capacity, price, type } = req.body;
     const room = await prisma.room.create({
       data: {
+        number: number,
+        name: name,
         capacity: capacity,
         price: price,
-        petType: petType,
-        picture: picture,
+        petType: type
       },
     });
     res.status(201).json({ success: true, data: room });
@@ -53,7 +114,9 @@ const updateRoom = async (req, res) => {
     const roomId = req.params.id;
     const dataToUpdate = {};
     if (req.body.price !== undefined) dataToUpdate.price = req.body.price;
+    if (req.body.name !== undefined) dataToUpdate.name = req.body.name;
     if (req.body.petType !== undefined) dataToUpdate.petType = req.body.petType;
+    if (req.body.capacity !== undefined) dataToUpdate.capacity = req.body.capacity;
 
     if (Object.keys(dataToUpdate).length === 0)
       return res
