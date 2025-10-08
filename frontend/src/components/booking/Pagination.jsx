@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 // pageAmount: total number of pages
 // currentPage: current page number
 // onClick: function to handle page change, takes the new page number as argument
@@ -5,14 +6,23 @@
 import { memo } from "react";
 import { getArrayWithRangeWithMid } from "../../utils/handleArray";
 
-const Pagination = ({ id, pageAmount, currentPage, onClick }) => {
+const Pagination = ({
+  id,
+  pageAmount,
+  currentPage,
+  onClick,
+  ...motionProps
+}) => {
   // check if the page number is the current page and hightlight it
   const checkCurrentPage = (pageNum) => {
     return pageNum === currentPage;
   };
 
   return (
-    <div className="my-10 flex justify-center items-center gap-1">
+    <motion.div
+      className="my-10 flex justify-center items-center gap-1"
+      {...motionProps}
+    >
       <i
         onClick={() => onClick(1)}
         className={`${
@@ -58,7 +68,7 @@ const Pagination = ({ id, pageAmount, currentPage, onClick }) => {
             : "pointer-events-auto opacity-100"
         } bi bi-chevron-double-right inline-flex justify-center items-center text-2xl cursor-pointer hover:scale-125 p-1 transition-all duration-200`}
       ></i>
-    </div>
+    </motion.div>
   );
 };
 

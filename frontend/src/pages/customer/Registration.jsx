@@ -110,6 +110,10 @@ const fields = [
     );
   }, [form, consentChecked]);
 
+  // useEffect(() => {
+  //   localStorage.removeItem("token");
+  // }, [])
+
   return (
     <>
       <div className="flex flex-row w-full overflow-auto">

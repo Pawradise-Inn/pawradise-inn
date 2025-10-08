@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
-import BookingPopup from "../../components/BookingPopup";
+import BookingPopup from "../../components/booking/BookingPopup";
 import Overlay from "../../components/Overlay";
 import ServiceCard from "../../components/service/ServiceCard";
 import { fetchServiceCommentsAPI } from "../../hooks/serviceAPI";
