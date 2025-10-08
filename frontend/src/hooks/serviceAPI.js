@@ -68,9 +68,9 @@ export const fetchServiceCommentsAPI = async () => {
   return response.data;
 };
 
-export const fetchServiceReviewAPI = async (name, NSP) => {
+export const fetchServiceReviewAPI = async (name, star, NSP) => {
   const response = await axios.get(`${API_URL}/reviews`, {
-    params: { name, NSP },
+    params: { name, star, NSP },
   });
   return response.data;
 };

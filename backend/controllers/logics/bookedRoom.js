@@ -13,12 +13,12 @@ const findBookedRoomById = async(id)=>{
     return bookedRoom;
 };
 
-const overlappingRoom = async(roomId, checkIn, checkOut)=>{
+const overlappingRoom = async(id, checkIn, checkOut)=>{
     const count = await prisma.bookedRoom.count({
         where: {
-            roomId,
-            checkIn: {lte: new Date(checkOut)},
-            checkOut: {gte: new Date(checkIn)}
+            roomId: Number(id),
+            checkIn: {lt: new Date(checkOut)},
+            checkOut: {gt: new Date(checkIn)}
         }
     });
     return count;
@@ -28,8 +28,8 @@ const duplicatedRoom = async(petId, checkIn, checkOut)=>{
     const duplicated = await prisma.bookedRoom.findMany({
         where: {
             petId: petId,
-            checkIn: { lte: new Date(checkOut) },
-            checkOut: { gte: new Date(checkIn) }
+            checkIn: { lt: new Date(checkOut) },
+            checkOut: { gt: new Date(checkIn) }
         }
     });
     return duplicated;

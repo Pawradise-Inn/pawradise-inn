@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { motion } from "motion/react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { fetchPetAPI, updatePetAPI } from "../../hooks/petAPI";
+import { startUpVariants } from "../../styles/animation";
 
 const PetUpdate = () => {
   const { createNotification } = useNotification();
@@ -118,16 +120,32 @@ const PetUpdate = () => {
   };
 
   return (
-    <div className="p-6 max-w-8xl">
+    <motion.div 
+      className="p-6 max-w-8xl"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
       {/* Header */}
-      <div className="mb-8">
+      <motion.div 
+        className="mb-8"
+        variants={startUpVariants}
+        initial="hidden"
+        animate="visible"
+        custom={0}
+      >
         <h1 className="text-3xl font-bold text-[var(--dark-brown-color)]"></h1>
-      </div>
+      </motion.div>
       <div></div>
       {/* Columns */}
       <div className="flex gap-8">
         {/* Left Column */}
-        <div className="flex flex-col flex-1 justify-between">
+        <motion.div 
+          className="flex flex-col flex-1 justify-between"
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
           {/* My Pets */}
           <div>
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-sleek">
@@ -146,31 +164,50 @@ const PetUpdate = () => {
               />
             </div>
           </div>
-        </div>
+        </motion.div>
         {/* Right Column */}
-        <div className="flex-1 flex flex-col">
+        <motion.div 
+          className="flex-1 flex flex-col"
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
           <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
             <h2 className="text-2xl font-bold mb-6">History</h2>
             <div className="space-y-6 overflow-y-auto pr-2 scrollbar-sleek">
-              {serviceData.map((service) => (
-                <ServiceCard
+              {serviceData.map((service, index) => (
+                <motion.div
                   key={service.id}
-                  service={service}
-                  getStatusText={getStatusText}
-                  getStatusColor={getRoomStatusColor}
-                />
+                  variants={startUpVariants}
+                  initial="hidden"
+                  animate="visible"
+                  custom={index + 1}
+                >
+                  <ServiceCard
+                    service={service}
+                    getStatusText={getStatusText}
+                    getStatusColor={getRoomStatusColor}
+                  />
+                </motion.div>
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 const PetCard = ({ pet }) => {
   return (
-    <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
+    <motion.div 
+      className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg"
+      variants={startUpVariants}
+      initial="hidden"
+      animate="visible"
+      custom={1}
+      whileHover={{ scale: 1.02 }}
+    >
       <div className="flex items-start space-x-6">
         <div className="w-64 h-64 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
           <img
@@ -199,7 +236,7 @@ const PetCard = ({ pet }) => {
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -208,7 +245,13 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
     setStatus(e.target.value);
   };
   return (
-    <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
+    <motion.div 
+      className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg"
+      variants={startUpVariants}
+      initial="hidden"
+      animate="visible"
+      custom={2}
+    >
       {/* Header */}
       <div className="flex items-center space-x-3 mb-6">
         <h2 className="text-2xl font-bold text-[var(--dark-brown-color)]">
@@ -222,7 +265,7 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
         <div className="flex flex-row justify-start">
           <label className="font-semibold mb-1 mr-4">Status:</label>
           <select
-            className="py-1 px-1 text-center p-2 border rounded-lg focus:ring-2 focus:ring-[var(--dark-brown-color)] focus:outline-none"
+            className="py-1 px-1 text-center p-2 border rounded-lg focus:ring-2 focus:ring-[var(--dark-brown-color)] focus:outline-none transition-all duration-200"
             value={status}
             onChange={handleStatusChange}
           >
@@ -241,27 +284,31 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
           <textarea
             rows="4"
             placeholder="Write a note here..."
-            className="p-2 border rounded-lg focus:ring-2 focus:ring-[var(--dark-brown-color)] focus:outline-none resize-none"
+            className="p-2 border rounded-lg focus:ring-2 focus:ring-[var(--dark-brown-color)] focus:outline-none resize-none transition-all duration-200"
           ></textarea>
         </div>
 
         {/* Submit Button */}
         <div className="flex-1">
-          <button
+          <motion.button
             className="bg-[var(--dark-brown-color)] !text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition cursor-pointer"
             onClick={() => handleSave()}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             Save
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             className="px-5 py-2 rounded-lg hover:bg-opacity-90 transition cursor-pointer"
             onClick={() => handleCancel()}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             Cancel
-          </button>
+          </motion.button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

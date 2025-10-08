@@ -202,8 +202,8 @@ const getServiceStatus = async (req, res)=>{ //requirement: 6
         });
         if (!service) return res.status(404).json({ success: false, error: "Service not found" });
 
-        const status = await overlappingService(service.id, schedule);
-        res.status(200).json({success: true, available: status < 3});
+        const count = await overlappingService(service.id, schedule);
+        res.status(200).json({success: true, count: count});
     }catch(err){
         res.status(400).json({success: false, error: err.message});
     }
@@ -211,7 +211,7 @@ const getServiceStatus = async (req, res)=>{ //requirement: 6
 
 const getServiceReviews = async (req, res) => { //requirement: 5
   try {
-    const { name, NSP } = req.query;
+    const { name, star, NSP } = req.query;
     const page = Number(NSP) || 1;
     const take = 3;
     const skip = (page - 1) * take;
@@ -222,14 +222,19 @@ const getServiceReviews = async (req, res) => { //requirement: 5
     const service = await prisma.service.findFirst({
         where: {name: name}
     });
+
+
+
     const reviews = await prisma.chatLog.findMany({
       where: {
         serviceId: service.id,
-        review: { not: null }
+        review: { not: null },
+        rating: star ? { equals: Number(star) } : undefined
       },
       skip,
       take,
       select: {
+        id: true,
         review: true,
         rating: true,
         review_date: true,
@@ -249,6 +254,7 @@ const getServiceReviews = async (req, res) => { //requirement: 5
     }
 
     const formattedReviews = reviews.map(r => ({
+        id: r.id,
       commenter_name: r.customer?.name || "Anonymous",
       comment_detail: r.review,
       comment_star: r.rating,
