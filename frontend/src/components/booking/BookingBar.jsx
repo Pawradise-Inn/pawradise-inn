@@ -1,6 +1,6 @@
 // this file still have to fetch userId from token
 
-import { AnimatePresence, motion, useMotionValue, useTransform, animate } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createBookedRoom } from "../../hooks/bookedRoomAPI";
 import { createBookedService } from "../../hooks/bookedServiceAPI";
@@ -413,18 +413,18 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
           {data.reviewStar}/5.0{" "}
           <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
         </b>
-        <div className="my-5 grid grid-cols-5 gap-2 bg-[var(--light-brown-color)]  p-2">
+        <div className="my-5 grid grid-cols-3 gap-2 bg-[var(--light-brown-color)]  p-2">
           {[null, 5, 4, 3, 2, 1].map((star) => {
             return (
               <CommentStarSelector
                 style={`${
                   commentStarSelect === star
-                    ? "bg-[var(--cream-color)] outline-2"
+                    ? "bg-[var(--cream-color)]"
                     : "bg-white"
                 }`}
                 key={star}
                 star={star}
-                // commentStarSelect={commentStarSelect}
+                commentStarSelect={commentStarSelect}
                 onClick={handleCommentStarSelect}
               />
             );
@@ -451,7 +451,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
                           initial="hidden"
                           animate="visible"
                           exit="exit"
-                          key={`${new Date()}-${comment.id || index}`}
+                          key={`${comment.id || index}`}
                           user={comment.commenter_name}
                           star={comment.comment_star}
                           detail={comment.comment_detail}

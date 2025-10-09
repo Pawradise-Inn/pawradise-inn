@@ -49,7 +49,7 @@ const Login = () => {
   const isFormValid = Object.values(form).every((field) => field.trim() !== "");
 
   return (
-    <div className="flex flex-col md:flex-row w-full h-dvh overflow-hidden">
+    <div className="flex flex-col md:flex-row w-full h-dvh overflow-hidden bg-[var(--cream-color)]">
       <motion.div 
         className="w-full md:w-3/5 h-64 md:h-auto flex-shrink-0"
         initial={{ x: -100, opacity: 0 }}
@@ -63,11 +63,8 @@ const Login = () => {
         />
       </motion.div>
 
-      <motion.div 
-        className="bg-[var(--cream-color)] w-full md:w-2/5 flex flex-col items-center justify-center p-6"
-        initial={{ x: 100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+      <div 
+        className="w-full md:w-2/5 flex flex-col items-center justify-center p-6"
       >
         <motion.img
           src={PawLogo}
@@ -76,25 +73,21 @@ const Login = () => {
           variants={startUpVariants}
           initial="hidden"
           animate="visible"
-          custom={0}
+          custom={1}
         />
         <motion.h1 
           className="text-2xl md:text-4xl text-[var(--dark-brown-color)] font-bold mt-4 md:mt-6"
           variants={startUpVariants}
           initial="hidden"
           animate="visible"
-          custom={1}
+          custom={2}
         >
           Pawradise In
         </motion.h1>
 
-        <motion.form
+        <form
           className="flex flex-col space-y-2 p-4 w-full max-w-md"
           onSubmit={(e) => handleSubmit(e, form, navigate)}
-          variants={startUpVariants}
-          initial="hidden"
-          animate="visible"
-          custom={2}
         >
           {fields.map((field, index) => (
             <motion.div
@@ -103,7 +96,7 @@ const Login = () => {
               variants={startUpVariants}
               initial="hidden"
               animate="visible"
-              custom={index + 3}
+              custom={index/3 + 2}
             >
               <label
                 className="text-[var(--brown-color)] font-semibold text-left w-full"
@@ -112,7 +105,7 @@ const Login = () => {
                 {field.label}
               </label>
               <input
-                className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full transition-all duration-200 hover:shadow-md"
+                className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full transition-all duration-200 hover:shadow-md outline-0"
                 type={field.type}
                 name={field.name}
                 placeholder={field.placeholder}
@@ -133,7 +126,7 @@ const Login = () => {
             variants={startUpVariants}
             initial="hidden"
             animate="visible"
-            custom={5}
+            custom={3}
             whileHover={isFormValid ? { scale: 1.05 } : {}}
             whileTap={isFormValid ? { scale: 0.95 } : {}}
           >
@@ -145,7 +138,7 @@ const Login = () => {
             variants={startUpVariants}
             initial="hidden"
             animate="visible"
-            custom={6}
+            custom={3.33}
           />
 
           <motion.p 
@@ -153,7 +146,7 @@ const Login = () => {
             variants={startUpVariants}
             initial="hidden"
             animate="visible"
-            custom={7}
+            custom={3.66}
           >
             Don't have an account?
             <NavLink
@@ -169,7 +162,7 @@ const Login = () => {
             variants={startUpVariants}
             initial="hidden"
             animate="visible"
-            custom={8}
+            custom={4}
           >
             <a href="/" className="underline hover:text-[var(--dark-brown-color)] transition-colors duration-200">
               Terms of Service
@@ -178,8 +171,8 @@ const Login = () => {
               Privacy Policy
             </a>
           </motion.p>
-        </motion.form>
-      </motion.div>
+        </form>
+      </div>
     </div>
   );
 };

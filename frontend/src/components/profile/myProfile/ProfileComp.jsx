@@ -57,7 +57,7 @@ const ProfileComp = () => {
   }, [user]);
 
   const handleCancel = () => {
-    createNotification("warning", "Confirmation", "Are you sure?", () => {
+    createNotification("warning", "Are you sure to cancel your change?", "Your modified infomation will be discarded.", () => {
       if(user) setNewUser({id: user.id, ... user})
     })
   };

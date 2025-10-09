@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "motion/react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { fetchPetAPI, updatePetAPI } from "../../hooks/petAPI";
-import { startUpVariants } from "../../styles/animation";
 
 const PetUpdate = () => {
   const { createNotification } = useNotification();
@@ -127,15 +126,9 @@ const PetUpdate = () => {
       transition={{ duration: 0.6 }}
     >
       {/* Header */}
-      <motion.div 
-        className="mb-8"
-        variants={startUpVariants}
-        initial="hidden"
-        animate="visible"
-        custom={0}
-      >
+      <div className="mb-8">
         <h1 className="text-3xl font-bold text-[var(--dark-brown-color)]"></h1>
-      </motion.div>
+      </div>
       <div></div>
       {/* Columns */}
       <div className="flex gap-8">
@@ -176,19 +169,13 @@ const PetUpdate = () => {
             <h2 className="text-2xl font-bold mb-6">History</h2>
             <div className="space-y-6 overflow-y-auto pr-2 scrollbar-sleek">
               {serviceData.map((service, index) => (
-                <motion.div
-                  key={service.id}
-                  variants={startUpVariants}
-                  initial="hidden"
-                  animate="visible"
-                  custom={index + 1}
-                >
+                <div key={service.id}>
                   <ServiceCard
                     service={service}
                     getStatusText={getStatusText}
                     getStatusColor={getRoomStatusColor}
                   />
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -202,10 +189,6 @@ const PetCard = ({ pet }) => {
   return (
     <motion.div 
       className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg"
-      variants={startUpVariants}
-      initial="hidden"
-      animate="visible"
-      custom={1}
       whileHover={{ scale: 1.02 }}
     >
       <div className="flex items-start space-x-6">
@@ -245,13 +228,7 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
     setStatus(e.target.value);
   };
   return (
-    <motion.div 
-      className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg"
-      variants={startUpVariants}
-      initial="hidden"
-      animate="visible"
-      custom={2}
-    >
+    <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
       {/* Header */}
       <div className="flex items-center space-x-3 mb-6">
         <h2 className="text-2xl font-bold text-[var(--dark-brown-color)]">
@@ -308,7 +285,7 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
           </motion.button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

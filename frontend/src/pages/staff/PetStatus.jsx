@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { motion } from "motion/react";
 import { fetchAllPetAPI } from "../../hooks/petAPI";
-import { startUpVariants } from "../../styles/animation";
 
 const PetCard = ({ pet }) => {
   return (
     <motion.div
-
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
     >
       <NavLink to={`/staff/pet/${pet.id}`}>
         <div className="mx-5 bg-[var(--cream-color)] border-1 border-color-[var(--dark-brown-color)] rounded-xl p-4 shadow-lg flex flex-col space-y-4 hover:shadow-xl transition-all duration-300 cursor-pointer">
@@ -96,44 +96,20 @@ const PetStatus = () => {
 
   return (
     <div className="mt-8 flex flex-col items-center">
-      <motion.b
-        className="text-7xl text-center block m-8 mt-0"
-        variants={startUpVariants}
-        initial="hidden"
-        animate="visible"
-        custom={0}
-      >
+      <b className="text-7xl text-center block m-8 mt-0">
         Pet Status
-      </motion.b>
-      <motion.hr
-        className="lg:w-300 md:w-175 sm:w-100 border-1 border-[var(--brown-color)] mt-2 mb-3"
-        variants={startUpVariants}
-        initial="hidden"
-        animate="visible"
-        custom={1}
-      />
+      </b>
+      <hr className="lg:w-300 md:w-175 sm:w-100 border-1 border-[var(--brown-color)] mt-2 mb-3" />
       <div className="flex mx-5 items-center space-x-6">
-        <motion.div
-          className="flex my-8 mx-15 border-2 rounded-4xl px-10 py-2 text-3xl w-64 sm:w-80 md:w-[400px] lg:w-[600px]"
-          variants={startUpVariants}
-          initial="hidden"
-          animate="visible"
-          custom={2}
-        >
+        <div className="flex my-8 mx-15 border-2 rounded-4xl px-10 py-2 text-3xl w-64 sm:w-80 md:w-[400px] lg:w-[600px]">
           <i className="bi bi-search opacity-50 pr-2 flex justify-center items-center "></i>
           <input
             className="w-full outline-0 placeholder:opacity-75"
             placeholder="search"
             onChange={(e) => setSearch(e.target.value)}
           />
-        </motion.div>
-        <motion.div
-          className="flex my-6 space-x-6"
-          variants={startUpVariants}
-          initial="hidden"
-          animate="visible"
-          custom={3}
-        >
+        </div>
+        <div className="flex my-6 space-x-6">
           <label className="relative flex items-center space-x-2 cursor-pointer font-semibold">
             <input
               type="checkbox"
@@ -169,16 +145,11 @@ const PetStatus = () => {
 
             <span>service</span>
           </label>
-        </motion.div>
+        </div>
       </div>
       <div className="grid grid-cols-3 gap-6 max-w-7xl mx-32 my-8">
         {filteredPets.map((pet, index) => (
-          <PetCard variants={startUpVariants}
-            initial="hidden"
-            animate="visible"
-            custom={index / 3 + 4}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }} key={pet.id} pet={pet} />
+          <PetCard key={pet.id} pet={pet} />
         ))}
       </div>
     </div>
