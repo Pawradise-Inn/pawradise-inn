@@ -65,7 +65,7 @@ const createChatLog = async(req, res)=> {
         const { review, rating, customerId, serviceId } = req.body;
 
         if (!customerId || !serviceId) {
-            return res.status(400).json({ error: 'Customer ID and Service ID are required'});
+            return res.status(200).json({ error: 'Customer ID and Service ID are required'});
         }
 
         const existingReview = await prisma.chatLog.findFirst({
@@ -76,7 +76,7 @@ const createChatLog = async(req, res)=> {
         });
 
         if (existingReview){
-            return res.status(400).json({success: false, error: 'Customer has already review'});
+            return res.status(200).json({success: false, error: 'Customer has already review'});
         }
 
         const chatlog = await prisma.chatLog.create({
@@ -100,7 +100,7 @@ const replyToChatLog = async (req, res)=> {
         const { reply, staffId } = req.body;
 
         if (!reply || !staffId) {
-            return res.status(400).json({ error: 'Reply text and staff ID are required' });
+            return res.status(200).json({ error: 'Reply text and staff ID are required' });
         }
 
         const chatlog = await prisma.chatLog.update({

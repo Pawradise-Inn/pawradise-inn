@@ -198,7 +198,7 @@ const cancelBooking = async(req, res) =>{
     }
 
     if (booking.status !== "BOOKED" && booking.status !== "PENDING") {
-      return res.status(400).json({
+      return res.status(200).json({
         success: false,
         message: "Booking cannot be cancelled"
       });
@@ -289,11 +289,6 @@ const putBooking = async (req, res) => {
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });
     }
-};
-
-module.exports = {
-    // ... other exports
-    putBooking,
 };
 
 module.exports = {
