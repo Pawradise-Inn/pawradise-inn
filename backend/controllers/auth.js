@@ -154,13 +154,13 @@ exports.login = async (req, res, next) => {
 
     const user = await findUserByUsername(userName);
     if (!user) {
-        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        return res.status(401).json({ success: false, message: 'username or password are wrong' });
     }
 
     // Match password
     const isMatch = await matchPassword(password, user.password);
     if (!isMatch) {
-        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        return res.status(401).json({ success: false, message: 'username or password are wrong' });
     }
     // Create token
     sendTokenResponse(user, 200, res);
