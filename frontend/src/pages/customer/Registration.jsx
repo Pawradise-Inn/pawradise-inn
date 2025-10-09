@@ -122,7 +122,7 @@ const fields = [
 
   return (
     <>
-      <div className="flex flex-row w-full overflow-auto">
+      <div className="flex flex-row w-full overflow-auto bg-[var(--cream-color)]">
         <motion.div 
           className="w-3/5"
           initial={{ x: -100, opacity: 0 }}
@@ -130,14 +130,14 @@ const fields = [
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <img
-            className="object-cover w-full h-full "
+            className="object-cover w-full h-full scale-105"
             src={registerImg}
             alt="Registration"
           />
         </motion.div>
 
-        <motion.div 
-          className="w-2/5 bg-[var(--cream-color)] flex flex-col items-center justify-center py-8"
+        <div 
+          className="w-2/5 flex flex-col items-center justify-center py-8"
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
@@ -148,12 +148,12 @@ const fields = [
             variants={startUpVariants}
             initial="hidden"
             animate="visible"
-            custom={0}
+            custom={1}
           >
             Registration
           </motion.h1>
 
-          <motion.form
+          <form
             className="flex flex-col space-y-2 p-2 w-full max-w-md"
             onSubmit={handleSubmit}
             variants={startUpVariants}
@@ -168,7 +168,7 @@ const fields = [
                 variants={startUpVariants}
                 initial="hidden"
                 animate="visible"
-                custom={index + 2}
+                custom={index /3+ 1}
               >
                 <label
                   className="text-[var(--brown-color)] font-semibold text-left mb-1"
@@ -178,7 +178,7 @@ const fields = [
                 </label>
                 <input
                   id={field.name}
-                  className="border-2 border-[var(--dark-brown-color)] bg-white opacity-65 rounded-md p-2 outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] focus:border-transparent shadow-lg w-full transition-all duration-200 hover:shadow-xl focus:opacity-100"
+                  className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full transition-all duration-200 hover:shadow-md outline-0"
                   type={field.type}
                   name={field.name}
                   placeholder={field.placeholder}
@@ -195,7 +195,7 @@ const fields = [
               variants={startUpVariants}
               initial="hidden"
               animate="visible"
-              custom={9}
+              custom={3.66}
             >
               <input
                 type="checkbox"
@@ -228,7 +228,7 @@ const fields = [
               variants={startUpVariants}
               initial="hidden"
               animate="visible"
-              custom={10}
+              custom={4}
             >
               <NavLink to="/login" className="w-full md:w-40">
                 <motion.button
@@ -255,8 +255,8 @@ const fields = [
                 Done
               </motion.button>
             </motion.div>
-          </motion.form>
-        </motion.div>
+          </form>
+        </div>
       </div>
     </>
   );

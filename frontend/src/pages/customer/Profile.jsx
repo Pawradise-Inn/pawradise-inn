@@ -7,7 +7,7 @@ const Profile = () => {
   const {user, setUser} = useAuth();
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex overflow-x-hidden">
       {/* Sidebar */}
       <motion.div
         initial={{ x: -100, opacity: 0 }}

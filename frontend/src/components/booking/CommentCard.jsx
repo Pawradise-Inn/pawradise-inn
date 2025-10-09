@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { memo } from "react";
 
 //  user: username of the commenter
 //  star: star rating given by the user
@@ -20,4 +21,4 @@ const CommentCard = ({ user, star, detail, ...motionProps }) => {
   );
 };
 
-export default CommentCard;
+export default memo(CommentCard);
