@@ -11,7 +11,7 @@ const getBookedServices = async (req, res) => {
     const bookedServices = await prisma.bookedService.findMany();
     if (bookedServices.length === 0)
       return res
-        .status(404)
+        .status(200)
         .json({ success: false, msg: "No booked services in database" });
     res.status(200).json({ success: true, data: bookedServices });
   } catch (err) {
@@ -64,7 +64,7 @@ const updateBookedService = async (req, res) => {
     const bookedId = Number(req.params.id);
     const scheduled = req.body.scheduled;
     if (!scheduled)
-      return res.status(400).json({ success: false, msg: "Nothing to update" });
+      return res.status(200).json({ success: false, msg: "Nothing to update" });
     const updateScheduled = new Date(scheduled);
     const bookedService = await findBookedServiceById(bookedId);
     const count = await overlappingService(
@@ -73,7 +73,7 @@ const updateBookedService = async (req, res) => {
     );
     if (count >= 3) {
       return res
-        .status(400)
+        .status(200)
         .json({ success: false, msg: "Service is not available" });
     }
     const check = await duplicatedService(
@@ -82,7 +82,7 @@ const updateBookedService = async (req, res) => {
       updateScheduled
     );
     if (check)
-      return res.status(400).json({
+      return res.status(200).json({
         success: false,
         msg: "Your pet had already schedule in this day",
       });
@@ -119,7 +119,6 @@ const deleteBookedService = async (req, res) => {
 };
 
 const getTodayService = async (req, res) => {
-  console.log("ROTI2");
   try {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);

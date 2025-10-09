@@ -206,12 +206,20 @@ const getRoomStatus = async (req, res) => {
 };
 
 const getAvailableRooms = async (req, res) => { //requirement: 7
+  let options = {};
+
+  if(req.query.checkIn){
+    const entryDate = new Date(checkIn);
+    options.checkOut = {gt: entryDate};
+  }
+  if(req.query.checkOut){
+    const exitDate = new Date(checkOut);
+    options.checkIn = {lt: exitDate};
+  }
+
+  console.log(entryDate);
+  console.log(exitDate);
   try {
-    const { entry_date_with_time, exit_date_with_time } = req.query;
-
-    const entryDate = new Date(entry_date_with_time);
-    const exitDate = new Date(exit_date_with_time);
-
     const allRooms = await prisma.room.findMany({
       select: {
         id: true,
