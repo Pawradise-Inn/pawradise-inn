@@ -336,60 +336,60 @@ const getAllRoomsWithReviews = async (req, res) => { //requirement: 9
   }
 };
 
-const getRoomReviews = async (req, res) => {
-  //requirement: 5
-  try {
-    const { roomId, star, NSP } = req.query;
-    const page = Number(NSP) || 1;
-    const take = 3;
-    const skip = (page - 1) * take;
+// const getRoomReviews = async (req, res) => {
+//   //requirement: 5
+//   try {
+//     const { roomId, star, NSP } = req.query;
+//     const page = Number(NSP) || 1;
+//     const take = 3;
+//     const skip = (page - 1) * take;
 
-    if (!roomId) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "roomId is required" });
-    }
-    const reviews = await prisma.chatLog.findMany({
-      where: {
-        roomId: Number(roomId),
-        review: { not: null },
-        rating: star ? { equals: Number(star) } : undefined,
-      },
-      skip,
-      take,
-      select: {
-        id: true,
-        review: true,
-        rating: true,
-        review_date: true,
-        customer: {
-          include: {
-            user: {
-              select: {
-                user_name: true,
-              },
-            },
-          },
-        },
-      },
-    });
+//     if (!roomId) {
+//       return res
+//         .status(400)
+//         .json({ success: false, msg: "roomId is required" });
+//     }
+//     const reviews = await prisma.chatLog.findMany({
+//       where: {
+//         roomId: Number(roomId),
+//         review: { not: null },
+//         rating: star ? { equals: Number(star) } : undefined,
+//       },
+//       skip,
+//       take,
+//       select: {
+//         id: true,
+//         review: true,
+//         rating: true,
+//         review_date: true,
+//         customer: {
+//           include: {
+//             user: {
+//               select: {
+//                 user_name: true,
+//               },
+//             },
+//           },
+//         },
+//       },
+//     });
 
-    if (!reviews || reviews.length === 0) {
-      return res.status(200).json({ success: false, msg: "No reviews found" });
-    }
+//     if (!reviews || reviews.length === 0) {
+//       return res.status(200).json({ success: false, msg: "No reviews found" });
+//     }
 
-    const formattedReviews = reviews.map((r) => ({
-      id: r.id,
-      commenter_name: r.customer?.name || "Anonymous",
-      comment_detail: r.review,
-      comment_star: r.rating,
-    }));
+//     const formattedReviews = reviews.map((r) => ({
+//       id: r.id,
+//       commenter_name: r.customer?.name || "Anonymous",
+//       comment_detail: r.review,
+//       comment_star: r.rating,
+//     }));
 
-    res.status(200).json({ success: true, data: formattedReviews });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-};
+//     res.status(200).json({ success: true, data: formattedReviews });
+//   } catch (err) {
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// };
 
 module.exports = {
   getRooms,
@@ -400,7 +400,7 @@ module.exports = {
   addPicturesToRoom,
   deletePicturesFromRoom,
   getRoomStatus,
-  getRoomReviews,
+  // getRoomReviews,
   getAvailableRooms,
   getAllRoomsWithReviews,
 };

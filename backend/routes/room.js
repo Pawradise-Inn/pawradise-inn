@@ -20,15 +20,11 @@ const {protect, authorize} = require('../middleware/auth');
 router.route('/available')
     .get(getAvailableRooms);
 
-router.route('/comments')
-    .get(getRoomReviews);
-
 router.route('/reviews')
     .get(getAllRoomsWithReviews);
 
-// const chatlogs = require('./chatlog.js');
-// router.use('/comments', chatlogs);
-// router.use('/:roomId/comments', chatlogs);
+const chatlogs = require('./chatlog.js');
+router.use('/:roomId/comments', chatlogs);
 
 router.route('/')
     .get(getRooms)

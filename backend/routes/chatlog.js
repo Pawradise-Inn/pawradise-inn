@@ -3,10 +3,11 @@ const router = express.Router();
 
 const {
     getChatLogs,
-    getChatLogById,
+    getChatLog,
     createChatLog,
     replyToChatLog,
-    deleteChatLog
+    deleteChatLog,
+    updateChatLog
 } = require('../controllers/chatlog');
 
 const {protect, authorize} = require('../middleware/auth');
@@ -16,8 +17,9 @@ router.route('/')
     .post(protect, authorize("CUSTOMER"), createChatLog);
 
 router.route('/:id')
-    .get(getChatLogById)
-    .patch(protect, authorize("STAFF"), replyToChatLog)
+    .get(getChatLog)
+    .post(protect, authorize("STAFF"), replyToChatLog)
+    .patch(protect, authorize("STAFF", "CUSTOMER"), updateChatLog)
     .delete(protect, authorize("STAFF", "CUSTOMER"), deleteChatLog);
 
 module.exports = router;
