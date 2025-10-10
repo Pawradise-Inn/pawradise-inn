@@ -11,7 +11,7 @@ const {
     deletePicturesFromService,
     getAllServiceComments,
     getServiceStatus,
-    getServiceReviews
+    //getServiceReviews
 } = require('../controllers/service');
 
 const {protect, authorize} = require('../middleware/auth');
@@ -22,12 +22,11 @@ router.route('/status')
 router.route('/comments')
     .get(getAllServiceComments);
 
-router.route('/reviews')
-    .get(getServiceReviews);
+// router.route('/reviews')
+    // .get(getServiceReviews);
 
-// const chatlogs = require('./chatlog.js');
-// router.use('/comments', chatlogs);
-// router.use('/:serviceId/comments', chatlogs);
+const chatlogs = require('./chatlog.js');
+router.use('/:serviceId/comments', chatlogs);
 
 router.route('/')
     .get(getServices)      
