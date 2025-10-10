@@ -279,7 +279,7 @@ const getAvailableRooms = async (req, res) => { //requirement: 7
   }
 };
 
-const getAllRoomsWithReviews = async (req, res) => { //requirement: 9
+const getRoomsWithReviews = async (req, res) => { //requirement: 9
   try {
     const rooms = await prisma.room.findMany({
       select: {
@@ -400,7 +400,7 @@ module.exports = {
   addPicturesToRoom,
   deletePicturesFromRoom,
   getRoomStatus,
-  // getRoomReviews,
+  getRoomsWithReviews,
   getAvailableRooms,
-  getAllRoomsWithReviews,
+  // getRoomReviews,
 };

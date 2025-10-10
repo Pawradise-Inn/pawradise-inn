@@ -9,22 +9,21 @@ const {
     deleteRoom,
     addPicturesToRoom,
     deletePicturesFromRoom,
-    getRoomStatus,
-    getRoomReviews,
     getAvailableRooms,
-    getAllRoomsWithReviews
+    getRoomsWithReviews,
+    getRoomStatus
 } = require('../controllers/room')
 
 const {protect, authorize} = require('../middleware/auth');
+
+const chatlogs = require('./chatlog.js');
+router.use('/:roomId/comments', chatlogs);
 
 router.route('/available')
     .get(getAvailableRooms);
 
 router.route('/reviews')
-    .get(getAllRoomsWithReviews);
-
-const chatlogs = require('./chatlog.js');
-router.use('/:roomId/comments', chatlogs);
+    .get(getRoomsWithReviews);
 
 router.route('/')
     .get(getRooms)
