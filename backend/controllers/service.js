@@ -166,7 +166,7 @@ const deletePicturesFromService = async (req, res) => {
     }
 };
 
-const getAllServiceComments = async (req, res)=>{ //requirement: 1
+const getServicesWithReviews = async (req, res)=>{ //requirement: 1
     try{
         const services = await prisma.service.findMany({
             include: {
@@ -275,7 +275,7 @@ module.exports = {
     deleteService,
     addPicturesToService,
     deletePicturesFromService,
-    getAllServiceComments,
     getServiceStatus,
+    getServicesWithReviews,
     //getServiceReviews
 };

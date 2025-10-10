@@ -9,24 +9,21 @@ const {
     deleteService,
     addPicturesToService,
     deletePicturesFromService,
-    getAllServiceComments,
+    getServicesWithReviews,
     getServiceStatus,
     //getServiceReviews
 } = require('../controllers/service');
 
 const {protect, authorize} = require('../middleware/auth');
 
+const chatlogs = require('./chatlog');
+router.use('/:serviceName/comments', chatlogs);
+
 router.route('/status')
     .get(getServiceStatus);
 
-router.route('/comments')
-    .get(getAllServiceComments);
-
-// router.route('/reviews')
-    // .get(getServiceReviews);
-
-const chatlogs = require('./chatlog.js');
-router.use('/:serviceId/comments', chatlogs);
+router.route('/reviews')
+    .get(getServicesWithReviews);
 
 router.route('/')
     .get(getServices)      
