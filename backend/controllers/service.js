@@ -166,7 +166,7 @@ const deletePicturesFromService = async (req, res) => {
     }
 };
 
-const getServicesWithReviews = async (req, res)=>{ //requirement: 1
+const getServicesWithPagination = async (req, res)=>{ //requirement: 1
     try{
         const services = await prisma.service.findMany({
             include: {
@@ -209,62 +209,62 @@ const getServiceStatus = async (req, res)=>{ //requirement: 6
     }
 };
 
-// const getServiceReviews = async (req, res) => { //requirement: 5
-//   try {
-//     const { name, star, NSP } = req.query;
-//     const page = Number(NSP) || 1;
-//     const take = 3;
-//     const skip = (page - 1) * take;
+const getServiceReviews = async (req, res) => { //requirement: 5
+  try {
+    const { name, star, NSP } = req.query;
+    const page = Number(NSP) || 1;
+    const take = 3;
+    const skip = (page - 1) * take;
 
-//     if (!name) {
-//       return res.status(400).json({ success: false, msg: "name is required" });
-//     }
-//     const service = await prisma.service.findFirst({
-//         where: {name: name}
-//     });
+    if (!name) {
+      return res.status(400).json({ success: false, msg: "name is required" });
+    }
+    const service = await prisma.service.findFirst({
+        where: {name: name}
+    });
 
 
 
-//     const reviews = await prisma.chatLog.findMany({
-//       where: {
-//         serviceId: service.id,
-//         review: { not: null },
-//         rating: star ? { equals: Number(star) } : undefined
-//       },
-//       skip,
-//       take,
-//       select: {
-//         id: true,
-//         review: true,
-//         rating: true,
-//         review_date: true,
-//         customer: {
-//           include:{
-//             user:{
-//                 select: {
-//                     user_name: true
-//             }}
-//           }
-//         }
-//       }
-//     });
+    const reviews = await prisma.chatLog.findMany({
+      where: {
+        serviceId: service.id,
+        review: { not: null },
+        rating: star ? { equals: Number(star) } : undefined
+      },
+      skip,
+      take,
+      select: {
+        id: true,
+        review: true,
+        rating: true,
+        review_date: true,
+        customer: {
+          include:{
+            user:{
+                select: {
+                    user_name: true
+            }}
+          }
+        }
+      }
+    });
 
-//     if (!reviews || reviews.length === 0) {
-//       return res.status(200).json({ success: false, msg: "No reviews found" });
-//     }
+    if (!reviews || reviews.length === 0) {
+      return res.status(200).json({ success: false, msg: "No reviews found" });
+    }
 
-//     const formattedReviews = reviews.map(r => ({
-//         id: r.id,
-//       commenter_name: r.customer?.name || "Anonymous",
-//       comment_detail: r.review,
-//       comment_star: r.rating,
-//     }));
+    const formattedReviews = reviews.map(r => ({
+        id: r.id,
+      commenter_name: r.customer?.user.user_name || "Anonymous",
+      comment_detail: r.review,
+      comment_star: r.rating,
+    }));
 
-//     res.status(200).json({ success: true, data: formattedReviews });
-//   } catch (err) {
-//     res.status(500).json({ success: false, error: err.message });
-//   }
-// };
+    res.status(200).json({ success: true, data: formattedReviews });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
 
 
 module.exports = {
@@ -276,6 +276,6 @@ module.exports = {
     addPicturesToService,
     deletePicturesFromService,
     getServiceStatus,
-    getServicesWithReviews,
-    //getServiceReviews
+    getServicesWithPagination,
+    getServiceReviews
 };

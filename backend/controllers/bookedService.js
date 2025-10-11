@@ -51,7 +51,7 @@ const createBookedService = async (req, res) => {
     );
     res.status(201).json({ success: true, data: bookedService });
   } catch (err) {
-    if (err.code == "SERVICE_FULL" || err.code == "SERVICE_DUPLICATE" || err.code == "PET_NOT_FREE" || err.code == "PET_NOT_SUIT") {
+    if (err.code == "PET_NOT_SUIT" || err.code == "SERVICE_FULL" || err.code == "SERVICE_DUPLICATE" || err.code == "PET_NOT_FREE") {
       res.status(200).json({ success: false, msg: err.message });
       return;
     } 

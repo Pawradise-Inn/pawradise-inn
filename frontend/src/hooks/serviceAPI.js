@@ -27,8 +27,10 @@ export const fetchServiceAPI = async (id) => {
  * POST: Creates a new service.
  * Corresponds to: POST api/v1/service
  */
-export const addServiceAPI = async (serviceData) => {
-  const response = await axios.post(API_URL, serviceData);
+export const addServiceAPI = async (serviceData, token = localStorage.getItem("token")) => {
+  const response = await axios.post(API_URL, serviceData, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   return response.data;
 };
 
@@ -36,8 +38,10 @@ export const addServiceAPI = async (serviceData) => {
  * DELETE: Deletes a service by its ID.
  * Corresponds to: DELETE api/v1/service/:id
  */
-export const deleteServiceAPI = async (id) => {
-  const response = await axios.delete(`${API_URL}/${id}`);
+export const deleteServiceAPI = async (id, token = localStorage.getItem("token")) => {
+  const response = await axios.delete(`${API_URL}/${id}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   return response.data;
 };
 
@@ -45,8 +49,10 @@ export const deleteServiceAPI = async (id) => {
  * PUT: Updates an existing service by its ID.
  * (This is based on your example file and is a standard operation)
  */
-export const updateServiceAPI = async (id, serviceData) => {
-  const response = await axios.patch(`${API_URL}/${id}`, serviceData);
+export const updateServiceAPI = async (id, serviceData, token = localStorage.getItem("token")) => {
+  const response = await axios.patch(`${API_URL}/${id}`, serviceData, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   return response.data;
 };
 
@@ -63,13 +69,36 @@ export const getServiceStatusAPI = async (name, entryDate) => {
  * GET: Fetches comments, optionally filtered by name and page.
  * Corresponds to: GET api/v1/service/comments?name=${ชื่อ}&NSP=${page}
  */
-export const fetchServiceCommentsAPI = async (serviceId) => {
-  const response = await axios.get(`${API_URL}/${serviceId}/comments`);
+export const fetchAllServiceWithPaginationAPI = async () => {
+  const response = await axios.get(`${API_URL}/reviews`);
   return response.data;
 };
 
-export const fetchServiceReviewAPI = async () => {
-  const response = await axios.get(`${API_URL}/reviews`);
+export const fetchServiceReviewsAPI = async (name, star, page) => {
+  const params = {};
+  if (name) params.name = name;
+  if (star !== null && star !== undefined) params.star = star;
+  if (page) params.page = page;
+
+  const response = await axios.get(`${API_URL}/${name}/reviews`, {
+    params,
+  });
+  return response.data;
+};
+
+// Add picture management functions
+export const addPicturesToServiceAPI = async (id, picture, token = localStorage.getItem("token")) => {
+  const response = await axios.post(`${API_URL}/${id}/pictures`, { picture }, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  return response.data;
+};
+
+export const deletePicturesFromServiceAPI = async (id, picture, token = localStorage.getItem("token")) => {
+  const response = await axios.delete(`${API_URL}/${id}/pictures`, {
+    data: { picture },
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   return response.data;
 };
 

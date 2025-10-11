@@ -20,20 +20,34 @@ export const getChatLogByIdAPI = async (id) => {
 
 // Create a new chat log (review)
 // Required: { review, rating, customerId, serviceId }
-export const createChatLogAPI = async (chatlogData) => {
-  const res = await axios.post(`${API_URL}`, chatlogData);
+export const createChatLogAPI = async (chatlogData, token = localStorage.getItem("token")) => {
+  const res = await axios.post(`${API_URL}`, chatlogData, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   return res.data;
 };
 
 // Reply to a chat log (staff response)
 // Required: { reply, staffId }
-export const replyToChatLogAPI = async (id, replyData) => {
-  const res = await axios.post(`${API_URL}/${id}`, replyData);
+export const replyToChatLogAPI = async (id, replyData, token = localStorage.getItem("token")) => {
+  const res = await axios.post(`${API_URL}/${id}`, replyData, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  return res.data;
+};
+
+// Update a chat log
+export const updateChatLogAPI = async (id, updateData, token = localStorage.getItem("token")) => {
+  const res = await axios.patch(`${API_URL}/${id}`, updateData, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   return res.data;
 };
 
 // Delete a chat log
-export const deleteChatLogAPI = async (id) => {
-  const res = await axios.delete(`${API_URL}/${id}`);
+export const deleteChatLogAPI = async (id, token = localStorage.getItem("token")) => {
+  const res = await axios.delete(`${API_URL}/${id}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   return res.data;
 };

@@ -5,14 +5,14 @@ import { getChatLogsAPI } from "../../../hooks/chatlogAPI";
 import { useNotification } from "../../../context/notification/NotificationProvider";
 import ReviewPopup from "../ReviewPopUp";
 import Overlay from "../../Overlay";
-import { overlay, popUP } from "../../../styles/animation";
+import { overlay, popUP, startUpVariants } from "../../../styles/animation";
 import { AnimatePresence } from "motion/react";
 
 const HistoryComp = () => {
   const { createNotification } = useNotification();
   const { user, historys, setHistorys } = useOutletContext();
   const [popUpStatus, setPopUpStatus] = useState(false);
-  const [popUpData, setPopUpData] = useState({})
+  const [popUpData, setPopUpData] = useState({});
   const [popUpEditable, setPopUpEditable] = useState(false);
 
   // img, name, petName, date, staffName, staffReply, status, type("Service" or "Room")
@@ -42,8 +42,18 @@ const HistoryComp = () => {
 
   return (
     <div className="p-6 flex-1">
-      {historys.map((history) => {
-        return <HistoryCard data={history} onClick={() => handlePopUpData(history, true)} key={history.id} />;
+      {historys.map((history, idx) => {
+        return (
+          <HistoryCard
+            variants={startUpVariants}
+            initial="hidden"
+            animate="visible"
+            custom={idx/3 + 1}
+            data={history}
+            onClick={() => handlePopUpData(history, true)}
+            key={history.id}
+          />
+        );
       })}
 
       <AnimatePresence initial={true}>

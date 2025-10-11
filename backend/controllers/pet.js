@@ -3,12 +3,10 @@ const prisma = require('../prisma/prisma');
 const register = async (req, res) => {
   try {
     const customerId = Number(req.body.customerId); // from protect middleware
-    console.log(customerId);
     // find the customer record that belongs to this user
     const customer = await prisma.customer.findUnique({
       where: { id : customerId } // requires Customer.userId to be unique
     });
-    console.log(customer);
     if (!customer) {
       return res.status(400).json({ success: false, error: "Customer profile not found for this user" });
     }
@@ -38,13 +36,11 @@ const register = async (req, res) => {
         picture,
       },
     });
-    console.log(pet);
     res.status(201).json({ success: true, data: pet });
   } catch (err) {
     if (err.code === "P2003") {
       return res.status(400).json({ success: false, error: "Invalid customerId (foreign key)" });
     }
-    console.error("pet.register:", err);
     res.status(400).json({ success: false, error: err.message });
   }
 };
@@ -117,14 +113,12 @@ const updatePet = async (req, res) => {
         res.status(200).json({success: true, data: pet});
     } catch(err) {
         res.status(400).json({success: false, error: err.message});
-        console.log(err.stack);
     }
 };
 
 const updatePetStatus = async (req, res) => {
   try {
     const petId = Number(req.params.id);
-    console.log(petId);
     const { status } = req.body;
     
     if (!status) {
@@ -161,7 +155,7 @@ const deletePet = async (req, res) => {
 
 const getCustomerPets = async (req, res) => {
   try {
-    const userId = Number(req.query.userId);
+    const userId = Number(req.params.id);
     const fields = req.query.fields ? req.query.fields.split(',') : ['name', 'breed', 'sex', 'age', 'type', 'status','breed', 'disease', 'allergic', 'picture'];
 
     const select = {};
@@ -171,10 +165,6 @@ const getCustomerPets = async (req, res) => {
       where: { customerId: userId },
       select
     });
-
-    if (!pets || pets.length === 0) {
-      return res.status(200).json({ success: false, msg: "There is no pet for this customer" });
-    }
 
     res.status(200).json({ success: true, data: pets });
   } catch (err) {
@@ -204,7 +194,6 @@ const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
             }
         });
 
-        if(!pets) return res.status(200).json({success: false, msg: "There is no pet available"});
         res.status(200).json({success: true, data: pets});
     }catch(err){
         res.status(400).json({success: false, error: err.message});

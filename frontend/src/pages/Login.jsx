@@ -8,13 +8,17 @@ import { loginAPI } from "../hooks/authAPI";
 import { useAuth } from "../context/AuthProvider";
 import { startUpVariants } from "../styles/animation";
 
-export default function Login({ role: roleProp, redirectTo: redirectProp, title: titleProp }) {
+export default function Login({
+  role: roleProp,
+  redirectTo: redirectProp,
+  title: titleProp,
+}) {
   const location = useLocation();
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
   const role = useMemo(() => {
-    if (roleProp) return roleProp;                     
+    if (roleProp) return roleProp;
     return location.pathname.includes("/staff/") ? "staff" : "customer";
   }, [location.pathname, roleProp]);
 
@@ -41,7 +45,8 @@ export default function Login({ role: roleProp, redirectTo: redirectProp, title:
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const isFormValid = form.Username.trim() !== "" && form.Password.trim() !== "";
+  const isFormValid =
+    form.Username.trim() !== "" && form.Password.trim() !== "";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,7 +80,11 @@ export default function Login({ role: roleProp, redirectTo: redirectProp, title:
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <img className="w-full h-full object-cover" src={Login_Image} alt="Image login" />
+        <img
+          className="w-full h-full object-cover"
+          src={Login_Image}
+          alt="Image login"
+        />
       </motion.div>
 
       <div className="w-full md:w-2/5 flex flex-col items-center justify-center p-6">
@@ -98,7 +107,10 @@ export default function Login({ role: roleProp, redirectTo: redirectProp, title:
           {pageTitle}
         </motion.h1>
 
-        <form className="flex flex-col space-y-2 p-4 w-full max-w-md" onSubmit={handleSubmit}>
+        <form
+          className="flex flex-col space-y-2 p-4 w-full max-w-md"
+          onSubmit={handleSubmit}
+        >
           {/* Username */}
           <motion.div
             className="flex flex-col w-full items-center mx-auto"
@@ -107,14 +119,19 @@ export default function Login({ role: roleProp, redirectTo: redirectProp, title:
             animate="visible"
             custom={2.33}
           >
-            <label className="text-[var(--brown-color)] font-semibold text-left w-full" htmlFor="Username">
+            <label
+              className="text-[var(--brown-color)] font-semibold text-left w-full"
+              htmlFor="Username"
+            >
               Username
             </label>
             <input
               className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full transition-all duration-200 hover:shadow-md outline-0"
               type="text"
               name="Username"
-              placeholder={role === "staff" ? "Employee username" : "Username (For Login)"}
+              placeholder={
+                role === "staff" ? "Employee username" : "Username (For Login)"
+              }
               value={form.Username}
               onChange={onChange}
               required
@@ -129,7 +146,10 @@ export default function Login({ role: roleProp, redirectTo: redirectProp, title:
             animate="visible"
             custom={2.66}
           >
-            <label className="text-[var(--brown-color)] font-semibold text-left w-full" htmlFor="Password">
+            <label
+              className="text-[var(--brown-color)] font-semibold text-left w-full"
+              htmlFor="Password"
+            >
               Password
             </label>
             <input
@@ -211,10 +231,16 @@ export default function Login({ role: roleProp, redirectTo: redirectProp, title:
             animate="visible"
             custom={3.8}
           >
-            <a href="/" className="underline hover:text-[var(--dark-brown-color)] transition-colors duration-200">
+            <a
+              href="/"
+              className="underline hover:text-[var(--dark-brown-color)] transition-colors duration-200"
+            >
               Terms of Service
             </a>
-            <a href="/" className="ml-3 underline hover:text-[var(--dark-brown-color)] transition-colors duration-200">
+            <a
+              href="/"
+              className="ml-3 underline hover:text-[var(--dark-brown-color)] transition-colors duration-200"
+            >
               Privacy Policy
             </a>
           </motion.p>

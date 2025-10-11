@@ -8,7 +8,7 @@ import AddRoomPopup from "./add_room";
 import {
   deleteRoomAPI,
   fetchAllRoomsAPI,
-  fetchAllRoomsWithReviewsAPI,
+  fetchAllRoomsWithPaginationAPI,
   updateRoomAPI,
 } from "../../hooks/roomAPI";
 
@@ -67,7 +67,7 @@ const RoomEdit = () => {
       setLoading(true);
       setTimeoutReached(false);
       try {
-        const list = await fetchAllRoomsWithReviewsAPI(); // ⬅️ use /reviews
+        const list = await fetchAllRoomsWithPaginationAPI(); // ⬅️ use /reviews
         if (mounted) setRooms(Array.isArray(list) ? list : []);
       } finally {
         if (mounted) setLoading(false);
