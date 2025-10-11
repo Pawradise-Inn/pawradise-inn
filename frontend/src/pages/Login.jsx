@@ -4,7 +4,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import Login_Image from "../assets/login.png";
 import PawLogo from "../assets/logo.png";
-import { loginAPI } from "../hooks/authAPI";
+import { getMeAPI, loginAPI } from "../hooks/authAPI";
 import { useAuth } from "../context/AuthProvider";
 import { startUpVariants } from "../styles/animation";
 
@@ -15,7 +15,7 @@ export default function Login({
 }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
 
   const role = useMemo(() => {
     if (roleProp) return roleProp;
@@ -59,7 +59,12 @@ export default function Login({
       if (res?.token) {
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
-        setUser?.(res.user);
+        getMeAPI(res.token).then((res2) => {
+          if (res2?.user) {
+            setUser?.(res2.user);
+          }
+        });
+        console.log(user)
         navigate(redirectTo, { replace: true });
       } else {
         setErr("Login failed. Please check your username or password.");
