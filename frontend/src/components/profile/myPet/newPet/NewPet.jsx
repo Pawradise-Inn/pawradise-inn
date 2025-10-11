@@ -86,13 +86,23 @@ const handleConfirm = () => {
         !formData.petType ||
         !formData.petBreed ||
         !formData.medicalCondition ||
-        !formData.foodAllergy
+        !formData.foodAllergy ||
+        isNaN(formData.age)
     ) {
-        createNotification(
+        if(isNaN(formData.age)) {
+          createNotification(
+              "fail",
+              "Invalid Age",
+              "Please provide a valid number for pet age."
+          );
+        }
+        else{
+          createNotification(
             "fail",
             "Fail to create a pet",
             "Please provide all required pet information."
         );
+        }
         return; // Stop execution if validation fails
     }
 
