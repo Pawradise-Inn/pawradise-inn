@@ -129,7 +129,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       body = {
         roomId: data.roomId,
         pet_name: currentPet,
-        bookingId: 10,
+        bookingId: 1,
         checkIn: new Date(`${formData.entryDate}T00:00:00.00Z`),
         checkOut: new Date(`${formData.exitDate}T00:00:00.00Z`),
       };
