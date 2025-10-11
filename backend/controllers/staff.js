@@ -66,6 +66,6 @@ exports.getStaffProfile = async(req, res)=>{ //requirement: 17
         if(!staffWithInformation) return res.status(404).json({success: false, error: "Staff is not found"});
         res.status(200).json({success: true, data: staffWithInformation});
     }catch(err){
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
