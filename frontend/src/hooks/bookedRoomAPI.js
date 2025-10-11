@@ -7,8 +7,11 @@ export const getTodayRoom = async () => {
   return response.data;
 };
 
-export const createBookedRoom = async (bookedRoom) => {
-  const response = await axios.post(API_URL, bookedRoom);
+export const createBookedRoom = async (bookedRoom, token) => {
+  const response = await axios.post(API_URL, bookedRoom,{
+        headers: { Authorization: `Bearer ${token}` },
+  });
+  
   return response.data;
 };
 

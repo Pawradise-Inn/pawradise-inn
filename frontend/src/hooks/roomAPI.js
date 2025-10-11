@@ -29,7 +29,7 @@ export const deleteRoomAPI = async (id) => {
 
 export const fetchAvailableRoomsAPI = async (
   entry_date_with_time,
-  exit_date_with_time
+  exit_date_with_time,
 ) => {
   const response = await axios.get(`${API_URL}/available`, {
     params: { entry_date_with_time, exit_date_with_time },
@@ -37,9 +37,10 @@ export const fetchAvailableRoomsAPI = async (
   return response.data;
 };
 
-export const fetchRoomStatusAPI = async (id, entry_date, exit_date) => {
+export const fetchRoomStatusAPI = async (id, entry_date, exit_date, token) => {
   const response = await axios.get(`${API_URL}/${id}/status`, {
     params: { entry_date, exit_date },
+    headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };
@@ -52,6 +53,7 @@ export const fetchAllRoomsWithReviewsAPI = async () => {
 export const fetchRoomWithCommentAPI = async (roomId, star, NSP) => {
   const response = await axios.get(`${API_URL}/${roomId}/comments`, {
     params: { roomId, star, NSP },
+    
   });
   return response.data;
 };
