@@ -33,7 +33,7 @@ const uploadImage = async (req, res) => {
 
     blobStream.on('error', (err) => {
         console.error('GCS Upload Stream Error:', err.message); // Log the specific error message
-        res.status(500).send('Upload failed due to GCS stream error.');
+        res.status(500).json({ success: false, error: 'Upload failed due to GCS stream error.' });
     });
 
     blobStream.on('finish', async () => {
@@ -46,11 +46,11 @@ const uploadImage = async (req, res) => {
             const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
 
             // Send the URL back to the React frontend
-            res.status(200).json({ imageUrl: publicUrl });
+            res.status(201).json({ success: true, imageUrl: publicUrl });
         } catch (dbError) {
             // Catch error if subsequent steps fail (e.g., database update logic if it were here)
             console.error('Post-upload processing error:', dbError.message);
-            res.status(500).send('Upload succeeded but failed to finalize access.');
+            res.status(500).json({success: false, error: 'Upload succeeded but failed to finalize access.' });
         }
     });
 
