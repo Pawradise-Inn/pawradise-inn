@@ -39,6 +39,6 @@ router.route('/:id/pictures')
     .delete(protect, authorize("STAFF"), deletePicturesFromRoom);
 
 router.route('/:id/status')
-    .get(protect, authorize("STAFF"), getRoomStatus);
+    .get(protect, authorize("STAFF", "CUSTOMER"), getRoomStatus);
 
 module.exports = router;

@@ -63,15 +63,13 @@ export const getServiceStatusAPI = async (name, entryDate) => {
  * GET: Fetches comments, optionally filtered by name and page.
  * Corresponds to: GET api/v1/service/comments?name=${ชื่อ}&NSP=${page}
  */
-export const fetchServiceCommentsAPI = async () => {
-  const response = await axios.get(`${API_URL}/comments`);
+export const fetchServiceCommentsAPI = async (serviceId) => {
+  const response = await axios.get(`${API_URL}/${serviceId}/comments`);
   return response.data;
 };
 
-export const fetchServiceReviewAPI = async (name, star, NSP) => {
-  const response = await axios.get(`${API_URL}/reviews`, {
-    params: { name, star, NSP },
-  });
+export const fetchServiceReviewAPI = async () => {
+  const response = await axios.get(`${API_URL}/reviews`);
   return response.data;
 };
 
