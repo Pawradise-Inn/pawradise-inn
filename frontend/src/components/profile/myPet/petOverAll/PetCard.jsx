@@ -1,10 +1,11 @@
 const PetCard = ({ pet }) => {
+    console.log(pet)
   return (
     <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
       <div className="flex items-start space-x-6">
         <div className="w-64 h-64 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
           <img
-            src={pet.img}
+            src={pet.picture}
             alt={pet.name}
             className="w-full h-full object-cover"
           />

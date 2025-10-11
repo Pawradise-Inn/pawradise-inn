@@ -148,7 +148,7 @@ const checkBookingStatus = async (req, res) => {
 
 const getMyBookings = async (req, res) => {
   try {
-    const customerId = Number(req.query.customerId);
+    const customerId = Number(req.user.roleId);
 
     const bookings = await prisma.booking.findMany({
       where: { customerId },

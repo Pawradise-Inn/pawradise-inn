@@ -9,10 +9,10 @@ export const fetchMyBookingAPI = async (id) => {
 };
 
 // 1. Fetch all bookings for a specific customer ID
-export const fetchMyBookings = async (customerId) => {
+export const fetchMyBookings = async (token) => {
   try {
     const response = await axios.get(`${API_URL}/mine`, {
-      params: { customerId },
+      headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   } catch (error) {

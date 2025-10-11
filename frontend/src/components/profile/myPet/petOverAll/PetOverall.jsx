@@ -5,11 +5,12 @@ import { fetchPetAPI } from "../../../../hooks/petAPI";
 import { startUpVariants } from "../../../../styles/animation";
 import ServiceCard from "../../../service/ServiceCard";
 import BookingCard from "../../myBooking/BookingCard";
-import PetCard from "../PetCard";
+import PetCard from "./PetCard";
+import { useAuth } from "../../../../context/AuthProvider";
 
 const PetOverall = () => {
   const { id } = useParams();
-  const { user, setUser } = useOutletContext();
+  const { user, setUser } = useAuth();
   const [pet, setPet] = useState([]);
   const [service, setService] = useState([]);
   const [booking, setBooking] = useState([]);
@@ -81,7 +82,7 @@ const PetOverall = () => {
           custom={1}
           className="text-3xl font-bold text-[var(--dark-brown-color)]"
         >
-          Pawradise/My Profile
+          {pet.name}'s Overview
         </motion.h1>
       </div>
       <div></div>
@@ -110,18 +111,21 @@ const PetOverall = () => {
             custom={1.66}
             className="mt-8"
           >
-            <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 scrollbar-sleek">
-              {stayed.map((s) => (
-                <BookingCard
-                  key={s.room.id}
-                  room={s.room}
-                  pet={pet}
-                  getRoomStatusColor={getRoomStatusColor}
-                  checkIn={s.checkIn}
-                  checkOut={s.checkOut}
-                />
-              ))}
-            </div>
+            {stayed.length > 0 && (
+                <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 scrollbar-sleek">
+                {stayed.map((s) => (
+                  <BookingCard
+                    key={s.room.id}
+                    room={s.room}
+                    pet={pet}
+                    getRoomStatusColor={getRoomStatusColor}
+                    checkIn={s.checkIn}
+                    checkOut={s.checkOut}
+                  />
+                ))}
+              </div>
+            )}
+            
           </motion.div>
         </div>
         {/* Right Column */}
@@ -132,20 +136,22 @@ const PetOverall = () => {
           custom={2}
           className="flex-1 flex flex-col"
         >
-          <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
-            <h2 className="text-2xl font-bold mb-6">Service status</h2>
-            <div className="space-y-6 overflow-y-auto pr-2 scrollbar-sleek">
-              {scheduled.map((sch) => (
-                <ServiceCard
-                  key={sch.id}
-                  service={sch.service}
-                  pet={pet}
-                  getStatusText={getStatusText}
-                  getStatusColor={getRoomStatusColor}
-                />
-              ))}
+          {scheduled.length > 0 && (
+              <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
+              <div className="space-y-6 overflow-y-auto pr-2 scrollbar-sleek">
+                {scheduled.map((sch) => (
+                  <ServiceCard
+                    key={sch.id}
+                    service={sch.service}
+                    pet={pet}
+                    getStatusText={getStatusText}
+                    getStatusColor={getRoomStatusColor}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+          
         </motion.div>
       </div>
     </div>
