@@ -49,7 +49,7 @@ const createBookedRoom = async (req, res) => {
     );
     res.status(201).json({ success: true, data: bookedRoom });
   } catch (err) {
-    if (err.code === "BOOKING_DUPLICATE" || err.code === "ROOM_FULL" || err.code === "PET_NOT_SUIT") {
+    if (err.code === "PET_NOT_SUIT" || err.code === "BOOKING_DUPLICATE" || err.code === "ROOM_FULL") {
         return res.status(200).json({success: false, msg: err.message});
     }
     //   if (err.duplicatedDates) {

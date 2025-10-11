@@ -9,9 +9,9 @@ const {
     deleteService,
     addPicturesToService,
     deletePicturesFromService,
-    getServicesWithReviews,
+    getServicesWithPagination,
     getServiceStatus,
-    //getServiceReviews
+    getServiceReviews
 } = require('../controllers/service');
 
 const {protect, authorize} = require('../middleware/auth');
@@ -23,7 +23,7 @@ router.route('/status')
     .get(getServiceStatus);
 
 router.route('/reviews')
-    .get(getServicesWithReviews);
+    .get(getServicesWithPagination);
 
 router.route('/')
     .get(getServices)      
@@ -37,5 +37,8 @@ router.route('/:id')
 router.route('/:id/pictures')
     .post(protect, authorize("STAFF"), addPicturesToService) 
     .delete(protect, authorize("STAFF"), deletePicturesFromService); 
+
+router.route('/:id/reviews')
+    .get(getServiceReviews);
 
 module.exports = router;

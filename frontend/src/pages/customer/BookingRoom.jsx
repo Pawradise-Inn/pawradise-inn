@@ -5,7 +5,7 @@ import { useNotification } from "../../context/notification/NotificationProvider
 import Overlay from "../../components/Overlay";
 import RoomCard from "../../components/room/RoomCard";
 import {
-  fetchAllRoomsWithReviewsAPI,
+  fetchAllRoomsWithPaginationAPI,
   fetchAvailableRoomsAPI,
 } from "../../hooks/roomAPI";
 import { overlay, popUP, startUpVariants } from "../../styles/animation";
@@ -41,7 +41,7 @@ const BookingRoom = () => {
 
   // fetch room data from backend and setRoom
   useEffect(() => {
-    fetchAllRoomsWithReviewsAPI().then((data) => {
+    fetchAllRoomsWithPaginationAPI().then((data) => {
       if (data.data) {
         data.data.forEach((room) => {
           room.headerType = "Room";

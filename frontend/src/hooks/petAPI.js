@@ -2,49 +2,84 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/v1/pet";
 
-// 1. Fetch all pets (optional userId + fields)
-export const fetchAllPetAPI = async (userId, fields) => {
-  const params = {};
-  if (userId) params.userId = userId;
-  if (fields) params.fields = fields;
-
-  const response = await axios.get(API_URL, { params });
-  return response.data;
-};
-
-// 2. Fetch single pet by petId
-export const fetchPetAPI = async (id) => {
-  const response = await axios.get(`${API_URL}/${id}`);
-  return response.data;
-};
-
-// 3. Fetch only available pets for a user
-export const fetchAvailablePetAPI = async (customerId) => {
-  const response = await axios.get(`${API_URL}/available`, {
-    params: { customerId },
+export const fetchAllPetAPI = async (token = localStorage.getItem("token")) => {
+  const response = await axios.get(API_URL, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
   return response.data;
 };
 
-// 4. Add new pet
-export const addPetAPI = async (pet) => {
-  const response = await axios.post(API_URL, pet);
+export const fetchPetAPI = async (
+  id,
+  token = localStorage.getItem("token")
+) => {
+  const response = await axios.get(`${API_URL}/${id}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   return response.data;
 };
 
-export const registerPetAPI = async (id, pet) => {
-  const response = await axios.post(`${API_URL}/register`, pet);
+export const updatePetAPI = async (
+  id,
+  pet,
+  token = localStorage.getItem("token")
+) => {
+  const response = await axios.put(`${API_URL}/${id}`, pet, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   return response.data;
 };
 
-// 5. Delete pet
-export const deletePetAPI = async (id) => {
-  const response = await axios.delete(`${API_URL}/${id}`);
+export const deletePetAPI = async (
+  id,
+  token = localStorage.getItem("token")
+) => {
+  const response = await axios.delete(`${API_URL}/${id}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   return response.data;
 };
 
-// 6. Update pet
-export const updatePetAPI = async (id, pet) => {
-  const response = await axios.put(`${API_URL}/${id}`, pet);
+export const updatePetStatusAPI = async (
+  pet,
+  token = localStorage.getItem("token")
+) => {
+  const response = await axios.patch(API_URL, pet, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  return response.data;
+};
+
+export const registerPetAPI = async (
+  pet,
+  token = localStorage.getItem("token")
+) => {
+  const response = await axios.post(`${API_URL}/register`, pet, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  return response.data;
+};
+
+export const fetchAvailablePetAPI = async (
+  customerId,
+  token = localStorage.getItem("token")
+) => {
+
+  const response = await axios.get(`${API_URL}/${customerId}/available`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  return response.data;
+};
+
+export const fetchCustomerPets = async (customerId, fields, token) => {
+  const params = {};
+  fields.forEach((field) => {
+    params[field] = true;
+  });
+
+  const response = await axios.get(`${API_URL}/${customerId}/available`, {
+    params,
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response.data;
 };

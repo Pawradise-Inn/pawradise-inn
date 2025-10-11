@@ -1,5 +1,5 @@
-import { useState } from "react";
 import testImg from "../../../assets/test.png";
+import { motion } from "framer-motion";
 
 const Tooltip = ({ children, text }) => {
 
@@ -15,10 +15,10 @@ const Tooltip = ({ children, text }) => {
   );
 };
 
-const HistoryCard = ({ data, onClick }) => {
+const HistoryCard = ({ data, onClick, ...motionProps }) => {
 
   return (
-    <div className="flex rounded-2xl bg-[var(--cream-color)] p-4 mt-6 shadow relative">
+    <motion.div className="flex rounded-2xl bg-[var(--cream-color)] p-4 mt-6 shadow relative" {...motionProps}>
       {data.status ? (
         <div className="absolute w-4 h-4 rounded-full bg-[var(--fail-color-alpha)] top-0 right-0 z-10 -translate-y-1/3 translate-x-1/3" />
       ) : null}
@@ -48,7 +48,7 @@ const HistoryCard = ({ data, onClick }) => {
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

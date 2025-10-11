@@ -4,12 +4,16 @@ const prisma = require('../prisma/prisma');
 // const JWT_SECRET = process.env.JWT_SECRET;
 
 // Protect routes
-const protect = async (req, res, next) => {
+const   protect = async (req, res, next) => {
   let token;
 
   // Check header first
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    console.log("header : ----------------------------------")
+    console.log(req.headers)
     token = req.headers.authorization.split(' ')[1];
+    console.log("token : ----------------------------------")
+    console.log(token)
   } else if (req.cookies?.token) {
     token = req.cookies.token;
   }

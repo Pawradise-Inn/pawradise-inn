@@ -10,8 +10,9 @@ const {
     addPicturesToRoom,
     deletePicturesFromRoom,
     getAvailableRooms,
-    getRoomsWithReviews,
-    getRoomStatus
+    getRoomsWithPagination,
+    getRoomStatus,
+    getRoomReviews
 } = require('../controllers/room')
 
 const {protect, authorize} = require('../middleware/auth');
@@ -23,7 +24,7 @@ router.route('/available')
     .get(getAvailableRooms);
 
 router.route('/reviews')
-    .get(getRoomsWithReviews);
+    .get(getRoomsWithPagination);
 
 router.route('/')
     .get(getRooms)
@@ -39,6 +40,9 @@ router.route('/:id/pictures')
     .delete(protect, authorize("STAFF"), deletePicturesFromRoom);
 
 router.route('/:id/status')
-    .get(protect, authorize("STAFF", "CUSTOMER"), getRoomStatus);
+    .get(getRoomStatus);
+
+router.route('/:id/reviews')
+    .get(getRoomReviews);
 
 module.exports = router;

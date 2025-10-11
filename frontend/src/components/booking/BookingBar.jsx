@@ -4,14 +4,13 @@ import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createBookedRoom } from "../../hooks/bookedRoomAPI";
 import { createBookedService } from "../../hooks/bookedServiceAPI";
-import { fetchAllPetAPI, fetchAvailablePetAPI } from "../../hooks/petAPI";
+import { fetchCustomerPets, fetchAvailablePetAPI } from "../../hooks/petAPI";
 import {
   fetchRoomStatusAPI,
-  fetchRoomWithCommentAPI,
+  fetchRoomReviewsAPI,
 } from "../../hooks/roomAPI";
 import {
-  fetchServiceCommentsAPI,
-  fetchServiceReviewAPI,
+  fetchServiceReviewsAPI,
   getServiceStatusAPI,
 } from "../../hooks/serviceAPI";
 import "../../styles/bookingBarStyle.css";
@@ -129,7 +128,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       body = {
         roomId: data.roomId,
         pet_name: currentPet,
-        bookingId: 10,
+        bookingId: 8,
         checkIn: new Date(`${formData.entryDate}T00:00:00.00Z`),
         checkOut: new Date(`${formData.exitDate}T00:00:00.00Z`),
       };
@@ -204,13 +203,16 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     if (!user) return;
 
     if (data.headerType == "Service") {
-      fetchAllPetAPI(user.customer.id, "name").then((pets) =>
-        setPetData(pets.data)
-      );
+      fetchCustomerPets(
+        user.customer.id,
+        ["name", "type"],
+        localStorage.getItem("token")
+      ).then((res) => setPetData(res.data));
     } else {
-      fetchAvailablePetAPI(user.customer.id, "name").then((pets) =>
-        setPetData(pets.data)
-      );
+      fetchAvailablePetAPI(
+        user.customer.id,
+        localStorage.getItem("token")
+      ).then((res) => setPetData(res.data));
     }
     setCurrentPage(1);
   }, [user]);
@@ -219,24 +221,24 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   useEffect(() => {
     if (data) {
       if (data.headerType == "Service") {
-        fetchServiceCommentsAPI(data.name).then(
-          (comments) => {
-            if (comments.success) {
-              console.log(comments);
-              setCommentStatus(true);
-              comments.data.forEach((comment) => {
-                console.log(comment)
-                comment.comment_star = comment.commenter_star.toFixed(1);
-              });
-              setComments(comments.data);
-            } else {
-              setCommentStatus(false);
-              setComments([]);
-            }
+        fetchServiceReviewsAPI(
+          data.name,
+          commentStarSelect,
+          currentPage
+        ).then((comments) => {
+          if (comments.success) {
+            setCommentStatus(true);
+            comments.data.forEach((comment) => {
+              comment.comment_star = comment.comment_star.toFixed(1);
+            });
+            setComments(comments.data);
+          } else {
+            setCommentStatus(false);
+            setComments([]);
           }
-        );
+        });
       } else {
-        fetchRoomWithCommentAPI(
+        fetchRoomReviewsAPI(
           data.roomId,
           commentStarSelect,
           currentPage
@@ -244,14 +246,14 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
           if (comments.success) {
             setCommentStatus(true);
             comments.data.forEach((comment) => {
-              comment.comment_star = comment.commenter_star.toFixed(1);
+              comment.comment_star = comment.comment_star.toFixed(1);
             });
             setComments(comments.data);
           } else {
             setCommentStatus(false);
             setComments([]);
           }
-        }); 
+        });
       }
     }
   }, [data, currentPage, commentStarSelect]);

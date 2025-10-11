@@ -8,7 +8,7 @@ const Review = () => {
   const [badge, setBadge] = useState(0);
   const [historys, setHistorys] = useState([
     {
-      id: 1,
+      id: 19,
       img: "test.png",
       name: "Premium oming Service",
       petName: "Buddy",
@@ -21,7 +21,7 @@ const Review = () => {
       review: "Excellent service! My pet was well taken care of and the staff was very professional.",
     },
     {
-      id: 2,
+      id: 20,
       img: "test.png",
       name: "Deluxe Pet Suite",
       petName: "Luna",
@@ -34,7 +34,7 @@ const Review = () => {
       review: "Great room with comfortable amenities. Luna seemed very happy during her stay.",
     },
     {
-      id: 3,
+      id: 21,
       img: "test.png",
       name: "Basic Health Checkup",
       petName: "Max",
@@ -47,7 +47,7 @@ const Review = () => {
       review: "Thorough checkup and the vet explained everything clearly. Highly recommend!",
     },
     {
-      id: 4,
+      id: 22,
       img: "test.png",
       name: "Standard Room",
       petName: "Bella",
@@ -60,7 +60,7 @@ const Review = () => {
       review: "Good basic room, but could use some improvements in cleanliness.",
     },
     {
-      id: 5,
+      id: 23,
       img: "test.png",
       name: "Dental Cleaning Service",
       petName: "Charlie",
