@@ -12,7 +12,7 @@ const {
 
 const {protect, authorize} = require('../middleware/auth');
 
-// router.get('/dashboard', getTodayRooms);
+router.get('/dashboard', getTodayRooms);
 router.route('/')
     .get(protect, authorize("STAFF", "CUSTOMER"), getBookedRooms)
     .post(protect, authorize("STAFF", "CUSTOMER"),createBookedRoom);

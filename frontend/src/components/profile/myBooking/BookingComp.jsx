@@ -23,7 +23,7 @@ const BookingComp = () => {
     if (!user) return;
     const getMyBookings = async () => {
       try {
-        const data = await fetchMyBookings(user.id);
+        const data = await fetchMyBookings();
         console.log(user.id);
         // Flatten all booked_service into one array
         const allServices = data.data.flatMap((book) => book.booked_service);
