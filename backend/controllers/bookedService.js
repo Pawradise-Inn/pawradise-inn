@@ -11,11 +11,11 @@ const getBookedServices = async (req, res) => {
     const bookedServices = await prisma.bookedService.findMany();
     if (bookedServices.length === 0)
       return res
-        .status(200)
+        .status(404)
         .json({ success: false, msg: "No booked services in database" });
     res.status(200).json({ success: true, data: bookedServices });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -30,7 +30,7 @@ const getBookedService = async (req, res) => {
         .json({ success: false, msg: "Booked Service is not found" });
     res.status(200).json({ success: true, data: bookedService });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -52,10 +52,10 @@ const createBookedService = async (req, res) => {
     res.status(201).json({ success: true, data: bookedService });
   } catch (err) {
     if (err.code == "PET_NOT_SUIT" || err.code == "SERVICE_FULL" || err.code == "SERVICE_DUPLICATE" || err.code == "PET_NOT_FREE") {
-      res.status(200).json({ success: false, msg: err.message });
+      res.status(409).json({ success: false, msg: err.message });
       return;
-    } 
-    res.status(400).json({ success: false, error: err.message });
+    }
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -64,7 +64,7 @@ const updateBookedService = async (req, res) => {
     const bookedId = Number(req.params.id);
     const scheduled = req.body.scheduled;
     if (!scheduled)
-      return res.status(200).json({ success: false, msg: "Nothing to update" });
+      return res.status(400).json({ success: false, msg: "Nothing to update" });
     const updateScheduled = new Date(scheduled);
     const bookedService = await findBookedServiceById(bookedId);
     const count = await overlappingService(
@@ -73,7 +73,7 @@ const updateBookedService = async (req, res) => {
     );
     if (count >= 3) {
       return res
-        .status(200)
+        .status(409)
         .json({ success: false, msg: "Service is not available" });
     }
     const check = await duplicatedService(
@@ -82,7 +82,7 @@ const updateBookedService = async (req, res) => {
       updateScheduled
     );
     if (check)
-      return res.status(200).json({
+      return res.status(409).json({
         success: false,
         msg: "Your pet had already schedule in this day",
       });
@@ -97,7 +97,7 @@ const updateBookedService = async (req, res) => {
         success: false,
         msg: "Booked service is not found or already deleted",
       });
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -114,7 +114,7 @@ const deleteBookedService = async (req, res) => {
         success: false,
         msg: "Booked service is not found or already deleted",
       });
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 

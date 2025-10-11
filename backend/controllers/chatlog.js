@@ -80,7 +80,7 @@ const getChatLogs = async (req, res) => {
             where: options.where
         });
         if(total === 0) {
-            return res.status(200).json({
+            return res.status(404).json({
                 success: false, 
                 msg: "No review in database"
             });
@@ -111,7 +111,7 @@ const getChatLogs = async (req, res) => {
         }
         res.status(200).json({ success: true, pagination, data: formattedReviews, count: total });
     } catch (err) {
-        res.status(400).json({ success: true, error: err.message});
+        res.status(500).json({ success: false, error: err.message});
     }
 };
 
@@ -126,7 +126,7 @@ const getChatLogs = async (req, res) => {
 
         res.status(200).json({success: true, data: chatlog});
     } catch (err) {
-        res.status(400).json({ success: true, error: err.message});
+        res.status(500).json({ success: false, error: err.message});
     }
   };
 
@@ -148,7 +148,7 @@ const createChatLog = async(req, res)=> {
     try {
         console.log(data);
         if (!data.serviceId && !data.roomId) {
-            return res.status(401).json({ error: 'ServiceID or RoomID are required'});
+            return res.status(400).json({ error: 'ServiceID or RoomID are required'});
         }
         data.customerId = req.user.roleId;
         const existingReview = await prisma.chatLog.findFirst({
@@ -162,15 +162,15 @@ const createChatLog = async(req, res)=> {
         });
 
         if (existingReview){
-            if (data.roomId) return res.status(200).json({success: false, error: `Customer has already review this room`});
-            else return res.status(200).json({success: false, error: `Customer has already review this service`});
+            if (data.roomId) return res.status(409).json({success: false, error: `Customer has already review this room`});
+            else return res.status(409).json({success: false, error: `Customer has already review this service`});
         }
 
         const chatlog = await prisma.chatLog.create({data});
 
         res.status(201).json({success: true, data: chatlog});
     } catch (err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
   };
 
@@ -192,9 +192,9 @@ const replyToChatLog = async (req, res)=> {
             }
         });
 
-        res.status(201).json({success: true, data: chatlog});
+        res.status(200).json({success: true, data: chatlog});
     } catch (err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -223,7 +223,7 @@ const updateChatLog = async(req, res) => {
 
         res.status(200).json({success: true, data: chatlog});
     }catch (err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -236,7 +236,7 @@ const deleteChatLog = async(req, res)=>{
 
         res.status(200).json({success: true, data: chatlog});
     } catch (err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 

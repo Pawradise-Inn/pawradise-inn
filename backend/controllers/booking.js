@@ -21,7 +21,7 @@ const getBookings = async (req, res) => {
         });
         res.status(200).json({success: true, data: bookings});
     } catch(err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -47,7 +47,7 @@ const getBooking = async (req, res) => {
         }
         res.status(200).json({success: true, data: booking});
     } catch(err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 }
 
@@ -96,7 +96,7 @@ const updateBookingStatus = async (req, res) => {
         }
         res.status(200).json({success: true, data: booking});
     } catch(err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -119,7 +119,7 @@ const createBooking = async (req, res) => {
         });
         res.status(201).json({success: true, data: booking});
     } catch(err){
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -131,7 +131,7 @@ const deleteBooking = async (req, res) => {
         });
         res.status(200).json({success: true, data: {}});
     } catch(err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -143,7 +143,10 @@ const checkBookingStatus = async (req, res) => {
         }
     });
 
-    if(!booking) res
+    if (!booking) {
+        return res.status(404).json({success: false, error: 'Booking not found'});
+    }
+    return res.status(200).json({success: true, data: booking});
 };
 
 const getMyBookings = async (req, res) => {
@@ -198,7 +201,7 @@ const cancelBooking = async(req, res) =>{
     }
 
     if (booking.status !== "BOOKED" && booking.status !== "PENDING") {
-      return res.status(200).json({
+      return res.status(409).json({
         success: false,
         message: "Booking cannot be cancelled"
       });
@@ -211,7 +214,7 @@ const cancelBooking = async(req, res) =>{
 
     res.status(200).json({ success: true, booking: updatedBooking });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -287,7 +290,7 @@ const putBooking = async (req, res) => {
 
         res.status(200).json({ success: true, data: responseData });
     } catch (err) {
-        res.status(400).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message });
     }
 };
 

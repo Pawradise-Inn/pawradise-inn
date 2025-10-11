@@ -41,7 +41,8 @@ const register = async (req, res) => {
     if (err.code === "P2003") {
       return res.status(400).json({ success: false, error: "Invalid customerId (foreign key)" });
     }
-    res.status(400).json({ success: false, error: err.message });
+    console.error("pet.register:", err);
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -64,12 +65,12 @@ const getAllPets = async (req, res) => {
         
         // Check if any pets were found
         if (pets.length === 0) {
-            return res.status(200).json({ success: false, error: "No pets found" });
+            return res.status(404).json({ success: false, error: "No pets found" });
         }
 
         res.status(200).json({ success: true, data: pets });
     } catch (err) {
-        res.status(400).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message });
     }
 };
 
@@ -97,7 +98,7 @@ const getPet = async (req, res) => {  //Both
         }
         res.status(200).json({success: true, data: pet});
     } catch(err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -112,7 +113,8 @@ const updatePet = async (req, res) => {
         }
         res.status(200).json({success: true, data: pet});
     } catch(err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
+        console.log(err.stack);
     }
 };
 
@@ -122,7 +124,7 @@ const updatePetStatus = async (req, res) => {
     const { status } = req.body;
     
     if (!status) {
-      return res.status(200).json({ success: false, error: "status is required" });
+      return res.status(400).json({ success: false, error: "status is required" });
     }
 
     const pet = await prisma.pet.update({
@@ -149,7 +151,7 @@ const deletePet = async (req, res) => {
         }
         res.status(200).json({success: true, data: {}});
     } catch(err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -168,7 +170,7 @@ const getCustomerPets = async (req, res) => {
 
     res.status(200).json({ success: true, data: pets });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -196,7 +198,7 @@ const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
 
         res.status(200).json({success: true, data: pets});
     }catch(err){
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 }
 

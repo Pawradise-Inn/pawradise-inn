@@ -54,7 +54,7 @@ const getRooms = async (req, res) => {
     });
     if (total === 0) {
       return res
-        .status(200)
+        .status(404)
         .json({ success: false, msg: "No room in database" });
     }
 
@@ -77,7 +77,7 @@ const getRooms = async (req, res) => {
       .status(200)
       .json({ success: true, pagination, data: rooms, count: total });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -89,7 +89,7 @@ const getRoom = async (req, res) => {
       return res.status(404).json({ success: false, msg: "Room is not found" });
     res.status(200).json({ success: true, data: room });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -107,7 +107,7 @@ const createRoom = async (req, res) => {
     });
     res.status(201).json({ success: true, data: room });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -134,7 +134,7 @@ const updateRoom = async (req, res) => {
   } catch (err) {
     if (err.code === "P2025")
       return res.status(404).json({ success: false, msg: "Room is not found" });
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -151,7 +151,7 @@ const deleteRoom = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, msg: "Room is not found or already deleted" });
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -293,7 +293,7 @@ const getRoomsWithPagination = async (req, res) => {
     });
 
     if (!rooms || rooms.length === 0) {
-      return res.status(200).json({ success: false, msg: "No rooms found" });
+      return res.status(404).json({ success: false, msg: "No rooms found" });
     }
 
     const formattedRooms = await Promise.all(

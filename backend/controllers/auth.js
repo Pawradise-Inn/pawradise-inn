@@ -20,7 +20,7 @@ exports.register = async (req, res, next) => {
     const role = (req.body.role ?? "CUSTOMER").toUpperCase();
 
     if (!firstname || !lastname || !email || !phone || !username || !password) {
-      return res.status(200).json({ success: false, message: "Missing required fields" });
+      return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 
     const hashed = await hashPassword(password);

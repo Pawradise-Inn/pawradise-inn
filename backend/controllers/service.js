@@ -49,7 +49,7 @@ const getServices = async (req, res) =>{
             where: options.where
         });
         if(total === 0) {
-            return res.status(200).json({
+            return res.status(404).json({
                 success: false, 
                 msg: "No service in database"
             });
@@ -72,7 +72,7 @@ const getServices = async (req, res) =>{
         }
         res.status(200).json({success: true, pagination, data: services, count: total});
     } catch (err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -83,7 +83,7 @@ const getService = async (req, res) => {
         if(!service) return res.status(404).json({success: false, msg: 'Service is not found'});
         res.status(200).json({success: true, data: service});
     } catch (err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -101,7 +101,7 @@ const createService = async (req, res) => { //requirement: 15
         console.log(service.data);
         res.status(201).json({success: true, data: service});
     } catch (err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -125,7 +125,7 @@ const updateService = async (req, res) => {
         res.status(200).json({success: true, data: service});
     } catch (err) {
         if (err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found'});
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -138,7 +138,7 @@ const deleteService = async (req, res) => { //requirement: 15
         res.status(200).json({success: true, data: {}});
     } catch(err){
         if (err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found or already deleted'});
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -150,7 +150,7 @@ const addPicturesToService = async (req, res) => {
         res.status(200).json({success: true, data: service});
     }catch(err){
         if(err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found'});
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -162,7 +162,7 @@ const deletePicturesFromService = async (req, res) => {
         res.status(200).json({success: true, data: service});
     }catch(err){
         if(err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found'});
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -189,7 +189,7 @@ const getServicesWithPagination = async (req, res)=>{ //requirement: 1
 
         res.status(200).json({success: true, data: formatted});
     }catch(err){
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -205,7 +205,7 @@ const getServiceStatus = async (req, res)=>{ //requirement: 6
         const count = await overlappingService(service.id, schedule);
         res.status(200).json({success: true, count: count});
     }catch(err){
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
