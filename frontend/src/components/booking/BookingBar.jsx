@@ -112,7 +112,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         ),
       };
 
-      createBookedService(body)
+      createBookedService(body, localStorage.getItem("token"))
         .then((res) => {
           if (res.success) {
             createNotification(
@@ -129,12 +129,12 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       body = {
         roomId: data.roomId,
         pet_name: currentPet,
-        bookingId: 1,
+        bookingId: 10,
         checkIn: new Date(`${formData.entryDate}T00:00:00.00Z`),
         checkOut: new Date(`${formData.exitDate}T00:00:00.00Z`),
       };
 
-      createBookedRoom(body)
+      createBookedRoom(body, localStorage.getItem("token"))
         .then((res) => {
           if (res.success) {
             createNotification(
@@ -178,7 +178,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       fetchRoomStatusAPI(
         data.roomId,
         formData.entryDate,
-        formData.exitDate
+        formData.exitDate,
+        localStorage.getItem("token")
       ).then((res) => {
         setSize(res.count);
         res.count < data.maxsize

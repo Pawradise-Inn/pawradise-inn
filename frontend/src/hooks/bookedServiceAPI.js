@@ -7,8 +7,10 @@ export const getTodayService = async () => {
   return response.data;
 };
 
-export const createBookedService = async (bookedServiceData) => {
-  const response = await axios.post(API_URL, bookedServiceData);
+export const createBookedService = async (bookedServiceData, token) => {
+  const response = await axios.post(API_URL, bookedServiceData, {
+        headers: { Authorization: `Bearer ${token}` },
+  });
   return response.data;
 };
 
