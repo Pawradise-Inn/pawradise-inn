@@ -1,13 +1,14 @@
 import { motion } from "motion/react";
 
 const BookingCard = ({ book, onCancelClick, ...motionProps }) => {
+  console.log("BookingCard Rendered:", book);
   return (
     <motion.div
       className="flex items-center bg-[var(--cream-color)] rounded-lg p-4 shadow-lg mb-6"
       {...motionProps}
     >
       <img
-        src={book.img}
+        src={book.picture}
         alt={book.pet.name || ""}
         className="w-50 h-50 rounded object-cover shadow mr-10"
       />
