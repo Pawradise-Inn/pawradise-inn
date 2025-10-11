@@ -32,24 +32,23 @@ import HistoryComp from "./components/review/history/HistoryComp";
 const App = () => {
   const location = useLocation();
 
-  // Check if the current path starts with "/staff"
   const isStaffPath = location.pathname.startsWith("/staff");
   const isRegistrationPath = location.pathname === "/register";
-  const isLogin = location.pathname === "/login";
+  const isCustomerLogin = location.pathname === "/login";
+  const isStaffLogin = location.pathname === "/staff/login";
+
+  const hideNavbar = isRegistrationPath || isCustomerLogin || isStaffLogin;
 
   return (
     <div>
-      {/* {isStaffPath ? <StaffNavbar /> : <Navbar />} */}
-      {isRegistrationPath || isLogin ? null : isStaffPath ? (
-        <StaffNavbar />
-      ) : (
-        <Navbar />
-      )}
+      {hideNavbar ? null : isStaffPath ? <StaffNavbar /> : <Navbar />}
+
       <Routes>
-        {" "}
-        {/* Public Routes */} <Route path="/login" element={<Login />} />
+        {/* Public Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/staff/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />
-        {/* <Route path="/" element={<><BookingRoom/><Footer/></>} />  */}
+
         <Route
           path="/room"
           element={
@@ -76,23 +75,61 @@ const App = () => {
           <Route path="pet/:id" element={<PetOverall />} />
           <Route path="pet/new" element={<NewPet />} />
         </Route>
+
         <Route path="/review" element={<Review />}>
           <Route index element={<ReviewComp />} />
           <Route path="history" element={<HistoryComp />} />
         </Route>
+
+        <Route path="/" element={<Navigate to="/room" replace />} />
         <Route path="*" element={<Navigate to="/room" replace />} />
-        {/* Staff Routes */}
-        <Route path="/staff" element={<div>Staff log in</div>} />
-        <Route path="/staff/dashboard" element={<Dashboard />}>
+
+        <Route
+          path="/staff/dashboard"
+          element={
+            <RequireAuth roles={["staff", "admin"]}>
+              <Dashboard />
+            </RequireAuth>
+          }
+        >
           <Route index element={<DashboardTab1 />} />
           <Route path="check-in" element={<DashboardTab2 />} />
           <Route path="check-out" element={<DashboardTab3 />} />
           <Route path="service-booked" element={<DashboardTab4 />} />
         </Route>
-        <Route path="/staff/pet status" element={<PetStatus />} />
-        <Route path="/staff/pet/:id" element={<PetUpdate />} />
-        <Route path="/staff/review" element={<StaffReview />} />
-        <Route path="/staff/management" element={<Management />}>
+
+        <Route
+          path="/staff/pet-status"
+          element={
+            <RequireAuth roles={["staff", "admin"]}>
+              <PetStatus />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/staff/pet/:id"
+          element={
+            <RequireAuth roles={["staff", "admin"]}>
+              <PetUpdate />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/staff/review"
+          element={
+            <RequireAuth roles={["staff", "admin"]}>
+              <StaffReview />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/staff/management"
+          element={
+            <RequireAuth roles={["staff", "admin"]}>
+              <Management />
+            </RequireAuth>
+          }
+        >
           <Route index element={<ServiceEdit />} />
           <Route path="profile" element={<ProfileComp />} />
           <Route path="payment" element={<div>Manage Payment Page</div>} />

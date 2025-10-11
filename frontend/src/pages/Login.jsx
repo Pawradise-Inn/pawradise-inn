@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+// src/pages/Login.jsx
+import { useMemo, useState, useEffect } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import Login_Image from "../assets/login.png";
 import PawLogo from "../assets/logo.png";
@@ -7,65 +8,77 @@ import { loginAPI } from "../hooks/authAPI";
 import { useAuth } from "../context/AuthProvider";
 import { startUpVariants } from "../styles/animation";
 
-const fields = [
-  {
-    label: "Username",
-    name: "Username",
-    type: "text",
-    placeholder: "Username (For Login)",
-  },
-  {
-    label: "Password",
-    name: "Password",
-    type: "password",
-    placeholder: "Password",
-  },
-];
-
-const Login = () => {
-  const [form, setForm] = useState({
-    Username: "",
-    Password: "",
-  });
+export default function Login({ role: roleProp, redirectTo: redirectProp, title: titleProp }) {
+  const location = useLocation();
   const navigate = useNavigate();
-  const {setUser} = useAuth();
+  const { setUser } = useAuth();
 
-  const handleChange = (form, setForm) => (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const role = useMemo(() => {
+    if (roleProp) return roleProp;                     
+    return location.pathname.includes("/staff/") ? "staff" : "customer";
+  }, [location.pathname, roleProp]);
+
+  const redirectTo = useMemo(() => {
+    if (redirectProp) return redirectProp;
+    return role === "staff" ? "/staff/dashboard" : "/room";
+  }, [role, redirectProp]);
+
+  const pageTitle = useMemo(() => {
+    if (titleProp) return titleProp;
+    return role === "staff" ? "Staff Login" : "Pawradise Inn";
+  }, [role, titleProp]);
+
+  useEffect(() => {
+    document.title = pageTitle;
+  }, [pageTitle]);
+
+  const [form, setForm] = useState({ Username: "", Password: "" });
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
-  const handleSubmit = (e) => {
+
+  const isFormValid = form.Username.trim() !== "" && form.Password.trim() !== "";
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    loginAPI(form.Username, form.Password).then((res) => {
-      if (res.token) {
+    if (!isFormValid || loading) return;
+    setErr("");
+    setLoading(true);
+    try {
+      // ปรับให้ตรงกับ backend: ถ้า loginAPI เดิมไม่รองรับ role ให้ลบบรรทัด role ทิ้ง
+      const res = await loginAPI(form.Username, form.Password, role);
+      if (res?.token) {
         localStorage.setItem("token", res.token);
-        localStorage.setItem("user", res.user);
-        setUser(res.user);
-        navigate("/room");
+        localStorage.setItem("user", JSON.stringify(res.user));
+        setUser?.(res.user);
+        navigate(redirectTo, { replace: true });
+      } else {
+        setErr("Login failed. Please check your username or password.");
       }
-    });
+    } catch (e2) {
+      const msg = e2?.response?.data?.message || "Cannot sign in right now.";
+      setErr(msg);
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const onChange = handleChange(form, setForm);
-  const isFormValid = Object.values(form).every((field) => field.trim() !== "");
 
   return (
     <div className="flex flex-col md:flex-row w-full h-dvh overflow-hidden bg-[var(--cream-color)]">
-      <motion.div 
+      <motion.div
         className="w-full md:w-3/5 h-64 md:h-auto flex-shrink-0"
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <img
-          className="w-full h-full object-cover"
-          src={Login_Image}
-          alt="Image login"
-        />
+        <img className="w-full h-full object-cover" src={Login_Image} alt="Image login" />
       </motion.div>
 
-      <div 
-        className="w-full md:w-2/5 flex flex-col items-center justify-center p-6"
-      >
+      <div className="w-full md:w-2/5 flex flex-col items-center justify-center p-6">
         <motion.img
           src={PawLogo}
           alt="Logo"
@@ -75,94 +88,128 @@ const Login = () => {
           animate="visible"
           custom={1}
         />
-        <motion.h1 
+        <motion.h1
           className="text-2xl md:text-4xl text-[var(--dark-brown-color)] font-bold mt-4 md:mt-6"
           variants={startUpVariants}
           initial="hidden"
           animate="visible"
           custom={2}
         >
-          Pawradise In
+          {pageTitle}
         </motion.h1>
 
-        <form
-          className="flex flex-col space-y-2 p-4 w-full max-w-md"
-          onSubmit={(e) => handleSubmit(e, form, navigate)}
-        >
-          {fields.map((field, index) => (
-            <motion.div
-              key={field.name}
-              className="flex flex-col w-full items-center mx-auto"
+        <form className="flex flex-col space-y-2 p-4 w-full max-w-md" onSubmit={handleSubmit}>
+          {/* Username */}
+          <motion.div
+            className="flex flex-col w-full items-center mx-auto"
+            variants={startUpVariants}
+            initial="hidden"
+            animate="visible"
+            custom={2.33}
+          >
+            <label className="text-[var(--brown-color)] font-semibold text-left w-full" htmlFor="Username">
+              Username
+            </label>
+            <input
+              className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full transition-all duration-200 hover:shadow-md outline-0"
+              type="text"
+              name="Username"
+              placeholder={role === "staff" ? "Employee username" : "Username (For Login)"}
+              value={form.Username}
+              onChange={onChange}
+              required
+            />
+          </motion.div>
+
+          {/* Password */}
+          <motion.div
+            className="flex flex-col w-full items-center mx-auto"
+            variants={startUpVariants}
+            initial="hidden"
+            animate="visible"
+            custom={2.66}
+          >
+            <label className="text-[var(--brown-color)] font-semibold text-left w-full" htmlFor="Password">
+              Password
+            </label>
+            <input
+              className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full transition-all duration-200 hover:shadow-md outline-0"
+              type="password"
+              name="Password"
+              placeholder="Password"
+              value={form.Password}
+              onChange={onChange}
+              required
+            />
+          </motion.div>
+
+          {/* Error */}
+          {err && (
+            <motion.p
+              className="text-red-600 text-sm mt-2 text-center"
               variants={startUpVariants}
               initial="hidden"
               animate="visible"
-              custom={index/3 + 2}
+              custom={2.9}
             >
-              <label
-                className="text-[var(--brown-color)] font-semibold text-left w-full"
-                htmlFor={field.name}
-              >
-                {field.label}
-              </label>
-              <input
-                className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full transition-all duration-200 hover:shadow-md outline-0"
-                type={field.type}
-                name={field.name}
-                placeholder={field.placeholder}
-                value={form[field.name]}
-                onChange={onChange}
-              />
-            </motion.div>
-          ))}
+              {err}
+            </motion.p>
+          )}
 
+          {/* Submit */}
           <motion.button
             type="submit"
-            disabled={!isFormValid}
+            disabled={!isFormValid || loading}
             className={`w-full md:w-40 h-10 mt-5 rounded shadow px-4 py-2 mx-auto ${
-              isFormValid
+              isFormValid && !loading
                 ? "!text-[var(--cream-color)] bg-[var(--dark-brown-color)] hover:bg-[var(--brown-color)] hover:!text-[var(--cream-color)] transition-colors cursor-pointer"
-                : "bg-[var(--light-brown-color)]"
+                : "bg-[var(--light-brown-color)] cursor-not-allowed"
             }`}
             variants={startUpVariants}
             initial="hidden"
             animate="visible"
-            custom={3}
-            whileHover={isFormValid ? { scale: 1.05 } : {}}
-            whileTap={isFormValid ? { scale: 0.95 } : {}}
+            custom={3.2}
+            whileHover={isFormValid && !loading ? { scale: 1.05 } : {}}
+            whileTap={isFormValid && !loading ? { scale: 0.95 } : {}}
           >
-            Login
+            {loading ? "Signing in..." : "Login"}
           </motion.button>
 
-          <motion.hr 
-            className="border-t-2 border-[var(--brown-color)] w-3/4 my-4 mx-auto"
-            variants={startUpVariants}
-            initial="hidden"
-            animate="visible"
-            custom={3.33}
-          />
+          {/* Register link — โชว์เฉพาะลูกค้า */}
+          {role === "customer" && (
+            <>
+              <motion.hr
+                className="border-t-2 border-[var(--brown-color)] w-3/4 my-4 mx-auto"
+                variants={startUpVariants}
+                initial="hidden"
+                animate="visible"
+                custom={3.4}
+              />
+              <motion.p
+                className="text-[var(--brown-color)] font-medium text-center text-sm md:text-base"
+                variants={startUpVariants}
+                initial="hidden"
+                animate="visible"
+                custom={3.6}
+              >
+                Don't have an account?
+                <NavLink
+                  to="/register"
+                  className="text-l ml-2 !text-[var(--fail-color)] font-bold hover:underline transition-all duration-200"
+                >
+                  Register here
+                </NavLink>
+              </motion.p>
+            </>
+          )}
 
-          <motion.p 
-            className="text-[var(--brown-color)] font-medium text-center text-sm md:text-base"
-            variants={startUpVariants}
-            initial="hidden"
-            animate="visible"
-            custom={3.66}
-          >
-            Don't have an account?
-            <NavLink
-              to="/register"
-              className="text-l ml-2 !text-[var(--fail-color)] font-bold hover:underline transition-all duration-200"
-            >
-              Register here
-            </NavLink>
-          </motion.p>
-
-          <motion.p 
+          {/* Footer links */}
+          <motion.p
             className="text-center text-xs md:text-sm font-normal !text-[var(--brown-color)] mt-4"
             variants={startUpVariants}
             initial="hidden"
             animate="visible"
-            custom={4}
+            custom={3.8}
           >
             <a href="/" className="underline hover:text-[var(--dark-brown-color)] transition-colors duration-200">
               Terms of Service
@@ -175,6 +222,4 @@ const Login = () => {
       </div>
     </div>
   );
-};
-
-export default Login;
+}
