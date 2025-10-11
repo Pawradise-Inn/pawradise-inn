@@ -68,7 +68,7 @@ const getAllPets = async (req, res) => {
         
         // Check if any pets were found
         if (pets.length === 0) {
-            return res.status(404).json({ success: false, error: "No pets found" });
+            return res.status(200).json({ success: false, error: "No pets found" });
         }
 
         res.status(200).json({ success: true, data: pets });
@@ -126,11 +126,9 @@ const updatePetStatus = async (req, res) => {
     const petId = Number(req.params.id);
     console.log(petId);
     const { status } = req.body;
-    if (Number.isNaN(petId)) {
-      return res.status(400).json({ success: false, error: "Invalid petId" });
-    }
+    
     if (!status) {
-      return res.status(400).json({ success: false, error: "status is required" });
+      return res.status(200).json({ success: false, error: "status is required" });
     }
 
     const pet = await prisma.pet.update({
@@ -175,7 +173,7 @@ const getCustomerPets = async (req, res) => {
     });
 
     if (!pets || pets.length === 0) {
-      return res.status(404).json({ success: false, msg: "There is no pet for this customer" });
+      return res.status(200).json({ success: false, msg: "There is no pet for this customer" });
     }
 
     res.status(200).json({ success: true, data: pets });
@@ -206,7 +204,7 @@ const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
             }
         });
 
-        if(!pets) return res.status(400).json({success: false, msg: "There is no pet available"});
+        if(!pets) return res.status(200).json({success: false, msg: "There is no pet available"});
         res.status(200).json({success: true, data: pets});
     }catch(err){
         res.status(400).json({success: false, error: err.message});

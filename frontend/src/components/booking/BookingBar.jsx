@@ -10,6 +10,7 @@ import {
   fetchRoomWithCommentAPI,
 } from "../../hooks/roomAPI";
 import {
+  fetchServiceCommentsAPI,
   fetchServiceReviewAPI,
   getServiceStatusAPI,
 } from "../../hooks/serviceAPI";
@@ -217,12 +218,14 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   useEffect(() => {
     if (data) {
       if (data.headerType == "Service") {
-        fetchServiceReviewAPI(data.name, commentStarSelect, currentPage).then(
+        fetchServiceCommentsAPI(data.name).then(
           (comments) => {
             if (comments.success) {
+              console.log(comments);
               setCommentStatus(true);
               comments.data.forEach((comment) => {
-                comment.comment_star = comment.comment_star.toFixed(1);
+                console.log(comment)
+                comment.comment_star = comment.commenter_star.toFixed(1);
               });
               setComments(comments.data);
             } else {
@@ -240,14 +243,14 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
           if (comments.success) {
             setCommentStatus(true);
             comments.data.forEach((comment) => {
-              comment.comment_star = comment.comment_star.toFixed(1);
+              comment.comment_star = comment.commenter_star.toFixed(1);
             });
             setComments(comments.data);
           } else {
             setCommentStatus(false);
             setComments([]);
           }
-        });
+        }); 
       }
     }
   }, [data, currentPage, commentStarSelect]);

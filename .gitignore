@@ -98,6 +98,7 @@ backend/config/
 backend/generated/
 backend/out/
 backend/testcase.sql
+backend/swagger
 
 # Frontend specific
 frontend/dist/

@@ -103,13 +103,18 @@ const updateBookingStatus = async (req, res) => {
 const createBooking = async (req, res) => {
     try {
         const bookingDate = req.body.date;
-        const customerId = req.body.customerId;
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id }
+        });
         const booking = await prisma.booking.create({
             data: {
-                customerId: customerId,
+                customerId: req.user.roleId,
                 date: new Date(bookingDate),
                 status: 'PENDING',
-                payment: 'PENDING'
+                // payment: 'PENDING',
+                customerName: user.firstname + ' ' + user.lastname,
+                customerEmail: user.email,
+                customerNumber: user.phone_number
             }
         });
         res.status(201).json({success: true, data: booking});
@@ -193,7 +198,7 @@ const cancelBooking = async(req, res) =>{
     }
 
     if (booking.status !== "BOOKED" && booking.status !== "PENDING") {
-      return res.status(400).json({
+      return res.status(200).json({
         success: false,
         message: "Booking cannot be cancelled"
       });
@@ -284,11 +289,6 @@ const putBooking = async (req, res) => {
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });
     }
-};
-
-module.exports = {
-    // ... other exports
-    putBooking,
 };
 
 module.exports = {

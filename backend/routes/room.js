@@ -9,39 +9,36 @@ const {
     deleteRoom,
     addPicturesToRoom,
     deletePicturesFromRoom,
-    getRoomStatus,
-    getRoomReviews,
     getAvailableRooms,
-    getAllRoomsWithReviews
+    getRoomsWithReviews,
+    getRoomStatus
 } = require('../controllers/room')
+
+const {protect, authorize} = require('../middleware/auth');
+
+const chatlogs = require('./chatlog.js');
+router.use('/:roomId/comments', chatlogs);
 
 router.route('/available')
     .get(getAvailableRooms);
 
-router.route('/comments')
-    .get(getRoomReviews);
-
 router.route('/reviews')
-    .get(getAllRoomsWithReviews);
-
-const chatlogs = require('./chatlog.js');
-router.use('/comments', chatlogs);
-router.use('/:roomId/comments', chatlogs);
+    .get(getRoomsWithReviews);
 
 router.route('/')
     .get(getRooms)
-    .post(createRoom);
+    .post(protect, authorize("STAFF"),createRoom);
 
 router.route('/:id')
     .get(getRoom)
-    .patch(updateRoom)
-    .delete(deleteRoom);
+    .patch(protect, authorize("STAFF"),updateRoom)
+    .delete(protect, authorize("STAFF"),deleteRoom);
 
 router.route('/:id/pictures')
-    .post(addPicturesToRoom)
-    .delete(deletePicturesFromRoom);
+    .post(protect, authorize("STAFF"), addPicturesToRoom)
+    .delete(protect, authorize("STAFF"), deletePicturesFromRoom);
 
 router.route('/:id/status')
-    .get(getRoomStatus);
+    .get(protect, authorize("STAFF", "CUSTOMER"), getRoomStatus);
 
 module.exports = router;
