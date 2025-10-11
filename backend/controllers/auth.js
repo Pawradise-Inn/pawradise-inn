@@ -20,7 +20,7 @@ exports.register = async (req, res, next) => {
     const role = (req.body.role ?? "CUSTOMER").toUpperCase();
 
     if (!firstname || !lastname || !email || !phone || !username || !password) {
-      return res.status(400).json({ success: false, message: "Missing required fields" });
+      return res.status(200).json({ success: false, message: "Missing required fields" });
     }
 
     const hashed = await hashPassword(password);
@@ -92,11 +92,7 @@ exports.getMe = async (req, res) => {
 
 exports.updateMe = async (req, res) => {
   try {
-    const idParam = req.params.id;
-    if (!idParam)
-      return res
-        .status(400)
-        .json({ success: false, error: "Missing id param" });
+    const idParam = req.user.id;
     const { firstname, lastname, email, phone_number, user_name, password } =
       req.body;
 
@@ -123,8 +119,7 @@ exports.updateMe = async (req, res) => {
         role: true,
       },
     });
-    if (!user)
-      return res.status(404).json({ success: false, error: "User not found" });
+    if (!user) return res.status(404).json({ success: false, error: "User not found" });
     res.status(200).json({ success: true, data: user });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -133,11 +128,8 @@ exports.updateMe = async (req, res) => {
 
 exports.deleteMe = async (req, res) => {
   try {
-    const idParam = req.params.id;
-    if (!idParam)
-      return res
-        .status(400)
-        .json({ success: false, error: "Missing id param" });
+    const idParam = req.user.id;
+    
     const user = await prisma.user.delete({
       where: { id: Number(idParam) },
     });
@@ -147,10 +139,7 @@ exports.deleteMe = async (req, res) => {
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
     });
-    res.status(200).json({ success: true, message: 'Logged out' });
-    if (!user)
-      return res.status(404).json({ success: false, error: "User not found" });
-    res.status(200).json({ success: true, data: {} });
+    res.status(200).json({ success: true, message: 'Deleted and Logged out' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -165,13 +154,13 @@ exports.login = async (req, res, next) => {
 
     const user = await findUserByUsername(userName);
     if (!user) {
-        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        return res.status(401).json({ success: false, message: 'username or password are wrong' });
     }
 
     // Match password
     const isMatch = await matchPassword(password, user.password);
     if (!isMatch) {
-        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        return res.status(401).json({ success: false, message: 'username or password are wrong' });
     }
     // Create token
     sendTokenResponse(user, 200, res);

@@ -7,13 +7,73 @@ const {
 const { overlappingRoom } = require("./logics/bookedRoom");
 
 const getRooms = async (req, res) => {
+  let options = {};
+  
+  //Select filter
+  if (req.query.filter){
+    let where = JSON.parse(req.query.filter)
+    if (where.name){
+      where.name.mode = 'insensitive';
+    }
+    options.where = where;
+  }
+
+  //Select fields
+  if (req.query.select){
+    const fields = req.query.select.split(",");
+    options.select = fields.reduce((acc, field) => {
+      acc[field.trim()] = true;
+      return acc;
+    }, {});
+  }
+
+  //Sort
+  if (req.query.sort){
+    const sortFields = req.query.sort.split(",");
+    options.orderBy = sortFields.map(sortField => {
+      const [field, direction = 'asc'] = sortField.split(":");
+      const dir = direction.trim().toLowerCase() === 'desc' ? 'desc' : 'asc';
+      return {[field.trim()] : dir};
+    });
+  } else {
+    options.orderBy = {id: 'asc'};
+  }
+
+  //Pagination
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const startIndex = (page - 1)*limit;
+  const endIndex = page*limit;
+
+  options.skip = startIndex;
+  options.take = limit;
+
   try {
-    const rooms = await prisma.room.findMany();
-    if (rooms.length === 0)
+    const total = await prisma.room.count({
+      where: options.where
+    });
+    if (total === 0){
       return res
-        .status(404)
+        .status(200)
         .json({ success: false, msg: "No room in database" });
-    res.status(200).json({ success: true, data: rooms });
+    }
+
+    const rooms = await prisma.room.findMany(options);
+
+    const pagination = {};
+    if (endIndex < total){
+      pagination.next = {
+        page: page + 1,
+        limit: limit
+      };
+    }
+    if (startIndex > 0){
+      pagination.prev = {
+        page: page - 1,
+        limit: limit
+      };
+    }
+    res.status(200).json({ success: true, pagination,data: rooms, count: total });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
@@ -33,13 +93,14 @@ const getRoom = async (req, res) => {
 
 const createRoom = async (req, res) => {
   try {
-    const { capacity, price, petType, picture } = req.body;
+    const { number, name, capacity, price, type } = req.body;
     const room = await prisma.room.create({
       data: {
+        number: number,
+        name: name,
         capacity: capacity,
         price: price,
-        petType: petType,
-        picture: picture,
+        petType: type
       },
     });
     res.status(201).json({ success: true, data: room });
@@ -53,7 +114,9 @@ const updateRoom = async (req, res) => {
     const roomId = req.params.id;
     const dataToUpdate = {};
     if (req.body.price !== undefined) dataToUpdate.price = req.body.price;
+    if (req.body.name !== undefined) dataToUpdate.name = req.body.name;
     if (req.body.petType !== undefined) dataToUpdate.petType = req.body.petType;
+    if (req.body.capacity !== undefined) dataToUpdate.capacity = req.body.capacity;
 
     if (Object.keys(dataToUpdate).length === 0)
       return res
@@ -143,12 +206,20 @@ const getRoomStatus = async (req, res) => {
 };
 
 const getAvailableRooms = async (req, res) => { //requirement: 7
+  let options = {};
+
+  if(req.query.checkIn){
+    const entryDate = new Date(checkIn);
+    options.checkOut = {gt: entryDate};
+  }
+  if(req.query.checkOut){
+    const exitDate = new Date(checkOut);
+    options.checkIn = {lt: exitDate};
+  }
+
+  console.log(entryDate);
+  console.log(exitDate);
   try {
-    const { entry_date_with_time, exit_date_with_time } = req.query;
-
-    const entryDate = new Date(entry_date_with_time);
-    const exitDate = new Date(exit_date_with_time);
-
     const allRooms = await prisma.room.findMany({
       select: {
         id: true,
@@ -208,7 +279,7 @@ const getAvailableRooms = async (req, res) => { //requirement: 7
   }
 };
 
-const getAllRoomsWithReviews = async (req, res) => { //requirement: 9
+const getRoomsWithReviews = async (req, res) => { //requirement: 9
   try {
     const rooms = await prisma.room.findMany({
       select: {
@@ -265,60 +336,60 @@ const getAllRoomsWithReviews = async (req, res) => { //requirement: 9
   }
 };
 
-const getRoomReviews = async (req, res) => {
-  //requirement: 5
-  try {
-    const { roomId, star, NSP } = req.query;
-    const page = Number(NSP) || 1;
-    const take = 3;
-    const skip = (page - 1) * take;
+// const getRoomReviews = async (req, res) => {
+//   //requirement: 5
+//   try {
+//     const { roomId, star, NSP } = req.query;
+//     const page = Number(NSP) || 1;
+//     const take = 3;
+//     const skip = (page - 1) * take;
 
-    if (!roomId) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "roomId is required" });
-    }
-    const reviews = await prisma.chatLog.findMany({
-      where: {
-        roomId: Number(roomId),
-        review: { not: null },
-        rating: star ? { equals: Number(star) } : undefined,
-      },
-      skip,
-      take,
-      select: {
-        id: true,
-        review: true,
-        rating: true,
-        review_date: true,
-        customer: {
-          include: {
-            user: {
-              select: {
-                user_name: true,
-              },
-            },
-          },
-        },
-      },
-    });
+//     if (!roomId) {
+//       return res
+//         .status(400)
+//         .json({ success: false, msg: "roomId is required" });
+//     }
+//     const reviews = await prisma.chatLog.findMany({
+//       where: {
+//         roomId: Number(roomId),
+//         review: { not: null },
+//         rating: star ? { equals: Number(star) } : undefined,
+//       },
+//       skip,
+//       take,
+//       select: {
+//         id: true,
+//         review: true,
+//         rating: true,
+//         review_date: true,
+//         customer: {
+//           include: {
+//             user: {
+//               select: {
+//                 user_name: true,
+//               },
+//             },
+//           },
+//         },
+//       },
+//     });
 
-    if (!reviews || reviews.length === 0) {
-      return res.status(200).json({ success: false, msg: "No reviews found" });
-    }
+//     if (!reviews || reviews.length === 0) {
+//       return res.status(200).json({ success: false, msg: "No reviews found" });
+//     }
 
-    const formattedReviews = reviews.map((r) => ({
-      id: r.id,
-      commenter_name: r.customer?.name || "Anonymous",
-      comment_detail: r.review,
-      comment_star: r.rating,
-    }));
+//     const formattedReviews = reviews.map((r) => ({
+//       id: r.id,
+//       commenter_name: r.customer?.name || "Anonymous",
+//       comment_detail: r.review,
+//       comment_star: r.rating,
+//     }));
 
-    res.status(200).json({ success: true, data: formattedReviews });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-};
+//     res.status(200).json({ success: true, data: formattedReviews });
+//   } catch (err) {
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// };
 
 module.exports = {
   getRooms,
@@ -329,7 +400,7 @@ module.exports = {
   addPicturesToRoom,
   deletePicturesFromRoom,
   getRoomStatus,
-  getRoomReviews,
+  getRoomsWithReviews,
   getAvailableRooms,
-  getAllRoomsWithReviews,
+  // getRoomReviews,
 };

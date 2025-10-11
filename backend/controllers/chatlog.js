@@ -1,26 +1,121 @@
 const prisma = require('../prisma/prisma')
 
 const getChatLogs = async (req, res) => {
-    try {
-        const { customerId, serviceId, staffId } = req.query;
-        const filters = {};
-        if (customerId) filters.customerId = Number(customerId);
-        if (serviceId) filters.serviceId = Number(serviceId);
-        if (staffId) filters.staffId = Number(staffId);
+    let options = {};
 
-        const chatlogs = await prisma.chatLog.findMany({
-            where: filters,
-            include: { customer: true, staff: true, service: true },
-            orderBy: { review_date: 'desc' },
+    //wait testing 1
+    // if(req.params.serviceId){
+    //     query = chatlogs.findMany({
+    //         where: {serviceId: Number(req.params.serviceId)},
+    //         include: { customer: true, staff: true },
+    //         orderBy: { review_date: 'desc' },
+    //     });
+    // }else if (req.params.roomId){
+    //     query = chatlogs.findMany({
+    //         where: {
+    //             roomId: Number(req.params.roomId),
+    //         },
+    //         include: { customer: true, staff: true },
+    //     });
+    // } else if (req.params.customerId && req.user.role === 'STAFF') {
+    //     query = chatlogs.findMany({
+    //         where: {customerId : Number(req.params.customerId)}
+    //     })
+    // } else {
+    //     query = chatlogs.findMany();
+    // }
+
+    //Select filter
+    console.log(req.params.serviceName);
+    if (req.params.serviceName){
+        try{
+            const service = await prisma.service.findFirst({
+                where: {name: req.params.serviceName}
+            })
+            options.where = {serviceId: service.id};
+        }catch (err){
+            res.status(400).json({ success: true, error: err.message});
+        }
+    }else if (req.params.roomId){
+        options.where = {roomId: Number(req.params.roomId)};
+    }
+    if (req.query.filter){
+        let filter = JSON.parse(req.query.filter);
+        options.where = {...options.where, ...filter};
+    }
+    console.log(options.where);
+
+    //Select fields
+    if (req.query.select){
+        const fields = req.query.select.split(",");
+        options.select = fields.reduce((acc, field) => {
+            acc[field.trim()] = true;
+            return acc;
+        }, {});
+    }
+
+    //Sort
+    if (req.query.sort){
+        const sortFields = req.query.sort.split(",");
+        options.orderBy = sortFields.map(sortField => {
+            const [field, direction = 'asc'] = sortField.split(":");
+            const dir = direction.trim().toLowerCase() === 'desc' ? 'desc' : 'asc';
+            return {[field.trim()] : dir};
         });
+    } else {
+        options.orderBy = {id: 'asc'};
+    }
 
-        res.status(200).json({ success: true, data: chatlogs });
+    //Pagination
+    const page = parseInt(req.query.page,10) || 1;
+    const limit = parseInt(req.query.limit,10) || 3;
+    const startIndex = (page-1)*limit;
+    const endIndex = page*limit;
+
+    options.skip = startIndex;
+    options.take = limit;
+
+    try {
+        const total = await prisma.chatLog.count({
+            where: options.where
+        });
+        if(total === 0) {
+            return res.status(200).json({
+                success: false, 
+                msg: "No review in database"
+            });
+        }
+
+        options.include = {customer: {include: {user: {select:{user_name:true}}}}};
+        
+        const reviews = await prisma.chatLog.findMany(options);
+        const formattedReviews = reviews.map(r => ({
+            id: r.id,
+            commenter_name: r.customer?.user.user_name || "Anonymous",
+            commenter_detail: r.review,
+            commenter_star: r.rating
+        }));
+
+        const pagination = {};
+        if(endIndex < total){
+            pagination.next = {
+                page: page + 1,
+                limit: limit
+            }
+        }
+        if(startIndex > 0){
+            pagination.prev = {
+                page: page - 1,
+                limit: limit
+            }
+        }
+        res.status(200).json({ success: true, pagination, data: formattedReviews, count: total });
     } catch (err) {
         res.status(400).json({ success: true, error: err.message});
     }
 };
 
-  const getChatLogById = async(req, res)=> {
+  const getChatLog= async(req, res)=> {
     try {
         const id = req.params.id;
         const chatlog = await prisma.chatLog.findUnique({
@@ -36,32 +131,42 @@ const getChatLogs = async (req, res) => {
   };
 
 const createChatLog = async(req, res)=> {
+    let data = {}
+    if (req.body.rating){
+        data.rating = Number(req.body.rating);
+    }
+    if (req.body.review){
+        data.review = req.body.review;
+    }
+
+    if (req.body.serviceId){
+        data.serviceId = Number(req.body.serviceId);
+    }else if(req.body.roomId){
+        data.roomId = Number(req.body.roomId);
+    }
+
     try {
-        const { review, rating, customerId, serviceId } = req.body;
-
-        if (!customerId || !serviceId) {
-            return res.status(400).json({ error: 'Customer ID and Service ID are required'});
+        console.log(data);
+        if (!data.serviceId && !data.roomId) {
+            return res.status(401).json({ error: 'ServiceID or RoomID are required'});
         }
-
+        data.customerId = req.user.roleId;
         const existingReview = await prisma.chatLog.findFirst({
             where: {
-                customerId: Number(customerId),
-                serviceId: Number(serviceId)
+                customerId: req.user.roleId,
+                OR : [
+                    {serviceId: data.serviceId},
+                    {roomId: data.roomId}
+                ]
             }
         });
 
         if (existingReview){
-            return res.status(400).json({success: false, error: 'Customer has already review'});
+            if (data.roomId) return res.status(200).json({success: false, error: `Customer has already review this room`});
+            else return res.status(200).json({success: false, error: `Customer has already review this service`});
         }
 
-        const chatlog = await prisma.chatLog.create({
-            data: {
-                review: review,
-                rating: rating,
-                customerId: Number(customerId),
-                serviceId: Number(serviceId)
-            }
-        });
+        const chatlog = await prisma.chatLog.create({data});
 
         res.status(201).json({success: true, data: chatlog});
     } catch (err) {
@@ -72,10 +177,10 @@ const createChatLog = async(req, res)=> {
 const replyToChatLog = async (req, res)=> {
     try {
         const id = req.params.id;
-        const { reply, staffId } = req.body;
-
+        const staffId = req.user.roleId;
+        const reply = req.body.reply;
         if (!reply || !staffId) {
-            return res.status(400).json({ error: 'Reply text and staff ID are required' });
+            return res.status(200).json({ error: 'Reply text and staff ID are required' });
         }
 
         const chatlog = await prisma.chatLog.update({
@@ -89,6 +194,35 @@ const replyToChatLog = async (req, res)=> {
 
         res.status(201).json({success: true, data: chatlog});
     } catch (err) {
+        res.status(400).json({success: false, error: err.message});
+    }
+};
+
+const updateChatLog = async(req, res) => {
+    let dataToUpdate = {};
+    if (req.user.role === "CUSTOMER"){
+        if (req.body.review !== undefined) dataToUpdate.review = req.body.review;
+        if (req.body.rating !== undefined) dataToUpdate.rating = req.body.rating;
+    }else if (req.user.role === "STAFF"){
+        if (req.body.reply !== undefined) dataToUpdate.reply = req.body.reply;
+        if (req.body.show !== undefined) dataToUpdate.show = req.body.show;
+    }
+    try {
+        const id = req.params.id;
+        
+        if (Object.keys(dataToUpdate).length === 0){
+            return res
+                .status(400)
+                .json({ success: false, msg: "No valid fields to update" });
+        }
+
+        const chatlog = await prisma.chatLog.update({
+            where: { id: Number(id) },
+            data: dataToUpdate,
+        });
+
+        res.status(200).json({success: true, data: chatlog});
+    }catch (err) {
         res.status(400).json({success: false, error: err.message});
     }
 };
@@ -108,8 +242,9 @@ const deleteChatLog = async(req, res)=>{
 
 module.exports = {
     getChatLogs,
-    getChatLogById,
+    getChatLog,
     createChatLog,
     replyToChatLog,
-    deleteChatLog
+    deleteChatLog,
+    updateChatLog
 };

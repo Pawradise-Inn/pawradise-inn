@@ -3,10 +3,74 @@ const {findServiceById, addServicePictures, removeServicePictures } = require('.
 const {overlappingService} = require('./logics/bookedService');
 
 const getServices = async (req, res) =>{
+    let options = {};
+
+    //Select Filter
+    if (req.query.filter){
+        let where = JSON.parse(req.query.filter)
+    if (where.name){
+        where.name.mode = 'insensitive';
+    }
+        options.where = where;
+    }
+
+    //Select fields
+    if (req.query.select){
+        const fields = req.query.select.split(",");
+        options.select = fields.reduce((acc, field) => {
+            acc[field.trim()] = true;
+            return acc;
+        }, {});
+    }
+
+    //Sort
+    if (req.query.sort){
+        const sortFields = req.query.sort.split(",");
+        options.orderBy = sortFields.map(sortField => {
+            const [field, direction = 'asc'] = sortField.split(":");
+            const dir = direction.trim().toLowerCase() === 'desc' ? 'desc' : 'asc';
+            return {[field.trim()] : dir};
+        });
+    } else {
+        options.orderBy = {id: 'asc'};
+    }
+
+    //Pagination
+    const page = parseInt(req.query.page,10) || 1;
+    const limit = parseInt(req.query.limit,10) || 10;
+    const startIndex = (page-1)*limit;
+    const endIndex = page*limit;
+
+    options.skip = startIndex;
+    options.take = limit;
+
     try {
-        const services = await prisma.service.findMany();
-        if(services.length === 0) return res.status(404).json({success: false, msg: "No service in database"});
-        res.status(200).json({success: true, data: services});
+        const total = await prisma.service.count({
+            where: options.where
+        });
+        if(total === 0) {
+            return res.status(200).json({
+                success: false, 
+                msg: "No service in database"
+            });
+        }
+
+        const services = await prisma.service.findMany(options);
+
+        const pagination = {};
+        if(endIndex < total){
+            pagination.next = {
+                page: page + 1,
+                limit: limit
+            }
+        }
+        if(startIndex > 0){
+            pagination.prev = {
+                page: page - 1,
+                limit: limit
+            }
+        }
+        res.status(200).json({success: true, pagination, data: services, count: total});
     } catch (err) {
         res.status(400).json({success: false, error: err.message});
     }
@@ -25,13 +89,13 @@ const getService = async (req, res) => {
 
 const createService = async (req, res) => { //requirement: 15
     try {
-        const {name, price, petType, picture} = req.body;
+        const {name, price, petType} = req.body;
         const service = await prisma.service.create({
             data: {
                 name: name,
                 price: price,
-                petType: [petType.toUpperCase()],
-                picture: "not done yet"
+                petType: petType,
+                picture: ""
             }
         });
         console.log(service.data);
@@ -102,7 +166,7 @@ const deletePicturesFromService = async (req, res) => {
     }
 };
 
-const getAllServiceComments = async (req, res)=>{ //requirement: 1
+const getServicesWithReviews = async (req, res)=>{ //requirement: 1
     try{
         const services = await prisma.service.findMany({
             include: {
@@ -145,62 +209,62 @@ const getServiceStatus = async (req, res)=>{ //requirement: 6
     }
 };
 
-const getServiceReviews = async (req, res) => { //requirement: 5
-  try {
-    const { name, star, NSP } = req.query;
-    const page = Number(NSP) || 1;
-    const take = 3;
-    const skip = (page - 1) * take;
+// const getServiceReviews = async (req, res) => { //requirement: 5
+//   try {
+//     const { name, star, NSP } = req.query;
+//     const page = Number(NSP) || 1;
+//     const take = 3;
+//     const skip = (page - 1) * take;
 
-    if (!name) {
-      return res.status(400).json({ success: false, msg: "name is required" });
-    }
-    const service = await prisma.service.findFirst({
-        where: {name: name}
-    });
+//     if (!name) {
+//       return res.status(400).json({ success: false, msg: "name is required" });
+//     }
+//     const service = await prisma.service.findFirst({
+//         where: {name: name}
+//     });
 
 
 
-    const reviews = await prisma.chatLog.findMany({
-      where: {
-        serviceId: service.id,
-        review: { not: null },
-        rating: star ? { equals: Number(star) } : undefined
-      },
-      skip,
-      take,
-      select: {
-        id: true,
-        review: true,
-        rating: true,
-        review_date: true,
-        customer: {
-          include:{
-            user:{
-                select: {
-                    user_name: true
-            }}
-          }
-        }
-      }
-    });
+//     const reviews = await prisma.chatLog.findMany({
+//       where: {
+//         serviceId: service.id,
+//         review: { not: null },
+//         rating: star ? { equals: Number(star) } : undefined
+//       },
+//       skip,
+//       take,
+//       select: {
+//         id: true,
+//         review: true,
+//         rating: true,
+//         review_date: true,
+//         customer: {
+//           include:{
+//             user:{
+//                 select: {
+//                     user_name: true
+//             }}
+//           }
+//         }
+//       }
+//     });
 
-    if (!reviews || reviews.length === 0) {
-      return res.status(200).json({ success: false, msg: "No reviews found" });
-    }
+//     if (!reviews || reviews.length === 0) {
+//       return res.status(200).json({ success: false, msg: "No reviews found" });
+//     }
 
-    const formattedReviews = reviews.map(r => ({
-        id: r.id,
-      commenter_name: r.customer?.name || "Anonymous",
-      comment_detail: r.review,
-      comment_star: r.rating,
-    }));
+//     const formattedReviews = reviews.map(r => ({
+//         id: r.id,
+//       commenter_name: r.customer?.name || "Anonymous",
+//       comment_detail: r.review,
+//       comment_star: r.rating,
+//     }));
 
-    res.status(200).json({ success: true, data: formattedReviews });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-};
+//     res.status(200).json({ success: true, data: formattedReviews });
+//   } catch (err) {
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// };
 
 
 module.exports = {
@@ -211,7 +275,7 @@ module.exports = {
     deleteService,
     addPicturesToService,
     deletePicturesFromService,
-    getAllServiceComments,
     getServiceStatus,
-    getServiceReviews
+    getServicesWithReviews,
+    //getServiceReviews
 };

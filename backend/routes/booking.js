@@ -12,23 +12,23 @@ const {
     putBooking
 } = require('../controllers/booking');
 
+const {protect, authorize} = require('../middleware/auth');
+
 router.route('/mine')
-    .get(getMyBookings);
+    .get(protect, getMyBookings);
 
 router.route('/cancel/:id')
-    .patch(cancelBooking);
+    .patch(protect, cancelBooking);
 
 router.route('/')
-    .get(getBookings)
-    .post(createBooking);
-
-
+    .get(protect, authorize("STAFF", "CUSTOMER"), getBookings)
+    .post(protect, authorize("STAFF", "CUSTOMER"), createBooking);
 
 router.route('/:id')
-    .get(getBooking)
-    .delete(deleteBooking)
-    .patch(updateBookingStatus)
-    .put(putBooking);
+    .get(protect, authorize("STAFF", "CUSTOMER"),getBooking)
+    .delete(protect, authorize("STAFF", "CUSTOMER"),deleteBooking)
+    .patch(protect, authorize("STAFF", "CUSTOMER"),updateBookingStatus)
+    .put(protect, authorize("STAFF", "CUSTOMER"),putBooking);
 
 
 module.exports = router;

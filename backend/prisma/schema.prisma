@@ -60,6 +60,7 @@ model ChatLog {
   rating      Float?    @default(5) @db.DoublePrecision
   review_date DateTime  @default(now()) @db.Timestamp(0)
   reply_date  DateTime? @db.Timestamp(0)
+  show        Boolean   @default(true) @db.Boolean
 
   customerId Int?
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
@@ -92,6 +93,8 @@ model Pet {
 
 model Room {
   id       Int      @id @default(autoincrement())
+  name     String   @db.VarChar(30)
+  number   Int      @unique @default(100) @db.Integer
   capacity Int      @default(1) @db.Integer
   price    Float    @default(2000.00) @db.DoublePrecision
   picture  String[]

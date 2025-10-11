@@ -28,6 +28,22 @@ app.use(cors({
   credentials: false,  
 }));
 
+// const swaggerJsDoc = require('swagger-jsdoc');
+// const swaggerUI = require('swagger-ui-express');
+
+// const swaggerOptions = {
+//   swaggerDefinition:{
+//     info:{
+//       title: 'Pawradise Inn API',
+//       version: '1.0.0'
+//     },
+//     apis:['./routes/*.js'],
+//   }
+// };
+
+// const swaggerDocs = swaggerJsDoc(swaggerOptions);
+// app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+
 
 const booking = require('./routes/booking');
 const bookedRoom = require('./routes/bookedRoom');

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const prisma = require('../prisma/prisma');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
+// const JWT_SECRET = process.env.JWT_SECRET;
 
 // Protect routes
 const protect = async (req, res, next) => {
@@ -33,23 +33,38 @@ const protect = async (req, res, next) => {
     }
 
     // Attach only what you need to req.user
-    req.user = { id: user.id, role: user.role };
+    let roleData;
+    if (user.role === 'CUSTOMER') {
+      roleData = await prisma.customer.findUnique({
+        where: { userId: user.id}
+      });
+    }else{
+      roleData = await prisma.staff.findUnique({
+        where: { userId: user.id}
+      });
+    }
+    req.user = { id: user.id, role: user.role, roleId : roleData.id };
     next();
   } catch (err) {
     console.error('JWT error:', err);
     return res.status(401).json({ success: false, message: 'Not authorized to access this route' });
   }
 };
-module.exports = { protect };
 
+// Restrict routes to specific roles
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    console.log(roles);
+    console.log(req.user.role);
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ 
+        success: false, 
+        message: `User role ${req.user.role} not authorized to access this route` 
+      });
+    }
+    next();
+  };
+};
 
-// // Restrict routes to specific roles
-// exports.authorize = (...roles) => {
-//   return (req, res, next) => {
-//     if (!roles.includes(req.user.role)) {
-//       return res.status(403).json({ success: false, message: 'User role not authorized to access this route' });
-//     }
-//     next();
-//   };
-// };
+module.exports = { protect, authorize };
 

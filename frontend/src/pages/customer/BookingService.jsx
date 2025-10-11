@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import BookingPopup from "../../components/booking/BookingPopup";
 import Overlay from "../../components/Overlay";
 import ServiceCard from "../../components/service/ServiceCard";
-import { fetchServiceCommentsAPI } from "../../hooks/serviceAPI";
+import { fetchServiceCommentsAPI, fetchServiceReviewAPI } from "../../hooks/serviceAPI";
 import { overlay, popUP, startUpVariants } from "../../styles/animation";
 import { removeWindowScroll } from "../../utils/handlePopup";
 import { filteredObjectByType } from "../../utils/handleSearch";
@@ -19,7 +19,7 @@ const BookingService = () => {
 
   // fetch service data from backend and setService
   useEffect(() => {
-    fetchServiceCommentsAPI().then((data) => {
+    fetchServiceReviewAPI().then((data) => {
       data.data.forEach((service) => {
         service.headerType = "Service";
         service.reviewStar = service.reviewStar.toFixed(1);
