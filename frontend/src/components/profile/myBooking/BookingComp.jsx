@@ -23,8 +23,10 @@ const BookingComp = () => {
     if (!user) return;
     const getMyBookings = async () => {
       try {
-        const data = await fetchMyBookings();
-        console.log(user.id);
+        const token = localStorage.getItem("token");
+        console.log(token);
+        const data = await fetchMyBookings(token);
+        console.log(data);
         // Flatten all booked_service into one array
         const allServices = data.data.flatMap((book) => book.booked_service);
         setAllBookedService(allServices);
