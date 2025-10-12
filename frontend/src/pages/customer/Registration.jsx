@@ -81,25 +81,41 @@ const fields = [
 ];
 
   // post Customer data to database
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (isFormValid && validateFormPassword(form, createNotification) && validateFormTel(form, createNotification)) {
-      const { confirmPassword, ...formData } = form;
-      registerAPI(formData).then((res) => {
-        if (res.token) {
-          localStorage.removeItem("token");
-          localStorage.setItem("token", res.token);
-          localStorage.setItem("user", JSON.stringify(res.user));
-          navigate("/room");
-          setUser(res.user);
-        } else {
-          createNotification(
-            "fail",
-            "Invalid username and phone number",
-            "your username, email and phone number must be unique."
-          );
-        }
-      });
+      // const { confirmPassword, ...formData } = form;
+      // registerAPI(formData).then((res) => {
+      //   if (res.token) {
+      //     localStorage.removeItem("token");
+      //     localStorage.setItem("token", res.token);
+      //     localStorage.setItem("user", JSON.stringify(res.user));
+      //     navigate("/room");
+      //     setUser(res.user);
+      //   } else {
+      //     createNotification(
+      //       "fail",
+      //       "Invalid username and phone number",
+      //       "your username, email and phone number must be unique."
+      //     );
+      //   }
+      // });
+      try {
+        const { confirmPassword, ...formData } = form;
+        const res = await registerAPI(formData);
+
+        createNotification({
+          status: 'success',
+          header: 'Registration Successful!',
+          text: 'Welcome! You will be redirected shortly'
+        })
+
+        localStorage.setItem('token', res.token);
+        setUser(res.user);
+        navigate("/room");
+      } catch (err) {
+        console.error("Registrarion failed, notification handled by interceptor:", err);
+      }
     }
   };
 

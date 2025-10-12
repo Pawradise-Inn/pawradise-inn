@@ -20,15 +20,11 @@ const NotificationProvider = ({ children }) => {
   //  onClick: function want to pass for warning notification when user agree
   //                  only neccessary with warning status
 
-  const createNotification = (
-    status,
-    header,
-    text,
-    onClick,
-    duration = 5000
-  ) => {
+  const createNotification = (config) => {
+    const { status, header, text, onClick, duration = 5000 } = config;
+
     const id = Date.now();
-    if (status === "warning") {
+    if (status === 'warning') {
       setIsBlock(true);
       setNotifications((prev) => [
         ...prev,
@@ -47,7 +43,10 @@ const NotificationProvider = ({ children }) => {
     if (notifications.length >= overflowNumber) {
       notifications[notifications.length - overflowNumber].overflow = true;
     }
-  };
+  }
+
+
+  window.notificationprovider = { createNotification };
 
   const removeNotification = (id) => {
     setNotifications((prev) => {

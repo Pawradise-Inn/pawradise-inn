@@ -1,19 +1,32 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { getMeAPI } from "../hooks/authAPI";
+import axiosInstance, { setUpInterceptors} from "../api/axiosInstance";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
+  const logout = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem("token");
+  }, []);
+
   useEffect(() => {
+    setUpInterceptors(logout);
+
     const token = localStorage.getItem("token");
     if (token) {
-      getMeAPI(token)
+      // getMeAPI(token)
+      //   .then((res) => setUser(res.data))
+      //   .catch(() => setUser(null));
+      axiosInstance.get("/api/v1/auth/me")
         .then((res) => setUser(res.data))
-        .catch(() => setUser(null));
+        .catch(() => {
+          logout();
+        })
     }
-  }, []);
+  }, [logout]);
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>

@@ -1,10 +1,10 @@
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance";
 
 const API_URL = "http://localhost:5000/api/v1/auth";
 
 // Register
 export const registerAPI = async (user) => {
-  const res = await axios.post(`${API_URL}/register`, user);
+  const res = await axiosInstance.post(`${API_URL}/register`, user);
   return res.data;
 };
 
