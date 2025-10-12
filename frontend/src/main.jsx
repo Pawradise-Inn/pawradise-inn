@@ -7,12 +7,12 @@ import { AuthProvider } from "./context/AuthProvider.jsx";
 import "./index.css";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <BrowserRouter>
-        <NotificationProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <BrowserRouter>
           <App />
-        </NotificationProvider>
-      </BrowserRouter>
-    </AuthProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </NotificationProvider>
   </StrictMode>
 );
