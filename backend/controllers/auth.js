@@ -47,8 +47,22 @@ exports.register = async (req, res, next) => {
     console.log("User created:", user)
     sendTokenResponse(user, 200, res);
   } catch (error) {
-    console.error(error); // 👈 log it
-    res.status(500).json({ success: false, error: error.message });
+    console.error(error);
+    
+    // Handle unique constraint violations
+    if (error.code === 'P2002') {
+      const field = error.meta?.target[0];
+      return res.status(409).json({ 
+        success: false, 
+        message: `${field} is already taken` 
+      });
+    }
+    
+    // Handle other errors
+    return res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
   }
 };
 
