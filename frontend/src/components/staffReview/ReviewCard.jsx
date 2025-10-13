@@ -1,16 +1,25 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const ReviewCard = ({
   review,
   onDelete,
-  onReply,          
-  defaultHidden = false,
-  hidden: controlledHidden, 
-  onHideChange,     
+  onReply, // (id, text) => void | Promise<void>
+  hidden: controlledHidden,
+  onHideChange,
 }) => {
-
-  const [uncontrolledHidden, setUncontrolledHidden] = useState(defaultHidden);
+  // hidden (controlled by parent if prop is given)
+  const [uncontrolledHidden, setUncontrolledHidden] = useState(false);
   const hidden = controlledHidden ?? uncontrolledHidden;
+
+  // editable reply draft
+  const [draftReply, setDraftReply] = useState(review?.staffReply ?? "");
+  const [isSaving, setIsSaving] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
+
+  // ถ้า prop review.staffReply เปลี่ยน ให้ sync เข้า textarea
+  useEffect(() => {
+    setDraftReply(review?.staffReply ?? "");
+  }, [review?.staffReply, review?.id]);
 
   const ratingText = useMemo(() => {
     const n = Number(review?.rating);
@@ -18,35 +27,29 @@ const ReviewCard = ({
   }, [review?.rating]);
 
   const handleHide = () => {
-    console.log("[ReviewCard] hide clicked", review?.id);
-    if (controlledHidden === undefined) {
-      setUncontrolledHidden(true);
-    }
+    if (controlledHidden === undefined) setUncontrolledHidden(true);
     onHideChange?.(true, review?.id);
   };
-
   const handleUnhide = () => {
-    console.log("[ReviewCard] unhide clicked", review?.id);
-    if (controlledHidden === undefined) {
-      setUncontrolledHidden(false);
-    }
+    if (controlledHidden === undefined) setUncontrolledHidden(false);
     onHideChange?.(false, review?.id);
   };
 
-  const handleDelete = () => {
-    console.log("[ReviewCard] delete clicked", review?.id);
-    onDelete?.(review?.id);
-  };
-
-  const handleReply = () => {
-    console.log("[ReviewCard] reply clicked", review?.id);
-    onReply?.(review);
+  const handleSaveReply = async () => {
+    try {
+      setIsSaving(true);
+      setJustSaved(false);
+      await onReply?.(review?.id, draftReply?.trim() ?? "");
+      setJustSaved(true);
+      setTimeout(() => setJustSaved(false), 1200);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
     <div
       data-probe="REVIEW-CARD-ACTIVE"
-      data-review-id={review?.id}
       className={`mb-6 bg-white border border-[var(--brown-color)] rounded-2xl ${
         hidden ? "p-3 h-12 overflow-hidden" : "p-6"
       }`}
@@ -66,7 +69,10 @@ const ReviewCard = ({
         </div>
       ) : (
         <div className="flex gap-6 justify-start">
+          {/* thumbnail */}
           <div className="h-[120px] w-[120px] flex-shrink-0 rounded-xl bg-gray-100" />
+
+          {/* left info */}
           <div className="flex-shrink-0 pt-1">
             <p className="text-base font-bold">{review?.serviceName}</p>
             <p className="my-1 text-gray-600">{review?.petName}</p>
@@ -75,6 +81,7 @@ const ReviewCard = ({
 
           <div className="w-px bg-gray-200" />
 
+          {/* right content */}
           <div className="flex flex-grow flex-col min-w-0">
             <div className="flex justify-between gap-3">
               <p className="font-bold truncate">{review?.customerName}</p>
@@ -87,24 +94,51 @@ const ReviewCard = ({
               “{review?.reviewText}”
             </p>
 
-            {!!review?.staffReply && (
-              <div>
-                <p className="mb-2 font-bold">Staff reply</p>
-                <div className="mt-2 rounded-lg bg-gray-50 p-4">
-                  <p className="italic text-gray-700">“{review?.staffReply}”</p>
+            {/* staff reply editor (มีให้ทุกการ์ดเสมอ) */}
+            <div className="mt-2">
+              <p className="mb-2 font-bold">Staff reply</p>
+
+              <div className="rounded-lg bg-gray-50 p-3 border border-gray-200">
+                <textarea
+                  value={draftReply}
+                  onChange={(e) => setDraftReply(e.target.value)}
+                  placeholder="Type your reply to the customer..."
+                  className="w-full resize-y min-h-[84px] bg-transparent outline-none"
+                />
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-xs text-gray-500">
+                    {draftReply.length} chars
+                  </span>
+                  <div className="flex items-center gap-3">
+                    {justSaved && (
+                      <span className="text-xs font-semibold text-green-700">
+                        Saved
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      disabled={isSaving}
+                      onClick={handleSaveReply}
+                      className={`cursor-pointer rounded-lg px-5 py-2 text-sm font-semibold text-white transition-opacity ${
+                        isSaving ? "opacity-60" : "hover:opacity-90"
+                      } bg-[#6F4E37]`}
+                    >
+                      {isSaving ? "Saving..." : "Reply"}
+                    </button>
+                  </div>
                 </div>
               </div>
-            )}
+            </div>
 
-            <div className="mt-auto flex items-center justify-between pt-6">
+            {/* actions */}
+            <div className="mt-6 flex items-center justify-between">
               <button
                 type="button"
-                className="cursor-pointer rounded-lg bg-[#6F4E37] px-7 py-2.5 text-sm font-semibold !text-white transition-opacity hover:opacity-90"
-                onClick={handleDelete}
+                className="cursor-pointer rounded-lg bg-[#6F4E37] px-7 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                onClick={() => onDelete?.(review?.id)}
               >
                 Delete
               </button>
-
               <div className="flex gap-4">
                 <button
                   type="button"
@@ -113,13 +147,7 @@ const ReviewCard = ({
                 >
                   Hide
                 </button>
-                <button
-                  type="button"
-                  className="cursor-pointer rounded-lg bg-[#6F4E37] px-7 py-2.5 text-sm font-semibold !text-white transition-opacity hover:opacity-90"
-                  onClick={handleReply}
-                >
-                  Reply
-                </button>
+                {/* ปุ่ม Reply หลักอยู่ใต้ textarea แล้ว */}
               </div>
             </div>
           </div>
