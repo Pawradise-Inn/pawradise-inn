@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       //   .catch(() => setUser(null));
       getMeAPI()
         .then((res) => {
-          setUser(res.user);
+          setUser(res.data);
         })
         .catch(() => {
           logout();
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
   }, [logout]);
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser,logout}}>
       {children}
     </AuthContext.Provider>
   );
