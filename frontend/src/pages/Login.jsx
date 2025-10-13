@@ -7,12 +7,14 @@ import PawLogo from "../assets/logo.png";
 import { getMeAPI, loginAPI } from "../hooks/authAPI";
 import { useAuth } from "../context/AuthProvider";
 import { startUpVariants } from "../styles/animation";
+import {useNotification} from "../context/notification/NotificationProvider"
 
 export default function Login({
   role: roleProp,
   redirectTo: redirectProp,
   title: titleProp,
 }) {
+  const { createNotification } = useNotification();
   const location = useLocation();
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
@@ -59,12 +61,16 @@ export default function Login({
       if (res?.token) {
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
-
         const userData = await getMeAPI();
-        if (userData?.user) {
-          setUser(userData.user);
+        if (userData?.data) {
+          setUser(userData.data);
         }
-        console.log(user)
+        createNotification({
+          status: 'success',
+          header: 'Login Successful!',
+          text: 'Welcome! You will be redirected shortly'
+        });
+        console.log(userData.data)
         navigate(redirectTo, { replace: true });
       } else {
         setErr("Login failed. Please check your username or password.");

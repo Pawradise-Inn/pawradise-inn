@@ -43,7 +43,7 @@ const getBooking = async (req, res) => {
             select
         });
         if(!booking){
-            return res.status(404).json({success: false, error: 'Booking not found'});
+            return res.status(404).json({success: false, message: 'Booking not found'});
         }
         res.status(200).json({success: true, data: booking});
     } catch(err) {
@@ -60,7 +60,7 @@ const updateBookingStatus = async (req, res) => {
         const status = req.body.status;
         const allowedStatuses = ["BOOKED", "CANCELLED", "COMPLETED"];
         if (!allowedStatuses.includes(status)) {
-            return res.status(400).json({ success: false, error: "Invalid booking status. Please select a valid status" });
+            return res.status(400).json({ success: false, message: "Invalid booking status. Please select a valid status" });
         }
         const booking = await prisma.booking.update({
             where: {
@@ -156,7 +156,7 @@ const checkBookingStatus = async (req, res) => {
     });
 
     if (!booking) {
-        return res.status(404).json({success: false, error: 'Booking not found'});
+        return res.status(404).json({success: false, message: 'Booking not found'});
     }
     return res.status(200).json({success: true, data: booking});
 };
