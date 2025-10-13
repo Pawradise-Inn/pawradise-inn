@@ -55,23 +55,24 @@ export default function Login({
     setLoading(true);
     try {
       // ปรับให้ตรงกับ backend: ถ้า loginAPI เดิมไม่รองรับ role ให้ลบบรรทัด role ทิ้ง
-      const res = await loginAPI(form.Username, form.Password, role);
+      const res = await loginAPI(form.Username, form.Password);
       if (res?.token) {
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
-        getMeAPI(res.token).then((res2) => {
-          if (res2?.user) {
-            setUser?.(res2.user);
-          }
-        });
+
+        const userData = await getMeAPI();
+        if (userData?.user) {
+          setUser(userData.user);
+        }
         console.log(user)
         navigate(redirectTo, { replace: true });
       } else {
         setErr("Login failed. Please check your username or password.");
       }
     } catch (e2) {
-      const msg = e2?.response?.data?.message || "Cannot sign in right now.";
-      setErr(msg);
+      //const msg = e2?.response?.data?.message || "Cannot sign in right now.";
+      //setErr(msg);
+      console.error("Login error:", e2);
     } finally {
       setLoading(false);
     }

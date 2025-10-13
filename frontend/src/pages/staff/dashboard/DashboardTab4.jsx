@@ -7,7 +7,9 @@ import { useNotification } from "../../../context/notification/NotificationProvi
 
 import {
   createBookedService,
+  deleteBookedService,
   getTodayService,
+  updateBookedService,
 } from "../../../hooks/bookedServiceAPI";
 
 // --- Helper Components ---
@@ -324,7 +326,7 @@ const DashboardTab4 = () => {
     try {
       setLoading(true);
       const data = await getTodayService();
-      setItems(data.data || []);
+      setItems(data || []);
     } catch (error) {
       console.error("Failed to fetch services:", error);
     } finally {
@@ -351,7 +353,7 @@ const DashboardTab4 = () => {
   // UPDATED: handleStatusChange now calls the API.
   const handleStatusChange = async (itemId, newStatus) => {
     try {
-      await updateBookedRoomAPI(itemId, { status: newStatus });
+      await updateBookedService(itemId, { status: newStatus });
       setItems(
         items.map((item) =>
           item.id === itemId ? { ...item, status: newStatus } : item
@@ -367,7 +369,7 @@ const DashboardTab4 = () => {
     try {
       if (editingItem) {
         // EDIT mode
-        const updatedItem = await updateBookedRoomAPI(
+        const updatedItem = await updateBookedService(
           editingItem.id,
           itemFromPopup
         );
@@ -390,7 +392,7 @@ const DashboardTab4 = () => {
   // NEW: Handler to delete a booking via the API.
   const handleDeleteBooking = async (id) => {
     try {
-      await deleteBookedRoomAPI(id);
+      await deleteBookedService(id);
       setItems((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.error("Failed to delete booking:", error);

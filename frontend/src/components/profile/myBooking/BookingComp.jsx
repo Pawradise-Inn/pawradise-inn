@@ -23,19 +23,17 @@ const BookingComp = () => {
     if (!user) return;
     const getMyBookings = async () => {
       try {
-        const token = localStorage.getItem("token");
-        console.log(token);
-        const data = await fetchMyBookings(token);
+        const data = await fetchMyBookings();
         console.log(data);
         // Flatten all booked_service into one array
-        const allServices = data.data.flatMap((book) => book.booked_service);
+        const allServices = data.flatMap((book) => book.booked_service);
         setAllBookedService(allServices);
       } catch (error) {
         console.error("Failed to fetch bookings:", error);
       }
     };
     getMyBookings();
-  }, []);
+  }, [user]);
 
   const handleCancelClick = (book) => {
     setSelectedBooking(book);

@@ -56,7 +56,7 @@ const NewPet = () => {
 
   const handleImageClick = () => {
     fileInputRef.current.click();
-    console.log(user)
+    //console.log(user)
 
   };
 
@@ -75,7 +75,7 @@ const NewPet = () => {
     }
   }; // <-- Added this bracket
 
-  console.log(user);
+  //console.log(user);
 
 const handleConfirm = () => {
     // Check for missing form data (initial synchronous validation)

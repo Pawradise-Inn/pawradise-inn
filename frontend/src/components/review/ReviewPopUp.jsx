@@ -17,12 +17,30 @@ const ReviewPopup = ({
   const demoData =
     "Lorem ipsum dolor sit amet consectetur adipisicing elit. Error et distinctio dolorem fugiat inventore modi at architecto! Deleniti adipisci maxime minima nihil dolor. Facilis totam placeat optio minus eius ducimus qui quidem fuga odit, doloremque quaerat perspiciatis distinctio velit iusto sunt sapiente dolorum veritatis cupiditate, perferendis ea? Molestiae veritatis nihil quasi facere odio eius, quisquam perspiciatis cumque inventore nostrum modi eveniet minima ipsum recusandae suscipit dolorem doloremque porro aliquid ipsa, soluta at fugit quod deserunt. Magnam eaque autem vel ab nostrum maxime, eveniet quas explicabo a iste ducimus tenetur consequuntur rem at cumque accusamus! In quasi earum beatae excepturi nemo odio, quibusdam repellendus, id explicabo, aliquam animi dolore quia laborum ea illo assumenda labore? Sequi eaque, in sunt alias officia fuga quam? Quibusdam, accusantium distinctio nihil autem modi facere iste ex velit. Quos porro dolores earum vel ipsum officiis nemo eveniet libero iusto molestias veniam odit unde itaque dolore rerum mollitia tempora aperiam ipsa, quaerat incidunt maiores fugiat! Numquam similique excepturi iure culpa molestiae nobis expedita reiciendis neque architecto earum officia quod beatae quaerat eaque incidunt eos sequi, ipsam vel at fugiat assumenda suscipit nulla est. Autem aspernatur rerum illum quod, ex nihil quis, cum error beatae nemo quas tenetur.";
 
-  const handleSubmitNewComment = () => {
-    updateChatLogAPI(data.id, {
+  // const handleSubmitNewComment = () => {
+  //   updateChatLogAPI(data.id, {
+  //     review: newData.review,
+  //     rating: newData.rating,
+  //   }).then((res) => console.log(res));
+
+  //   setHistorys((prev) => {
+  //     return prev.map((history) => {
+  //       if (history.id === data.id) {
+  //         return newData;
+  //       }
+  //       return history;
+  //     });
+  //   });
+  // };
+  const handleSubmitNewComment = async () => {
+  try {
+    const res = await updateChatLogAPI(data.id, {
       review: newData.review,
       rating: newData.rating,
-    }).then((res) => console.log(res));
-
+    });
+    
+    console.log(res);
+    
     setHistorys((prev) => {
       return prev.map((history) => {
         if (history.id === data.id) {
@@ -31,7 +49,16 @@ const ReviewPopup = ({
         return history;
       });
     });
-  };
+    
+    createNotification(
+      "success",
+      "Comment updated",
+      "Your comment has been updated successfully."
+    );
+  } catch (error) {
+    console.error("Failed to update comment:", error);
+  }
+};
 
   const getStarColor = (value) => {
     if (value <= newData.rating) {

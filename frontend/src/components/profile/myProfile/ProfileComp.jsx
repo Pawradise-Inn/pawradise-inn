@@ -73,13 +73,16 @@ const ProfileComp = () => {
           const { id, ...userObjected } = newUser;
           updateCustomerAPI(user.customer.id, userObjected).then((data) => {
             console.log("data:",data)
-            setUser?.(data.data); 
+            setUser?.(data); 
             createNotification(
               "success",
               "Profile updated successfully!",
               "Your update has been saved."
             );
-          });
+          })
+          .catch((err) => {
+            console.error("Update failed:", err);
+          });
         } catch (err) {
           console.error(err);
         }

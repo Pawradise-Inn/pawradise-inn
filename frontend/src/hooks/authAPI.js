@@ -1,6 +1,6 @@
 import axiosInstance from "../api/axiosInstance";
 
-const API_URL = "http://localhost:5000/api/v1/auth";
+const API_URL = "/api/v1/auth";
 
 // Register
 export const registerAPI = async (user) => {
@@ -10,34 +10,25 @@ export const registerAPI = async (user) => {
 
 // Login
 export const loginAPI = async (userName, password) => {
-  const res = await axios.post(`${API_URL}/login`, { userName, password });
+  const res = await axiosInstance.post(`${API_URL}/login`, { userName, password });
   return res.data;
 };
 
 // Get current user (token required)
 export const getMeAPI = async (token) => {
-  const res = await axios.get(`${API_URL}/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await axiosInstance.get(`${API_URL}/me`);
   return res.data;
 };
 
 // Update current user
 export const updateMeAPI = async (user, token) => {
-  const res = await axios.put(`${API_URL}/me`, user, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await axiosInstance.put(`${API_URL}/me`, user);
   return res.data;
 };
 
 // Logout
 export const logoutAPI = async (token) => {
-  const res = await axios.post(
-    `${API_URL}/logout`,
-    {},
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+  const res = await axiosInstance.post(
+    `${API_URL}/logout`,{});
   return res.data;
 };
