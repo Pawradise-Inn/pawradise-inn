@@ -41,17 +41,33 @@ const BookingRoom = () => {
 
   // fetch room data from backend and setRoom
   useEffect(() => {
-    fetchAllRoomsWithPaginationAPI().then((data) => {
-      if (data.data) {
-        data.data.forEach((room) => {
+    // fetchAllRoomsWithPaginationAPI().then((data) => {
+    //   if (data.data) {
+    //     data.data.forEach((room) => {
+    //       room.headerType = "Room";
+    //       room.reviewStar = room.reviewStar.toFixed(1);
+    //       room.commentPages = Math.max(1, room.commentPages);
+    //     });
+
+    //     setRoom(data.data);
+    //   }
+    // });
+    const loadInitialRooms = async () => {
+      try {
+        const roomsData = await fetchAllRoomsWithPaginationAPI();
+        console.log("API Response:", roomsData); // Add this line
+        roomsData.data.forEach((room) => {
           room.headerType = "Room";
           room.reviewStar = room.reviewStar.toFixed(1);
           room.commentPages = Math.max(1, room.commentPages);
         });
 
-        setRoom(data.data);
+        setRoom(roomsData.data);
+      } catch(error) {
+        console.error("Failed to load initial rooms:", error);
       }
-    });
+    }
+    loadInitialRooms();
   }, []);
 
   // if entryDate and exitDate is fill select 2 route
@@ -59,28 +75,36 @@ const BookingRoom = () => {
   //   2) if petType !== null call API and store in filterRoom
   // if entryDate and exitDate isn't fill filterRoom = Room
   useEffect(() => {
-    if (filter.entryDate && filter.exitDate) {
-      const validatedDate = getDateValidation(
-        filter.entryDate,
-        filter.exitDate
-      );
-      if (validatedDate.status) {
-        fetchAvailableRoomsAPI(filter.entryDate, filter.exitDate).then(
-          (res) => {
-            setFilterRoom(filterWithPet(res.data));
+    const filterRooms = async () => {
+      if (filter.entryDate && filter.exitDate) {
+        const validatedDate = getDateValidation(filter.entryDate, filter.exitDate);
+        if (validatedDate.status) {
+          try {
+            const availableRooms = await fetchAvailableRoomsAPI(
+              filter.entryDate,
+              filter.exitDate
+            );
+            setFilterRoom(filterWithPet(availableRooms.data));
+          } catch (error) {
+            console.error("Failed to fetch available rooms:", error);
+            setFilterRoom([]);
+            // Interceptor handles the fail notification.
           }
-        );
+        } else {
+          // FIXED: Changed createNotification to use the new object style.
+          createNotification({
+            status: "fail",
+            header: "Date is invalid",
+            text: validatedDate.warningText,
+          });
+          setFilterRoom([]);
+        }
       } else {
-        createNotification(
-          "fail",
-          "Date is invalid",
-          validatedDate.warningText
-        );
-        setFilterRoom([]);
+        setFilterRoom(filterWithPet(room));
       }
-    } else {
-      setFilterRoom(filterWithPet(room));
-    }
+    };
+
+    filterRooms();
   }, [filter, room]);
 
   //  if filterRoom is empty === no result

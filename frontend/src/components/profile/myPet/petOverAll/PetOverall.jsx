@@ -19,9 +19,9 @@ const PetOverall = () => {
   const fetchData = async () => {
     try {
       const response = await fetchPetAPI(id);
-      setPet(response.data);
-      setStayed(response.data.stayed);
-      setScheduled(response.data.scheduled);
+      setPet(response);
+      setStayed(response.stayed);
+      setScheduled(response.scheduled);
     } catch (err) {
       console.error(err);
     }

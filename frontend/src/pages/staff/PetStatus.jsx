@@ -40,7 +40,7 @@ const PetStatus = () => {
   const fetchPets = async () => {
     try {
       const response = await fetchAllPetAPI();
-      setPets(response.data);
+      setPets(response);
     } catch (err) {
       console.error(err);
     }
