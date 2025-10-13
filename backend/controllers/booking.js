@@ -21,7 +21,7 @@ const getBookings = async (req, res) => {
         });
         res.status(200).json({success: true, data: bookings});
     } catch(err) {
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to fetch bookings. Please try again later"});
     }
 };
 
@@ -47,7 +47,10 @@ const getBooking = async (req, res) => {
         }
         res.status(200).json({success: true, data: booking});
     } catch(err) {
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({
+            success: false, 
+            message: "Unable to fetch booking details. Please try again later"
+        });
     }
 }
 
@@ -57,7 +60,7 @@ const updateBookingStatus = async (req, res) => {
         const status = req.body.status;
         const allowedStatuses = ["BOOKED", "CANCELLED", "COMPLETED"];
         if (!allowedStatuses.includes(status)) {
-            return res.status(400).json({ success: false, error: "Invalid status" });
+            return res.status(400).json({ success: false, error: "Invalid booking status. Please select a valid status" });
         }
         const booking = await prisma.booking.update({
             where: {
@@ -96,7 +99,10 @@ const updateBookingStatus = async (req, res) => {
         }
         res.status(200).json({success: true, data: booking});
     } catch(err) {
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({
+            success: false, 
+            message: "Unable to update booking status. Please try again later"
+        });
     }
 };
 
@@ -119,7 +125,7 @@ const createBooking = async (req, res) => {
         });
         res.status(201).json({success: true, data: booking});
     } catch(err){
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to create booking. Please try again later"});
     }
 };
 
@@ -131,7 +137,13 @@ const deleteBooking = async (req, res) => {
         });
         res.status(200).json({success: true, data: {}});
     } catch(err) {
-        res.status(500).json({success: false, error: err.message});
+        if (err.code === 'P2025') {
+            return res.status(404).json({
+                success: false, 
+                message: "This booking no longer exists"
+            });
+        }
+        res.status(500).json({success: false, message: "Unable to cancel booking. Please try again later"});
     }
 };
 
@@ -183,7 +195,10 @@ const getMyBookings = async (req, res) => {
 
     res.status(200).json({ success: true, data: bookings });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ 
+        success: false, 
+        message: "Unable to fetch your bookings. Please try again later" 
+    });
   }
 };
 
@@ -203,7 +218,7 @@ const cancelBooking = async(req, res) =>{
     if (booking.status !== "BOOKED" && booking.status !== "PENDING") {
       return res.status(409).json({
         success: false,
-        message: "Booking cannot be cancelled"
+        message: "This booking cannot be cancelled"
       });
     }
 
@@ -214,7 +229,7 @@ const cancelBooking = async(req, res) =>{
 
     res.status(200).json({ success: true, booking: updatedBooking });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, message: "Unable to cancel booking. Please try again later" });
   }
 };
 
@@ -238,7 +253,10 @@ const putBooking = async (req, res) => {
         });
 
         if (!existingBooking) {
-            return res.status(404).json({ success: false, error: 'Booking not found' });
+            return res.status(404).json({ 
+                success: false, 
+                message: "Booking not found" 
+            });
         }
 
         // Prepare the data to update the Booking model
@@ -290,7 +308,7 @@ const putBooking = async (req, res) => {
 
         res.status(200).json({ success: true, data: responseData });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, message: "Unable to update booking. Please try again later" });
     }
 };
 
