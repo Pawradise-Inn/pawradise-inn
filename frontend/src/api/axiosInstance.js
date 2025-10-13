@@ -1,10 +1,14 @@
 import axios from 'axios';
 
+let isInterceptorSetup = false;
+
 const axiosInstance = axios.create({
     baseURL: 'http://localhost:5000',
 });
 
 export const setUpInterceptors = (logout) => {
+    if (isInterceptorSetup) return ;
+    
     axiosInstance.interceptors.request.use(
         (config) => {
             const token = localStorage.getItem('token');
@@ -50,6 +54,8 @@ export const setUpInterceptors = (logout) => {
             return Promise.reject(error);
         }
     );
+
+    isInterceptorSetup = true;
 };
 
 export default axiosInstance;
