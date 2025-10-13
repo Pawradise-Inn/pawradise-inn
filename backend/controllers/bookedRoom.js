@@ -186,7 +186,7 @@ const getTodayRooms = async (req, res) => {
 
     res.status(200).json({ success: true, data: formattedRooms });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, message: "Unable to fetch today's room bookings. Please try again later" });
   }
 };
 
