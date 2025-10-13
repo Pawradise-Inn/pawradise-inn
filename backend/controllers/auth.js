@@ -96,7 +96,7 @@ exports.getMe = async (req, res) => {
     });
 
     if (!user)
-      return res.status(404).json({ success: false, error: "Profile not found. Please try again" });
+      return res.status(404).json({ success: false, message: "Profile not found. Please try again" });
 
     res.status(200).json({ success: true, data: user });
   } catch (err) {
@@ -134,7 +134,7 @@ exports.updateMe = async (req, res) => {
         role: true,
       },
     });
-    if (!user) return res.status(404).json({ success: false, error: "Profile not found. Please try again" });
+    if (!user) return res.status(404).json({ success: false, message: "Profile not found. Please try again" });
     res.status(200).json({ success: true, data: user });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message, message: "Unable to update profile. Please try again later" });

@@ -171,7 +171,7 @@ const deletePicturesFromService = async (req, res) => {
         res.status(200).json({success: true, data: service});
     }catch(err){
         if(err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found'});
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message, message: "Unable to remove pictures from service. Please try again later" });
     }
 };
 
@@ -198,7 +198,7 @@ const getServicesWithPagination = async (req, res)=>{ //requirement: 1
 
         res.status(200).json({success: true, data: formatted});
     }catch(err){
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message, message: "Unable to fetch services. Please try again later" });
     }
 };
 

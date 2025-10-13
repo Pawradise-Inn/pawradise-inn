@@ -15,20 +15,19 @@ export const loginAPI = async (userName, password) => {
 };
 
 // Get current user (token required)
-export const getMeAPI = async (token) => {
+export const getMeAPI = async () => {
   const res = await axiosInstance.get(`${API_URL}/me`);
   return res.data;
 };
 
 // Update current user
-export const updateMeAPI = async (user, token) => {
+export const updateMeAPI = async (user) => {
   const res = await axiosInstance.put(`${API_URL}/me`, user);
   return res.data;
 };
 
 // Logout
-export const logoutAPI = async (token) => {
-  const res = await axiosInstance.post(
-    `${API_URL}/logout`,{});
+export const logoutAPI = async () => {
+  const res = await axiosInstance.post(`${API_URL}/logout`,{});
   return res.data;
 };

@@ -171,7 +171,7 @@ const addPicturesToRoom = async (req, res) => {
   } catch (err) {
     if (err.code === "P2025")
       return res.status(404).json({ success: false, msg: "Room is not found" });
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message, message: "Unable to add pictures to room. Please try again later" });
   }
 };
 
@@ -184,7 +184,7 @@ const deletePicturesFromRoom = async (req, res) => {
   } catch (err) {
     if (err.code === "P2025")
       return res.status(404).json({ success: false, msg: "Room is not found" });
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message, message: "Unable to delete pictures from room. Please try again later" });
   }
 };
 
@@ -279,7 +279,7 @@ const getAvailableRooms = async (req, res) => {
 
     res.status(200).json({ success: true, data: formattedRooms });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch available rooms. Please try again later" });
   }
 };
 
@@ -334,7 +334,7 @@ const getRoomsWithPagination = async (req, res) => {
 
     res.status(200).json({ success: true, data: formattedRooms });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch rooms. Please try again later" });
   }
 };
 
