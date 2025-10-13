@@ -1,35 +1,29 @@
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance";
 
-const API_URL = "http://localhost:5000/api/v1/room";
+const API_URL = "/api/v1/room";
 
 export const fetchAllRoomsAPI = async () => {
-  const response = await axios.get(API_URL);
+  const response = await axiosInstance.get(API_URL);
   return response.data;
 };
 
 export const fetchRoomAPI = async (id) => {
-  const response = await axios.get(`${API_URL}/${id}`);
+  const response = await axiosInstance.get(`${API_URL}/${id}`);
   return response.data;
 };
 
-export const addRoomAPI = async (room, token = localStorage.getItem("token")) => {
-  const response = await axios.post(API_URL, room, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+export const addRoomAPI = async (room) => {
+  const response = await axiosInstance.post(API_URL, room);
   return response.data;
 };
 
-export const updateRoomAPI = async (id, roomData, token = localStorage.getItem("token")) => {
-  const response = await axios.patch(`${API_URL}/${id}`, roomData, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+export const updateRoomAPI = async (id, roomData) => {
+  const response = await axiosInstance.patch(`${API_URL}/${id}`, roomData);
   return response.data;
 };
 
-export const deleteRoomAPI = async (id, token = localStorage.getItem("token")) => {
-  const response = await axios.delete(`${API_URL}/${id}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+export const deleteRoomAPI = async (id) => {
+  const response = await axiosInstance.delete(`${API_URL}/${id}`);
   return response.data;
 };
 
@@ -37,42 +31,37 @@ export const fetchAvailableRoomsAPI = async (
   checkIn,
   checkOut,
 ) => {
-  const response = await axios.get(`${API_URL}/available`, {
+  const response = await axiosInstance.get(`${API_URL}/available`, {
     params: { checkIn, checkOut },
   });
   return response.data;
 };
 
 export const fetchRoomStatusAPI = async (id, entry_date, exit_date) => {
-  const response = await axios.get(`${API_URL}/${id}/status`, {
+  const response = await axiosInstance.get(`${API_URL}/${id}/status`, {
     params: { entry_date, exit_date }
   });
   return response.data;
 };
 
 export const fetchAllRoomsWithPaginationAPI = async () => {
-  const response = await axios.get(`${API_URL}/reviews`);
+  const response = await axiosInstance.get(`${API_URL}/reviews`);
   return response.data;
 };
 
 export const fetchRoomReviewsAPI = async (roomId, star, NSP) => {
-  const response = await axios.get(`${API_URL}/${roomId}/reviews`, {
+  const response = await axiosInstance.get(`${API_URL}/${roomId}/reviews`, {
     params: { roomId, star, NSP }
   });
   return response.data;
 };
 
-export const addPicturesToRoomAPI = async (id, picture, token = localStorage.getItem("token")) => {
-  const response = await axios.post(`${API_URL}/${id}/pictures`, { picture }, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+export const addPicturesToRoomAPI = async (id, picture) => {
+  const response = await axiosInstance.post(`${API_URL}/${id}/pictures`, { picture });
   return response.data;
 };
 
-export const deletePicturesFromRoomAPI = async (id, picture, token = localStorage.getItem("token")) => {
-  const response = await axios.delete(`${API_URL}/${id}/pictures`, {
-    data: { picture },
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+export const deletePicturesFromRoomAPI = async (id, picture) => {
+  const response = await axiosInstance.delete(`${API_URL}/${id}/pictures`, { picture });
   return response.data;
 };
