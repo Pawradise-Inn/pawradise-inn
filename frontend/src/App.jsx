@@ -23,7 +23,7 @@ import DashboardTab3 from "./pages/staff/dashboard/DashboardTab3";
 import DashboardTab4 from "./pages/staff/dashboard/DashboardTab4";
 import PetStatus from "./pages/staff/PetStatus";
 import PetUpdate from "./pages/staff/PetUpdate";
-import StaffReview from "./pages/staff/StaffReview";
+import StaffReview from "./pages/staff/StaffReview/StaffReview";
 import RequireAuth from "./utils/RequireAuth";
 import Review from "./pages/customer/Review";
 import ReviewComp from "./components/review/ReviewComp";

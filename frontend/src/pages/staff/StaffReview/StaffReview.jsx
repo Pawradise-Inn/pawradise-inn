@@ -164,7 +164,7 @@ const StaffReviewPage = () => {
               type="date" 
               value={dateFilter} 
               onChange={handleDateChange} 
-              className="cursor-pointer border-none bg-transparent text-white outline-none"
+              className="cursor-pointer border-none bg-transparent !text-white outline-none"
             />
             {dateFilter && (
               <button onClick={clearDateFilter} className="absolute right-2.5 top-1/2 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-none bg-white/20 font-bold leading-none text-white transition-opacity hover:opacity-80">
@@ -173,7 +173,7 @@ const StaffReviewPage = () => {
             )}
           </div>
           <div className="relative">
-            <button onClick={() => setIsStarDropdownOpen(prev => !prev)} className="flex h-full cursor-pointer items-center gap-2 whitespace-nowrap rounded-xl bg-[#6F4E37] px-6 py-3 text-lg text-white transition-opacity hover:opacity-90">
+            <button onClick={() => setIsStarDropdownOpen(prev => !prev)} className="flex h-full cursor-pointer items-center gap-2 whitespace-nowrap rounded-xl bg-[#6F4E37] px-6 py-3 text-lg !text-white transition-opacity hover:opacity-90">
               star <span>▼</span>
             </button>
             {isStarDropdownOpen && <StarFilter onFilterChange={handleStarFilterChange} />}
