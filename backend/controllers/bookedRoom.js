@@ -13,10 +13,10 @@ const getBookedRooms = async (req, res) => {
     if (bookedRooms.length === 0)
       return res
         .status(404)
-        .json({ success: false, msg: "No booked room in database" });
+        .json({ success: false, msg: "No room bookings found" });
     res.status(200).json({ success: true, data: bookedRooms });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch room bookings. Please try again later" });
   }
 };
 
@@ -27,10 +27,10 @@ const getBookedRoom = async (req, res) => {
     if (!bookedRoom)
       return res
         .status(404)
-        .json({ success: false, msg: "Booked room is not found" });
+        .json({ success: false, msg: "Room booking not found" });
     res.status(200).json({ success: true, data: bookedRoom });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch booking details. Please try again later" });
   }
 };
 
@@ -49,8 +49,23 @@ const createBookedRoom = async (req, res) => {
     );
     res.status(201).json({ success: true, data: bookedRoom });
   } catch (err) {
-    if (err.code === "PET_NOT_SUIT" || err.code === "BOOKING_DUPLICATE" || err.code === "ROOM_FULL") {
-        return res.status(409).json({success: false, msg: err.message});
+    if (err.code === "PET_NOT_SUIT") {
+      return res.status(409).json({
+        success: false, 
+        message: "This room type is not suitable for your pet"
+      });
+    }
+    if (err.code === "BOOKING_DUPLICATE") {
+      return res.status(409).json({
+        success: false, 
+        message: "Your pet already has a booking for these dates"
+      });
+    }
+    if (err.code === "ROOM_FULL") {
+      return res.status(409).json({
+        success: false, 
+        message: "This room is fully booked for the selected dates"
+      });
     }
     //   if (err.duplicatedDates) {
     //     return res.status(400).json({
@@ -59,7 +74,10 @@ const createBookedRoom = async (req, res) => {
     //       duplicatedDates: err.duplicatedDates,
     //     });
     //   }
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ 
+      success: false, 
+      message: "Unable to create booking. Please try again later" 
+    });
   }
 };
 
@@ -68,14 +86,14 @@ const updateBookedRoom = async (req, res) => {
     const bookedId = Number(req.params.id);
     const { checkIn, checkOut } = req.body;
     if ((!checkIn, !checkOut)) {
-      return res.status(400).json({ success: false, msg: "Nothing to update" });
+      return res.status(400).json({ success: false, msg: "Please provide check-in and check-out dates" });
     }
 
     const bookedRoom = await findBookedRoomById(bookedId);
     const count = await overlappingRoom(bookedRoom.roomId, checkIn, checkOut);
     const cap = await getRoomCap(roomId);
     if (count >= cap) {
-      res.status(409).json({ success: false, msg: "Room is not available" });
+      res.status(409).json({ success: false, msg: "This room is not available for the selected dates" });
     }
 
     const check = await duplicatedRoom(
@@ -86,7 +104,7 @@ const updateBookedRoom = async (req, res) => {
     if (check.length > 0) {
       return res
         .status(409)
-        .json({ success: false, msg: "This pet already has a booking during the selected dates." });
+        .json({ success: false, msg: "Your pet already has a booking during these dates." });
     }
 
     const updateBookedRoom = await prisma.bookedRoom.update({
@@ -105,7 +123,10 @@ const updateBookedRoom = async (req, res) => {
           success: false,
           msg: "Booked room is not found or already deleted",
         });
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ 
+      success: false, 
+      message: "Unable to update booking. Please try again later" 
+    });
   }
 };
 
@@ -124,7 +145,10 @@ const deleteBookedRoom = async (req, res) => {
           success: false,
           msg: "Booked room is not found or already deleted",
         });
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ 
+      success: false, 
+      message: "Unable to cancel booking. Please try again later" 
+    });
   }
 };
 

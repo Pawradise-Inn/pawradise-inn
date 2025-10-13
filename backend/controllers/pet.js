@@ -8,7 +8,10 @@ const register = async (req, res) => {
       where: { id : customerId } // requires Customer.userId to be unique
     });
     if (!customer) {
-      return res.status(400).json({ success: false, error: "Customer profile not found for this user" });
+      res.status(400).json({ 
+        success: false, 
+        message: "Customer profile not found." 
+      });
     }
 
     const {
@@ -39,10 +42,13 @@ const register = async (req, res) => {
     res.status(201).json({ success: true, data: pet });
   } catch (err) {
     if (err.code === "P2003") {
-      return res.status(400).json({ success: false, error: "Invalid customerId (foreign key)" });
+      return res.status(400).json({ 
+        success: false, 
+        message: "Unable to register pet. Please check your customer information" 
+      });
     }
     console.error("pet.register:", err);
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, message: "Unable to register pet. Please try again later" });
   }
 };
 
@@ -65,12 +71,14 @@ const getAllPets = async (req, res) => {
         
         // Check if any pets were found
         if (pets.length === 0) {
-            return res.status(404).json({ success: false, error: "No pets found" });
+            return res.status(404).json({ 
+              success: false, 
+              message: "No pets found in our system" 
+            });
         }
-
         res.status(200).json({ success: true, data: pets });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, message: "Unable to fetch pets. Please try again later" });
     }
 };
 
@@ -94,11 +102,14 @@ const getPet = async (req, res) => {  //Both
             }
         });
         if (!pet) {
-            return res.status(404).json({success: false, error: "Pet not found"});
+            return res.status(404).json({
+              success: false, 
+              message: "Pet not found"
+            });
         }
         res.status(200).json({success: true, data: pet});
     } catch(err) {
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to fetch pet details. Please try again later" });
     }
 };
 
@@ -109,12 +120,17 @@ const updatePet = async (req, res) => {
             data: req.body
           });
         if (!pet) {
-            return res.status(404).json({success: false, error: 'Pet not found'});
+            return res.status(404).json({
+              success: false, 
+              message: "Pet not found"
+            });
         }
         res.status(200).json({success: true, data: pet});
     } catch(err) {
-        res.status(500).json({success: false, error: err.message});
-        console.log(err.stack);
+        res.status(500).json({
+          success: false, 
+          message: "Unable to update pet information. Please try again later"
+        });
     }
 };
 
@@ -124,7 +140,10 @@ const updatePetStatus = async (req, res) => {
     const { status } = req.body;
     
     if (!status) {
-      return res.status(400).json({ success: false, error: "status is required" });
+      return res.status(400).json({ 
+        success: false, 
+        message: "Please provide a status for the pet" 
+      });
     }
 
     const pet = await prisma.pet.update({
@@ -135,9 +154,12 @@ const updatePetStatus = async (req, res) => {
     res.status(200).json({ success: true, data: pet });
   } catch (err) {
     if (err.code === 'P2025') {
-      return res.status(404).json({ success: false, error: "Pet not found" });
+      return res.status(404).json({ 
+        success: false, 
+        message: "Pet not found" 
+      });
     }
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, message: "Unable to update pet status. Please try again later" });
   }
 };
 
@@ -147,11 +169,14 @@ const deletePet = async (req, res) => {
             where: {id: Number(req.params.id)}
         });
         if (!pet) {
-            return res.status(404).json({success: false, error: 'Pet not found'});
+            return res.status(404).json({
+              success: false, 
+              message: "Pet not found"
+            });
         }
         res.status(200).json({success: true, data: {}});
     } catch(err) {
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to delete pet. Please try again later" });
     }
 };
 
@@ -168,9 +193,16 @@ const getCustomerPets = async (req, res) => {
       select
     });
 
+    if (!pets || pets.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "No pets found for this customer" 
+      });
+    }
+
     res.status(200).json({ success: true, data: pets });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, message: "Unable to fetch pets. Please try again later" });
   }
 };
 
@@ -195,10 +227,15 @@ const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
                 type: true
             }
         });
-
+        if(!pets || pets.length === 0) {
+            return res.status(404).json({
+              success: false, 
+              message: "No available pets found for booking"
+            });
+        }
         res.status(200).json({success: true, data: pets});
     }catch(err){
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to check pet availability. Please try again later"});
     }
 }
 

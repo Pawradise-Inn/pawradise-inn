@@ -53,9 +53,10 @@ const getRooms = async (req, res) => {
       where: options.where,
     });
     if (total === 0) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "No room in database" });
+      return res.status(404).json({ 
+        success: false, 
+        message: "No rooms are available at the moment" 
+      });
     }
 
     const rooms = await prisma.room.findMany(options);
@@ -77,7 +78,7 @@ const getRooms = async (req, res) => {
       .status(200)
       .json({ success: true, pagination, data: rooms, count: total });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, message: "Unable to fetch rooms. Please try again later" });
   }
 };
 
@@ -89,7 +90,7 @@ const getRoom = async (req, res) => {
       return res.status(404).json({ success: false, msg: "Room is not found" });
     res.status(200).json({ success: true, data: room });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, message: "Unable to fetch room details. Please try again later" });
   }
 };
 
@@ -107,7 +108,7 @@ const createRoom = async (req, res) => {
     });
     res.status(201).json({ success: true, data: room });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, message: "Unable to create room. Please try again later" });
   }
 };
 
@@ -121,10 +122,12 @@ const updateRoom = async (req, res) => {
     if (req.body.capacity !== undefined)
       dataToUpdate.capacity = req.body.capacity;
 
-    if (Object.keys(dataToUpdate).length === 0)
-      return res
-        .status(400)
-        .json({ success: false, msg: "No valid fields to update" });
+    if (Object.keys(dataToUpdate).length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Please provide details to update" 
+      });
+    }
 
     const room = await prisma.room.update({
       where: { id: Number(roomId) },
@@ -134,7 +137,10 @@ const updateRoom = async (req, res) => {
   } catch (err) {
     if (err.code === "P2025")
       return res.status(404).json({ success: false, msg: "Room is not found" });
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ 
+      success: false, 
+      message: "Unable to update room. Please try again later" 
+    });
   }
 };
 
@@ -148,10 +154,11 @@ const deleteRoom = async (req, res) => {
     res.status(200).json({ success: true, data: {} });
   } catch (err) {
     if (err.code === "P2025")
-      return res
-        .status(404)
-        .json({ success: false, msg: "Room is not found or already deleted" });
-    res.status(500).json({ success: false, error: err.message });
+      return res.status(404).json({ 
+        success: false, 
+        message: "Room not found or has already been deleted" 
+      });
+    res.status(500).json({ success: false, message: "Unable to delete room. Please try again later" });
   }
 };
 
@@ -204,7 +211,10 @@ const getRoomStatus = async (req, res) => {
     const count = await overlappingRoom(id, checkIn, checkOut);
     res.status(200).json({ success: true, count: count });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ 
+      success: false, 
+      message: "Unable to check room availability. Please try again later" 
+    });
   }
 };
 
@@ -337,9 +347,10 @@ const getRoomReviews = async (req, res) => {
     const skip = (page - 1) * take;
 
     if (!roomId) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "roomId is required" });
+      return res.status(400).json({ 
+        success: false, 
+        message: "Please select a room to view reviews" 
+      });
     }
     const reviews = await prisma.chatLog.findMany({
       where: {
@@ -367,7 +378,10 @@ const getRoomReviews = async (req, res) => {
     });
 
     if (!reviews || reviews.length === 0) {
-      return res.status(200).json({ success: false, msg: "No reviews found" });
+      return res.status(404).json({ 
+        success: false, 
+        message: "No reviews found for this room" 
+      });
     }
 
     console.log(reviews)
@@ -381,7 +395,10 @@ const getRoomReviews = async (req, res) => {
 
     res.status(200).json({ success: true, data: formattedReviews });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ 
+      success: false, 
+      message: "Unable to fetch room reviews. Please try again later" 
+    });
   }
 };
 
