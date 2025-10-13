@@ -2,7 +2,7 @@ const prisma = require('../prisma/prisma');
 
 const register = async (req, res) => {
   try {
-    const customerId = Number(req.body.customerId); // from protect middleware
+    const customerId = Number(req.user.roleId); // from protect middleware
     // find the customer record that belongs to this user
     const customer = await prisma.customer.findUnique({
       where: { id : customerId } // requires Customer.userId to be unique
