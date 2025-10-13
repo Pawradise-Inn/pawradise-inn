@@ -111,7 +111,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         ),
       };
 
-      createBookedService(body, localStorage.getItem("token"))
+      createBookedService(body)
         .then((res) => {
           if (res.success) {
             createNotification(
@@ -123,7 +123,10 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
             createNotification("fail", "Booking fail", res.msg);
           }
         })
-        .then(() => changeBookingBarStatus());
+        .then(() => changeBookingBarStatus())
+        .catch((error)=>{
+          console.error("Booking service error:",error);
+        });
     } else {
       body = {
         roomId: data.roomId,
@@ -133,7 +136,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         checkOut: new Date(`${formData.exitDate}T00:00:00.00Z`),
       };
 
-      createBookedRoom(body, localStorage.getItem("token"))
+      createBookedRoom(body)
         .then((res) => {
           if (res.success) {
             createNotification(
@@ -145,10 +148,12 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
             createNotification("fail", "Booking fail", res.msg);
           }
         })
-        .then(() => changeBookingBarStatus());
+        .then(() => changeBookingBarStatus())
+        .catch((error) =>{
+          console.error("Booking error:",error);
+        });
     }
   };
-
   //  change BookingStatus when formData and currentPet is changed
   //  @constraint: if data is not fully filled Notify warning
   //  @constraint: if available Notify success

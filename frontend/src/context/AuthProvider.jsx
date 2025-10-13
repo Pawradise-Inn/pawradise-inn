@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { getMeAPI } from "../hooks/authAPI";
-import axiosInstance, { setUpInterceptors} from "../api/axiosInstance";
+import { setUpInterceptors} from "../api/axiosInstance";
 
 const AuthContext = createContext();
 
@@ -20,8 +20,10 @@ export const AuthProvider = ({ children }) => {
       // getMeAPI(token)
       //   .then((res) => setUser(res.data))
       //   .catch(() => setUser(null));
-      axiosInstance.get("/api/v1/auth/me")
-        .then((res) => setUser(res.data))
+      getMeAPI()
+        .then((res) => {
+          setUser(res.user);
+        })
         .catch(() => {
           logout();
         })

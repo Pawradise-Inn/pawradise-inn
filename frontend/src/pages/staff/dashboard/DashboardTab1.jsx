@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-
 // --- API Functions (adjust path as needed) ---
 // Now using the new bookedRoomAPI functions
 import {
@@ -187,8 +186,9 @@ const DashboardTab1 = () => {
       try {
         setLoading(true);
         const data = await getTodayRoom();
-        setItems(data.data || []);
+        setItems(data || []);
       } catch (error) {
+        //setItem([]); just an enpty string ;
         console.error("Failed to fetch rooms:", error);
       } finally {
         setLoading(false);
@@ -207,16 +207,22 @@ const DashboardTab1 = () => {
     setIsPopupOpen(false);
   }; // Simplified to only handle adding a new item
   const handleSaveItem = async (itemFromPopup) => {
+    const { createNotification } = useNotification();
     try {
       const newItem = await createBookedRoom({
         ...itemFromPopup,
         status: "pending",
       });
       setItems((prev) => [newItem, ...prev]);
+      handleClosePopup();
+      createNotification(
+        "success",
+        "Saving Item",
+        "Item saved successfully"
+      )
     } catch (error) {
       console.error("Failed to save item:", error);
     }
-    handleClosePopup();
   }; // Handles deleting a booking from the card
   const handleDeleteItem = async (id) => {
     // Optional: Add a confirmation dialog before deleting
