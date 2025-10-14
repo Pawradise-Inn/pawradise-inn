@@ -5,10 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createBookedRoom } from "../../hooks/bookedRoomAPI";
 import { createBookedService } from "../../hooks/bookedServiceAPI";
 import { fetchCustomerPets, fetchAvailablePetAPI } from "../../hooks/petAPI";
-import {
-  fetchRoomStatusAPI,
-  fetchRoomReviewsAPI,
-} from "../../hooks/roomAPI";
+import { fetchRoomStatusAPI, fetchRoomReviewsAPI } from "../../hooks/roomAPI";
 import {
   fetchServiceReviewsAPI,
   getServiceStatusAPI,
@@ -23,6 +20,7 @@ import Pagination from "./Pagination";
 import { useAuth } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { notification, startUpVariants } from "../../styles/animation";
+import DropDownList from "../DropDownList";
 
 // data: { image, name, review, forwhich, price, size, maxsize, headerType } of service and room
 const BookingBar = ({ data, popupStatus, onClick }) => {
@@ -50,6 +48,10 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   const validDateStatus = useMemo(() => {
     return getDateValidation(formData.entryDate, formData.exitDate);
   }, [formData]);
+
+  useEffect(() => {
+    console.log(currentPet);
+  }, [currentPet]);
 
   //  handle form submit and check availability and validation
   //  @params: e -> form itself
@@ -221,39 +223,35 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   useEffect(() => {
     if (data) {
       if (data.headerType == "Service") {
-        fetchServiceReviewsAPI(
-          data.name,
-          commentStarSelect,
-          currentPage
-        ).then((comments) => {
-          if (comments.success) {
-            setCommentStatus(true);
-            comments.data.forEach((comment) => {
-              comment.comment_star = comment.comment_star.toFixed(1);
-            });
-            setComments(comments.data);
-          } else {
-            setCommentStatus(false);
-            setComments([]);
+        fetchServiceReviewsAPI(data.name, commentStarSelect, currentPage).then(
+          (comments) => {
+            if (comments.success) {
+              setCommentStatus(true);
+              comments.data.forEach((comment) => {
+                comment.comment_star = comment.comment_star.toFixed(1);
+              });
+              setComments(comments.data);
+            } else {
+              setCommentStatus(false);
+              setComments([]);
+            }
           }
-        });
+        );
       } else {
-        fetchRoomReviewsAPI(
-          data.roomId,
-          commentStarSelect,
-          currentPage
-        ).then((comments) => {
-          if (comments.success) {
-            setCommentStatus(true);
-            comments.data.forEach((comment) => {
-              comment.comment_star = comment.comment_star.toFixed(1);
-            });
-            setComments(comments.data);
-          } else {
-            setCommentStatus(false);
-            setComments([]);
+        fetchRoomReviewsAPI(data.roomId, commentStarSelect, currentPage).then(
+          (comments) => {
+            if (comments.success) {
+              setCommentStatus(true);
+              comments.data.forEach((comment) => {
+                comment.comment_star = comment.comment_star.toFixed(1);
+              });
+              setComments(comments.data);
+            } else {
+              setCommentStatus(false);
+              setComments([]);
+            }
           }
-        });
+        );
       }
     }
   }, [data, currentPage, commentStarSelect]);
@@ -336,20 +334,16 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
           ></motion.i>
         </div>
         <div className="relative">
-          <select
-            onChange={(e) => setCurrentPet(e.target.value)}
-            className="inline-block mb-4 w-full rounded-xl px-4 py-2 text-2xl my-2 outline-0 bg-[var(--light-brown-color)] appearance-none cursor-pointer"
-          >
-            <option value="">Pick pet</option>
-            {petData.map((data, idx) => {
-              return (
-                <option key={idx} value={data.name}>
-                  {data.name} ({data.type})
-                </option>
-              );
-            })}
-          </select>
-          <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-2/3 flex justify-center items-center text-2xl !text-white cursor-pointer pointer-events-none"></i>
+          <DropDownList
+            startText="Pick pet"
+            options={petData.map((pet) => ({
+              name: `${pet.name} (${pet.type})`,
+              value: pet.name,
+            }))}
+            onChange={(pet) => setCurrentPet(pet)}
+            value={currentPet}
+            mainStyle="mt-2 mb-4"
+          />
         </div>
         <form onSubmit={handleFormSubmit}>
           <b className="mb-2 text-3xl inline-block w-1/2 ">Entry date</b>
@@ -362,42 +356,41 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
               <b className="mb-2 text-3xl inline-block w-1/2">Exit date</b>
             </>
           )}
-          <div className="relative mb-4 w-full rounded-xl text-2xl bg-[var(--light-brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1  before:border-[var(--dark-brown-color)]">
-            <input
-              type="date"
-              className="relative w-1/2 rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
-              onChange={(e) => handleFormDataChange(e, setFormData)}
-              name="entryDate"
-            />
-            <i className="bi bi-caret-down-fill absolute top-1/2 right-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
+          <div className="grid grid-cols-2 relative mb-4 w-full rounded-xl text-2xl bg-[var(--light-brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1  before:border-[var(--dark-brown-color)]">
+            <div className="w-full relative">
+              <input
+                type="date"
+                className="relative w-full rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
+                onChange={(e) => handleFormDataChange(e, setFormData)}
+                name="entryDate"
+              />
+              <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
+            </div>
             {data.headerType === "Service" ? (
-              <>
-                <select
-                  className="relative w-1/2 rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer appearance-none"
-                  name="entryTime"
-                  onChange={(e) => handleFormDataChange(e, setFormData)}
-                >
-                  <option value="">Pick time</option>
-                  {selectableTime.map((time, idx) => {
-                    return (
-                      <option key={idx} value={time}>
-                        {time}
-                      </option>
-                    );
-                  })}
-                </select>
-              </>
+              <DropDownList
+                startText="Pick time"
+                options={selectableTime.map((time) => ({
+                  name: time,
+                  value: time,
+                }))}
+                onChange={(time) =>
+                  setFormData((prev) => {
+                    return { ...prev, entryTime: time };
+                  })
+                }
+                value={formData.entryTime}
+              />
             ) : (
-              <>
+              <div className="w-full">
                 <input
                   type="date"
-                  className="relative w-1/2 rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
+                  className="relative w-full rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
                   onChange={(e) => handleFormDataChange(e, setFormData)}
                   name="exitDate"
                 />
-              </>
+                <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
+              </div>
             )}
-            <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
           </div>
           {/* booking detail section */}
 

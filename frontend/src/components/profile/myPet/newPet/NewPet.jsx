@@ -1,16 +1,15 @@
 import { motion } from "motion/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/AuthProvider";
 import { updateCustomerAPI } from "../../../../hooks/customerAPI";
 import { registerPetAPI } from "../../../../hooks/petAPI";
 import { startUpVariants } from "../../../../styles/animation";
-import { handleFormDataChange } from "../../../../utils/handleForm";
 import PetInput from "./PetInput";
 import RadioInput from "./RadioInput";
-import SelectInput from "./SelectInput";
 import { useNotification } from "../../../../context/notification/NotificationProvider";
 import { uploadImageAPI } from "../../../../hooks/imageAPI";
+import DropDownList from "../../../DropDownList";
 
 const NewPet = () => {
   const { user, setUser } = useAuth();
@@ -26,6 +25,10 @@ const NewPet = () => {
     medicalCondition: "",
   });
   const [petImagePreview, setPetImagePreview] = useState("");
+
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
 
   const fields = [
     {
@@ -56,8 +59,7 @@ const NewPet = () => {
 
   const handleImageClick = () => {
     fileInputRef.current.click();
-    console.log(user)
-
+    console.log(user);
   };
 
   // FIXED: Added missing closing bracket for handleImageChange
@@ -77,108 +79,109 @@ const NewPet = () => {
 
   console.log(user);
 
-const handleConfirm = () => {
+  const handleConfirm = () => {
     // Check for missing form data (initial synchronous validation)
     if (
-        !formData.petName ||
-        !formData.petGender ||
-        !formData.petAge ||
-        !formData.petType ||
-        !formData.petBreed ||
-        !formData.medicalCondition ||
-        !formData.foodAllergy ||
-        isNaN(formData.age)
+      !formData.petName ||
+      !formData.petGender ||
+      !formData.petAge ||
+      !formData.petType ||
+      !formData.petBreed ||
+      !formData.medicalCondition ||
+      !formData.foodAllergy ||
+      isNaN(formData.petAge)
     ) {
-        if(isNaN(formData.age)) {
-          createNotification(
-              "fail",
-              "Invalid Age",
-              "Please provide a valid number for pet age."
-          );
-        }
-        else{
-          createNotification(
-            "fail",
-            "Fail to create a pet",
-            "Please provide all required pet information."
+      if (isNaN(formData.petAge)) {
+        createNotification(
+          "fail",
+          "Invalid Age",
+          "Please provide a valid number for pet age."
         );
-        }
-        return; // Stop execution if validation fails
+      } else {
+        createNotification(
+          "fail",
+          "Fail to create a pet",
+          "Please provide all required pet information."
+        );
+      }
+      return; // Stop execution if validation fails
     }
 
     // Launch confirmation notification, which executes the async logic upon confirmation
     createNotification(
-        "warning",
-        "Confirmation",
-        "Create this new pet?",
-        async () => {
-            let pictureUrl = "default.img"; // Default image if no file is selected
+      "warning",
+      "Confirmation",
+      "Create this new pet?",
+      async () => {
+        let pictureUrl = "default.img"; // Default image if no file is selected
 
-            try {
-                // 1. UPLOAD IMAGE TO GCS
-                if (formData.petImage) {
-                    // This API call sends the file object via multipart/form-data
-                    const uploadResponse = await uploadImageAPI(formData.petImage);
-                    
-                    // Store the public GCS URL returned by the backend
-                    pictureUrl = uploadResponse.imageUrl; 
-                }
+        try {
+          // 1. UPLOAD IMAGE TO GCS
+          if (formData.petImage) {
+            // This API call sends the file object via multipart/form-data
+            const uploadResponse = await uploadImageAPI(formData.petImage);
 
-                // 2. PREPARE NEW PET DATA
-                const newPet = {
-                    name: formData.petName,
-                    sex: formData.petGender,
-                    age: Number(formData.petAge), // Ensure age is a number
-                    type: formData.petType,
-                    status: "IDLE", // Assuming IDLE is the initial status
-                    breed: formData.petBreed,
-                    disease: [formData.medicalCondition],
-                    allergic: [formData.foodAllergy],
-                    picture: pictureUrl, // **Use the GCS URL here**
-                    customerId: user.customer.id,
-                };
+            // Store the public GCS URL returned by the backend
+            pictureUrl = uploadResponse.imageUrl;
+          }
 
-                // 3. REGISTER PET IN DATABASE
-                // Assuming registerPetAPI handles the actual insertion into the 'pet' table
-                // and returns the pet object with its database-generated ID (if needed)
-                await registerPetAPI(user.customer.id, newPet); 
+          // 2. PREPARE NEW PET DATA
+          const newPet = {
+            name: formData.petName,
+            sex: formData.petGender,
+            age: Number(formData.petAge), // Ensure age is a number
+            type: formData.petType,
+            status: "IDLE", // Assuming IDLE is the initial status
+            breed: formData.petBreed,
+            disease: [formData.medicalCondition],
+            allergic: [formData.foodAllergy],
+            picture: pictureUrl, // **Use the GCS URL here**
+            customerId: user.customer.id,
+          };
 
-                // 4. UPDATE CUSTOMER'S LOCAL PET LIST (DB & Context)
-                // Safely get current pets or initialize to an empty array
-                const currentPets = user.customer.pets || [];
-                
-                // Create a NEW array and push the new pet (Avoids mutating state)
-                const updatedPetsArr = [...currentPets, newPet]; 
-                
-                // Prepare the customer object with the updated pets list
-                const updatedCustomerData = { ...user.customer, pets: updatedPetsArr }; 
+          // 3. REGISTER PET IN DATABASE
+          // Assuming registerPetAPI handles the actual insertion into the 'pet' table
+          // and returns the pet object with its database-generated ID (if needed)
+          await registerPetAPI(user.customer.id, newPet);
 
-                // 5. UPDATE CUSTOMER IN DB (to link the new pet list)
-                await updateCustomerAPI(user.customer.id, updatedCustomerData);
+          // 4. UPDATE CUSTOMER'S LOCAL PET LIST (DB & Context)
+          // Safely get current pets or initialize to an empty array
+          const currentPets = user.customer.pets || [];
 
-                // 6. UPDATE LOCAL AUTH CONTEXT
-                setUser({ ...user, customer: updatedCustomerData });
+          // Create a NEW array and push the new pet (Avoids mutating state)
+          const updatedPetsArr = [...currentPets, newPet];
 
-                // 7. SUCCESS & REDIRECT
-                createNotification(
-                    "success",
-                    "Pet has been created!",
-                    "Your pet has been successfully saved."
-                );
-                navigate("/profile/pet");
+          // Prepare the customer object with the updated pets list
+          const updatedCustomerData = {
+            ...user.customer,
+            pets: updatedPetsArr,
+          };
 
-            } catch (error) {
-                // Catch any API errors during upload, registration, or update
-                console.error("Pet creation failed:", error);
-                createNotification(
-                    "fail",
-                    "Operation Failed",
-                    "An error occurred during pet creation. Please try again."
-                );
-            }
+          // 5. UPDATE CUSTOMER IN DB (to link the new pet list)
+          await updateCustomerAPI(user.customer.id, updatedCustomerData);
+
+          // 6. UPDATE LOCAL AUTH CONTEXT
+          setUser({ ...user, customer: updatedCustomerData });
+
+          // 7. SUCCESS & REDIRECT
+          createNotification(
+            "success",
+            "Pet has been created!",
+            "Your pet has been successfully saved."
+          );
+          navigate("/profile/pet");
+        } catch (error) {
+          // Catch any API errors during upload, registration, or update
+          console.error("Pet creation failed:", error);
+          createNotification(
+            "fail",
+            "Operation Failed",
+            "An error occurred during pet creation. Please try again."
+          );
         }
+      }
     );
-};
+  };
 
   const handleCancel = () => {
     navigate("/profile/pet");
@@ -244,13 +247,38 @@ const handleConfirm = () => {
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <motion.div
+              variants={startUpVariants}
+              initial="hidden"
+              animate="visible"
+              custom={2}
+            >
+              <label className="block text-sm font-semibold mb-2">
+                Pet type
+              </label>
+              <DropDownList
+                startText="Select Pet Type"
+                value={formData.petType}
+                onChange={(value) => {
+                  setFormData((prev) => ({ ...prev, petType: value }));
+                }}
+                arrowColor="var(--brown-color)"
+                inputSyle="shadow-md rounded-lg  px-6 py-4.5  text-sm border-2 border-[var(--dark-brown-color)] bg-[var(--cream-color)]"
+                options={["DOG", "CAT", "BIRD", "MOUSE", "RABBIT"].map(
+                  (type) => ({
+                    name: type,
+                    value: type,
+                  })
+                )}
+              />
+            </motion.div>
             {fields.map((data, idx) => {
               return (
                 <PetInput
                   variants={startUpVariants}
                   initial="hidden"
                   animate="visible"
-                  custom={idx / 3 + 2}
+                  custom={idx / 3 + 2.33}
                   key={idx}
                   data={formData[`${data.name}`]}
                   setData={setFormData}
@@ -259,17 +287,6 @@ const handleConfirm = () => {
                 />
               );
             })}
-            {/* Pet type */}
-            <SelectInput
-              variants={startUpVariants}
-              initial="hidden"
-              animate="visible"
-              custom={fields.length / 3 + 2}
-              setData={setFormData}
-              name="petType"
-              label="Pet type"
-              options={["DOG", "CAT", "BIRD", "MOUSE", "RABBIT"]}
-            />
           </div>
           {/* Buttons - Right aligned within the input section */}
           <div className="flex justify-end mt-8 pt-6 border-t border-gray-200 space-x-4">

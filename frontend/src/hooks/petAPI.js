@@ -51,10 +51,11 @@ export const updatePetStatusAPI = async (
 };
 
 export const registerPetAPI = async (
+  customerId,
   pet,
   token = localStorage.getItem("token")
 ) => {
-  const response = await axios.post(`${API_URL}/register`, pet, {
+  const response = await axios.post(`${API_URL}/register`,  {...pet, customerId}, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
   return response.data;
