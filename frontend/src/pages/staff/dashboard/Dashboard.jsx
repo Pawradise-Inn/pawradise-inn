@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
+import Navbar from "../../../components/Navbar";
 
 const Dashboard = () => {
   return (
@@ -11,72 +12,20 @@ const Dashboard = () => {
       <div className="relative w-full max-w-5xl mx-auto">
         <div className="flex justify-center overflow-x-auto space-x-4 pb-2">
           {/* NavLink for Today's Booking */}
-          <NavLink
-            to="/staff/dashboard"
-            className={({ isActive }) =>
-              `flex-shrink-0 px-12 py-6 rounded-xl transition-all duration-300
-               text-base sm:text-lg md:text-2xl font-semibold
-               ${
-                 isActive
-                   ? "bg-[var(--light-brown-color)] font-bold text-gray-800 shadow-lg"
-                   : "bg-transparent text-gray-800 hover:bg-[var(--light-brown-color)]"
-               }`
-            }
-            end
-          >
-            Today's Booking
-          </NavLink>
-
-          {/* NavLink for Check-in */}
-          <NavLink
-            to="/staff/dashboard/check-in"
-            className={({ isActive }) =>
-              `flex-shrink-0 px-12 py-6 rounded-xl transition-all duration-300
-               text-base sm:text-lg md:text-2xl font-semibold
-               ${
-                 isActive
-                   ? "bg-[var(--light-brown-color)] font-bold text-gray-800 shadow-lg"
-                   : "bg-transparent text-gray-800 hover:bg-[var(--light-brown-color)]"
-               }`
-            }
-            end
-          >
-            Check-in
-          </NavLink>
-
-          {/* NavLink for Check-out */}
-          <NavLink
-            to="/staff/dashboard/check-out"
-            className={({ isActive }) =>
-              `flex-shrink-0 px-12 py-6 rounded-xl transition-all duration-300
-               text-base sm:text-lg md:text-2xl font-semibold
-               ${
-                 isActive
-                   ? "bg-[var(--light-brown-color)] font-bold text-gray-800 shadow-lg"
-                   : "bg-transparent text-gray-800 hover:bg-[var(--light-brown-color)]"
-               }`
-            }
-            end
-          >
-            Check-out
-          </NavLink>
-
-          {/* NavLink for Service booked */}
-          <NavLink
-            to="/staff/dashboard/service-booked"
-            className={({ isActive }) =>
-              `flex-shrink-0 px-12 py-6 rounded-xl transition-all duration-300
-               text-base sm:text-lg md:text-2xl font-semibold
-               ${
-                 isActive
-                   ? "bg-[var(--light-brown-color)] font-bold text-gray-800 shadow-lg"
-                   : "bg-transparent text-gray-800 hover:bg-[var(--light-brown-color)]"
-               }`
-            }
-            end
-          >
-            Service booked
-          </NavLink>
+          <Navbar
+            pages={[
+              "Today's Booking",
+              "Check In",
+              "Check Out",
+              "Service Booked",
+            ]}
+            paths={["", "check-in", "check-out", "service-booked"]}
+            pathIdxHighlight={3}
+            prevPath="/staff/dashboard"
+            mainStyle="flex-shrink-0 px-12 py-6 rounded-xl transition-all duration-300
+               text-base sm:text-lg md:text-2xl font-semibold"
+            element="dashboard-nav"
+          />
         </div>
 
         {/* Extended Underline */}

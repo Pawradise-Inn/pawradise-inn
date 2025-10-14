@@ -14,7 +14,6 @@ import NewPet from "./components/profile/myPet/newPet/NewPet";
 import PetComp from "./components/profile/myPet/PetComp";
 import PetOverall from "./components/profile/myPet/petOverAll/PetOverall";
 import ProfileComp from "./components/profile/myProfile/ProfileComp";
-import StaffNavbar from "./components/StaffNavbar";
 import Management from "./pages/Management";
 import Dashboard from "./pages/staff/dashboard/Dashboard";
 import DashboardTab1 from "./pages/staff/dashboard/DashboardTab1";
@@ -41,7 +40,25 @@ const App = () => {
 
   return (
     <div>
-      {hideNavbar ? null : isStaffPath ? <StaffNavbar /> : <Navbar />}
+      {hideNavbar ? null : isStaffPath ? (
+        <Navbar
+          paths={["dashboard", "pet-status", "review", "management"]}
+          pages={["dashboard", "pet status", "review", "management"]}
+          pathIdxHighlight={2}
+          prevPath="/staff"
+          topNavBar={true}
+          element="main-nav"
+        />
+      ) : (
+        <Navbar
+          paths={["room", "service", "review", "profile"]}
+          pages={["room", "service", "review", "profile"]}
+          pathIdxHighlight={1}
+          prevPath=""
+          topNavBar={true}
+          element="main-nav"
+        />
+      )}
 
       <Routes>
         {/* Public Routes */}
@@ -68,10 +85,14 @@ const App = () => {
           }
         />
 
-        <Route path="/profile" element={
-          <RequireAuth>
-            <Profile />
-          </RequireAuth>}>
+        <Route
+          path="/profile"
+          element={
+            <RequireAuth>
+              <Profile />
+            </RequireAuth>
+          }
+        >
           <Route index element={<ProfileComp />} />
           <Route path="booking" element={<BookingComp />} />
           <Route path="pet" element={<PetComp />} />

@@ -26,7 +26,7 @@ export default function Login({
 
   const redirectTo = useMemo(() => {
     if (redirectProp) return redirectProp;
-    return role === "staff" ? "/staff/dashboard" : "/room";
+    return role === "staff" ? "/staff/dashboard/" : "/room/";
   }, [role, redirectProp]);
 
   const pageTitle = useMemo(() => {
