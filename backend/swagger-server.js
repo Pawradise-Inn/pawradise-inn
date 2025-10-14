@@ -24,7 +24,7 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 swaggerApp.use('/', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
-const PORT = 5050;
+const PORT = 5000;
 swaggerApp.listen(PORT, () => {
   console.log(`Swagger docs running at http://localhost:${PORT}`);
 });
