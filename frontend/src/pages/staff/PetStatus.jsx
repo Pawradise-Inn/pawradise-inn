@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
-import { motion } from "motion/react";
 import { fetchAllPetAPI } from "../../hooks/petAPI";
-import { PetCard } from "../../components/staff/"
+import PetCard  from "../../components/staff/PetCard"
 
 const PetStatus = () => {
   const [pets, setPets] = useState([]);
   const [filters, setFilter] = useState([]);
   const [search, setSearch] = useState("");
-
   const fetchPets = async () => {
     try {
       const response = await fetchAllPetAPI();
-      setPets(response);
+      console.log(response)
+      if(response.success){
+        setPets(response.data);
+      }
+      
     } catch (err) {
       console.error(err);
     }
@@ -20,8 +21,8 @@ const PetStatus = () => {
 
   useEffect(() => {
     fetchPets();
+    console.log(pets)
   }, []);
-  console.log(pets);
   const handleCheckboxChange = (e) => {
     const value = e.target.value;
     if (e.target.checked) {
@@ -120,7 +121,7 @@ const PetStatus = () => {
         </div>
       </div>
       <div className="grid grid-cols-3 gap-6 max-w-7xl mx-32 my-8">
-        {filteredPets.map((pet, index) => (
+        {filteredPets.map((pet) => (
           <PetCard key={pet.id} pet={pet} />
         ))}
       </div>

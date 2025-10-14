@@ -65,12 +65,11 @@ export default function Login({
           setUser(userData.data);
           localStorage.setItem("user", JSON.stringify(userData.data));
         }
-        createNotification({
-          status: 'success',
-          header: 'Login Successful!',
-          text: 'Welcome! You will be redirected shortly'
-        });
-        console.log(userData.data)
+        createNotification(
+          'success',
+          'Login Successful!',
+          'Welcome! You will be redirected shortly'
+        );
         navigate(redirectTo, { replace: true });
       } else {
         setErr("Login failed. Please check your username or password.");

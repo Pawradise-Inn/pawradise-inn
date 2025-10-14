@@ -1,8 +1,13 @@
+import { motion } from "motion/react";
 const PetCard = ({ pet }) => {
+  console.log(pet)
   return (
-    <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
+    <motion.div
+      className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg"
+      whileHover={{ scale: 1.02 }}
+    >
       <div className="flex items-start space-x-6">
-        <div className="w-64 h-64 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+        <div className="w-64 h-64 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
           <img
             src={pet.picture}
             alt={pet.name}
@@ -29,7 +34,7 @@ const PetCard = ({ pet }) => {
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

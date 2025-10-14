@@ -22,13 +22,13 @@ export const deletePetAPI = async (id) => {
   return response.data;
 };
 
-export const updatePetStatusAPI = async (pet) => {
-  const response = await axiosInstance.patch(API_URL, pet);
+export const updatePetStatusAPI = async (id, status) => {
+  const response = await axiosInstance.patch(`${API_URL}/${id}`, {status});
   return response.data;
 };
 
-export const registerPetAPI = async (pet) => {
-  const response = await axiosInstance.post(`${API_URL}/register`, pet);
+export const registerPetAPI = async (customerId, pet) => {
+  const response = await axiosInstance.post(`${API_URL}/register`, {...pet, customerId});
   return response.data;
 };
 
