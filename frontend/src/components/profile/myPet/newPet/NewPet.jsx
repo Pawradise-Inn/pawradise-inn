@@ -246,13 +246,15 @@ const NewPet = () => {
                   setFormData((prev) => ({ ...prev, petType: value }));
                 }}
                 arrowColor="var(--brown-color)"
-                inputSyle="shadow-md rounded-lg  px-6 py-4.5  text-sm border-2 border-[var(--dark-brown-color)] bg-[var(--cream-color)]"
+                inputSyle="shadow-md transition-all duration-300 rounded-lg  px-6 py-4.5  text-sm border-2 border-[var(--dark-brown-color)] bg-[var(--cream-color)]"
+                focusStyle="border-gray-400 outline-none"
                 options={["DOG", "CAT", "BIRD", "MOUSE", "RABBIT"].map(
                   (type) => ({
                     name: type,
                     value: type,
                   })
                 )}
+                element="selectPetType"
               />
             </motion.div>
             {fields.map((data, idx) => {

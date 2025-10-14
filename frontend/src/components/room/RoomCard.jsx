@@ -1,4 +1,4 @@
-// data = { image, roomId, status, forwhich, price, size, maxsize, review }
+// data = { image, id, status, forwhich, price, size, maxsize, review }
 // compact: boolean to show fewer fields
 // actionLabel: override button text (e.g., "EDIT")
 import { motion } from "motion/react";
@@ -18,7 +18,7 @@ const RoomCard = ({
     >
       <img
         src={data.image}
-        alt={`Room ${data.roomId}`}
+        alt={`Room ${data.id}`}
         className="object-center rounded-2xl w-[180px] h-[180px]"
       />
 
@@ -26,7 +26,7 @@ const RoomCard = ({
         <div className="flex flex-col justify-between h-full w-5/12">
           {/* Top info */}
           <div className="space-y-1">
-            <p className="font-semibold">{`Room_${data.roomId
+            <p className="font-semibold">{`Room_${data.id
               .toString()
               .padStart(3, 0)}`}</p>
             <p>Status : {data.status}</p>

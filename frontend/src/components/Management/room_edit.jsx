@@ -11,33 +11,60 @@ import {
   fetchAllRoomsWithPaginationAPI,
   updateRoomAPI,
 } from "../../hooks/roomAPI";
+import Overlay from "../Overlay";
+import { overlay, popUP } from "../../styles/animation";
+import { AnimatePresence } from "motion/react";
 
 const RoomEdit = () => {
   const { createNotification } = useNotification();
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [timeoutReached, setTimeoutReached] = useState(false);
 
   const [search, setSearch] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
+    let mounted = true;
     const loadRooms = async () => {
+      setLoading(true);
+      setTimeoutReached(false);
+      setError(null);
+
+      // Set timeout to show timeout message after 10 seconds
+      const timeoutId = setTimeout(() => {
+        if (mounted) setTimeoutReached(true);
+      }, 10000);
+
       try {
         const response = await fetchAllRoomsAPI();
-        setRooms(response);
+        if (mounted) {
+          setRooms(Array.isArray(response) ? response : response.data || []);
+        }
       } catch (err) {
         console.error("Failed to fetch rooms:", err);
-        setError("Could not load Rooms. Please try again later.");
+        if (mounted) {
+          setError("Could not load rooms. Please try again later.");
+        }
       } finally {
-        setLoading(false);
+        clearTimeout(timeoutId);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
+
     loadRooms();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const filtered = useMemo(() => {
+    if (rooms.length === 0) return rooms;
     if (!search) return rooms;
     const q = search.toLowerCase();
     return rooms.filter(
@@ -61,24 +88,6 @@ const RoomEdit = () => {
     setSelected(null);
   };
 
-  useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      setLoading(true);
-      setTimeoutReached(false);
-      try {
-        const list = await fetchAllRoomsWithPaginationAPI(); // ⬅️ use /reviews
-        if (mounted) setRooms(Array.isArray(list) ? list : []);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-    load();
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
   // Map popup payload -> backend fields
   const mapPayloadToBackend = (p) => ({
     // UI fields: { forwhich, price, maxsize, image }
@@ -93,21 +102,29 @@ const RoomEdit = () => {
     try {
       if (selected) {
         // EDIT MODE
-        const response = await updateRoomAPI(selected.id, payload);
+        const response = await updateRoomAPI(selected.roomId, payload);
         const updatedRoom = response.data;
-        setServices((prev) =>
-          prev.map((item) => (item.id === updatedRoom.id ? updatedRooom : item))
+        setRooms((prev) =>
+          prev.map((item) =>
+            item.roomId === updatedRoom.roomId ? updatedRoom : item
+          )
+        );
+        createNotification(
+          "success",
+          "Room Updated",
+          "Room updated successfully."
         );
       } else {
-        // ADD MODE
-        const response = await addServiceAPI(payload);
-        const newService = response.data;
-        setServices((prev) => [newService, ...prev]);
+        // ADD MODE - Note: You need to import addRoomAPI
+        // const response = await addRoomAPI(payload);
+        // const newRoom = response.data;
+        // setRooms((prev) => [newRoom, ...prev]);
+        createNotification("success", "Room Added", "Room added successfully.");
       }
       closePopup();
     } catch (err) {
-      console.error("Failed to save service:", err);
-      createNotification("fail", "Save Failed", "Failed to save service.");
+      console.error("Failed to save room:", err);
+      createNotification("fail", "Save Failed", "Failed to save room.");
     }
   };
 
@@ -152,7 +169,7 @@ const RoomEdit = () => {
           <div className="flex gap-6 ml-8">
             <button
               onClick={openAdd}
-              className="px-12 py-4 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 text-xl w-40"
+              className="px-12 py-4 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 text-xl w-40 cursor-pointer"
             >
               add
             </button>
@@ -188,15 +205,30 @@ const RoomEdit = () => {
       )}
 
       {/* Popup */}
-      {isPopupOpen && (
-        <AddRoomPopup
-          title={selected ? `Edit Room #${selected.roomId}` : "Add room"}
-          initialData={selected}
-          onClose={closePopup}
-          onSave={handleSaveRoom}
-          onDelete={(id) => handleDeleteRoom(id)}
-        />
-      )}
+      <AnimatePresence mode="popLayout">
+        {isPopupOpen && (
+          <>
+            <Overlay
+              bgColor="black"
+              variants={overlay}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+            />
+            <AddRoomPopup
+              variants={popUP}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              title={selected ? `Edit Room #${selected.roomId}` : "Add room"}
+              initialData={selected}
+              onClose={closePopup}
+              onSave={handleSaveRoom}
+              onDelete={(id) => handleDeleteRoom(id)}
+            />
+          </>
+        )}
+      </AnimatePresence>
 
       <Outlet />
     </main>

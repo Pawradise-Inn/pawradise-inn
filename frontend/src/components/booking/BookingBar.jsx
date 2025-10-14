@@ -16,7 +16,7 @@ import { getDateValidation } from "../../utils/handleValidation";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import CommentCard from "./CommentCard";
 import CommentStarSelector from "./CommentStarSelector";
-import Pagination from "./Pagination";
+import Pagination from "../Pagination";
 import { useAuth } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { notification, startUpVariants } from "../../styles/animation";
@@ -125,7 +125,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         });
     } else {
       body = {
-        roomId: data.roomId,
+        roomId: data.id,
         pet_name: currentPet,
         bookingId: 1,
         checkIn: new Date(`${formData.entryDate}T00:00:00.00Z`),
@@ -173,16 +173,14 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
           : setStatus("room not available");
       });
     } else {
-      fetchRoomStatusAPI(
-        data.roomId,
-        formData.entryDate,
-        formData.exitDate
-      ).then((res) => {
-        setSize(res.count);
-        res.count < data.maxsize
-          ? setStatus("room available")
-          : setStatus("room not available");
-      });
+      fetchRoomStatusAPI(data.id, formData.entryDate, formData.exitDate).then(
+        (res) => {
+          setSize(res.count);
+          res.count < data.maxsize
+            ? setStatus("room available")
+            : setStatus("room not available");
+        }
+      );
     }
   };
 
@@ -218,7 +216,6 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     };
 
     fetchPetData();
-    setCurrentPage(1);
   }, [user, data.headerType]);
 
   // fetch new comment data when currentPage change
@@ -236,13 +233,13 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
           );
         } else {
           commentResponse = await fetchRoomReviewsAPI(
-            data.roomId,
+            data.id,
             commentStarSelect,
             currentPage
           );
         }
 
-        setCommentStatus(true);
+        setCommentStatus(commentResponse.data.length !== 0);
         commentResponse.data.forEach((comment) => {
           comment.comment_star = comment.comment_star.toFixed(1);
         });
@@ -257,6 +254,10 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     fetchReviews();
   }, [data, currentPage, commentStarSelect]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [data, commentStarSelect]);
+
   return (
     <div className="w-1/2 bg-white rounded-3xl p-8 border-2 border-[var(--brown-color)] overflow-hidden">
       {/* header dataial section */}
@@ -267,7 +268,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
             {popupStatus
               ? data.headerType == "Service"
                 ? data.name
-                : data.roomId.toString().padStart(3, 0)
+                : data.id.toString().padStart(3, 0)
               : null}
           </p>
           <div className="text-xl mb-2 flex gap-1 items-center">
@@ -344,6 +345,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
             onChange={(pet) => setCurrentPet(pet)}
             value={currentPet}
             mainStyle="mt-2 mb-4"
+            element="bookingPickPet"
           />
         </div>
         <form onSubmit={handleFormSubmit}>
@@ -380,6 +382,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
                   })
                 }
                 value={formData.entryTime}
+                element="bookingPickTime"
               />
             ) : (
               <div className="w-full">
@@ -461,10 +464,15 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
                   </AnimatePresence>
                 </div>
                 <Pagination
-                  id={data.headerType == "Service" ? data.name : data.roomId}
-                  pageAmount={data.commentPages}
+                  id={data.headerType == "Service" ? data.name : data.id}
+                  pageAmount={
+                    commentStarSelect
+                      ? data.commentPages[commentStarSelect]
+                      : data.commentPages.total
+                  }
                   currentPage={currentPage}
                   onClick={setCurrentPage}
+                  commentPerPage={3}
                 />
               </motion.div>
             ) : (
