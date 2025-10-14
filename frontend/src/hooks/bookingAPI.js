@@ -45,7 +45,6 @@ export const updateBooking = async (id, book) => {
     const response = await axiosInstance.put(`${API_URL}/${id}`, book);
     return response.data;
   } catch (error) {
-    console.log("Error: ", error);
     throw error;
   }
 };
@@ -55,7 +54,6 @@ export const updateBookingStatus = async (id, status) => {
     const response = await axiosInstance.patch(`${API_URL}/${id}`, status);
     return response.data;
   } catch (error) {
-    console.log("Error: ", error);
     throw error;
   }
 };

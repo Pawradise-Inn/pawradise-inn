@@ -73,7 +73,6 @@ const ProfileComp = () => {
         try {
           const { id, ...userObjected } = newUser;
           const data = await updateCustomerAPI(user.customer.id, userObjected);
-          console.log("data:", data);
           setUser?.(data.data); 
           createNotification({
             status: "success",
@@ -100,9 +99,8 @@ const ProfileComp = () => {
     }
 
     setShowDeleteModal(false);
-    setUser?.(null);z 
+    setUser?.(null); 
     deleteMeAPI().then((data) => {
-      console.log(data)
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
       createNotification({
@@ -110,7 +108,7 @@ const ProfileComp = () => {
         header: "Account deletion confirmed",
         text: "Your account would be deleted. Any active bookings (if any) would be automatically declined."
       });
-      navigate("/", { replace: true })
+      navigate("/register", { replace: true })
     })
     .catch((err) => {
       createNotification("fail", "Delete failed", "Failed to delete.");

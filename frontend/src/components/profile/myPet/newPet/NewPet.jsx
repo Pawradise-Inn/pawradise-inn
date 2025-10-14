@@ -1,16 +1,15 @@
 import { motion } from "motion/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/AuthProvider";
 import { updateCustomerAPI } from "../../../../hooks/customerAPI";
 import { registerPetAPI } from "../../../../hooks/petAPI";
 import { startUpVariants } from "../../../../styles/animation";
-import { handleFormDataChange } from "../../../../utils/handleForm";
 import PetInput from "./PetInput";
 import RadioInput from "./RadioInput";
-import SelectInput from "./SelectInput";
 import { useNotification } from "../../../../context/notification/NotificationProvider";
 import { uploadImageAPI } from "../../../../hooks/imageAPI";
+import DropDownList from "../../../DropDownList";
 
 const NewPet = () => {
   const { user, setUser } = useAuth();
@@ -56,8 +55,6 @@ const NewPet = () => {
 
   const handleImageClick = () => {
     fileInputRef.current.click();
-    //console.log(user)
-
   };
 
   // FIXED: Added missing closing bracket for handleImageChange
@@ -75,9 +72,7 @@ const NewPet = () => {
     }
   }; // <-- Added this bracket
 
-  //console.log(user);
-
-const handleConfirm = () => {
+  const handleConfirm = () => {
     // Check for missing form data (initial synchronous validation)
     if (
         !formData.petName ||
@@ -89,52 +84,48 @@ const handleConfirm = () => {
         !formData.foodAllergy
     ) {
         if(isNaN(formData.petAge)) {
-          createNotification({
-              status: "fail",
-              header: "Invalid Age",
-              text: "Please provide a valid number for pet age."
-          });
+          createNotification(
+              "fail",
+              "Invalid Age",
+              "Please provide a valid number for pet age."
+          );
         }
         else{
-          createNotification({
-            status: "fail",
-            header: "Fail to create a pet",
-            text: "Please provide all required pet information."
-          });
+          createNotification(
+            "fail",
+            "Fail to create a pet",
+            "Please provide all required pet information."
+          );
         }
         return; // Stop execution if validation fails
     }
 
     // Launch confirmation notification, which executes the async logic upon confirmation
-    createNotification({
-        status: "warning",
-        header: "Confirmation",
-        text: "Create this new pet?",
-        onClick: async () => {
+    createNotification(
+        "warning",
+        "Confirmation",
+        "Create this new pet?",
+        async () => {
             let pictureUrl = "default.img"; // Default image if no file is selected
 
-            try {
-                // 1. UPLOAD IMAGE TO GCS
-                if (formData.petImage) {
-                    // This API call sends the file object via multipart/form-data
-                    const uploadResponse = await uploadImageAPI(formData.petImage);
-                    
-                    // Store the public GCS URL returned by the backend
-                    pictureUrl = uploadResponse.imageUrl; 
-                }
-
+        // 1. UPLOAD IMAGE TO GCS
+          if (formData.petImage) {
+            // This API call sends the file object via multipart/form-data
+                  const uploadResponse = await uploadImageAPI(formData.petImage);
+          }
+          
                 // 2. PREPARE NEW PET DATA
                 const newPet = {
-                    name: formData.petName,
-                    sex: formData.petGender,
-                    age: Number(formData.petAge), // Ensure age is a number
-                    type: formData.petType,
-                    status: "IDLE", // Assuming IDLE is the initial status
-                    breed: formData.petBreed,
-                    disease: [formData.medicalCondition],
-                    allergic: [formData.foodAllergy],
-                    picture: pictureUrl, // **Use the GCS URL here**
-                    customerId: user.customer.id,
+                  name: formData.petName,
+                  sex: formData.petGender,
+                  age: Number(formData.petAge), // Ensure age is a number
+                  type: formData.petType,
+                  status: "IDLE", // Assuming IDLE is the initial status
+                  breed: formData.petBreed,
+                  disease: [formData.medicalCondition],
+                  allergic: [formData.foodAllergy],
+                  picture: pictureUrl, // **Use the GCS URL here**
+                  customerId: user.customer.id,
                 };
                 console.log(newPet)
 
@@ -160,25 +151,14 @@ const handleConfirm = () => {
                 setUser({ ...user, customer: updatedCustomerData });
 
                 // 7. SUCCESS & REDIRECT
-                createNotification({
-                    status: "success",
-                    text: "Pet has been created!",
-                    header: "Your pet has been successfully saved."
-                });
+                createNotification(
+                    "success",
+                    "Pet has been created!",
+                    "Your pet has been successfully saved."
+                );
                 navigate("/profile/pet");
-
-            } catch (error) {
-                // Catch any API errors during upload, registration, or update
-                console.error("Pet creation failed:", error);
-                createNotification({
-                    status: "fail",
-                    header: "Operation Failed",
-                    text: "An error occurred during pet creation. Please try again."
-            });
             }
-        }
-    });
-};
+)}
 
   const handleCancel = () => {
     navigate("/profile/pet");
@@ -244,13 +224,38 @@ const handleConfirm = () => {
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <motion.div
+              variants={startUpVariants}
+              initial="hidden"
+              animate="visible"
+              custom={2}
+            >
+              <label className="block text-sm font-semibold mb-2">
+                Pet type
+              </label>
+              <DropDownList
+                startText="Select Pet Type"
+                value={formData.petType}
+                onChange={(value) => {
+                  setFormData((prev) => ({ ...prev, petType: value }));
+                }}
+                arrowColor="var(--brown-color)"
+                inputSyle="shadow-md rounded-lg  px-6 py-4.5  text-sm border-2 border-[var(--dark-brown-color)] bg-[var(--cream-color)]"
+                options={["DOG", "CAT", "BIRD", "MOUSE", "RABBIT"].map(
+                  (type) => ({
+                    name: type,
+                    value: type,
+                  })
+                )}
+              />
+            </motion.div>
             {fields.map((data, idx) => {
               return (
                 <PetInput
                   variants={startUpVariants}
                   initial="hidden"
                   animate="visible"
-                  custom={idx / 3 + 2}
+                  custom={idx / 3 + 2.33}
                   key={idx}
                   data={formData[`${data.name}`]}
                   setData={setFormData}
@@ -259,17 +264,6 @@ const handleConfirm = () => {
                 />
               );
             })}
-            {/* Pet type */}
-            <SelectInput
-              variants={startUpVariants}
-              initial="hidden"
-              animate="visible"
-              custom={fields.length / 3 + 2}
-              setData={setFormData}
-              name="petType"
-              label="Pet type"
-              options={["DOG", "CAT", "BIRD", "MOUSE", "RABBIT"]}
-            />
           </div>
           {/* Buttons - Right aligned within the input section */}
           <div className="flex justify-end mt-8 pt-6 border-t border-gray-200 space-x-4">

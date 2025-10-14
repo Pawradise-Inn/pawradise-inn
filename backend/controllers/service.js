@@ -101,7 +101,6 @@ const createService = async (req, res) => { //requirement: 15
                 picture: ""
             }
         });
-        console.log(service.data);
         res.status(201).json({success: true, data: service});
     } catch (err) {
         res.status(500).json({success: false, message: "Unable to create service. Please try again later"});
@@ -111,8 +110,6 @@ const createService = async (req, res) => { //requirement: 15
 const updateService = async (req, res) => {
     try {
         const serviceId = req.params.id;
-        console.log(serviceId);
-        console.log(req.body.petType.toUpperCase());
         const dataToUpdate = {};
         if (req.body.name !== undefined) dataToUpdate.name = req.body.name;
         if (req.body.price !== undefined) dataToUpdate.price = req.body.price;
@@ -262,10 +259,6 @@ const getServiceReviews = async (req, res) => { //requirement: 5
         }
       }
     });
-
-    if (!reviews || reviews.length === 0) {
-      return res.status(200).json({ success: false, msg: "No reviews found for this service" });
-    }
 
     const formattedReviews = reviews.map(r => ({
         id: r.id,

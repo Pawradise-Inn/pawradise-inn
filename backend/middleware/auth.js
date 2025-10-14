@@ -9,11 +9,7 @@ const   protect = async (req, res, next) => {
 
   // Check header first
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    console.log("header : ----------------------------------")
-    console.log(req.headers)
     token = req.headers.authorization.split(' ')[1];
-    console.log("token : ----------------------------------")
-    console.log(token)
   } else if (req.cookies?.token) {
     token = req.cookies.token;
   }
@@ -58,8 +54,6 @@ const   protect = async (req, res, next) => {
 // Restrict routes to specific roles
 const authorize = (...roles) => {
   return (req, res, next) => {
-    console.log(roles);
-    console.log(req.user.role);
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({ 
         success: false, 

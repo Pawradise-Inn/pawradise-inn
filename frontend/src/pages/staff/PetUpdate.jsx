@@ -3,21 +3,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "motion/react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { fetchPetAPI, updatePetAPI } from "../../hooks/petAPI";
-
+import { getStatusColor, getRoomStatusColor, getStatusText } from '../../components/staff/StatusUtils';
+import PetCard from '../../components/staff/PetUpdateCard'
+import ServiceCard from "../../components/staff/ServiceCard";
 const PetUpdate = () => {
   const { createNotification } = useNotification();
   const { id } = useParams();
   const [pet, setPet] = useState({});
   const [status, setStatus] = useState("");
   const fetchPet = async () => {
-    try {
-      const response = await fetchPetAPI(id);
-      console.log(response);
-      setPet(response);
-      setStatus(response.status);
-    } catch (err) {
-      console.err(err);
-    }
+    const response = await fetchPetAPI(id);
+    setPet(response.data);
+    setStatus(response.data.status);
   };
   useEffect(() => {
     fetchPet();
@@ -33,77 +30,44 @@ const PetUpdate = () => {
     }
   ]);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-600";
-      case "in_progress":
-        return "bg-blue-600";
-      case "available":
-        return "bg-gray-600";
-      case "unavailable":
-        return "bg-red-600";
-      default:
-        return "bg-gray-600";
-    }
-  };
-  const getStatusText = (status) => {
-    switch (status) {
-      case "completed":
-        return "🟢 Completed";
-      case "available":
-        return "🔵 Available";
-      case "unavailable":
-        return "🔴 Unavailable";
-      case "in_progress":
-        return "🟡 In progress";
-      default:
-        return status;
-    }
-  };
-  const getRoomStatusColor = (status) => {
-    switch (status) {
-      case "full":
-        return "bg-red-600";
-      case "reserved":
-        return "bg-yellow-600";
-      case "available":
-        return "bg-green-600";
-      default:
-        return "bg-gray-600";
-    }
-  };
   const navigate = useNavigate();
 
   const handleSave = () => {
-    createNotification({
-      status: "warning", 
-      header: "Confirmation", 
-      text: "Are you sure?", 
-      onClick: async () => {
+    createNotification(
+      "warning",
+      "Confirmation",
+      "Are you sure?",
+      async () => {
         try {
           const { scheduled, stayed, ...updatePet } = pet;
-          updatePet.status = status; 
-          console.log("update pet", updatePet);
+          updatePet.status = status;
           updatePetAPI(id, updatePet);
           setPet(updatePet);
-          createNotification("success", "Update Successful", "Pet details have been saved.");
+          createNotification(
+            "success",
+            "Update Successful",
+            "Pet details have been saved."
+          );
           navigate("/staff/pet status");
-        } catch(error) {
+        } catch (error) {
           console.error("Interceptor handled the update error:", error);
         }
-      }
-    })
+      },
+    );
   };
   const handleCancel = () => {
-    createNotification("warning", "Confirmation", "Back to status page?", () => {
-      navigate("/staff/pet status");
-
-    })
+    createNotification(
+      "warning",
+      "Confirmation",
+      "Back to status page?",
+      () => {
+        navigate("/staff/pet status");
+      }
+    );
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="p-6 max-w-8xl"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -117,7 +81,7 @@ const PetUpdate = () => {
       {/* Columns */}
       <div className="flex gap-8">
         {/* Left Column */}
-        <motion.div 
+        <motion.div
           className="flex flex-col flex-1 justify-between"
           initial={{ x: -100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -143,7 +107,7 @@ const PetUpdate = () => {
           </div>
         </motion.div>
         {/* Right Column */}
-        <motion.div 
+        <motion.div
           className="flex-1 flex flex-col"
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -169,43 +133,6 @@ const PetUpdate = () => {
   );
 };
 
-const PetCard = ({ pet }) => {
-  return (
-    <motion.div 
-      className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg"
-      whileHover={{ scale: 1.02 }}
-    >
-      <div className="flex items-start space-x-6">
-        <div className="w-64 h-64 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
-          <img
-            src={pet.picture}
-            alt={pet.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex-1 space-y-2">
-          <h3 className="text-xl font-bold">{pet.name}</h3>
-          <p className="text-base">
-            <span className="font-semibold">Pet type:</span> {pet.type}
-          </p>
-          <p className="text-base">
-            <span className="font-semibold">Pet breed:</span> {pet.breed}
-          </p>
-          <p className="text-base">
-            <span className="font-semibold">Pet gender:</span> {pet.sex}
-          </p>
-          <p className="text-base">
-            <span className="font-semibold">Food allergy:</span> {pet.allergic}
-          </p>
-          <p className="text-base">
-            <span className="font-semibold">Medical condition:</span>{" "}
-            {pet.disease}
-          </p>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
 
 const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
   const handleStatusChange = (e) => {
@@ -273,41 +200,4 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
   );
 };
 
-const ServiceCard = ({ service, getStatusText, getStatusColor }) => {
-  return (
-    <div className="bg-[var(--light-brown-color)] rounded-lg p-4 shadow-lg flex items-center justify-between">
-      {/* Left section: image + details */}
-      <div className="flex items-center space-x-4">
-        <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-          <img
-            src={service.img}
-            alt={service.staff_name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold">{service.service_name}</h3>
-          <p className="text-sm">for {service.pet_type}</p>
-          <p className="text-sm">
-            {service.status === "available" || service.status === "unavailable"
-              ? service.status
-              : ""}
-          </p>
-        </div>
-      </div>
-
-      {/* Right section: status + staff */}
-      <div className="flex flex-col items-end space-y-2">
-        <span
-          className={`w-33 flex justify-center px-4 py-1 !text-white text-sm rounded-full ${getStatusColor(
-            service.status
-          )}`}
-        >
-          {getStatusText(service.status)}
-        </span>
-        <p className="text-sm">by: {service.staff_name}</p>
-      </div>
-    </div>
-  );
-};
 export default PetUpdate;

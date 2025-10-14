@@ -1,4 +1,5 @@
-
+import { motion } from "motion/react";
+import { NavLink } from "react-router-dom";
 const PetCard = ({ pet }) => {
   return (
     <motion.div
@@ -27,4 +28,5 @@ const PetCard = ({ pet }) => {
     </motion.div>
   );
 };
+
 export default PetCard

@@ -12,6 +12,7 @@ import { overlay, popUP, startUpVariants } from "../../styles/animation";
 import { handleFormDataChange } from "../../utils/handleForm";
 import { removeWindowScroll } from "../../utils/handlePopup";
 import { getDateValidation } from "../../utils/handleValidation";
+import DropDownList from "../../components/DropDownList";
 
 const BookingRoom = () => {
   const petTypes = ["DOG", "CAT", "MOUSE", "RABBIT", "BIRD"];
@@ -55,7 +56,6 @@ const BookingRoom = () => {
     const loadInitialRooms = async () => {
       try {
         const roomsData = await fetchAllRoomsWithPaginationAPI();
-        console.log("API Response:", roomsData); // Add this line
         roomsData.data.forEach((room) => {
           room.headerType = "Room";
           room.reviewStar = room.reviewStar.toFixed(1);
@@ -150,30 +150,16 @@ const BookingRoom = () => {
       >
         <div className="flex flex-col justify-start items-center gap-6 w-3/10 py-4 px-8">
           <p className="text-xl font-bold">Pet type</p>
-          <div className="relative mx-auto text-xl bg-[var(--brown-color)] rounded-lg w-full">
-            <select
-              onFocus={() => setMounted(true)}
-              onChange={(e) => handleFormDataChange(e, setFilter)}
-              name="petType"
-              className="!text-white w-full  px-4 py-2 outline-0 appearance-none cursor-pointer"
-            >
-              <option className="bg-[var(--light-brown-color)]" value="">
-                -- Select --
-              </option>
-              {petTypes.map((type, idx) => {
-                return (
-                  <option
-                    className="bg-[var(--light-brown-color)]"
-                    value={type}
-                    key={idx}
-                  >
-                    {type}
-                  </option>
-                );
+            <DropDownList
+              startText="-- Select --"
+              options={petTypes.map((type) => {
+                return { name: type, value: type };
               })}
-            </select>
-            <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
-          </div>
+              onChange={(value) => setFilter((prev) => ({ ...prev, petType: value }))}
+              value={filter.petType}
+              arrowColor="white"
+              inputSyle="!text-white px-4 py-2 outline-0 text-xl bg-(--brown-color) rounded-lg"
+            />
         </div>
         <div className="flex flex-col justify-start items-center gap-6 w-7/10 py-4 px-8">
           <p className="text-xl font-bold">Booking date</p>
