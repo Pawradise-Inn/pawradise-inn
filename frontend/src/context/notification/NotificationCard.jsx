@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { useEffect } from "react";
 
 const NotificationCard = ({
   notification,
@@ -6,6 +7,7 @@ const NotificationCard = ({
   onClick,
   ...motionProps
 }) => {
+
   const getStatusColor = (status) => {
     if (status === "success") {
       return "var(--success-color-alpha)";

@@ -84,8 +84,9 @@ const App = () => {
           <Route path="history" element={<HistoryComp />} />
         </Route>
 
-        <Route path="/" element={<Navigate to="/room" replace />} />
-        <Route path="*" element={<Navigate to="/room" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/staff" element={<Navigate to="/staff/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
 
         <Route
           path="/staff/dashboard"

@@ -39,8 +39,6 @@ const ReviewPopup = ({
       rating: newData.rating,
     });
     
-    console.log(res);
-    
     setHistorys((prev) => {
       return prev.map((history) => {
         if (history.id === data.id) {

@@ -5,10 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createBookedRoom } from "../../hooks/bookedRoomAPI";
 import { createBookedService } from "../../hooks/bookedServiceAPI";
 import { fetchCustomerPets, fetchAvailablePetAPI } from "../../hooks/petAPI";
-import {
-  fetchRoomStatusAPI,
-  fetchRoomReviewsAPI,
-} from "../../hooks/roomAPI";
+import { fetchRoomStatusAPI, fetchRoomReviewsAPI } from "../../hooks/roomAPI";
 import {
   fetchServiceReviewsAPI,
   getServiceStatusAPI,
@@ -23,6 +20,7 @@ import Pagination from "./Pagination";
 import { useAuth } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { notification, startUpVariants } from "../../styles/animation";
+import DropDownList from "../DropDownList";
 
 // data: { image, name, review, forwhich, price, size, maxsize, headerType } of service and room
 const BookingBar = ({ data, popupStatus, onClick }) => {
@@ -119,13 +117,11 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
               "Booking success",
               "Create booking successfully."
             );
-          } else {
-            createNotification("fail", "Booking fail", res.msg);
           }
         })
         .then(() => changeBookingBarStatus())
-        .catch((error)=>{
-          console.error("Booking service error:",error);
+        .catch((error) => {
+          console.error("Booking service error:", error);
         });
     } else {
       body = {
@@ -144,13 +140,11 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
               "Booking success",
               "Create booking successfully."
             );
-          } else {
-            createNotification("fail", "Booking fail", res.msg);
           }
         })
         .then(() => changeBookingBarStatus())
-        .catch((error) =>{
-          console.error("Booking error:",error);
+        .catch((error) => {
+          console.error("Booking error:", error);
         });
     }
   };
@@ -168,29 +162,27 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       return;
     }
 
-    try {
-      if (data.headerType == "Service") {
-        getServiceStatusAPI(
-          data.name,
-          `${formData.entryDate}T${formData.entryTime}:00.00Z`
-        ).then((res) => {
-          setSize(res.count);
-          res.count < 3
-            ? setStatus("room available")
-            : setStatus("room not available");
-        });
-      } else {
-        const response = await fetchRoomStatusAPI(
-          data.roomId,
-          formData.entryDate,
-          formData.exitDate
-        );
-
-        setSize(response.data.count);
-        response.data.count < data.maxsize ? setStatus("room available") : setStatus("room not available");
-      }
-    } catch(err) {
-
+    if (data.headerType == "Service") {
+      getServiceStatusAPI(
+        data.name,
+        `${formData.entryDate}T${formData.entryTime}:00.00Z`
+      ).then((res) => {
+        setSize(res.count);
+        res.count < 3
+          ? setStatus("room available")
+          : setStatus("room not available");
+      });
+    } else {
+      fetchRoomStatusAPI(
+        data.roomId,
+        formData.entryDate,
+        formData.exitDate
+      ).then((res) => {
+        setSize(res.count);
+        res.count < data.maxsize
+          ? setStatus("room available")
+          : setStatus("room not available");
+      });
     }
   };
 
@@ -206,36 +198,24 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
 
   // fetch API to get petname
   useEffect(() => {
-    // if (!user) return;
-
-    // if (data.headerType == "Service") {
-    //   fetchCustomerPets(
-    //     user.customer.id,
-    //     ["name", "type"],
-    //     localStorage.getItem("token")
-    //   ).then((res) => setPetData(res.data));
-    // } else {
-    //   fetchAvailablePetAPI(
-    //     user.customer.id,
-    //     localStorage.getItem("token")
-    //   ).then((res) => setPetData(res.data));
-    // }
-    // setCurrentPage(1);
     const fetchPetData = async () => {
       if (!user) return;
 
       try {
         let response;
-        if (data.headerType === 'Service') {
-          response = await fetchCustomerPets(user.customer.id, ["name", "type"]);
+        if (data.headerType === "Service") {
+          response = await fetchCustomerPets(user.customer.id, [
+            "name",
+            "type",
+          ]);
         } else {
           response = await fetchAvailablePetAPI(user.customer.id);
         }
-        setPetData(response);
-      } catch(err) {
+        setPetData(response.data);
+      } catch (err) {
         console.error("Failed to fetch pet data:", err);
       }
-    }
+    };
 
     fetchPetData();
     setCurrentPage(1);
@@ -247,8 +227,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       if (!data) return;
       try {
         let commentResponse;
-  
-        if (data.headerType === 'Service') {
+
+        if (data.headerType === "Service") {
           commentResponse = await fetchServiceReviewsAPI(
             data.name,
             commentStarSelect,
@@ -265,14 +245,14 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         setCommentStatus(true);
         commentResponse.data.forEach((comment) => {
           comment.comment_star = comment.comment_star.toFixed(1);
-        })
+        });
         setComments(commentResponse.data);
-      } catch(err) {
+      } catch (err) {
         console.error("Failed to fetch reviews:", err);
         setCommentStatus(false);
         setComments([]);
       }
-    }
+    };
 
     fetchReviews();
   }, [data, currentPage, commentStarSelect]);
@@ -355,20 +335,16 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
           ></motion.i>
         </div>
         <div className="relative">
-          <select
-            onChange={(e) => setCurrentPet(e.target.value)}
-            className="inline-block mb-4 w-full rounded-xl px-4 py-2 text-2xl my-2 outline-0 bg-[var(--light-brown-color)] appearance-none cursor-pointer"
-          >
-            <option value="">Pick pet</option>
-            {petData.map((data, idx) => {
-              return (
-                <option key={idx} value={data.name}>
-                  {data.name} ({data.type})
-                </option>
-              );
-            })}
-          </select>
-          <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-2/3 flex justify-center items-center text-2xl !text-white cursor-pointer pointer-events-none"></i>
+          <DropDownList
+            startText="Pick pet"
+            options={petData.map((pet) => ({
+              name: `${pet.name} (${pet.type})`,
+              value: pet.name,
+            }))}
+            onChange={(pet) => setCurrentPet(pet)}
+            value={currentPet}
+            mainStyle="mt-2 mb-4"
+          />
         </div>
         <form onSubmit={handleFormSubmit}>
           <b className="mb-2 text-3xl inline-block w-1/2 ">Entry date</b>
@@ -381,42 +357,41 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
               <b className="mb-2 text-3xl inline-block w-1/2">Exit date</b>
             </>
           )}
-          <div className="relative mb-4 w-full rounded-xl text-2xl bg-[var(--light-brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1  before:border-[var(--dark-brown-color)]">
-            <input
-              type="date"
-              className="relative w-1/2 rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
-              onChange={(e) => handleFormDataChange(e, setFormData)}
-              name="entryDate"
-            />
-            <i className="bi bi-caret-down-fill absolute top-1/2 right-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
+          <div className="grid grid-cols-2 relative mb-4 w-full rounded-xl text-2xl bg-[var(--light-brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1  before:border-[var(--dark-brown-color)]">
+            <div className="w-full relative">
+              <input
+                type="date"
+                className="relative w-full rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
+                onChange={(e) => handleFormDataChange(e, setFormData)}
+                name="entryDate"
+              />
+              <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
+            </div>
             {data.headerType === "Service" ? (
-              <>
-                <select
-                  className="relative w-1/2 rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer appearance-none"
-                  name="entryTime"
-                  onChange={(e) => handleFormDataChange(e, setFormData)}
-                >
-                  <option value="">Pick time</option>
-                  {selectableTime.map((time, idx) => {
-                    return (
-                      <option key={idx} value={time}>
-                        {time}
-                      </option>
-                    );
-                  })}
-                </select>
-              </>
+              <DropDownList
+                startText="Pick time"
+                options={selectableTime.map((time) => ({
+                  name: time,
+                  value: time,
+                }))}
+                onChange={(time) =>
+                  setFormData((prev) => {
+                    return { ...prev, entryTime: time };
+                  })
+                }
+                value={formData.entryTime}
+              />
             ) : (
-              <>
+              <div className="w-full">
                 <input
                   type="date"
-                  className="relative w-1/2 rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
+                  className="relative w-full rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
                   onChange={(e) => handleFormDataChange(e, setFormData)}
                   name="exitDate"
                 />
-              </>
+                <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
+              </div>
             )}
-            <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
           </div>
           {/* booking detail section */}
 

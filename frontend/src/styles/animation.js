@@ -8,6 +8,25 @@ const popUP = {
   hidden: { opacity: 0, transform: "translateY(100%)" },
 };
 
+const dropDown = {
+  hidden: {
+    opacity: 0,
+    scaleY: 0,
+    transition: {
+      opacity: { duration: 0.1 },
+      scaleY: { duration: 0.2 },
+    },
+  },
+  visible: {
+    opacity: 1,
+    scaleY: 1,
+    transition: {
+      opacity: { duration: 0.1 },
+      scaleY: { duration: 0.2 },
+    },
+  },
+};
+
 const notification = {
   hidden: { opacity: 0, y: 50 },
   visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } },
@@ -73,14 +92,15 @@ const staggerItem = {
   },
 };
 
-export { 
-  notification, 
-  overlay, 
-  popUP, 
+export {
+  notification,
+  overlay,
+  popUP,
+  dropDown,
   startUpVariants,
   slideInLeft,
   slideInRight,
   fadeInUp,
   staggerContainer,
-  staggerItem
+  staggerItem,
 };
