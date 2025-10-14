@@ -61,6 +61,7 @@ model ChatLog {
   review_date DateTime  @default(now()) @db.Timestamp(0)
   reply_date  DateTime? @db.Timestamp(0)
   show        Boolean   @default(true) @db.Boolean
+  isRead      Boolean   @default(false) @db.Boolean
 
   customerId Int?
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
@@ -124,7 +125,7 @@ model Service {
   name    String    @db.VarChar(30)
   price   Float     @default(500.00) @db.DoublePrecision
   petType PetType[]
-  picture String
+  picture String    @default("https://storage.googleapis.com/paw_image/unnamed.jpg")
 
   reviews         ChatLog[]
   staffOnServices StaffOnService[]
