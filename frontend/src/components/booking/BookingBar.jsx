@@ -48,7 +48,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   const validDateStatus = useMemo(() => {
     return getDateValidation(formData.entryDate, formData.exitDate);
   }, [formData]);
-  
+
   //  handle form submit and check availability and validation
   //  @params: e -> form itself
   //  @constraint: if this is room and EntryDate and ExitDate is not fully filled Notify fail
@@ -117,13 +117,11 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
               "Booking success",
               "Create booking successfully."
             );
-          } else {
-            createNotification("fail", "Booking fail", res.msg);
           }
         })
         .then(() => changeBookingBarStatus())
-        .catch((error)=>{
-          console.error("Booking service error:",error);
+        .catch((error) => {
+          console.error("Booking service error:", error);
         });
     } else {
       body = {
@@ -142,13 +140,11 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
               "Booking success",
               "Create booking successfully."
             );
-          } else {
-            createNotification("fail", "Booking fail", res.msg);
           }
         })
         .then(() => changeBookingBarStatus())
-        .catch((error) =>{
-          console.error("Booking error:",error);
+        .catch((error) => {
+          console.error("Booking error:", error);
         });
     }
   };
@@ -166,29 +162,27 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       return;
     }
 
-    try {
-      if (data.headerType == "Service") {
-        getServiceStatusAPI(
-          data.name,
-          `${formData.entryDate}T${formData.entryTime}:00.00Z`
-        ).then((res) => {
-          setSize(res.count);
-          res.count < 3
-            ? setStatus("room available")
-            : setStatus("room not available");
-        });
-      } else {
-        const response = await fetchRoomStatusAPI(
-          data.roomId,
-          formData.entryDate,
-          formData.exitDate
-        );
-
-        setSize(response.data.count);
-        response.data.count < data.maxsize ? setStatus("room available") : setStatus("room not available");
-      }
-    } catch(err) {
-
+    if (data.headerType == "Service") {
+      getServiceStatusAPI(
+        data.name,
+        `${formData.entryDate}T${formData.entryTime}:00.00Z`
+      ).then((res) => {
+        setSize(res.count);
+        res.count < 3
+          ? setStatus("room available")
+          : setStatus("room not available");
+      });
+    } else {
+      fetchRoomStatusAPI(
+        data.roomId,
+        formData.entryDate,
+        formData.exitDate
+      ).then((res) => {
+        setSize(res.count);
+        res.count < data.maxsize
+          ? setStatus("room available")
+          : setStatus("room not available");
+      });
     }
   };
 
@@ -204,36 +198,24 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
 
   // fetch API to get petname
   useEffect(() => {
-    // if (!user) return;
-
-    // if (data.headerType == "Service") {
-    //   fetchCustomerPets(
-    //     user.customer.id,
-    //     ["name", "type"],
-    //     localStorage.getItem("token")
-    //   ).then((res) => setPetData(res.data));
-    // } else {
-    //   fetchAvailablePetAPI(
-    //     user.customer.id,
-    //     localStorage.getItem("token")
-    //   ).then((res) => setPetData(res.data));
-    // }
-    // setCurrentPage(1);
     const fetchPetData = async () => {
       if (!user) return;
 
       try {
         let response;
-        if (data.headerType === 'Service') {
-          response = await fetchCustomerPets(user.customer.id, ["name", "type"]);
+        if (data.headerType === "Service") {
+          response = await fetchCustomerPets(user.customer.id, [
+            "name",
+            "type",
+          ]);
         } else {
           response = await fetchAvailablePetAPI(user.customer.id);
         }
-        setPetData(response);
-      } catch(err) {
+        setPetData(response.data);
+      } catch (err) {
         console.error("Failed to fetch pet data:", err);
       }
-    }
+    };
 
     fetchPetData();
     setCurrentPage(1);
@@ -245,8 +227,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       if (!data) return;
       try {
         let commentResponse;
-  
-        if (data.headerType === 'Service') {
+
+        if (data.headerType === "Service") {
           commentResponse = await fetchServiceReviewsAPI(
             data.name,
             commentStarSelect,
@@ -263,14 +245,14 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         setCommentStatus(true);
         commentResponse.data.forEach((comment) => {
           comment.comment_star = comment.comment_star.toFixed(1);
-        })
+        });
         setComments(commentResponse.data);
-      } catch(err) {
+      } catch (err) {
         console.error("Failed to fetch reviews:", err);
         setCommentStatus(false);
         setComments([]);
       }
-    }
+    };
 
     fetchReviews();
   }, [data, currentPage, commentStarSelect]);
