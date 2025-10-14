@@ -5,7 +5,8 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { PrismaClient } = require("./generated/prisma/client");
 
-dotenv.config({path: './config/config.env.local'});
+dotenv.config({path: './config/config.env'});
+// dotenv.config({path: './config/config.env.local'});
 
 const app = express();
 const prisma = new PrismaClient();
