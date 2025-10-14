@@ -1,46 +1,19 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
-import { motion } from "motion/react";
 import { fetchAllPetAPI } from "../../hooks/petAPI";
-
-const PetCard = ({ pet }) => {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-    >
-      <NavLink to={`/staff/pet/${pet.id}`}>
-        <div className="mx-5 bg-[var(--cream-color)] border-1 border-color-[var(--dark-brown-color)] rounded-xl p-4 shadow-lg flex flex-col space-y-4 hover:shadow-xl transition-all duration-300 cursor-pointer">
-          <div className="w-full aspect-square bg-gray-200 rounded mb-4 flex items-center justify-center overflow-hidden">
-            <img
-              src={pet.picture}
-              alt="pet"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex justify-between mb-3">
-            <div className="text-center">
-              <p className="text-xl font-semibold">{pet.name}</p>
-            </div>
-            <span className="px-5 py-1 !text-white text-xs rounded-full bg-[var(--dark-brown-color)] font-semibold">
-              {pet.status}
-            </span>
-          </div>
-        </div>
-      </NavLink>
-    </motion.div>
-  );
-};
+import PetCard  from "../../components/staff/PetCard"
 
 const PetStatus = () => {
   const [pets, setPets] = useState([]);
   const [filters, setFilter] = useState([]);
   const [search, setSearch] = useState("");
-
   const fetchPets = async () => {
     try {
       const response = await fetchAllPetAPI();
-      setPets(response);
+      console.log(response)
+      if(response.success){
+        setPets(response.data);
+      }
+      
     } catch (err) {
       console.error(err);
     }
@@ -48,6 +21,7 @@ const PetStatus = () => {
 
   useEffect(() => {
     fetchPets();
+    console.log(pets)
   }, []);
   const handleCheckboxChange = (e) => {
     const value = e.target.value;
@@ -147,7 +121,7 @@ const PetStatus = () => {
         </div>
       </div>
       <div className="grid grid-cols-3 gap-6 max-w-7xl mx-32 my-8">
-        {filteredPets.map((pet, index) => (
+        {filteredPets.map((pet) => (
           <PetCard key={pet.id} pet={pet} />
         ))}
       </div>
