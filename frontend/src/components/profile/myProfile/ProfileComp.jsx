@@ -113,7 +113,7 @@ const ProfileComp = () => {
         "Account deletion confirmed",
         "Your account would be deleted. Any active bookings (if any) would be automatically declined."
       );
-      navigate("/", { replace: true })
+      navigate("/login", { replace: true })
     })
     .catch((err) => {
       createNotification("fail", "Delete failed", "Failed to delete.");
