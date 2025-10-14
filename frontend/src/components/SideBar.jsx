@@ -55,6 +55,16 @@ const SideBar = ({ link, currentPage, setCurrentPage }) => {
           </motion.div>
         );
       })}
+      {/* Logout Button */}
+      <motion.div className="relative px-4 py-4 rounded mt-auto shadow-md">
+        <NavLink
+          to="/login" // Redirect to login
+          onClick={() => setCurrentPage('/login')} // Set current page to login
+          className="block w-full text-center text-red-600"
+        >
+          Logout
+        </NavLink>
+      </motion.div>
     </motion.aside>
   );
 };
