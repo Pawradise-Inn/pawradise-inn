@@ -26,7 +26,6 @@ const getChatLogs = async (req, res) => {
     // }
 
     //Select filter
-    console.log(req.params.serviceName);
     if (req.params.serviceName){
         try{
             const service = await prisma.service.findFirst({
@@ -43,7 +42,6 @@ const getChatLogs = async (req, res) => {
         let filter = JSON.parse(req.query.filter);
         options.where = {...options.where, ...filter};
     }
-    console.log(options.where);
 
     //Select fields
     if (req.query.select){
@@ -149,7 +147,6 @@ const createChatLog = async(req, res)=> {
     }
 
     try {
-        console.log(data);
         if (!data.serviceId && !data.roomId) {
             return res.status(400).json({ 
                 success: false,

@@ -73,7 +73,6 @@ const ProfileComp = () => {
         try {
           const { id, ...userObjected } = newUser;
           const data = await updateCustomerAPI(user.customer.id, userObjected);
-          console.log("data:", data);
           setUser?.(data.data); 
           createNotification({
             status: "success",
@@ -102,7 +101,6 @@ const ProfileComp = () => {
     setShowDeleteModal(false);
     setUser?.(null); 
     deleteMeAPI().then((data) => {
-      console.log(data)
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
       createNotification({

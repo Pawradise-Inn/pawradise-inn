@@ -1,5 +1,4 @@
 const PetCard = ({ pet }) => {
-    console.log(pet)
   return (
     <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
       <div className="flex items-start space-x-6">
