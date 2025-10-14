@@ -30,31 +30,7 @@ const PetUpdate = () => {
       status: "completed",
       staff_name: "Sarah Johnson",
       img: "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-    },
-    {
-      id: 2,
-      service_name: "Vet Checkup",
-      pet_type: "Dog",
-      status: "in_progress",
-      staff_name: "Dr. Mike Wilson",
-      img: "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-    },
-    {
-      id: 3,
-      service_name: "Playtime",
-      pet_type: "Dog",
-      status: "available",
-      staff_name: "Emma Davis",
-      img: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-    },
-    {
-      id: 4,
-      service_name: "Training Session",
-      pet_type: "Dog",
-      status: "unavailable",
-      staff_name: "John Smith",
-      img: "https://images.unsplash.com/photo-1588943211346-0908a1fb0b01?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-    },
+    }
   ]);
 
   const getStatusColor = (status) => {
