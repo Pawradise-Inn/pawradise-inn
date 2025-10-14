@@ -48,11 +48,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   const validDateStatus = useMemo(() => {
     return getDateValidation(formData.entryDate, formData.exitDate);
   }, [formData]);
-
-  useEffect(() => {
-    console.log(currentPet);
-  }, [currentPet]);
-
+  
   //  handle form submit and check availability and validation
   //  @params: e -> form itself
   //  @constraint: if this is room and EntryDate and ExitDate is not fully filled Notify fail

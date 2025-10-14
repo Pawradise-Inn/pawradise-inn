@@ -70,7 +70,6 @@ export default function Login({
           header: 'Login Successful!',
           text: 'Welcome! You will be redirected shortly'
         });
-        console.log(userData.data)
         navigate(redirectTo, { replace: true });
       } else {
         setErr("Login failed. Please check your username or password.");

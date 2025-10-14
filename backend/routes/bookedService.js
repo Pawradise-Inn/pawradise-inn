@@ -9,17 +9,18 @@ const {
     deleteBookedService,
     getTodayService
 } = require('../controllers/bookedService');
+const { authorize, protect } = require('../middleware/auth');
 
 router.route('/dashboard')
-    .get(getTodayService);
+    .get(protect, authorize("CUSTOMER", "STAFF"), getTodayService);
 
 router.route('/')
     .get(getBookedServices)
-    .post(createBookedService);
+    .post(protect, authorize("CUSTOMER", "STAFF"), createBookedService);
 
 router.route('/:id')
-    .get(getBookedService)
-    .patch(updateBookedService)
-    .delete(deleteBookedService);
+    .get(protect, authorize("CUSTOMER", "STAFF"), getBookedService)
+    .patch(protect, authorize("CUSTOMER", "STAFF"), updateBookedService)
+    .delete(protect, authorize("CUSTOMER", "STAFF"), deleteBookedService);
 
 module.exports = router;

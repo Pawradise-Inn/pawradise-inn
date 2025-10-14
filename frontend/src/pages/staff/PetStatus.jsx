@@ -49,7 +49,6 @@ const PetStatus = () => {
   useEffect(() => {
     fetchPets();
   }, []);
-  console.log(pets);
   const handleCheckboxChange = (e) => {
     const value = e.target.value;
     if (e.target.checked) {
