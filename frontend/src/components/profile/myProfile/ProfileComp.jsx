@@ -5,6 +5,7 @@ import { useAuth } from "../../../context/AuthProvider";
 import { updateCustomerAPI } from "../../../hooks/customerAPI";
 import { startUpVariants } from "../../../styles/animation";
 import { useNotification } from "../../../context/notification/NotificationProvider";
+import { deleteMeAPI } from "../../../hooks/authAPI";
 
 const ProfileComp = () => {
   const { createNotification } = useNotification();
@@ -61,34 +62,34 @@ const ProfileComp = () => {
       if(user) setNewUser({id: user.id, ... user})
     })
   };
-  const handleConfirm = async (e) => {
-    e.preventDefault();
-    if (!newUser.id) return;
-    createNotification(
-      "warning",
-      "Confirmation.",
-      "Are you sure to update the data?",
-      () => {
-        try {
-          const { id, ...userObjected } = newUser;
-          updateCustomerAPI(user.customer.id, userObjected).then((data) => {
-            console.log("data:",data)
-            setUser?.(data); 
-            createNotification(
-              "success",
-              "Profile updated successfully!",
-              "Your update has been saved."
-            );
-          })
+  const handleConfirm = async (e) => {
+    e.preventDefault();
+    if (!newUser.id) return;
+    createNotification(
+      "warning",
+      "Confirmation.",
+      "Are you sure to update the data?",
+      () => {
+        try {
+          const { id, ...userObjected } = newUser;
+          updateCustomerAPI(user.customer.id, userObjected).then((data) => {
+          console.log("data:",data)
+          setUser?.(data); 
+          createNotification(
+            "success",
+            "Profile updated successfully!",
+            "Your update has been saved."
+          );
+          })
           .catch((err) => {
             console.error("Update failed:", err);
           });
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    );
-  };
+} catch (err) {
+ console.error(err);
+ }
+}
+ );
+  };
   const openDeleteModal = () => {
     setPassword("");
     setSubmitErr("");
@@ -103,16 +104,22 @@ const ProfileComp = () => {
 
     setShowDeleteModal(false);
     setUser?.(null);
-    try {
+    deleteMeAPI().then((data) => {
+      console.log(data)
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
-    } catch {}
-    createNotification(
-      "success",
-      "Account deletion confirmed",
-      "Your account would be deleted. Any active bookings (if any) would be automatically declined."
-    );
-    navigate("/", { replace: true });
+      createNotification(
+        "success",
+        "Account deletion confirmed",
+        "Your account would be deleted. Any active bookings (if any) would be automatically declined."
+      );
+      navigate("/", { replace: true })
+    })
+    .catch((err) => {
+      createNotification("fail", "Delete failed", "Failed to delete.");
+    });
+
+
   };
 
   return (
