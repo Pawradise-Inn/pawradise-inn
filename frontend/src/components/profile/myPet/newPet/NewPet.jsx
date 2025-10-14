@@ -59,7 +59,8 @@ const NewPet = () => {
 
   const handleImageClick = () => {
     fileInputRef.current.click();
-    console.log(user);
+    //console.log(user)
+
   };
 
   // FIXED: Added missing closing bracket for handleImageChange
@@ -77,7 +78,7 @@ const NewPet = () => {
     }
   }; // <-- Added this bracket
 
-  console.log(user);
+  //console.log(user);
 
   const handleConfirm = () => {
     // Check for missing form data (initial synchronous validation)

@@ -116,6 +116,7 @@ model BookedRoom {
   pet       Pet?    @relation(fields: [petId], references: [id], onDelete: SetNull)
   bookingId Int
   booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  Care      Care[]
 }
 
 model Service {
@@ -140,6 +141,7 @@ model BookedService {
   scheduled  DateTime @db.Timestamp(0)
   booking_id Int
   booking    Booking  @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  Care       Care[]
 }
 
 model Booking {
@@ -175,15 +177,18 @@ model Payment {
 }
 
 model Care {
-  start_period DateTime @default(now()) @db.Timestamp(0)
-  end_period   DateTime @db.Timestamp(0)
+  id     Int       @id @default(autoincrement())
+  date   DateTime  @default(now()) @db.Timestamp(0)
+  status PetStatus
 
-  staff_id Int
-  staff    Staff @relation(fields: [staff_id], references: [id], onDelete: Cascade)
-  pet_id   Int
-  pet      Pet   @relation(fields: [pet_id], references: [id], onDelete: Cascade)
-
-  @@unique([staff_id, pet_id])
+  staff_id      Int
+  staff         Staff          @relation(fields: [staff_id], references: [id], onDelete: Cascade)
+  pet_id        Int
+  pet           Pet            @relation(fields: [pet_id], references: [id], onDelete: Cascade)
+  bs_id         Int?
+  bookedService BookedService? @relation(fields: [bs_id], references: [id], onDelete: SetNull)
+  br_id         Int?
+  bookedRoom    BookedRoom?    @relation(fields: [br_id], references: [id], onDelete: SetNull)
 }
 
 model StaffOnService {

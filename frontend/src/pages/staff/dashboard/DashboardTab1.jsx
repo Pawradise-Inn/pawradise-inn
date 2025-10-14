@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-
 // --- API Functions (adjust path as needed) ---
 // Now using the new bookedRoomAPI functions
 import {
@@ -186,10 +185,12 @@ const DashboardTab1 = () => {
     const loadRooms = async () => {
       try {
         setLoading(true);
-        const data = await getTodayRoom();
-        setItems(data.data || []);
+        const response = await getTodayRoom();
+        // Ensure we're setting an array, even if empty
+        setItems(Array.isArray(response?.data) ? response.data : []);
       } catch (error) {
         console.error("Failed to fetch rooms:", error);
+        setItems([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
@@ -198,25 +199,31 @@ const DashboardTab1 = () => {
   }, []);
 
   const filtered = !search
-    ? items
-    : items.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+    ? (items || [])
+    : (items || []).filter((item) =>
+        item?.name?.toLowerCase().includes(search.toLowerCase())
       );
 
   const handleClosePopup = () => {
     setIsPopupOpen(false);
   }; // Simplified to only handle adding a new item
   const handleSaveItem = async (itemFromPopup) => {
+    const { createNotification } = useNotification();
     try {
       const newItem = await createBookedRoom({
         ...itemFromPopup,
         status: "pending",
       });
       setItems((prev) => [newItem, ...prev]);
+      handleClosePopup();
+      createNotification(
+        "success",
+        "Saving Item",
+        "Item saved successfully"
+      )
     } catch (error) {
       console.error("Failed to save item:", error);
     }
-    handleClosePopup();
   }; // Handles deleting a booking from the card
   const handleDeleteItem = async (id) => {
     // Optional: Add a confirmation dialog before deleting
@@ -309,7 +316,7 @@ const DashboardTab1 = () => {
                  {" "}
       {loading ? (
         <p style={feedbackStyle}>Loading bookings...</p>
-      ) : filtered.length === 0 ? (
+      ) : !Array.isArray(filtered) || filtered.length === 0 ? (
         <p style={feedbackStyle}>No results found.</p>
       ) : (
         <div style={listContainerStyle}>

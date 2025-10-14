@@ -13,8 +13,8 @@ const PetUpdate = () => {
     try {
       const response = await fetchPetAPI(id);
       console.log(response);
-      setPet(response.data);
-      setStatus(response.data.status);
+      setPet(response);
+      setStatus(response.status);
     } catch (err) {
       console.err(err);
     }
@@ -100,15 +100,23 @@ const PetUpdate = () => {
   const navigate = useNavigate();
 
   const handleSave = () => {
-    createNotification("warning", "Confirmation", "Are you sure?", () => {
-      const { scheduled, stayed, ...updatePet } = pet;
-      updatePet.status = status; 
-      console.log("update pet", updatePet);
-      updatePetAPI(id, updatePet);
-      setPet(updatePet);
-      createNotification("success", "Update Successful", "Update Complete.");
-      navigate("/staff/pet status");
-
+    createNotification({
+      status: "warning", 
+      header: "Confirmation", 
+      text: "Are you sure?", 
+      onClick: async () => {
+        try {
+          const { scheduled, stayed, ...updatePet } = pet;
+          updatePet.status = status; 
+          console.log("update pet", updatePet);
+          updatePetAPI(id, updatePet);
+          setPet(updatePet);
+          createNotification("success", "Update Successful", "Pet details have been saved.");
+          navigate("/staff/pet status");
+        } catch(error) {
+          console.error("Interceptor handled the update error:", error);
+        }
+      }
     })
   };
   const handleCancel = () => {

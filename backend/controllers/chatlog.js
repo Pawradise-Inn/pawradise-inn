@@ -82,7 +82,7 @@ const getChatLogs = async (req, res) => {
         if(total === 0) {
             return res.status(404).json({
                 success: false, 
-                msg: "No review in database"
+                msg: "No reviews found"
             });
         }
 
@@ -111,22 +111,25 @@ const getChatLogs = async (req, res) => {
         }
         res.status(200).json({ success: true, pagination, data: formattedReviews, count: total });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message});
+        res.status(500).json({ 
+            success: false, 
+            message: "Unable to fetch reviews. Please try again later"
+        });
     }
 };
 
-  const getChatLog= async(req, res)=> {
+const getChatLog= async(req, res)=> {
     try {
         const id = req.params.id;
         const chatlog = await prisma.chatLog.findUnique({
             where: { id: Number(id) }
         });
 
-        if (!chatlog) return res.status(404).json({success: false, msg: 'Chatlog not found'});
+        if (!chatlog) return res.status(404).json({success: false, msg: 'Review not found'});
 
         res.status(200).json({success: true, data: chatlog});
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message});
+        res.status(500).json({ success: false, message: "Unable to fetch review. Please try again later" });
     }
   };
 
@@ -148,7 +151,10 @@ const createChatLog = async(req, res)=> {
     try {
         console.log(data);
         if (!data.serviceId && !data.roomId) {
-            return res.status(400).json({ error: 'ServiceID or RoomID are required'});
+            return res.status(400).json({ 
+                success: false,
+                message: 'Please select a service or room to review'
+            });
         }
         data.customerId = req.user.roleId;
         const existingReview = await prisma.chatLog.findFirst({
@@ -162,15 +168,24 @@ const createChatLog = async(req, res)=> {
         });
 
         if (existingReview){
-            if (data.roomId) return res.status(409).json({success: false, error: `Customer has already review this room`});
-            else return res.status(409).json({success: false, error: `Customer has already review this service`});
+            if (data.roomId) {
+                return res.status(409).json({
+                    success: false, 
+                    message: "You have already reviewed this room"
+                });
+            } else {
+                return res.status(409).json({
+                    success: false, 
+                    message: "You have already reviewed this service"
+                });
+            }
         }
 
         const chatlog = await prisma.chatLog.create({data});
 
         res.status(201).json({success: true, data: chatlog});
     } catch (err) {
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to create review. Please try again later"});
     }
   };
 
@@ -180,7 +195,10 @@ const replyToChatLog = async (req, res)=> {
         const staffId = req.user.roleId;
         const reply = req.body.reply;
         if (!reply || !staffId) {
-            return res.status(200).json({ error: 'Reply text and staff ID are required' });
+            return res.status(400).json({ 
+                success: false,
+                message: 'Please provide your reply'
+            });
         }
 
         const chatlog = await prisma.chatLog.update({
@@ -194,7 +212,10 @@ const replyToChatLog = async (req, res)=> {
 
         res.status(200).json({success: true, data: chatlog});
     } catch (err) {
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({
+            success: false, 
+            message: "Unable to post reply. Please try again later"
+        });
     }
 };
 
@@ -211,9 +232,10 @@ const updateChatLog = async(req, res) => {
         const id = req.params.id;
         
         if (Object.keys(dataToUpdate).length === 0){
-            return res
-                .status(400)
-                .json({ success: false, msg: "No valid fields to update" });
+            return res.status(400).json({ 
+                success: false, 
+                message: "No changes were provided to update"
+            });
         }
 
         const chatlog = await prisma.chatLog.update({
@@ -223,7 +245,10 @@ const updateChatLog = async(req, res) => {
 
         res.status(200).json({success: true, data: chatlog});
     }catch (err) {
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({
+            success: false, 
+            message: "Unable to update review. Please try again later"
+        });
     }
 };
 
@@ -236,7 +261,16 @@ const deleteChatLog = async(req, res)=>{
 
         res.status(200).json({success: true, data: chatlog});
     } catch (err) {
-        res.status(500).json({success: false, error: err.message});
+        if (err.code === 'P2025') {
+            return res.status(404).json({
+                success: false, 
+                message: "This review no longer exists"
+            });
+        }
+        res.status(500).json({
+            success: false, 
+            message: "Unable to delete review. Please try again later"
+        });
     }
 };
 

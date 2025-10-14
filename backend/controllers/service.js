@@ -51,7 +51,7 @@ const getServices = async (req, res) =>{
         if(total === 0) {
             return res.status(404).json({
                 success: false, 
-                msg: "No service in database"
+                msg: "No service are available at the moment"
             });
         }
 
@@ -72,7 +72,7 @@ const getServices = async (req, res) =>{
         }
         res.status(200).json({success: true, pagination, data: services, count: total});
     } catch (err) {
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to fetch services. Please try again later" });
     }
 };
 
@@ -83,7 +83,10 @@ const getService = async (req, res) => {
         if(!service) return res.status(404).json({success: false, msg: 'Service is not found'});
         res.status(200).json({success: true, data: service});
     } catch (err) {
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({
+            success: false, 
+            message: "Unable to fetch service details. Please try again later"
+        });
     }
 };
 
@@ -101,7 +104,7 @@ const createService = async (req, res) => { //requirement: 15
         console.log(service.data);
         res.status(201).json({success: true, data: service});
     } catch (err) {
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to create service. Please try again later"});
     }
 };
 
@@ -116,7 +119,7 @@ const updateService = async (req, res) => {
         if (req.body.petType !== undefined) dataToUpdate.petType = [req.body.petType.toUpperCase()];
         if (req.body.picture !== undefined) dataToUpdate.picture = req.body.picture;
 
-        if(Object.keys(dataToUpdate).length === 0) return res.status(400).json({success: false, msg: "No valid fields to update"});
+        if(Object.keys(dataToUpdate).length === 0) return res.status(400).json({success: false, msg: "Please provide details to update"});
 
         const service = await prisma.service.update({
             where: {id: Number(serviceId)},
@@ -125,7 +128,10 @@ const updateService = async (req, res) => {
         res.status(200).json({success: true, data: service});
     } catch (err) {
         if (err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found'});
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({
+            success: false, 
+            message: "Unable to update service. Please try again later"
+        });
     }
 };
 
@@ -138,7 +144,7 @@ const deleteService = async (req, res) => { //requirement: 15
         res.status(200).json({success: true, data: {}});
     } catch(err){
         if (err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found or already deleted'});
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to delete service. Please try again later"});
     }
 };
 
@@ -150,7 +156,10 @@ const addPicturesToService = async (req, res) => {
         res.status(200).json({success: true, data: service});
     }catch(err){
         if(err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found'});
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({
+            success: false, 
+            message: "Unable to add pictures to service. Please try again later"
+        });
     }
 };
 
@@ -162,7 +171,7 @@ const deletePicturesFromService = async (req, res) => {
         res.status(200).json({success: true, data: service});
     }catch(err){
         if(err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found'});
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message, message: "Unable to remove pictures from service. Please try again later" });
     }
 };
 
@@ -189,7 +198,7 @@ const getServicesWithPagination = async (req, res)=>{ //requirement: 1
 
         res.status(200).json({success: true, data: formatted});
     }catch(err){
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, error: err.message, message: "Unable to fetch services. Please try again later" });
     }
 };
 
@@ -200,12 +209,17 @@ const getServiceStatus = async (req, res)=>{ //requirement: 6
         const service = await prisma.service.findFirst({
             where: {name: name}
         });
-        if (!service) return res.status(404).json({ success: false, error: "Service not found" });
+        if (!service) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Service not found" 
+            });
+        }
 
         const count = await overlappingService(service.id, schedule);
         res.status(200).json({success: true, count: count});
     }catch(err){
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to check service availability. Please try again later"});
     }
 };
 
@@ -217,7 +231,7 @@ const getServiceReviews = async (req, res) => { //requirement: 5
     const skip = (page - 1) * take;
 
     if (!name) {
-      return res.status(400).json({ success: false, msg: "name is required" });
+      return res.status(400).json({ success: false, msg: "Please provide a service name to view reviews" });
     }
     const service = await prisma.service.findFirst({
         where: {name: name}
@@ -250,7 +264,7 @@ const getServiceReviews = async (req, res) => { //requirement: 5
     });
 
     if (!reviews || reviews.length === 0) {
-      return res.status(200).json({ success: false, msg: "No reviews found" });
+      return res.status(200).json({ success: false, msg: "No reviews found for this service" });
     }
 
     const formattedReviews = reviews.map(r => ({
@@ -262,7 +276,7 @@ const getServiceReviews = async (req, res) => { //requirement: 5
 
     res.status(200).json({ success: true, data: formattedReviews });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, message: "Unable to fetch service reviews. Please try again later" });
   }
 };
 

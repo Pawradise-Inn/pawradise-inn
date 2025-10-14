@@ -7,12 +7,14 @@ import PawLogo from "../assets/logo.png";
 import { getMeAPI, loginAPI } from "../hooks/authAPI";
 import { useAuth } from "../context/AuthProvider";
 import { startUpVariants } from "../styles/animation";
+import {useNotification} from "../context/notification/NotificationProvider"
 
 export default function Login({
   role: roleProp,
   redirectTo: redirectProp,
   title: titleProp,
 }) {
+  const { createNotification } = useNotification();
   const location = useLocation();
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
@@ -55,23 +57,28 @@ export default function Login({
     setLoading(true);
     try {
       // ปรับให้ตรงกับ backend: ถ้า loginAPI เดิมไม่รองรับ role ให้ลบบรรทัด role ทิ้ง
-      const res = await loginAPI(form.Username, form.Password, role);
+      const res = await loginAPI(form.Username, form.Password);
       if (res?.token) {
         localStorage.setItem("token", res.token);
-        localStorage.setItem("user", JSON.stringify(res.user));
-        getMeAPI(res.token).then((res2) => {
-          if (res2?.user) {
-            setUser?.(res2.user);
-          }
+        const userData = await getMeAPI();
+        if (userData?.data) {
+          setUser(userData.data);
+          localStorage.setItem("user", JSON.stringify(userData.data));
+        }
+        createNotification({
+          status: 'success',
+          header: 'Login Successful!',
+          text: 'Welcome! You will be redirected shortly'
         });
-        console.log(user)
+        console.log(userData.data)
         navigate(redirectTo, { replace: true });
       } else {
         setErr("Login failed. Please check your username or password.");
       }
     } catch (e2) {
-      const msg = e2?.response?.data?.message || "Cannot sign in right now.";
-      setErr(msg);
+      //const msg = e2?.response?.data?.message || "Cannot sign in right now.";
+      //setErr(msg);
+      console.error("Login error:", e2);
     } finally {
       setLoading(false);
     }

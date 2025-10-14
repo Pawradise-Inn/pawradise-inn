@@ -113,7 +113,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         ),
       };
 
-      createBookedService(body, localStorage.getItem("token"))
+      createBookedService(body)
         .then((res) => {
           if (res.success) {
             createNotification(
@@ -125,7 +125,10 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
             createNotification("fail", "Booking fail", res.msg);
           }
         })
-        .then(() => changeBookingBarStatus());
+        .then(() => changeBookingBarStatus())
+        .catch((error)=>{
+          console.error("Booking service error:",error);
+        });
     } else {
       body = {
         roomId: data.roomId,
@@ -135,7 +138,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         checkOut: new Date(`${formData.exitDate}T00:00:00.00Z`),
       };
 
-      createBookedRoom(body, localStorage.getItem("token"))
+      createBookedRoom(body)
         .then((res) => {
           if (res.success) {
             createNotification(
@@ -147,15 +150,17 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
             createNotification("fail", "Booking fail", res.msg);
           }
         })
-        .then(() => changeBookingBarStatus());
+        .then(() => changeBookingBarStatus())
+        .catch((error) =>{
+          console.error("Booking error:",error);
+        });
     }
   };
-
   //  change BookingStatus when formData and currentPet is changed
   //  @constraint: if data is not fully filled Notify warning
   //  @constraint: if available Notify success
   //  @constraint: if not available Notify fail
-  const changeBookingBarStatus = () => {
+  const changeBookingBarStatus = async () => {
     if (
       !formData.entryDate ||
       (!formData.exitDate && !formData.entryTime) ||
@@ -165,28 +170,29 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       return;
     }
 
-    if (data.headerType == "Service") {
-      getServiceStatusAPI(
-        data.name,
-        `${formData.entryDate}T${formData.entryTime}:00.00Z`
-      ).then((res) => {
-        setSize(res.count);
-        res.count < 3
-          ? setStatus("room available")
-          : setStatus("room not available");
-      });
-    } else {
-      fetchRoomStatusAPI(
-        data.roomId,
-        formData.entryDate,
-        formData.exitDate,
-        localStorage.getItem("token")
-      ).then((res) => {
-        setSize(res.count);
-        res.count < data.maxsize
-          ? setStatus("room available")
-          : setStatus("room not available");
-      });
+    try {
+      if (data.headerType == "Service") {
+        getServiceStatusAPI(
+          data.name,
+          `${formData.entryDate}T${formData.entryTime}:00.00Z`
+        ).then((res) => {
+          setSize(res.count);
+          res.count < 3
+            ? setStatus("room available")
+            : setStatus("room not available");
+        });
+      } else {
+        const response = await fetchRoomStatusAPI(
+          data.roomId,
+          formData.entryDate,
+          formData.exitDate
+        );
+
+        setSize(response.data.count);
+        response.data.count < data.maxsize ? setStatus("room available") : setStatus("room not available");
+      }
+    } catch(err) {
+
     }
   };
 
@@ -202,58 +208,75 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
 
   // fetch API to get petname
   useEffect(() => {
-    if (!user) return;
+    // if (!user) return;
 
-    if (data.headerType == "Service") {
-      fetchCustomerPets(
-        user.customer.id,
-        ["name", "type"],
-        localStorage.getItem("token")
-      ).then((res) => setPetData(res.data));
-    } else {
-      fetchAvailablePetAPI(
-        user.customer.id,
-        localStorage.getItem("token")
-      ).then((res) => setPetData(res.data));
+    // if (data.headerType == "Service") {
+    //   fetchCustomerPets(
+    //     user.customer.id,
+    //     ["name", "type"],
+    //     localStorage.getItem("token")
+    //   ).then((res) => setPetData(res.data));
+    // } else {
+    //   fetchAvailablePetAPI(
+    //     user.customer.id,
+    //     localStorage.getItem("token")
+    //   ).then((res) => setPetData(res.data));
+    // }
+    // setCurrentPage(1);
+    const fetchPetData = async () => {
+      if (!user) return;
+
+      try {
+        let response;
+        if (data.headerType === 'Service') {
+          response = await fetchCustomerPets(user.customer.id, ["name", "type"]);
+        } else {
+          response = await fetchAvailablePetAPI(user.customer.id);
+        }
+        setPetData(response);
+      } catch(err) {
+        console.error("Failed to fetch pet data:", err);
+      }
     }
+
+    fetchPetData();
     setCurrentPage(1);
-  }, [user]);
+  }, [user, data.headerType]);
 
   // fetch new comment data when currentPage change
   useEffect(() => {
-    if (data) {
-      if (data.headerType == "Service") {
-        fetchServiceReviewsAPI(data.name, commentStarSelect, currentPage).then(
-          (comments) => {
-            if (comments.success) {
-              setCommentStatus(true);
-              comments.data.forEach((comment) => {
-                comment.comment_star = comment.comment_star.toFixed(1);
-              });
-              setComments(comments.data);
-            } else {
-              setCommentStatus(false);
-              setComments([]);
-            }
-          }
-        );
-      } else {
-        fetchRoomReviewsAPI(data.roomId, commentStarSelect, currentPage).then(
-          (comments) => {
-            if (comments.success) {
-              setCommentStatus(true);
-              comments.data.forEach((comment) => {
-                comment.comment_star = comment.comment_star.toFixed(1);
-              });
-              setComments(comments.data);
-            } else {
-              setCommentStatus(false);
-              setComments([]);
-            }
-          }
-        );
+    const fetchReviews = async () => {
+      if (!data) return;
+      try {
+        let commentResponse;
+  
+        if (data.headerType === 'Service') {
+          commentResponse = await fetchServiceReviewsAPI(
+            data.name,
+            commentStarSelect,
+            currentPage
+          );
+        } else {
+          commentResponse = await fetchRoomReviewsAPI(
+            data.roomId,
+            commentStarSelect,
+            currentPage
+          );
+        }
+
+        setCommentStatus(true);
+        commentResponse.data.forEach((comment) => {
+          comment.comment_star = comment.comment_star.toFixed(1);
+        })
+        setComments(commentResponse.data);
+      } catch(err) {
+        console.error("Failed to fetch reviews:", err);
+        setCommentStatus(false);
+        setComments([]);
       }
     }
+
+    fetchReviews();
   }, [data, currentPage, commentStarSelect]);
 
   return (

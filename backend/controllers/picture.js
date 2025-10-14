@@ -10,7 +10,10 @@ const bucket = storage.bucket('paw_image');
 
 const uploadImage = async (req, res) => {
     if(!req.file){
-        return res.status(400).send('No file uploaded.');
+        return res.status(400).json({
+            success: false,
+            message: "Please select an image to upload"
+        });
     }
     
     // Debugging logs to confirm file is received
@@ -33,7 +36,10 @@ const uploadImage = async (req, res) => {
 
     blobStream.on('error', (err) => {
         console.error('GCS Upload Stream Error:', err.message); // Log the specific error message
-        res.status(500).json({ success: false, error: 'Upload failed due to GCS stream error.' });
+        res.status(500).json({
+            success: false,
+            message: "Unable to upload image. Please try again later"
+        });
     });
 
     blobStream.on('finish', async () => {
@@ -50,7 +56,10 @@ const uploadImage = async (req, res) => {
         } catch (dbError) {
             // Catch error if subsequent steps fail (e.g., database update logic if it were here)
             console.error('Post-upload processing error:', dbError.message);
-            res.status(500).json({success: false, error: 'Upload succeeded but failed to finalize access.' });
+            res.status(500).json({
+                success: false,
+                message: "Image uploaded but couldn't be saved. Please try again"
+            });
         }
     });
 

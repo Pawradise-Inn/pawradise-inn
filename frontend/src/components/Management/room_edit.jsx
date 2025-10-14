@@ -26,7 +26,7 @@ const RoomEdit = () => {
     const loadRooms = async () => {
       try {
         const response = await fetchAllRoomsAPI();
-        setRooms(response.data);
+        setRooms(response);
       } catch (err) {
         console.error("Failed to fetch rooms:", err);
         setError("Could not load Rooms. Please try again later.");
