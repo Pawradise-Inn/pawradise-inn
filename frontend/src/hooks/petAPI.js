@@ -22,8 +22,8 @@ export const deletePetAPI = async (id) => {
   return response.data;
 };
 
-export const updatePetStatusAPI = async (pet) => {
-  const response = await axiosInstance.patch(API_URL, pet);
+export const updatePetStatusAPI = async (id, status) => {
+  const response = await axiosInstance.patch(`${API_URL}/${id}`, {status});
   return response.data;
 };
 
