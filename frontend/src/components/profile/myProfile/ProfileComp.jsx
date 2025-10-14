@@ -100,7 +100,7 @@ const ProfileComp = () => {
     }
 
     setShowDeleteModal(false);
-    setUser?.(null);z 
+    setUser?.(null); 
     deleteMeAPI().then((data) => {
       console.log(data)
       localStorage.removeItem("token");
@@ -110,7 +110,7 @@ const ProfileComp = () => {
         header: "Account deletion confirmed",
         text: "Your account would be deleted. Any active bookings (if any) would be automatically declined."
       });
-      navigate("/", { replace: true })
+      navigate("/register", { replace: true })
     })
     .catch((err) => {
       createNotification("fail", "Delete failed", "Failed to delete.");
