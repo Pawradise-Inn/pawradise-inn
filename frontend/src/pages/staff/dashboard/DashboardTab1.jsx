@@ -185,11 +185,12 @@ const DashboardTab1 = () => {
     const loadRooms = async () => {
       try {
         setLoading(true);
-        const data = await getTodayRoom();
-        setItems(data || []);
+        const response = await getTodayRoom();
+        // Ensure we're setting an array, even if empty
+        setItems(Array.isArray(response?.data) ? response.data : []);
       } catch (error) {
-        //setItem([]); just an enpty string ;
         console.error("Failed to fetch rooms:", error);
+        setItems([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
@@ -198,9 +199,9 @@ const DashboardTab1 = () => {
   }, []);
 
   const filtered = !search
-    ? items
-    : items.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+    ? (items || [])
+    : (items || []).filter((item) =>
+        item?.name?.toLowerCase().includes(search.toLowerCase())
       );
 
   const handleClosePopup = () => {
@@ -315,7 +316,7 @@ const DashboardTab1 = () => {
                  {" "}
       {loading ? (
         <p style={feedbackStyle}>Loading bookings...</p>
-      ) : filtered.length === 0 ? (
+      ) : !Array.isArray(filtered) || filtered.length === 0 ? (
         <p style={feedbackStyle}>No results found.</p>
       ) : (
         <div style={listContainerStyle}>

@@ -87,7 +87,7 @@ const App = () => {
         <Route
           path="/staff/dashboard"
           element={
-            <RequireAuth roles={["staff", "admin"]}>
+            <RequireAuth roles={["STAFF", "ADMIN"]}>
               <Dashboard />
             </RequireAuth>
           }
@@ -101,7 +101,7 @@ const App = () => {
         <Route
           path="/staff/pet-status"
           element={
-            <RequireAuth roles={["staff", "admin"]}>
+            <RequireAuth roles={["STAFF", "ADMIN"]}>
               <PetStatus />
             </RequireAuth>
           }
@@ -109,7 +109,7 @@ const App = () => {
         <Route
           path="/staff/pet/:id"
           element={
-            <RequireAuth roles={["staff", "admin"]}>
+            <RequireAuth roles={["STAFF", "ADMIN"]}>
               <PetUpdate />
             </RequireAuth>
           }
@@ -117,7 +117,7 @@ const App = () => {
         <Route
           path="/staff/review"
           element={
-            <RequireAuth roles={["staff", "admin"]}>
+            <RequireAuth roles={["STAFF", "ADMIN"]}>
               <StaffReview />
             </RequireAuth>
           }
@@ -125,7 +125,7 @@ const App = () => {
         <Route
           path="/staff/management"
           element={
-            <RequireAuth roles={["staff", "admin"]}>
+            <RequireAuth roles={["STAFF", "ADMIN"]}>
               <Management />
             </RequireAuth>
           }
