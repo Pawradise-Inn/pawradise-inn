@@ -26,10 +26,6 @@ const NewPet = () => {
   });
   const [petImagePreview, setPetImagePreview] = useState("");
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
-
   const fields = [
     {
       label: "Pet name",
@@ -59,8 +55,6 @@ const NewPet = () => {
 
   const handleImageClick = () => {
     fileInputRef.current.click();
-    //console.log(user)
-
   };
 
   // FIXED: Added missing closing bracket for handleImageChange
@@ -77,8 +71,6 @@ const NewPet = () => {
       reader.readAsDataURL(file);
     }
   }; // <-- Added this bracket
-
-  //console.log(user);
 
   const handleConfirm = () => {
     // Check for missing form data (initial synchronous validation)

@@ -1,7 +1,6 @@
 import { motion } from "motion/react";
 
 const BookingCard = ({ book, onCancelClick, ...motionProps }) => {
-  console.log("BookingCard Rendered:", book);
   return (
     <motion.div
       className="flex items-center bg-[var(--cream-color)] rounded-lg p-4 shadow-lg mb-6"

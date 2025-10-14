@@ -384,8 +384,6 @@ const getRoomReviews = async (req, res) => {
       });
     }
 
-    console.log(reviews)
-
     const formattedReviews = reviews.map((r) => ({
       id: r.id,
       commenter_name: r.customer?.user.user_name || "Anonymous",

@@ -10,14 +10,9 @@ const PetUpdate = () => {
   const [pet, setPet] = useState({});
   const [status, setStatus] = useState("");
   const fetchPet = async () => {
-    try {
-      const response = await fetchPetAPI(id);
-      console.log(response);
-      setPet(response);
-      setStatus(response.status);
-    } catch (err) {
-      console.err(err);
-    }
+    const response = await fetchPetAPI(id);
+    setPet(response);
+    setStatus(response.status);
   };
   useEffect(() => {
     fetchPet();
@@ -101,33 +96,40 @@ const PetUpdate = () => {
 
   const handleSave = () => {
     createNotification({
-      status: "warning", 
-      header: "Confirmation", 
-      text: "Are you sure?", 
+      status: "warning",
+      header: "Confirmation",
+      text: "Are you sure?",
       onClick: async () => {
         try {
           const { scheduled, stayed, ...updatePet } = pet;
-          updatePet.status = status; 
-          console.log("update pet", updatePet);
+          updatePet.status = status;
           updatePetAPI(id, updatePet);
           setPet(updatePet);
-          createNotification("success", "Update Successful", "Pet details have been saved.");
+          createNotification(
+            "success",
+            "Update Successful",
+            "Pet details have been saved."
+          );
           navigate("/staff/pet status");
-        } catch(error) {
+        } catch (error) {
           console.error("Interceptor handled the update error:", error);
         }
-      }
-    })
+      },
+    });
   };
   const handleCancel = () => {
-    createNotification("warning", "Confirmation", "Back to status page?", () => {
-      navigate("/staff/pet status");
-
-    })
+    createNotification(
+      "warning",
+      "Confirmation",
+      "Back to status page?",
+      () => {
+        navigate("/staff/pet status");
+      }
+    );
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="p-6 max-w-8xl"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -141,7 +143,7 @@ const PetUpdate = () => {
       {/* Columns */}
       <div className="flex gap-8">
         {/* Left Column */}
-        <motion.div 
+        <motion.div
           className="flex flex-col flex-1 justify-between"
           initial={{ x: -100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -167,7 +169,7 @@ const PetUpdate = () => {
           </div>
         </motion.div>
         {/* Right Column */}
-        <motion.div 
+        <motion.div
           className="flex-1 flex flex-col"
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -195,7 +197,7 @@ const PetUpdate = () => {
 
 const PetCard = ({ pet }) => {
   return (
-    <motion.div 
+    <motion.div
       className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg"
       whileHover={{ scale: 1.02 }}
     >

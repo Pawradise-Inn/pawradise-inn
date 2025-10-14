@@ -56,7 +56,6 @@ const BookingRoom = () => {
     const loadInitialRooms = async () => {
       try {
         const roomsData = await fetchAllRoomsWithPaginationAPI();
-        console.log("API Response:", roomsData); // Add this line
         roomsData.data.forEach((room) => {
           room.headerType = "Room";
           room.reviewStar = room.reviewStar.toFixed(1);
