@@ -25,10 +25,18 @@ const getCustomerProfile = async(req, res)=>{ //requirement: 2
                 }
             }
         });
-        if(!customerWithPets) return res.status(404).json({success: false, error: "Customer is not found"});
+        if(!customerWithPets) {
+            return res.status(404).json({
+                success: false, 
+                message: "Customer profile not found"
+            });
+        }
         res.status(200).json({success: true, data: customerWithPets});
     }catch(err){
-        res.status(500).json({success: false, error: err.message});
+        res.status(500).json({
+            success: false, 
+            message: "Unable to fetch customer profile. Please try again later"
+        });
     }
 };
 
@@ -45,6 +53,12 @@ const updateCustomerProfile = async(req, res)=>{
                 id: customerId
             }
         });
+        if (!customer) {
+            return res.status(404).json({
+                success: false,
+                message: "Customer profile not found"
+            });
+        }
         const user = await prisma.user.update({
             where: {id: customer.userId},
             data: {
@@ -57,7 +71,13 @@ const updateCustomerProfile = async(req, res)=>{
         });
         res.status(200).json({success: true, data: user});
     }catch(err){
-        res.status(500).json({success: false, error: err.message});
+        if (err.code === 'P2002') {
+            return res.status(409).json({
+                success: false,
+                message: "This email or username is already in use"
+            });
+        }
+        res.status(500).json({success: false, message: "Unable to update customer profile. Please try again later"});
     }
 }
 

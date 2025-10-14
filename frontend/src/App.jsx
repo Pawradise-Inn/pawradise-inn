@@ -23,7 +23,7 @@ import DashboardTab3 from "./pages/staff/dashboard/DashboardTab3";
 import DashboardTab4 from "./pages/staff/dashboard/DashboardTab4";
 import PetStatus from "./pages/staff/PetStatus";
 import PetUpdate from "./pages/staff/PetUpdate";
-import StaffReview from "./pages/staff/StaffReview";
+import StaffReview from "./pages/staff/StaffReview/StaffReview";
 import RequireAuth from "./utils/RequireAuth";
 import Review from "./pages/customer/Review";
 import ReviewComp from "./components/review/ReviewComp";
@@ -68,7 +68,10 @@ const App = () => {
           }
         />
 
-        <Route path="/profile" element={<Profile />}>
+        <Route path="/profile" element={
+          <RequireAuth>
+            <Profile />
+          </RequireAuth>}>
           <Route index element={<ProfileComp />} />
           <Route path="booking" element={<BookingComp />} />
           <Route path="pet" element={<PetComp />} />
@@ -87,7 +90,7 @@ const App = () => {
         <Route
           path="/staff/dashboard"
           element={
-            <RequireAuth roles={["staff", "admin"]}>
+            <RequireAuth roles={["STAFF", "ADMIN"]}>
               <Dashboard />
             </RequireAuth>
           }
@@ -101,7 +104,7 @@ const App = () => {
         <Route
           path="/staff/pet-status"
           element={
-            <RequireAuth roles={["staff", "admin"]}>
+            <RequireAuth roles={["STAFF", "ADMIN"]}>
               <PetStatus />
             </RequireAuth>
           }
@@ -109,7 +112,7 @@ const App = () => {
         <Route
           path="/staff/pet/:id"
           element={
-            <RequireAuth roles={["staff", "admin"]}>
+            <RequireAuth roles={["STAFF", "ADMIN"]}>
               <PetUpdate />
             </RequireAuth>
           }
@@ -117,7 +120,7 @@ const App = () => {
         <Route
           path="/staff/review"
           element={
-            <RequireAuth roles={["staff", "admin"]}>
+            <RequireAuth roles={["STAFF", "ADMIN"]}>
               <StaffReview />
             </RequireAuth>
           }
@@ -125,7 +128,7 @@ const App = () => {
         <Route
           path="/staff/management"
           element={
-            <RequireAuth roles={["staff", "admin"]}>
+            <RequireAuth roles={["STAFF", "ADMIN"]}>
               <Management />
             </RequireAuth>
           }

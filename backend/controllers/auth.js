@@ -47,8 +47,23 @@ exports.register = async (req, res, next) => {
     console.log("User created:", user)
     sendTokenResponse(user, 200, res);
   } catch (error) {
-    console.error(error); // 👈 log it
-    res.status(500).json({ success: false, error: error.message });
+    console.error(error);
+    
+    // Handle unique constraint violations
+    if (error.code === 'P2002') {
+      const field = error.meta?.target[0];
+      return res.status(409).json({ 
+        success: false, 
+        message: `This ${field} is already taken` 
+      });
+    }
+    
+    // Handle other errors
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Unable to create account. Please try again later.', 
+      error: error.message
+    });
   }
 };
 
@@ -81,12 +96,12 @@ exports.getMe = async (req, res) => {
     });
 
     if (!user)
-      return res.status(404).json({ success: false, error: "User not found" });
+      return res.status(404).json({ success: false, message: "Profile not found. Please try again" });
 
     res.status(200).json({ success: true, data: user });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch profile. Please try again later" });
   }
 };
 
@@ -119,10 +134,10 @@ exports.updateMe = async (req, res) => {
         role: true,
       },
     });
-    if (!user) return res.status(404).json({ success: false, error: "User not found" });
+    if (!user) return res.status(404).json({ success: false, message: "Profile not found. Please try again" });
     res.status(200).json({ success: true, data: user });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message, message: "Unable to update profile. Please try again later" });
   }
 };
 
@@ -141,7 +156,7 @@ exports.deleteMe = async (req, res) => {
     });
     res.status(200).json({ success: true, message: 'Deleted and Logged out' });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message, message: "Unable to delete profile. Please try again later" });
   }
 };
 
@@ -149,12 +164,12 @@ exports.login = async (req, res, next) => {
     const { userName, password } = req.body;
 
     if (!userName || !password) {
-        return res.status(400).json({ success: false, message: 'Please provide an email and password' });
+        return res.status(400).json({ success: false, message: 'Please enter both username and password' });
     }
 
     const user = await findUserByUsername(userName);
     if (!user) {
-        return res.status(401).json({ success: false, message: 'username or password are wrong' });
+        return res.status(401).json({ success: false, message: 'Invalid username or password' });
     }
 
     // Match password

@@ -1,17 +1,13 @@
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance";
 
-const API_URL = "http://localhost:5000/api/v1/customer";
+const API_URL = "/api/v1/customer";
 
-export const fetchCustomerAPI = async (id, token = localStorage.getItem("token")) => {
-  const response = await axios.get(`${API_URL}/${id}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+export const fetchCustomerAPI = async (id) => {
+  const response = await axiosInstance.get(`${API_URL}/${id}`);
   return response.data;
 };
 
-export const updateCustomerAPI = async (id, customer, token = localStorage.getItem("token")) => {
-  const response = await axios.put(`${API_URL}/${id}`, customer, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+export const updateCustomerAPI = async (id, customer) => {
+  const response = await axiosInstance.put(`${API_URL}/${id}`, customer);
   return response.data;
 };
