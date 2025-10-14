@@ -58,37 +58,34 @@ const ProfileComp = () => {
   }, [user]);
 
   const handleCancel = () => {
-    createNotification("warning", "Are you sure to cancel your change?", "Your modified infomation will be discarded.", () => {
+    createNotification({status: "warning",header: "Are you sure to cancel your change?",text: "Your modified infomation will be discarded.",onClick: () => {
       if(user) setNewUser({id: user.id, ... user})
-    })
+    }})
   };
   const handleConfirm = async (e) => {
     e.preventDefault();
     if (!newUser.id) return;
-    createNotification(
-      "warning",
-      "Confirmation.",
-      "Are you sure to update the data?",
-      () => {
+    createNotification({
+      status: "warning",
+      header: "Confirmation.",
+      text: "Are you sure to update the data?",
+      onClick: async () => {
         try {
           const { id, ...userObjected } = newUser;
-          updateCustomerAPI(user.customer.id, userObjected).then((data) => {
-          console.log("data:",data)
-          setUser?.(data); 
-          createNotification(
-            "success",
-            "Profile updated successfully!",
-            "Your update has been saved."
-          );
-          })
-          .catch((err) => {
-            console.error("Update failed:", err);
-          });
-} catch (err) {
- console.error(err);
- }
-}
- );
+          const data = await updateCustomerAPI(user.customer.id, userObjected);
+          console.log("data:", data);
+          setUser?.(data.data); 
+          createNotification({
+            status: "success",
+            header: "Profile updated successfully!",
+            text: "Your update has been saved."
+        });
+        } catch (err) {
+          console.error("Update failed:", err);
+          // The axios interceptor will handle showing the error notification
+        }
+      }
+  });
   };
   const openDeleteModal = () => {
     setPassword("");
@@ -103,7 +100,7 @@ const ProfileComp = () => {
     }
 
     setShowDeleteModal(false);
-    setUser?.(null);
+    setUser?.(null);z 
     deleteMeAPI().then((data) => {
       console.log(data)
       localStorage.removeItem("token");
@@ -213,7 +210,7 @@ const ProfileComp = () => {
               className="absolute right-4 top-3 text-2xl leading-none hover:opacity-70"
               aria-label="Close"
             >
-              ×
+              
             </button>
 
             <h2 className="text-center text-3xl font-extrabold mb-6">

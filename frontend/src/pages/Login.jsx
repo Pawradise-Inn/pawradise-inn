@@ -60,10 +60,10 @@ export default function Login({
       const res = await loginAPI(form.Username, form.Password);
       if (res?.token) {
         localStorage.setItem("token", res.token);
-        localStorage.setItem("user", JSON.stringify(res.user));
         const userData = await getMeAPI();
         if (userData?.data) {
           setUser(userData.data);
+          localStorage.setItem("user", JSON.stringify(userData.data));
         }
         createNotification({
           status: 'success',
