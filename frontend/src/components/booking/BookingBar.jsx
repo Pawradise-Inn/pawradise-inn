@@ -224,7 +224,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     // }
     // setCurrentPage(1);
     const fetchPetData = async () => {
-      if (!user) return;
+      if (!user || !user.pet) return;
 
       try {
         let response;
@@ -246,7 +246,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   // fetch new comment data when currentPage change
   useEffect(() => {
     const fetchReviews = async () => {
-      if (!data) return;
+      if (!data.data) return;
       try {
         let commentResponse;
   
