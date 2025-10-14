@@ -260,10 +260,6 @@ const getServiceReviews = async (req, res) => { //requirement: 5
       }
     });
 
-    if (!reviews || reviews.length === 0) {
-      return res.status(200).json({ success: false, msg: "No reviews found for this service" });
-    }
-
     const formattedReviews = reviews.map(r => ({
         id: r.id,
       commenter_name: r.customer?.user.user_name || "Anonymous",

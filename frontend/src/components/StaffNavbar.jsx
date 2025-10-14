@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import Logo from "../assets/logo.png";
 
 const Navbar = () => {
-  const pages = ["dashboard", "pet status", "review", "management"];
+  const pages = ["dashboard", "pet-status", "review", "management"];
   return (
     <nav className="bg-white shadow-md px-10 py-4 flex items-center justify-between">
       {/* Logo */}
