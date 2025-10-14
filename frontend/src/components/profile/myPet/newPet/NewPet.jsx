@@ -86,32 +86,31 @@ const handleConfirm = () => {
         !formData.petType ||
         !formData.petBreed ||
         !formData.medicalCondition ||
-        !formData.foodAllergy ||
-        isNaN(formData.age)
+        !formData.foodAllergy
     ) {
-        if(isNaN(formData.age)) {
-          createNotification(
-              "fail",
-              "Invalid Age",
-              "Please provide a valid number for pet age."
-          );
+        if(isNaN(formData.petAge)) {
+          createNotification({
+              status: "fail",
+              header: "Invalid Age",
+              text: "Please provide a valid number for pet age."
+          });
         }
         else{
-          createNotification(
-            "fail",
-            "Fail to create a pet",
-            "Please provide all required pet information."
-        );
+          createNotification({
+            status: "fail",
+            header: "Fail to create a pet",
+            text: "Please provide all required pet information."
+          });
         }
         return; // Stop execution if validation fails
     }
 
     // Launch confirmation notification, which executes the async logic upon confirmation
-    createNotification(
-        "warning",
-        "Confirmation",
-        "Create this new pet?",
-        async () => {
+    createNotification({
+        status: "warning",
+        header: "Confirmation",
+        text: "Create this new pet?",
+        onClick: async () => {
             let pictureUrl = "default.img"; // Default image if no file is selected
 
             try {
@@ -137,6 +136,7 @@ const handleConfirm = () => {
                     picture: pictureUrl, // **Use the GCS URL here**
                     customerId: user.customer.id,
                 };
+                console.log(newPet)
 
                 // 3. REGISTER PET IN DATABASE
                 // Assuming registerPetAPI handles the actual insertion into the 'pet' table
@@ -160,24 +160,24 @@ const handleConfirm = () => {
                 setUser({ ...user, customer: updatedCustomerData });
 
                 // 7. SUCCESS & REDIRECT
-                createNotification(
-                    "success",
-                    "Pet has been created!",
-                    "Your pet has been successfully saved."
-                );
+                createNotification({
+                    status: "success",
+                    text: "Pet has been created!",
+                    header: "Your pet has been successfully saved."
+                });
                 navigate("/profile/pet");
 
             } catch (error) {
                 // Catch any API errors during upload, registration, or update
                 console.error("Pet creation failed:", error);
-                createNotification(
-                    "fail",
-                    "Operation Failed",
-                    "An error occurred during pet creation. Please try again."
-                );
+                createNotification({
+                    status: "fail",
+                    header: "Operation Failed",
+                    text: "An error occurred during pet creation. Please try again."
+            });
             }
         }
-    );
+    });
 };
 
   const handleCancel = () => {
