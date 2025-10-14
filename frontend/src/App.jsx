@@ -68,7 +68,10 @@ const App = () => {
           }
         />
 
-        <Route path="/profile" element={<Profile />}>
+        <Route path="/profile" element={
+          <RequireAuth>
+            <Profile />
+          </RequireAuth>}>
           <Route index element={<ProfileComp />} />
           <Route path="booking" element={<BookingComp />} />
           <Route path="pet" element={<PetComp />} />

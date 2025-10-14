@@ -105,11 +105,11 @@ const ProfileComp = () => {
       console.log(data)
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
-      createNotification(
-        "success",
-        "Account deletion confirmed",
-        "Your account would be deleted. Any active bookings (if any) would be automatically declined."
-      );
+      createNotification({
+        status: "success",
+        header: "Account deletion confirmed",
+        text: "Your account would be deleted. Any active bookings (if any) would be automatically declined."
+      });
       navigate("/", { replace: true })
     })
     .catch((err) => {
