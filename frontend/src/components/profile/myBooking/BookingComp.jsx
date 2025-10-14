@@ -24,7 +24,6 @@ const BookingComp = () => {
     const getMyBookings = async () => {
       try {
         const data = await fetchMyBookings();
-        console.log(data);
         // Flatten all booked_service into one array
         const allServices = data.flatMap((book) => book.booked_service);
         setAllBookedService(allServices);

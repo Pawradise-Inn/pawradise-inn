@@ -44,7 +44,6 @@ exports.register = async (req, res, next) => {
       await prisma.staff.create({ data: { userId: user.id, wages: 0, bank_account: "TBD" } });
     }
 
-    console.log("User created:", user)
     sendTokenResponse(user, 200, res);
   } catch (error) {
     console.error(error);
