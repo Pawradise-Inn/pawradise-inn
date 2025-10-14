@@ -31,3 +31,9 @@ export const logoutAPI = async () => {
   const res = await axiosInstance.post(`${API_URL}/logout`,{});
   return res.data;
 };
+
+// Delete current user
+export const deleteMeAPI = async () => {
+  const res = await axiosInstance.delete(`${API_URL}/me`);
+  return res.data;
+}
