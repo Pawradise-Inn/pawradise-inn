@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const {
   register,
   getPet,
@@ -7,20 +7,35 @@ const {
   deletePet,
   getAllPets,
   getCustomerPets,
-  getCustomerPetNamesWithAvailable
-} = require('../controllers/pet');
-const {protect, authorize} = require('../middleware/auth');
+  getCustomerPetNamesWithAvailable,
+} = require("../controllers/pet");
+const { protect, authorize } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.route("/").get(getAllPets)
+router.route("/").get(getAllPets);
 
-router.route("/:id").get(getPet).put(updatePet).delete(deletePet).patch(updatePetStatus)
+router
+  .route("/:id")
+  .get(protect, authorize("CUSTOMER", "STAFF"), getPet)
+  .put(protect, authorize("CUSTOMER", "STAFF"), updatePet)
+  .delete(protect, authorize("CUSTOMER", "STAFF"), deletePet)
+  .patch(protect, authorize("CUSTOMER", "STAFF"), updatePetStatus);
 
-router.route("/register").post(register);
+router
+  .route("/register")
+  .post(protect, authorize("CUSTOMER", "STAFF"), register);
 
-router.route("/available").get(getCustomerPetNamesWithAvailable)
+router
+  .route("/available")
+  .get(
+    protect,
+    authorize("CUSTOMER", "STAFF"),
+    getCustomerPetNamesWithAvailable
+  );
 
-router.route("/:id/available").get(getCustomerPets)
+router
+  .route("/:id/available")
+  .get(protect, authorize("CUSTOMER", "STAFF"), getCustomerPets);
 
 module.exports = router;

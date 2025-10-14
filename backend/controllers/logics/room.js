@@ -42,8 +42,6 @@ const removeRoomPictures = async(id, pictures)=>{
 
 const getRoomCap = async(id)=>{
     const room = await findRoomById(id);
-    console.log(room, room.capacity);
-
     return room.capacity;
 }
 

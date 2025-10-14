@@ -16,10 +16,6 @@ const uploadImage = async (req, res) => {
         });
     }
     
-    // Debugging logs to confirm file is received
-    console.log("File received by Multer:", req.file.originalname); 
-    console.log("File buffer size:", req.file.buffer.length); 
-    
     // 1. Combine filename parts into a single string using template literal
     // We use a unique timestamp + the original file extension
     const filename = `${Date.now()}${path.extname(req.file.originalname)}`;
