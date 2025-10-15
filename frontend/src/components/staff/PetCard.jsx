@@ -6,7 +6,7 @@ const PetCard = ({ pet }) => {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
     >
-      <NavLink to={`/staff/pet/${pet.id}`}>
+      <NavLink to={`/staff/pet-status/${pet.id}`}>
         <div className="mx-5 bg-[var(--cream-color)] border-1 border-color-[var(--dark-brown-color)] rounded-xl p-4 shadow-lg flex flex-col space-y-4 hover:shadow-xl transition-all duration-300 cursor-pointer">
           <div className="w-full aspect-square bg-gray-200 rounded mb-4 flex items-center justify-center overflow-hidden">
             <img

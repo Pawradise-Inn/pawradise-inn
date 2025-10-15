@@ -3,7 +3,7 @@ import { AnimatePresence } from "motion/react";
 import {  useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthProvider";
 import { deleteBookedService } from "../../../hooks/bookedServiceAPI";
-import { fetchMyBookings } from "../../../hooks/bookingAPI"; // Import cancelBooking
+import { createBooking, fetchMyBookingAPI, fetchMyBookings } from "../../../hooks/bookingAPI"; // Import cancelBooking
 import { overlay, popUP, startUpVariants } from "../../../styles/animation";
 import { removeWindowScroll } from "../../../utils/handlePopup";
 import Overlay from "../../Overlay";
@@ -24,8 +24,9 @@ const BookingComp = () => {
     const getMyBookings = async () => {
       try {
         const data = await fetchMyBookings();
+        console.log(data)
         // Flatten all booked_service into one array
-        const allServices = data.flatMap((book) => book.booked_service);
+        const allServices = data.data.flatMap((book) => book.booked_service);
         setAllBookedService(allServices);
       } catch (error) {
         console.error("Failed to fetch bookings:", error);

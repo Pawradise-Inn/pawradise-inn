@@ -164,6 +164,7 @@ const checkBookingStatus = async (req, res) => {
 const getMyBookings = async (req, res) => {
   try {
     const customerId = Number(req.user.roleId);
+    console.log(customerId)
 
     const bookings = await prisma.booking.findMany({
       where: { customerId },
@@ -192,6 +193,7 @@ const getMyBookings = async (req, res) => {
         }
       },
     });
+    console.log(bookings)
 
     res.status(200).json({ success: true, data: bookings });
   } catch (err) {
