@@ -7,6 +7,9 @@ import {
   deleteBookedRoom,
   getTodayRoom,
 } from "../../../hooks/bookedRoomAPI";
+import Overlay from "../../../components/Overlay";
+import { overlay, popUP } from "../../../styles/animation";
+import { AnimatePresence, motion } from "motion/react";
 
 // --- Helper Components ---
 
@@ -48,17 +51,15 @@ const DashboardCard = ({ data, onDelete }) => {
 
   return (
     <div style={cardStyle}>
-                  <div style={imagePlaceholderStyle}></div>           {" "}
+      <div style={imagePlaceholderStyle}></div>{" "}
       <div style={textContainerStyle}>
-                        <p style={nameStyle}>{data.name}</p>               {" "}
-        <p style={detailStyle}>{data.petName}</p>               {" "}
-        <p style={detailStyle}>{data.timeBooked}</p>           {" "}
-      </div>
-                 {" "}
+        <p style={nameStyle}>{data.name}</p>{" "}
+        <p style={detailStyle}>{data.petName}</p>{" "}
+        <p style={detailStyle}>{data.timeBooked}</p>{" "}
+      </div>{" "}
       <button onClick={onDelete} style={deleteButtonStyle}>
         Delete
-      </button>
-             {" "}
+      </button>{" "}
     </div>
   );
 };
@@ -67,7 +68,7 @@ const DashboardCard = ({ data, onDelete }) => {
  * MODIFIED: The ItemPopup is now only for adding new items.
  * Edit and delete functionalities have been removed from the popup.
  */
-const ItemPopup = ({ onClose, onSave }) => {
+const ItemPopup = ({ onClose, onSave, ...motionProps }) => {
   const [name, setName] = useState("");
   const [petName, setPetName] = useState("");
   const [timeBooked, setTimeBooked] = useState("");
@@ -79,25 +80,7 @@ const ItemPopup = ({ onClose, onSave }) => {
       timeBooked: timeBooked || "Scheduled Time",
     });
   };
-  const popupOverlayStyle = {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000,
-  };
-  const popupContentStyle = {
-    backgroundColor: "white",
-    padding: "2rem",
-    borderRadius: "8px",
-    width: "90%",
-    maxWidth: "500px",
-  };
+  // Converted to Tailwind classes below
   const inputStyle = {
     width: "100%",
     padding: "0.5rem",
@@ -119,58 +102,51 @@ const ItemPopup = ({ onClose, onSave }) => {
   };
 
   return (
-    <div style={popupOverlayStyle} onClick={onClose}>
-                 {" "}
-      <div style={popupContentStyle} onClick={(e) => e.stopPropagation()}>
-                        <h2>Add New Booking</h2>
-                       {" "}
-        <input
-          type="text"
-          placeholder="Enter room name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={inputStyle}
-        />
-                       {" "}
-        <input
-          type="text"
-          placeholder="Enter pet name"
-          value={petName}
-          onChange={(e) => setPetName(e.target.value)}
-          style={inputStyle}
-        />
-                       {" "}
-        <input
-          type="text"
-          placeholder="Enter time"
-          value={timeBooked}
-          onChange={(e) => setTimeBooked(e.target.value)}
-          style={inputStyle}
-        />
-                       {" "}
-        <div style={buttonContainerStyle}>
-                             {" "}
-          <button onClick={onClose} style={buttonStyle}>
-            Cancel
-          </button>
-                             {" "}
-          <button
-            onClick={handleSave}
-            style={{
-              ...buttonStyle,
-              backgroundColor: "#007bff",
-              color: "white",
-              border: "none",
-            }}
-          >
-            Save
-          </button>
-                         {" "}
-        </div>
-                   {" "}
-      </div>
-             {" "}
-    </div>
+    <motion.div
+      className="bg-white p-8 rounded-lg w-[90%] max-w-[500px] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
+      onClick={(e) => e.stopPropagation()}
+      {...motionProps}
+    >
+      <h2>Add New Booking</h2>{" "}
+      <input
+        type="text"
+        placeholder="Enter room name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        style={inputStyle}
+      />{" "}
+      <input
+        type="text"
+        placeholder="Enter pet name"
+        value={petName}
+        onChange={(e) => setPetName(e.target.value)}
+        style={inputStyle}
+      />{" "}
+      <input
+        type="text"
+        placeholder="Enter time"
+        value={timeBooked}
+        onChange={(e) => setTimeBooked(e.target.value)}
+        style={inputStyle}
+      />{" "}
+      <div style={buttonContainerStyle}>
+        {" "}
+        <button onClick={onClose} style={buttonStyle}>
+          Cancel
+        </button>{" "}
+        <button
+          onClick={handleSave}
+          style={{
+            ...buttonStyle,
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+          }}
+        >
+          Save
+        </button>{" "}
+      </div>{" "}
+    </motion.div>
   );
 };
 
@@ -199,7 +175,7 @@ const DashboardTab1 = () => {
   }, []);
 
   const filtered = !search
-    ? (items || [])
+    ? items || []
     : (items || []).filter((item) =>
         item?.name?.toLowerCase().includes(search.toLowerCase())
       );
@@ -216,11 +192,7 @@ const DashboardTab1 = () => {
       });
       setItems((prev) => [newItem, ...prev]);
       handleClosePopup();
-      createNotification(
-        "success",
-        "Saving Item",
-        "Item saved successfully"
-      )
+      createNotification("success", "Saving Item", "Item saved successfully");
     } catch (error) {
       console.error("Failed to save item:", error);
     }
@@ -228,7 +200,7 @@ const DashboardTab1 = () => {
   const handleDeleteItem = async (id) => {
     // Optional: Add a confirmation dialog before deleting
     // if (!window.confirm("Are you sure you want to delete this booking?")) {
-    //   return;
+    //  return;
     // }
     try {
       await deleteBookedRoom(id);
@@ -278,28 +250,24 @@ const DashboardTab1 = () => {
 
   return (
     <main style={mainStyle}>
-                 {" "}
+      {" "}
       <div style={headerStyle}>
-                       {" "}
+        {" "}
         <div className="flex flex-1 border-2 rounded-4xl px-6 py-4 text-3xl">
-                             {" "}
-          <i className="bi bi-search opacity-50 pr-2 flex justify-center items-center -bottom-1 relative"></i>
-                             {" "}
+          {" "}
+          <i className="bi bi-search opacity-50 pr-2 flex justify-center items-center -bottom-1 relative"></i>{" "}
           <input
             style={inputStyle}
             placeholder="search by room name"
             onChange={(e) => setSearch(e.target.value)}
             value={search}
-          />
-                         {" "}
-        </div>
-                       {" "}
+          />{" "}
+        </div>{" "}
         <div style={buttonGroupStyle}>
-                             {" "}
+          {" "}
           <button onClick={handleAddClick} style={buttonStyle}>
             add
-          </button>
-                             {" "}
+          </button>{" "}
           <button
             style={{
               ...buttonStyle,
@@ -308,34 +276,48 @@ const DashboardTab1 = () => {
             }}
           >
             delete
-          </button>
-                         {" "}
-        </div>
-                   {" "}
-      </div>
-                 {" "}
+          </button>{" "}
+        </div>{" "}
+      </div>{" "}
       {loading ? (
         <p style={feedbackStyle}>Loading bookings...</p>
       ) : !Array.isArray(filtered) || filtered.length === 0 ? (
         <p style={feedbackStyle}>No results found.</p>
       ) : (
         <div style={listContainerStyle}>
-                             {" "}
+          {" "}
           {filtered.map((item) => (
             <DashboardCard
               key={item.id}
               data={item}
               onDelete={() => handleDeleteItem(item.id)}
             />
-          ))}
-                         {" "}
+          ))}{" "}
         </div>
-      )}
-                 {" "}
-      {isPopupOpen && (
-        <ItemPopup onClose={handleClosePopup} onSave={handleSaveItem} />
-      )}
-                  <Outlet />       {" "}
+      )}{" "}
+      <AnimatePresence mode="popLayout">
+        {isPopupOpen && (
+          <>
+            <Overlay
+              variants={overlay}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              bgColor="black"
+              onClick={handleClosePopup}
+            />
+            <ItemPopup
+              variants={popUP}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              onClose={handleClosePopup}
+              onSave={handleSaveItem}
+            />
+          </>
+        )}
+      </AnimatePresence>
+      <Outlet />{" "}
     </main>
   );
 };

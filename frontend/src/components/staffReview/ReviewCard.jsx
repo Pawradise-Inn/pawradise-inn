@@ -61,7 +61,7 @@ const ReviewCard = ({
           <p className="truncate italic text-gray-600">This review is hidden</p>
           <button
             type="button"
-            className="cursor-pointer rounded-md bg-[#EADDCA] px-4 py-1.5 text-sm font-semibold text-[#6F4E37] transition-opacity hover:opacity-90"
+            className="cursor-pointer rounded-md bg-[var(--light-brown-color)] px-4 py-1.5 text-sm font-semibold transition-opacity hover:opacity-90"
             onClick={handleUnhide}
           >
             Unhide
@@ -86,7 +86,7 @@ const ReviewCard = ({
             <div className="flex justify-between gap-3">
               <p className="font-bold truncate">{review?.customerName}</p>
               <p className="flex-shrink-0 text-gray-600">
-                {ratingText} <span className="text-[#f5b32a]">★</span>
+                {ratingText} <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
               </p>
             </div>
 
@@ -119,9 +119,9 @@ const ReviewCard = ({
                       type="button"
                       disabled={isSaving}
                       onClick={handleSaveReply}
-                      className={`cursor-pointer rounded-lg px-5 py-2 text-sm font-semibold text-white transition-opacity ${
+                      className={`cursor-pointer rounded-lg px-5 py-2 text-sm font-semibold !text-white transition-opacity ${
                         isSaving ? "opacity-60" : "hover:opacity-90"
-                      } bg-[#6F4E37]`}
+                      } bg-[var(--brown-color)]`}
                     >
                       {isSaving ? "Saving..." : "Reply"}
                     </button>
@@ -134,7 +134,7 @@ const ReviewCard = ({
             <div className="mt-6 flex items-center justify-between">
               <button
                 type="button"
-                className="cursor-pointer rounded-lg bg-[#6F4E37] px-7 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                className="cursor-pointer rounded-lg bg-[var(--brown-color)] px-7 py-2.5 text-sm font-semibold !text-white transition-opacity hover:opacity-90"
                 onClick={() => onDelete?.(review?.id)}
               >
                 Delete
@@ -142,7 +142,7 @@ const ReviewCard = ({
               <div className="flex gap-4">
                 <button
                   type="button"
-                  className="cursor-pointer rounded-lg bg-[#EADDCA] px-7 py-2.5 text-sm font-semibold text-[#6F4E37] transition-opacity hover:opacity-90"
+                  className="cursor-pointer rounded-lg bg-[var(--light-brown-color)] px-7 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
                   onClick={handleHide}
                 >
                   Hide
