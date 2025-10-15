@@ -65,7 +65,7 @@ const ToBeReviewedPopUp = ({
 
   return (
     <motion.div
-      className="fixed w-dvw h-dvh top-0 left-0 z-20 overflow-y-auto overflow-x-hidden"
+      className="fixed w-dvw h-dvh top-0 left-0 z-20 overflow-x-hidden"
       {...motionProps}
     >
       <div className="absolute p-10 flex gap-5 w-9/10 max-w-5xl bg-white rounded-3xl top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -112,7 +112,7 @@ const ToBeReviewedPopUp = ({
               <b>Review detail</b>
             </p>
             <textarea
-              className="mb-2 w-full h-30 p-2 border-2 border-[var(--light-brown-color)] outline-0 bg-[var(--cream-color)] rounded-lg resize-none overflow-auto"
+              className="mb-2 w-full h-30 p-2 border-2 border-[var(--light-brown-color)] outline-0 bg-[var(--cream-color)] rounded-lg resize-none"
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
               placeholder="Write your review here"

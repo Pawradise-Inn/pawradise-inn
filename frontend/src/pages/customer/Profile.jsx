@@ -19,7 +19,7 @@ const Profile = () => {
 
       {/* Content Area */}
       <motion.div 
-        className="flex-1 p-6"
+        className="flex-1 p-6 overflow-y-hidden"
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}

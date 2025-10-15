@@ -8,6 +8,7 @@ import { getMeAPI, loginAPI } from "../hooks/authAPI";
 import { useAuth } from "../context/AuthProvider";
 import { startUpVariants } from "../styles/animation";
 import {useNotification} from "../context/notification/NotificationProvider"
+import { useScrollUpArrow } from "../context/ScrollUpArrowProvider";
 
 export default function Login({
   role: roleProp,
@@ -18,6 +19,12 @@ export default function Login({
   const location = useLocation();
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
+  const { setShow } = useScrollUpArrow();
+
+  useEffect(() => {
+    setShow(false);
+    return () => setShow(true);
+  }, []);
 
   const role = useMemo(() => {
     if (roleProp) return roleProp;

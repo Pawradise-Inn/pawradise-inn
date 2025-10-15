@@ -317,7 +317,7 @@ const DashboardTab1 = () => {
           </>
         )}
       </AnimatePresence>
-      <Outlet />{" "}
+      <Outlet className="overflow-y-hidden" />{" "}
     </main>
   );
 };

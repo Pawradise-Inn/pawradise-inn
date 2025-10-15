@@ -19,6 +19,7 @@ const ManagementSideBar = () => {
       link={link}
       currentPage={currentPage}
       setCurrentPage={setCurrentPage}
+      showLogout={true}
     />
   );
 };
