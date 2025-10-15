@@ -2,61 +2,55 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import testImage from "../../assets/test.png";
-import { updateChatLogAPI } from "../../hooks/chatlogAPI";
+import { deleteChatLogAPI, updateChatLogAPI } from "../../hooks/chatlogAPI";
+import { useOutletContext } from "react-router-dom";
 
-const ReviewPopup = ({
-  data,
-  setHistorys,
-  onClick,
-  editable,
-  ...motionProps
-}) => {
+const ReviewPopup = ({ data, onClick, editable, ...motionProps }) => {
   const { createNotification } = useNotification();
   const [newData, setNewData] = useState(data);
+  const { setHistorys } = useOutletContext();
 
-  const demoData =
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Error et distinctio dolorem fugiat inventore modi at architecto! Deleniti adipisci maxime minima nihil dolor. Facilis totam placeat optio minus eius ducimus qui quidem fuga odit, doloremque quaerat perspiciatis distinctio velit iusto sunt sapiente dolorum veritatis cupiditate, perferendis ea? Molestiae veritatis nihil quasi facere odio eius, quisquam perspiciatis cumque inventore nostrum modi eveniet minima ipsum recusandae suscipit dolorem doloremque porro aliquid ipsa, soluta at fugit quod deserunt. Magnam eaque autem vel ab nostrum maxime, eveniet quas explicabo a iste ducimus tenetur consequuntur rem at cumque accusamus! In quasi earum beatae excepturi nemo odio, quibusdam repellendus, id explicabo, aliquam animi dolore quia laborum ea illo assumenda labore? Sequi eaque, in sunt alias officia fuga quam? Quibusdam, accusantium distinctio nihil autem modi facere iste ex velit. Quos porro dolores earum vel ipsum officiis nemo eveniet libero iusto molestias veniam odit unde itaque dolore rerum mollitia tempora aperiam ipsa, quaerat incidunt maiores fugiat! Numquam similique excepturi iure culpa molestiae nobis expedita reiciendis neque architecto earum officia quod beatae quaerat eaque incidunt eos sequi, ipsam vel at fugiat assumenda suscipit nulla est. Autem aspernatur rerum illum quod, ex nihil quis, cum error beatae nemo quas tenetur.";
-
-  // const handleSubmitNewComment = () => {
-  //   updateChatLogAPI(data.id, {
-  //     review: newData.review,
-  //     rating: newData.rating,
-  //   }).then((res) => console.log(res));
-
-  //   setHistorys((prev) => {
-  //     return prev.map((history) => {
-  //       if (history.id === data.id) {
-  //         return newData;
-  //       }
-  //       return history;
-  //     });
-  //   });
-  // };
   const handleSubmitNewComment = async () => {
-  try {
-    const res = await updateChatLogAPI(data.id, {
-      review: newData.review,
-      rating: newData.rating,
-    });
-    
-    setHistorys((prev) => {
-      return prev.map((history) => {
-        if (history.id === data.id) {
-          return newData;
-        }
-        return history;
+    try {
+      updateChatLogAPI(data.id, {
+        review: newData.review,
+        rating: newData.rating,
       });
-    });
-    
-    createNotification(
-      "success",
-      "Comment updated",
-      "Your comment has been updated successfully."
-    );
-  } catch (error) {
-    console.error("Failed to update comment:", error);
-  }
-};
+
+      setHistorys((prev) => {
+        return prev.map((history) => {
+          if (history.id === data.id) {
+            return newData;
+          }
+          return history;
+        });
+      });
+
+      createNotification(
+        "success",
+        "Review updated",
+        "Your review has been updated successfully."
+      );
+    } catch (error) {
+      console.error("Failed to update comment:", error);
+    }
+  };
+
+  const handleDeleteComment = () => {
+    const Id = data.id;
+    deleteChatLogAPI(Id)
+      .then((res) => {
+        createNotification(
+          "success",
+          "Review removed",
+          "Your review have been removed."
+        );
+        setHistorys((prev) => prev.filter((history) => history.id !== Id));
+      })
+      .catch((error) => {
+        console.error("Failed to delete comment:", error);
+      });
+  };
 
   const getStarColor = (value) => {
     if (value <= newData.rating) {
@@ -83,9 +77,13 @@ const ReviewPopup = ({
         />
         <div className="flex flex-col justify-between gap-2 w-1/2">
           <p className="text-2xl mb-2 ">
-            <b>
-              {data.type} : {data.name}
-            </b>
+            {data.type === "service" ? (
+              <b>
+                {data.type} : {data.name}
+              </b>
+            ) : (
+              <b>room_{data.name.toString().padStart(3, 0)}</b>
+            )}
           </p>
           <p className="text-2xl mb-1">
             <b>Rating</b>
@@ -96,12 +94,13 @@ const ReviewPopup = ({
                 <i
                   key={value}
                   onClick={() =>
-                    !data.status && setNewData({ ...newData, rating: value })
+                    !data.nameOfStaffReply &&
+                    setNewData({ ...newData, rating: value })
                   }
                   className={`bi bi-star-fill ${getStarColor(
                     value
                   )} inline-flex justify-center items-center ${
-                    !data.status && "cursor-pointer"
+                    !data.nameOfStaffReply && "cursor-pointer"
                   }`}
                 ></i>
               );
@@ -112,9 +111,9 @@ const ReviewPopup = ({
               <b>Review detail</b>
             </p>
             <textarea
-              disabled={data.status}
+              disabled={!!data.nameOfStaffReply}
               className={`${
-                data.status && "opacity-70"
+                !!data.nameOfStaffReply && "opacity-70"
               } mb-2  w-full h-30 p-2 border-2 border-[var(--light-brown-color)] outline-0 bg-[var(--cream-color)] rounded-lg resize-none overflow-auto`}
               value={newData.review}
               onChange={(e) =>
@@ -123,21 +122,21 @@ const ReviewPopup = ({
               placeholder="Write your review here"
             ></textarea>
           </section>
-          {data.status && (
+          {!!data.nameOfStaffReply && (
             <section>
               <p className="text-2xl my-1">
                 <b>Staff reply</b>
               </p>
               <p className="my-1">
-                Reply by: <i>{data.staffReply}</i>
+                Reply by: <i>{data.nameOfStaffReply}</i>
               </p>
               <div className="w-full h-40 p-2 border-2 border-[var(--light-brown-color)] outline-0 bg-[var(--cream-color)] rounded-lg resize-none overflow-y-auto">
-                {demoData}
+                {data.reply}
               </div>
             </section>
           )}
 
-          {!data.status && (
+          {!data.nameOfStaffReply && (
             <>
               {editable ? (
                 <>
@@ -150,11 +149,6 @@ const ReviewPopup = ({
                         "This will save your changes to the review and rating.",
                         () => {
                           onClick();
-                          createNotification(
-                            "success",
-                            "Review Updated",
-                            "Your review has been updated successfully."
-                          );
                           handleSubmitNewComment();
                         }
                       )
@@ -167,15 +161,11 @@ const ReviewPopup = ({
                     onClick={() =>
                       createNotification(
                         "warning",
-                        "Are you sure to cancel your change?",
-                        "Your modified data will be lost.",
+                        "Are you sure to remove your review?",
+                        "Your review data will be removed.",
                         () => {
                           onClick();
-                          createNotification(
-                            "fail",
-                            "Changes Discarded",
-                            "Your review changes have been cancelled."
-                          );
+                          handleDeleteComment();
                         }
                       )
                     }

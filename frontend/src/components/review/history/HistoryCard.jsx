@@ -1,8 +1,8 @@
 import testImg from "../../../assets/test.png";
 import { motion } from "framer-motion";
+import { getStatusColor } from "../../staff/StatusUtils";
 
 const Tooltip = ({ children, text }) => {
-
   return (
     <div className="relative group w-full">
       {children}
@@ -16,35 +16,52 @@ const Tooltip = ({ children, text }) => {
 };
 
 const HistoryCard = ({ data, onClick, ...motionProps }) => {
+  const getDateBlock = (dateWithTime) => {
+    const [date, time] = dateWithTime.replace(".000Z", "").split("T");
+    return (
+      <>
+        <span className={ `py-1 px-3 rounded-xl mr-2 ${getStatusColor("IDLE")}`}>{date}</span>
+        <span className={ `py-1 px-3 rounded-xl mr-2 ${getStatusColor("IDLE")}`}>{time}</span>
+      </>
+    );
+  };
 
   return (
-    <motion.div className="flex rounded-2xl bg-[var(--cream-color)] p-4 mt-6 shadow relative" {...motionProps}>
-      {data.status ? (
+    <motion.div
+      className="flex rounded-2xl bg-[var(--cream-color)] p-4 mt-6 shadow relative"
+      {...motionProps}
+    >
+      {!data.readingStatus && (
         <div className="absolute w-4 h-4 rounded-full bg-[var(--fail-color-alpha)] top-0 right-0 z-10 -translate-y-1/3 translate-x-1/3" />
-      ) : null}
+      )}
       <img
-        src={testImg}
+        src={data.image || testImg}
         className="w-40 h-40 object-cover object-center rounded-lg"
       />
       <div className="flex justify-between items-cente w-full mx-10">
         <div className="flex flex-col gap-2 justify-center items-start">
-          {data.type === "Service" ? (
+          {data.type === "service" ? (
             <b>service: {data.name}</b>
           ) : (
-            <b>room: {data.name}</b>
+            <b>room_{data.name.toString().padStart(3, 0)}</b>
           )}
-          <p>pet name: {data.petName}</p>
-          <p>finish date: {data.date}</p>
+          <p>finished date {getDateBlock(data.date)}</p>
         </div>
         <div className="flex flex-col gap-2 justify-center items-start w-2/10">
-          <Tooltip text={data.staffName}>
-            <p className="truncate w-full">Done by: {data.staffName}</p>
+          <Tooltip text={data.nameOfStaffReply}>
+            <p className="truncate w-full">
+              Reply by: {data.nameOfStaffReply ?? "N/A"}
+            </p>
           </Tooltip>
-          <Tooltip text={data.staffReply}>
-            <p className="truncate w-full">Reply by: {data.staffReply}</p>
-          </Tooltip>
-          <button onClick={onClick} className="py-2 px-12 rounded-xl bg-[var(--dark-brown-color)] !text-white cursor-pointer transition-all duration-200 active:scale-90">
-            edit
+          <button
+            onClick={onClick}
+            className={`py-2 px-12 rounded-xl ${
+              !data.nameOfStaffReply
+                ? "bg-[var(--brown-color)]"
+                : "bg-[var(--dark-brown-color)]"
+            }  !text-white cursor-pointer transition-all duration-200 active:scale-90`}
+          >
+            {!data.nameOfStaffReply ? "edit" : "view"}
           </button>
         </div>
       </div>
