@@ -79,7 +79,7 @@ model Pet {
   sex      Sex       @default(MALE)
   age      Int
   type     PetType   @default(DOG)
-  status   PetStatus @default(QUEUE)
+  status   PetStatus @default(IDLE)
   breed    String    @db.VarChar(30)
   disease  String[]  @db.VarChar(30)
   allergic String[]  @db.VarChar(30)
