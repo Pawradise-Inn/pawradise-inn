@@ -7,10 +7,12 @@ import { registerAPI } from "../../hooks/authAPI";
 import { validateFormPassword, validateFormTel } from "../../utils/handleForm";
 import { useAuth } from "../../context/AuthProvider";
 import { startUpVariants } from "../../styles/animation";
+import { useScrollUpArrow } from "../../context/ScrollUpArrowProvider";
 
 const Registration = () => {
 
   const { createNotification } = useNotification();
+  const { setShow } = useScrollUpArrow();
   const [form, setForm] = useState({
     firstname: "",
     lastname: "",
@@ -132,13 +134,14 @@ const fields = [
     );
   }, [form, consentChecked]);
 
-  // useEffect(() => {
-  //   localStorage.removeItem("token");
-  // }, [])
+  useEffect(() => {
+    setShow(false);
+    return () => setShow(true);
+  }, []);
 
   return (
     <>
-      <div className="flex flex-row w-full overflow-auto bg-[var(--cream-color)]">
+      <div className="flex flex-row w-full bg-[var(--cream-color)]">
         <motion.div 
           className="w-3/5"
           initial={{ x: -100, opacity: 0 }}

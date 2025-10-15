@@ -10,7 +10,7 @@ const Management = () => {
       </button> */}
 
       {/* Content Area */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 overflow-y-hidden">
         <Outlet />
       </div>
     </div>

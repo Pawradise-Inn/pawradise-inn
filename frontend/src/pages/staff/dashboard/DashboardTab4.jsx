@@ -500,7 +500,7 @@ const DashboardTab4 = () => {
         />
       )}
 
-      <Outlet />
+      <Outlet className="overflow-y-hidden" />
     </main>
   );
 };
