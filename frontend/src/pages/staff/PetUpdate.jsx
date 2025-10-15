@@ -166,18 +166,6 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
             arrowColor="var(--dark-brown-color)"
           />
         </div>
-        {/* <select
-            className="py-1 px-1 text-center p-2 border rounded-lg focus:ring-2 focus:ring-[var(--dark-brown-color)] focus:outline-none transition-all duration-200"
-            value={status}
-            onChange={handleStatusChange}
-          >
-            <option>IDLE</option>
-            <option>CHECKED_IN</option>
-            <option>CHECKED_OUT</option>
-            <option>QUEUE</option>
-            <option>IN_PROGRESS</option>
-            <option>COMPLETED</option>
-          </select> */}
 
         {/* Note Input */}
         <div className="flex flex-col">
