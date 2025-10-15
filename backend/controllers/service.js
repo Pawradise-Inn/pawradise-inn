@@ -1,5 +1,8 @@
 const prisma = require('../prisma/prisma');
-const {findServiceById, addServicePictures, removeServicePictures } = require('./logics/service');
+const {findServiceById,
+//      addServicePictures,
+//       removeServicePictures 
+    } = require('./logics/service');
 const {overlappingService} = require('./logics/bookedService');
 
 const getServices = async (req, res) =>{
@@ -92,13 +95,13 @@ const getService = async (req, res) => {
 
 const createService = async (req, res) => { //requirement: 15
     try {
-        const {name, price, petType} = req.body;
+        const {name, price, petType, picture} = req.body;
         const service = await prisma.service.create({
             data: {
                 name: name,
                 price: price,
                 petType: petType,
-                picture: ""
+                picture: picture? picture : "https://storage.googleapis.com/paw_image/service/unnamed.jpg"
             }
         });
         res.status(201).json({success: true, data: service});
@@ -148,8 +151,11 @@ const deleteService = async (req, res) => { //requirement: 15
 const addPicturesToService = async (req, res) => {
     try {
         const serviceId = req.params.id;
-        const pictures = req.body.picture;
-        const service = await addServicePictures(serviceId, pictures);
+        // const service = await addServicePictures(serviceId, pictures);
+        const service = await prisma.service.update({
+            where: {id: Number(serviceId)},
+            data: req.body.picture
+        });
         res.status(200).json({success: true, data: service});
     }catch(err){
         if(err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found'});
@@ -163,8 +169,11 @@ const addPicturesToService = async (req, res) => {
 const deletePicturesFromService = async (req, res) => {
     try {
         const serviceId = req.params.id;
-        const pictures = req.body.picture;
-        const service = await removeServicePictures(serviceId, pictures);
+        // const service = await removeServicePictures(serviceId, pictures);
+        const service = await prisma.service.update({
+            where: {id: Number(serviceId)},
+            data: "https://storage.googleapis.com/paw_image/service/unnamed.jpg"
+        });
         res.status(200).json({success: true, data: service});
     }catch(err){
         if(err.code === 'P2025') return res.status(404).json({success: false, msg: 'Service is not found'});
