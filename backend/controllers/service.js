@@ -154,7 +154,9 @@ const addPicturesToService = async (req, res) => {
         // const service = await addServicePictures(serviceId, pictures);
         const service = await prisma.service.update({
             where: {id: Number(serviceId)},
-            data: req.body.picture
+            data: {
+                picture: req.body.picture
+            }
         });
         res.status(200).json({success: true, data: service});
     }catch(err){
@@ -172,7 +174,9 @@ const deletePicturesFromService = async (req, res) => {
         // const service = await removeServicePictures(serviceId, pictures);
         const service = await prisma.service.update({
             where: {id: Number(serviceId)},
-            data: "https://storage.googleapis.com/paw_image/service/unnamed.jpg"
+            data: {
+                picture: "https://storage.googleapis.com/paw_image/service/unnamed.jpg"
+            }
         });
         res.status(200).json({success: true, data: service});
     }catch(err){
