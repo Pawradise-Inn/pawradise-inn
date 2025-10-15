@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { NavLink } from "react-router-dom";
+import { getStatusColor, getStatusText } from "./StatusUtils";
 const PetCard = ({ pet }) => {
   return (
     <motion.div
@@ -7,21 +8,29 @@ const PetCard = ({ pet }) => {
       whileTap={{ scale: 0.95 }}
     >
       <NavLink to={`/staff/pet-status/${pet.id}`}>
-        <div className="mx-5 bg-[var(--cream-color)] border-1 border-color-[var(--dark-brown-color)] rounded-xl p-4 shadow-lg flex flex-col space-y-4 hover:shadow-xl transition-all duration-300 cursor-pointer">
-          <div className="w-full aspect-square bg-gray-200 rounded mb-4 flex items-center justify-center overflow-hidden">
-            <img
-              src={pet.picture}
-              alt="pet"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex justify-between mb-3">
-            <div className="text-center">
-              <p className="text-xl font-semibold">{pet.name}</p>
+        <div className="mx-5 bg-gradient-to-br from-[var(--cream-color)] to-white border border-[var(--dark-brown-color)]/20 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer min-w-[300px] min-h-[420px] backdrop-blur-sm relative overflow-hidden group">
+          {/* Decorative background element */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[var(--dark-brown-color)]/5 to-transparent rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
+          
+          <div className="relative z-10">
+            <div className="w-full h-72 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl mb-6 flex items-center justify-center overflow-hidden shadow-inner ring-1 ring-white/50">
+              <img
+                src={pet.picture}
+                alt="pet"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
             </div>
-            <span className="px-5 py-1 !text-white text-xs rounded-full bg-[var(--dark-brown-color)] font-semibold">
-              {pet.status}
-            </span>
+            
+            <div className="flex justify-between items-center">
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-[var(--dark-brown-color)] tracking-wide">
+                  {pet.name}
+                </h3>
+              </div>
+              <span className={`px-4 py-2 text-sm font-semibold rounded-full min-w-[120px] text-center inline-block whitespace-nowrap shadow-md border transition-all duration-300 hover:scale-105 ${getStatusColor(pet.status)}`}>
+                {getStatusText(pet.status)}
+              </span>
+            </div>
           </div>
         </div>
       </NavLink>
