@@ -15,7 +15,7 @@ import { getDateValidation } from "../../utils/handleValidation";
 import DropDownList from "../../components/DropDownList";
 
 const BookingRoom = () => {
-  const petTypes = ["DOG", "CAT", "MOUSE", "RABBIT", "BIRD"];
+  const petTypes = [null, "DOG", "CAT", "MOUSE", "RABBIT", "BIRD"];
 
   const { createNotification } = useNotification();
   const [mounted, setMounted] = useState(false);
@@ -30,6 +30,10 @@ const BookingRoom = () => {
   const [popUpStatus, setPopUpStatus] = useState(false);
   const [popUpData, setPopUpData] = useState([]);
 
+  useEffect(() => {
+    console.log(filterRoom)
+  }, [filterRoom])
+
   //   if filter.petType is not null return data with filter with petType else return data itself back
   //   @params: filteredRoom -> data that want to filter
   //  @return: filteredRoom with filtered with petType or not filter if petType is null
@@ -42,31 +46,19 @@ const BookingRoom = () => {
 
   // fetch room data from backend and setRoom
   useEffect(() => {
-    // fetchAllRoomsWithPaginationAPI().then((data) => {
-    //   if (data.data) {
-    //     data.data.forEach((room) => {
-    //       room.headerType = "Room";
-    //       room.reviewStar = room.reviewStar.toFixed(1);
-    //       room.commentPages = Math.max(1, room.commentPages);
-    //     });
-
-    //     setRoom(data.data);
-    //   }
-    // });
     const loadInitialRooms = async () => {
       try {
         const roomsData = await fetchAllRoomsWithPaginationAPI();
         roomsData.data.forEach((room) => {
           room.headerType = "Room";
           room.reviewStar = room.reviewStar.toFixed(1);
-          room.commentPages = Math.max(1, room.commentPages);
         });
 
         setRoom(roomsData.data);
-      } catch(error) {
+      } catch (error) {
         console.error("Failed to load initial rooms:", error);
       }
-    }
+    };
     loadInitialRooms();
   }, []);
 
@@ -77,7 +69,10 @@ const BookingRoom = () => {
   useEffect(() => {
     const filterRooms = async () => {
       if (filter.entryDate && filter.exitDate) {
-        const validatedDate = getDateValidation(filter.entryDate, filter.exitDate);
+        const validatedDate = getDateValidation(
+          filter.entryDate,
+          filter.exitDate
+        );
         if (validatedDate.status) {
           try {
             const availableRooms = await fetchAvailableRoomsAPI(
@@ -150,16 +145,21 @@ const BookingRoom = () => {
       >
         <div className="flex flex-col justify-start items-center gap-6 w-3/10 py-4 px-8">
           <p className="text-xl font-bold">Pet type</p>
-            <DropDownList
-              startText="-- Select --"
-              options={petTypes.map((type) => {
-                return { name: type, value: type };
-              })}
-              onChange={(value) => setFilter((prev) => ({ ...prev, petType: value }))}
-              value={filter.petType}
-              arrowColor="white"
-              inputSyle="!text-white px-4 py-2 outline-0 text-xl bg-(--brown-color) rounded-lg"
-            />
+          <DropDownList
+            startText="-- Select --"
+            options={petTypes.map((type) => {
+              if (type === null) return { name: "-- Select --", value: null };
+              return { name: type, value: type };
+            })}
+            onChange={(value) => {
+              setFilter((prev) => ({ ...prev, petType: value }));
+              setMounted(true);
+            }}
+            value={filter.petType}
+            arrowColor="white"
+            inputSyle="!text-white px-4 py-2 outline-0 text-xl bg-(--brown-color) rounded-lg"
+            element="selectPetType"
+          />
         </div>
         <div className="flex flex-col justify-start items-center gap-6 w-7/10 py-4 px-8">
           <p className="text-xl font-bold">Booking date</p>
@@ -185,7 +185,7 @@ const BookingRoom = () => {
       </motion.form>
 
       {noResult ? (
-        <AnimatePresence>
+        <AnimatePresence mode="popLayout">
           <motion.p
             variants={startUpVariants}
             initial="hidden"
@@ -209,7 +209,7 @@ const BookingRoom = () => {
                   exit="exit"
                   whileHover={{ scale: 1.05 }}
                   custom={idx / 3 + 2}
-                  key={`room-${data.roomId}`}
+                  key={`room-${data.id}`}
                   data={data}
                   onClick={handlePopUpData}
                 />
@@ -219,7 +219,7 @@ const BookingRoom = () => {
         </div>
       )}
 
-      <AnimatePresence initial={true}>
+      <AnimatePresence mode="popLayout" initial={true}>
         {popUpStatus ? (
           <>
             <Overlay

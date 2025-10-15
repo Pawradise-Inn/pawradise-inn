@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNotification } from "../../context/notification/NotificationProvider";
+import DropDownList from "../DropDownList";
+import {motion} from "motion/react"
 
 const AddRoomPopup = ({
   title = "Add room",
@@ -7,6 +9,7 @@ const AddRoomPopup = ({
   onClose,
   onSave,
   onDelete,
+  ...motionProps
 }) => {
   const { createNotification } = useNotification();
   const [status, setStatus] = useState(initialData?.status ?? "available");
@@ -126,14 +129,14 @@ const AddRoomPopup = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-10 grid place-items-center p-4">
-      <div className="bg-white rounded-3xl p-8 w-[680px] max-w-full flex flex-col gap-6 shadow-lg">
+    
+      <motion.div className="bg-white rounded-3xl p-8 w-[680px] max-w-full flex flex-col gap-6 shadow-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20" {...motionProps}>
         <div className="flex items-start justify-between">
           <h2 className="text-3xl font-bold text-[var(--dark-brown-color)]">
             {title}
           </h2>
           <button
-            className="text-2xl px-3 py-1 rounded hover:bg-gray-100"
+            className="text-2xl px-3 py-1 rounded hover:bg-gray-100 cursor-pointer transition-all duration-150"
             aria-label="Close"
             onClick={onClose}
           >
@@ -148,16 +151,21 @@ const AddRoomPopup = ({
               <label className="block text-sm font-medium text-gray-700">
                 Status
               </label>
-              <select
+              <DropDownList
+                startText="Select..."
+                options={["available", "full", "maintenance"].map((type) => ({
+                  name: type,
+                  value: type,
+                }))}
                 value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
-                required
-              >
-                <option value="available">available</option>
-                <option value="full">full</option>
-                <option value="maintenance">maintenance</option>
-              </select>
+                onChange={(value) => setStatus(value)}
+                inputSyle="mt-1 border rounded-md px-3 py-2"
+                dropDownStyle="bg-white border border-$var(--brown-color) origin-top translate-y-1"
+                arrowColor="var(--light-brown-color)"
+                activeColor="var(--service-available-color)"
+                focusStyle="outline-none ring border-blue-400"
+                element="addRoomStatus"
+              />
             </div>
 
             {/* For which (pet size/type) */}
@@ -165,15 +173,21 @@ const AddRoomPopup = ({
               <label className="block text-sm font-medium text-gray-700">
                 For which
               </label>
-              <select
+              <DropDownList
+                startText="Select..."
+                options={["small", "big"].map((type) => ({
+                  name: type,
+                  value: type,
+                }))}
                 value={forwhich}
-                onChange={(e) => setForwhich(e.target.value)}
-                className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
-                required
-              >
-                <option value="small">small</option>
-                <option value="big">big</option>
-              </select>
+                onChange={(value) => setForwhich(value)}
+                inputSyle="mt-1 border rounded-md px-3 py-2"
+                dropDownStyle="bg-white border border-$var(--brown-color) origin-top translate-y-1"
+                arrowColor="var(--light-brown-color)"
+                activeColor="var(--service-available-color)"
+                focusStyle="outline-none ring border-blue-400"
+                element="addRoomType"
+              />
             </div>
 
             {/* Price */}
@@ -290,8 +304,7 @@ const AddRoomPopup = ({
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
   );
 };
 

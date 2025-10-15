@@ -8,14 +8,16 @@ const DropDownList = ({
   options,
   onChange,
   value,
+  element,
   arrowColor = "white",
   mainStyle = "",
+  focusStyle="",
   inputSyle = "rounded-xl px-4 py-2 text-2xl outline-0 bg-[var(--light-brown-color)] rounded",
   dropDownStyle = "border-2 border-[var(--brown-color)] bg-[var(--light-brown-color)]  origin-top translate-y-1 top-full left-0",
+  activeColor = "var(--cream-color)",
   ...motionProps
 }) => {
   const [dropDownStatus, setDropDownStatus] = useState(false);
-  const [dropDownSelected, setDropDownSelected] = useState(null);
   const { createNotification } = useNotification();
 
   const handleDropDown = () => {
@@ -34,7 +36,7 @@ const DropDownList = ({
     <motion.div className={`w-full relative ${mainStyle}`} {...motionProps}>
       <div
         onClick={handleDropDown}
-        className={`relative inline-block w-full cursor-pointer ${inputSyle}`}
+        className={`relative inline-block w-full cursor-pointer ${inputSyle} ${dropDownStatus && focusStyle}`}
       >
         {value || startText}
         <i
@@ -60,14 +62,14 @@ const DropDownList = ({
                 <div
                   onClick={() => {
                     onChange(option.value);
-                    setDropDownSelected(idx);
                   }}
-                  className="w-full px-4 py-2 bg-[var(--light-brown-color)] text-xl cursor-pointer relative"
+                  className="w-full px-4 py-2 text-xl cursor-pointer relative"
                 >
-                  {dropDownSelected === idx ? (
+                  {option.value === value ? (
                     <motion.div
-                      layoutId="active"
-                      className="w-full px-4 py-2 bg-[var(--cream-color)] text-xl cursor-pointer absolute top-0 left-0 pointer-events-none h-full z-20"
+                      layoutId={element}
+                      style={{backgroundColor: activeColor}}
+                      className="w-full px-4 py-2 text-xl cursor-pointer absolute top-0 left-0 pointer-events-none h-full z-20"
                     />
                   ) : null}
                   <span className="z-30 relative">{option.name}</span>
