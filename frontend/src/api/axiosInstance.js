@@ -3,7 +3,7 @@ import axios from "axios";
 let isInterceptorSetup = false;
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "http://localhost:5050",
 });
 
 export const setUpInterceptors = (logout) => {
