@@ -22,8 +22,6 @@ const getBookedServices = async (req, res) => {
   }
 };
 
-
-
 const getBookedService = async (req, res) => {
   //requirement: 13
   try {
