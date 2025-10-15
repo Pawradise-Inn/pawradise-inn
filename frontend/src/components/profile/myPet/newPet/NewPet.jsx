@@ -111,7 +111,8 @@ const NewPet = () => {
         // 1. UPLOAD IMAGE TO GCS
           if (formData.petImage) {
             // This API call sends the file object via multipart/form-data
-                  const uploadResponse = await uploadImageAPI(formData.petImage);
+                  pictureUrl = await uploadImageAPI(formData.petImage);
+                  console.log(pictureUrl)
           }
           
                 // 2. PREPARE NEW PET DATA
@@ -124,7 +125,7 @@ const NewPet = () => {
                   breed: formData.petBreed,
                   disease: [formData.medicalCondition],
                   allergic: [formData.foodAllergy],
-                  picture: pictureUrl, // **Use the GCS URL here**
+                  picture: pictureUrl.imageUrl, // **Use the GCS URL here**
                   customerId: user.customer.id,
                 };
                 console.log(newPet)
