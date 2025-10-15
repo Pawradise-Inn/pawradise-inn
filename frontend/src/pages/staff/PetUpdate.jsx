@@ -3,9 +3,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "motion/react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { fetchPetAPI, updatePetAPI } from "../../hooks/petAPI";
-import { getStatusColor, getRoomStatusColor, getStatusText } from '../../components/staff/StatusUtils';
-import PetCard from '../../components/staff/PetUpdateCard'
+import {
+  getStatusColor,
+  getRoomStatusColor,
+  getStatusText,
+} from "../../components/staff/StatusUtils";
+import PetCard from "../../components/staff/PetUpdateCard";
 import ServiceCard from "../../components/staff/ServiceCard";
+import DropDownList from "../../components/DropDownList";
 const PetUpdate = () => {
   const { createNotification } = useNotification();
   const { id } = useParams();
@@ -16,41 +21,35 @@ const PetUpdate = () => {
     const response = await fetchPetAPI(id);
     setPet(response.data);
     setStatus(response.data.status);
-    setScheduled(response.data.scheduled)
-    
+    setScheduled(response.data.scheduled);
+
     //setServiceData(response.data.scheduled.service)
   };
 
   useEffect(() => {
     fetchPet();
-    console.log(pet)
+    console.log(pet);
   }, []);
-
 
   const navigate = useNavigate();
 
   const handleSave = () => {
-    createNotification(
-      "warning",
-      "Confirmation",
-      "Are you sure?",
-      async () => {
-        try {
-          const { scheduled, stayed, ...updatePet } = pet;
-          updatePet.status = status;
-          updatePetAPI(id, updatePet);
-          setPet(updatePet);
-          createNotification(
-            "success",
-            "Update Successful",
-            "Pet details have been saved."
-          );
-          navigate("/staff/pet-status");
-        } catch (error) {
-          console.error("Interceptor handled the update error:", error);
-        }
-      },
-    );
+    createNotification("warning", "Confirmation", "Are you sure?", async () => {
+      try {
+        const { scheduled, stayed, ...updatePet } = pet;
+        updatePet.status = status;
+        updatePetAPI(id, updatePet);
+        setPet(updatePet);
+        createNotification(
+          "success",
+          "Update Successful",
+          "Pet details have been saved."
+        );
+        navigate("/staff/pet-status");
+      } catch (error) {
+        console.error("Interceptor handled the update error:", error);
+      }
+    });
   };
   const handleCancel = () => {
     createNotification(
@@ -130,11 +129,16 @@ const PetUpdate = () => {
   );
 };
 
-
 const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
-  const handleStatusChange = (e) => {
-    setStatus(e.target.value);
-  };
+  const OPERATE_STATUS = [
+    "IDLE",
+    "CHECKED_IN",
+    "CHECKED_OUT",
+    "QUEUE",
+    "IN_PROGRESS",
+    "COMPLETED",
+  ];
+
   return (
     <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
       {/* Header */}
@@ -147,9 +151,22 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
       {/* Form */}
       <div className="flex flex-col gap-4">
         {/* Status Dropdown */}
-        <div className="flex flex-row justify-start">
+        <div className="flex flex-row justify-start items-center">
           <label className="font-semibold mb-1 mr-4">Status:</label>
-          <select
+          <DropDownList
+            value={status}
+            options={OPERATE_STATUS.map((os) => ({ name: os, value: os }))}
+            onChange={(value) => {
+              setStatus(value);
+            }}
+            element="changeStatus"
+            inputSyle="py-1 px-1 text-center p-2 border rounded-lg"
+            dropDownStyle="border-2 border-[var(--brown-color)] bg-[var(--light-brown-color)]  origin-bottom -translate-y-full top-0 left-0 mb-1"
+            focusStyle="outline-none ring-[var(--dark-brown-color)] ring-2"
+            arrowColor="var(--dark-brown-color)"
+          />
+        </div>
+        {/* <select
             className="py-1 px-1 text-center p-2 border rounded-lg focus:ring-2 focus:ring-[var(--dark-brown-color)] focus:outline-none transition-all duration-200"
             value={status}
             onChange={handleStatusChange}
@@ -160,8 +177,7 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
             <option>QUEUE</option>
             <option>IN_PROGRESS</option>
             <option>COMPLETED</option>
-          </select>
-        </div>
+          </select> */}
 
         {/* Note Input */}
         <div className="flex flex-col">
