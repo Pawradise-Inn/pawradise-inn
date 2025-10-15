@@ -13,7 +13,7 @@ const ProfileSideBar = () => {
   const [currentPage, setCurrentPage] = useState(pathList[2] || "me");
 
   return (
-    <SideBar link={link} currentPage={currentPage} setCurrentPage={setCurrentPage} />
+    <SideBar link={link} currentPage={currentPage} setCurrentPage={setCurrentPage} showLogout={true}/>
   );
 };
 

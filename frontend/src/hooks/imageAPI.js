@@ -1,6 +1,6 @@
 import axiosInstance from "../api/axiosInstance";
 
-const API_URL = "http://localhost:5000/api/v1/image";
+const API_URL = "http://localhost:5050/api/v1/image";
 
 export const uploadImageAPI = async (file) => {
     const formData = new FormData();
