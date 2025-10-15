@@ -48,7 +48,7 @@ const PetUpdate = () => {
             "Update Successful",
             "Pet details have been saved."
           );
-          navigate("/staff/pet status");
+          navigate("/staff/pet-status");
         } catch (error) {
           console.error("Interceptor handled the update error:", error);
         }
@@ -61,7 +61,7 @@ const PetUpdate = () => {
       "Confirmation",
       "Back to status page?",
       () => {
-        navigate("/staff/pet status");
+        navigate("/staff/pet-status");
       }
     );
   };
