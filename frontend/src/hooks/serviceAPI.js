@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // The base URL for all service-related API calls
-const API_URL = "http://localhost:5050/api/v1/service";
+const API_URL = "http://localhost:5000/api/v1/service";
 
 // --- Basic CRUD Operations ---
 

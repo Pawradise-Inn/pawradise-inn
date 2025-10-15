@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5050/api/v1/customer";
+const API_URL = "http://localhost:5000/api/v1/customer";
 
 export const fetchUserAPI = async (id, token = localStorage.getItem("token")) => {
   const response = await axios.get(`${API_URL}/${id}`, {

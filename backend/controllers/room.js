@@ -1,8 +1,8 @@
 const prisma = require("../prisma/prisma");
 const {
   findRoomById,
-  addRoomPictures,
-  removeRoomPictures,
+  // addRoomPictures,
+  // removeRoomPictures,
 } = require("./logics/room");
 const { overlappingRoom } = require("./logics/bookedRoom");
 
@@ -128,8 +128,8 @@ const updateRoom = async (req, res) => {
     if (req.body.price !== undefined) dataToUpdate.price = req.body.price;
     if (req.body.name !== undefined) dataToUpdate.name = req.body.name;
     if (req.body.petType !== undefined) dataToUpdate.petType = req.body.petType;
-    if (req.body.capacity !== undefined)
-      dataToUpdate.capacity = req.body.capacity;
+    if (req.body.capacity !== undefined) dataToUpdate.capacity = req.body.capacity;
+    if (req.body.picture !== undefined) dataToUpdate.picture = req.body.picture;
 
     if (Object.keys(dataToUpdate).length === 0) {
       return res.status(400).json({
@@ -177,8 +177,13 @@ const deleteRoom = async (req, res) => {
 const addPicturesToRoom = async (req, res) => {
   try {
     const roomId = Number(req.params.id);
-    const pictures = req.body.picture;
-    const room = await addRoomPictures(roomId, pictures);
+    // const room = await addRoomPictures(roomId, pictures);
+    const room = await prisma.room.update({
+      where: { id: Number(roomId) },
+      data: {
+        picture: req.body.picture
+      },
+    });
     res.status(200).json({ success: true, data: room });
   } catch (err) {
     if (err.code === "P2025")
@@ -194,8 +199,13 @@ const addPicturesToRoom = async (req, res) => {
 const deletePicturesFromRoom = async (req, res) => {
   try {
     const roomId = Number(req.params.id);
-    const pictures = req.body.picture;
-    const room = await removeRoomPictures(roomId, pictures);
+    // const room = await removeRoomPictures(roomId, pictures);
+    const room = await prisma.room.update({
+      where: { id: Number(roomId) },
+      data: {
+        picture: "https://storage.googleapis.com/paw_image/rooms/unnamed.jpg"
+      }
+    });
     res.status(200).json({ success: true, data: room });
   } catch (err) {
     if (err.code === "P2025")

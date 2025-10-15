@@ -31,7 +31,7 @@ const register = async (req, res) => {
         sex,
         age: Number(age),
         type,
-        status,
+        status: "IDLE",
         breed,
         disease,
         allergic,

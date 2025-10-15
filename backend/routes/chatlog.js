@@ -7,10 +7,14 @@ const {
     createChatLog,
     replyToChatLog,
     deleteChatLog,
-    updateChatLog
+    updateChatLog,
+    getMyreviews
 } = require('../controllers/chatlog');
 
 const {protect, authorize} = require('../middleware/auth');
+
+router.route('/mine')
+    .get(protect, authorize("STAFF", "CUSTOMER"), getMyreviews);
 
 router.route('/')
     .get(getChatLogs)

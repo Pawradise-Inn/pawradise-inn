@@ -107,22 +107,22 @@ exports.getMe = async (req, res) => {
 exports.updateMe = async (req, res) => {
   try {
     const idParam = req.user.id;
-    const { firstname, lastname, email, phone_number, user_name, password } =
-      req.body;
 
-    const salt = await bcrypt.genSalt(10);
-    const hashed = await bcrypt.hash(password, salt);
+    const dataUpdate = {};
+    if (req.body.firstname) dataUpdate.firstname = req.body.firstname;
+    if (req.body.lastname) dataUpdate.lastname = req.body.lastname;
+    if (req.body.email) dataUpdate.email = req.body.email;
+    if (req.body.phone_number) dataUpdate.phone_number = req.body.phone_number;
+    if (req.body.user_name) dataUpdate.user_name = req.body.user_name;
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashed = await bcrypt.hash(req.body.password, salt);
+      dataUpdate.password = hashed;
+    }
 
     const user = await prisma.user.update({
       where: { id: Number(idParam) },
-      data: {
-        firstname,
-        lastname,
-        email,
-        phone_number,
-        user_name,
-        password: hashed,
-      },
+      data: dataUpdate,
       select: {
         id: true,
         firstname: true,

@@ -61,6 +61,7 @@ model ChatLog {
   review_date DateTime  @default(now()) @db.Timestamp(0)
   reply_date  DateTime? @db.Timestamp(0)
   show        Boolean   @default(true) @db.Boolean
+  isRead      Boolean   @default(false) @db.Boolean
 
   customerId Int?
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
@@ -78,11 +79,11 @@ model Pet {
   sex      Sex       @default(MALE)
   age      Int
   type     PetType   @default(DOG)
-  status   PetStatus @default(QUEUE)
+  status   PetStatus @default(IDLE)
   breed    String    @db.VarChar(30)
   disease  String[]  @db.VarChar(30)
   allergic String[]  @db.VarChar(30)
-  picture  String
+  picture  String    @default("https://storage.googleapis.com/paw_image/unnamed.jpg")
 
   scheduled  BookedService[]
   stayed     BookedRoom[]
@@ -92,13 +93,13 @@ model Pet {
 }
 
 model Room {
-  id       Int      @id @default(autoincrement())
-  name     String   @db.VarChar(30)
-  number   Int      @unique @default(100) @db.Integer
-  capacity Int      @default(1) @db.Integer
-  price    Float    @default(2000.00) @db.DoublePrecision
-  picture  String[]
-  petType  PetType  @default(DOG)
+  id       Int     @id @default(autoincrement())
+  name     String  @db.VarChar(30)
+  number   Int     @unique @default(100) @db.Integer
+  capacity Int     @default(1) @db.Integer
+  price    Float   @default(2000.00) @db.DoublePrecision
+  picture  String  @default("https://storage.googleapis.com/paw_image/unnamed.jpg")
+  petType  PetType @default(DOG)
 
   bookings     BookedRoom[]
   staffOnRooms RoomStaff[]
@@ -124,7 +125,7 @@ model Service {
   name    String    @db.VarChar(30)
   price   Float     @default(500.00) @db.DoublePrecision
   petType PetType[]
-  picture String
+  picture String    @default("https://storage.googleapis.com/paw_image/unnamed.jpg")
 
   reviews         ChatLog[]
   staffOnServices StaffOnService[]
@@ -132,15 +133,15 @@ model Service {
 }
 
 model BookedService {
-  id Int @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
+  scheduled DateTime @db.Timestamp(0)
 
   serviceId  Int
-  service    Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  service    Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   petId      Int?
-  pet        Pet?     @relation(fields: [petId], references: [id], onDelete: SetNull)
-  scheduled  DateTime @db.Timestamp(0)
+  pet        Pet?    @relation(fields: [petId], references: [id], onDelete: SetNull)
   booking_id Int
-  booking    Booking  @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  booking    Booking @relation(fields: [booking_id], references: [id], onDelete: Cascade)
   Care       Care[]
 }
 
