@@ -36,7 +36,7 @@ const register = async (req, res) => {
         disease,
         allergic,
         customerId: customer.id,
-        picture,
+        picture: picture? picture:"https://storage.googleapis.com/paw_image/unnamed.jpg",
       },
     });
     res.status(201).json({ success: true, data: pet });
