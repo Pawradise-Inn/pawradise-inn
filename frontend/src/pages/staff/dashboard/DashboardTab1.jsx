@@ -163,6 +163,7 @@ const DashboardTab1 = () => {
         setLoading(true);
         const response = await getTodayRoom();
         // Ensure we're setting an array, even if empty
+        console.log(response);
         setItems(Array.isArray(response?.data) ? response.data : []);
       } catch (error) {
         console.error("Failed to fetch rooms:", error);
@@ -262,21 +263,6 @@ const DashboardTab1 = () => {
             onChange={(e) => setSearch(e.target.value)}
             value={search}
           />{" "}
-        </div>{" "}
-        <div style={buttonGroupStyle}>
-          {" "}
-          <button onClick={handleAddClick} style={buttonStyle}>
-            add
-          </button>{" "}
-          <button
-            style={{
-              ...buttonStyle,
-              backgroundColor: "#ccc",
-              cursor: "not-allowed",
-            }}
-          >
-            delete
-          </button>{" "}
         </div>{" "}
       </div>{" "}
       {loading ? (
