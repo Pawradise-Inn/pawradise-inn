@@ -14,10 +14,10 @@ const Dashboard = () => {
           {/* NavLink for Today's Booking */}
           <Navbar
             pages={[
-              "Today's Booking",
+              "Room Bookings",
               "Check In",
               "Check Out",
-              "Service Booked",
+              "Service Bookings",
             ]}
             paths={["", "check-in", "check-out", "service-booked"]}
             pathIdxHighlight={3}

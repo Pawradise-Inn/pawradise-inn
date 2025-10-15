@@ -156,7 +156,7 @@ const DashboardCard = ({ data, onClick, onStatusChange }) => {
  * UPDATED: The ItemPopup now includes an onDelete prop and a Delete button.
  */
 const ItemPopup = ({ onClose, onSave, onDelete, initialData }) => {
-  const [name, setName] = useState(initialData?.name || "");
+  const [name, setName] = useState(initialData?.serviceName || "");
   const [petName, setPetName] = useState(initialData?.petName || "");
   const [timeBooked, setTimeBooked] = useState(initialData?.timeBooked || "");
 
@@ -326,7 +326,8 @@ const DashboardTab4 = () => {
     try {
       setLoading(true);
       const data = await getTodayService();
-      setItems(data || []);
+      setItems(Array.isArray(data.data) ? data.data : []);
+      console.log(data);
     } catch (error) {
       console.error("Failed to fetch services:", error);
     } finally {
@@ -342,7 +343,7 @@ const DashboardTab4 = () => {
   const filtered = !search
     ? items
     : items.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+        item.serviceName.toLowerCase().includes(search.toLowerCase())
       );
 
   const handleClosePopup = () => {
@@ -456,20 +457,6 @@ const DashboardTab4 = () => {
             onChange={(e) => setSearch(e.target.value)}
             value={search}
           />
-        </div>
-        <div style={buttonGroupStyle}>
-          <button onClick={handleAddClick} style={buttonStyle}>
-            add
-          </button>
-          <button
-            style={{
-              ...buttonStyle,
-              backgroundColor: "#ccc",
-              cursor: "not-allowed",
-            }}
-          >
-            delete
-          </button>
         </div>
       </div>
 
