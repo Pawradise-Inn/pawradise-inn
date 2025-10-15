@@ -43,7 +43,7 @@ const App = () => {
       {hideNavbar ? null : isStaffPath ? (
         <Navbar
           paths={["dashboard", "pet-status", "review", "management"]}
-          pages={["dashboard", "pet status", "review", "management"]}
+          pages={["dashboard", "pet-status", "review", "management"]}
           pathIdxHighlight={2}
           prevPath="/staff"
           topNavBar={true}
@@ -132,7 +132,7 @@ const App = () => {
           }
         />
         <Route
-          path="/staff/pet/:id"
+          path="/staff/pet-status/:id"
           element={
             <RequireAuth roles={["STAFF", "ADMIN"]}>
               <PetUpdate />
