@@ -11,6 +11,9 @@ import {
   fetchAllServicesAPI,
   updateServiceAPI,
 } from "../../hooks/serviceAPI"; // Assuming your hook file is at this path
+import { AnimatePresence } from "motion/react";
+import Overlay from "../Overlay";
+import { overlay, popUP } from "../../styles/animation";
 
 const ServiceEdit = () => {
   const { createNotification } = useNotification();
@@ -155,15 +158,30 @@ const ServiceEdit = () => {
       )}
 
       {/* Popup (unchanged, but now calls the updated handlers) */}
-      {isPopupOpen && (
-        <AddServicePopup
-          title={selected ? "Edit service" : "Add service"}
-          initialData={selected}
-          onClose={closePopup}
-          onSave={handleSaveService}
-          onDelete={handleDeleteService}
-        />
+      <AnimatePresence mode="popLayout">
+        {isPopupOpen && (
+        <>
+          <Overlay
+            bgColor="black"
+            variants={overlay}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+          />
+          <AddServicePopup
+            variants={popUP}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            title={selected ? "Edit service" : "Add service"}
+            initialData={selected}
+            onClose={closePopup}
+            onSave={handleSaveService}
+            onDelete={handleDeleteService}
+          />
+        </>
       )}
+      </AnimatePresence>
 
       <Outlet />
     </main>

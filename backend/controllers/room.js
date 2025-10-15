@@ -53,9 +53,9 @@ const getRooms = async (req, res) => {
       where: options.where,
     });
     if (total === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "No rooms are available at the moment" 
+      return res.status(404).json({
+        success: false,
+        message: "No rooms are available at the moment",
       });
     }
 
@@ -78,7 +78,10 @@ const getRooms = async (req, res) => {
       .status(200)
       .json({ success: true, pagination, data: rooms, count: total });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Unable to fetch rooms. Please try again later" });
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch rooms. Please try again later",
+    });
   }
 };
 
@@ -90,7 +93,10 @@ const getRoom = async (req, res) => {
       return res.status(404).json({ success: false, msg: "Room is not found" });
     res.status(200).json({ success: true, data: room });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Unable to fetch room details. Please try again later" });
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch room details. Please try again later",
+    });
   }
 };
 
@@ -108,7 +114,10 @@ const createRoom = async (req, res) => {
     });
     res.status(201).json({ success: true, data: room });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Unable to create room. Please try again later" });
+    res.status(500).json({
+      success: false,
+      message: "Unable to create room. Please try again later",
+    });
   }
 };
 
@@ -123,9 +132,9 @@ const updateRoom = async (req, res) => {
       dataToUpdate.capacity = req.body.capacity;
 
     if (Object.keys(dataToUpdate).length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Please provide details to update" 
+      return res.status(400).json({
+        success: false,
+        message: "Please provide details to update",
       });
     }
 
@@ -137,9 +146,9 @@ const updateRoom = async (req, res) => {
   } catch (err) {
     if (err.code === "P2025")
       return res.status(404).json({ success: false, msg: "Room is not found" });
-    res.status(500).json({ 
-      success: false, 
-      message: "Unable to update room. Please try again later" 
+    res.status(500).json({
+      success: false,
+      message: "Unable to update room. Please try again later",
     });
   }
 };
@@ -154,11 +163,14 @@ const deleteRoom = async (req, res) => {
     res.status(200).json({ success: true, data: {} });
   } catch (err) {
     if (err.code === "P2025")
-      return res.status(404).json({ 
-        success: false, 
-        message: "Room not found or has already been deleted" 
+      return res.status(404).json({
+        success: false,
+        message: "Room not found or has already been deleted",
       });
-    res.status(500).json({ success: false, message: "Unable to delete room. Please try again later" });
+    res.status(500).json({
+      success: false,
+      message: "Unable to delete room. Please try again later",
+    });
   }
 };
 
@@ -171,7 +183,11 @@ const addPicturesToRoom = async (req, res) => {
   } catch (err) {
     if (err.code === "P2025")
       return res.status(404).json({ success: false, msg: "Room is not found" });
-    res.status(500).json({ success: false, error: err.message, message: "Unable to add pictures to room. Please try again later" });
+    res.status(500).json({
+      success: false,
+      error: err.message,
+      message: "Unable to add pictures to room. Please try again later",
+    });
   }
 };
 
@@ -184,7 +200,11 @@ const deletePicturesFromRoom = async (req, res) => {
   } catch (err) {
     if (err.code === "P2025")
       return res.status(404).json({ success: false, msg: "Room is not found" });
-    res.status(500).json({ success: false, error: err.message, message: "Unable to delete pictures from room. Please try again later" });
+    res.status(500).json({
+      success: false,
+      error: err.message,
+      message: "Unable to delete pictures from room. Please try again later",
+    });
   }
 };
 
@@ -211,9 +231,9 @@ const getRoomStatus = async (req, res) => {
     const count = await overlappingRoom(id, checkIn, checkOut);
     res.status(200).json({ success: true, count: count });
   } catch (err) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Unable to check room availability. Please try again later" 
+    res.status(500).json({
+      success: false,
+      message: "Unable to check room availability. Please try again later",
     });
   }
 };
@@ -222,7 +242,6 @@ const getAvailableRooms = async (req, res) => {
   //requirement: 7
 
   try {
-    
     const { checkIn, checkOut } = req.query;
     const entryDate = new Date(checkIn);
     const exitDate = new Date(checkOut);
@@ -266,7 +285,7 @@ const getAvailableRooms = async (req, res) => {
 
         return {
           image: r.picture,
-          roomId: r.id,
+          id: r.id,
           reviewStar: avgRating,
           forWhich: r.petType,
           price: r.price,
@@ -279,7 +298,11 @@ const getAvailableRooms = async (req, res) => {
 
     res.status(200).json({ success: true, data: formattedRooms });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch available rooms. Please try again later" });
+    res.status(500).json({
+      success: false,
+      error: err.message,
+      message: "Unable to fetch available rooms. Please try again later",
+    });
   }
 };
 
@@ -308,7 +331,12 @@ const getRoomsWithPagination = async (req, res) => {
 
     const formattedRooms = await Promise.all(
       rooms.map(async (r) => {
-        const totalReviews = r.ChatLog.length;
+        let totalReviews = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, "total": 0 };
+        r.ChatLog.forEach((c) => {
+          totalReviews[c.rating] += 1;
+          totalReviews["total"] += 1;
+        });
+
         const ratings = r.ChatLog.map((c) => c.rating ?? 5);
         const avgRating = ratings.length
           ? ratings.reduce((a, b) => a + b, 0) / ratings.length
@@ -321,20 +349,24 @@ const getRoomsWithPagination = async (req, res) => {
         const count = await overlappingRoom(r.id, entryDate, exitDate);
         return {
           image: r.picture,
-          roomId: r.id,
+          id: r.id,
           reviewStar: avgRating,
           forWhich: r.petType,
           price: r.price,
           size: count,
           maxsize: r.capacity,
-          commentPages: Math.ceil(totalReviews / 3),
+          commentPages: totalReviews,
         };
       })
     );
 
     res.status(200).json({ success: true, data: formattedRooms });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch rooms. Please try again later" });
+    res.status(500).json({
+      success: false,
+      error: err.message,
+      message: "Unable to fetch rooms. Please try again later",
+    });
   }
 };
 
@@ -347,9 +379,9 @@ const getRoomReviews = async (req, res) => {
     const skip = (page - 1) * take;
 
     if (!roomId) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Please select a room to view reviews" 
+      return res.status(400).json({
+        success: false,
+        message: "Please select a room to view reviews",
       });
     }
     const reviews = await prisma.chatLog.findMany({
@@ -386,9 +418,9 @@ const getRoomReviews = async (req, res) => {
 
     res.status(200).json({ success: true, data: formattedReviews });
   } catch (err) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Unable to fetch room reviews. Please try again later" 
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch room reviews. Please try again later",
     });
   }
 };
