@@ -11,34 +11,34 @@ const findRoomById = async(id)=>{
     return room;
 };
 
-const addRoomPictures = async(id, pictures)=>{
-    const updatedRoom = await prisma.room.update({
-        where: {id: Number(id)},
-        data: {
-            picture: {
-                push: pictures
-            }
-        }
-    });
-    return updatedRoom;
-};
+// const addRoomPictures = async(id, pictures)=>{
+//     const updatedRoom = await prisma.room.update({
+//         where: {id: Number(id)},
+//         data: {
+//             picture: {
+//                 push: pictures
+//             }
+//         }
+//     });
+//     return updatedRoom;
+// };
 
-const removeRoomPictures = async(id, pictures)=>{
-    const room = await findRoomById(id);
+// const removeRoomPictures = async(id, pictures)=>{
+//     const room = await findRoomById(id);
 
-    const updatedPictures = room.picture.filter(
-        url => !pictures.includes(url)
-    );
+//     const updatedPictures = room.picture.filter(
+//         url => !pictures.includes(url)
+//     );
 
-    const updatedRoom = await prisma.room.update({
-        where: {id: id},
-        data: {
-            picture: updatedPictures
-        }
-    });
+//     const updatedRoom = await prisma.room.update({
+//         where: {id: id},
+//         data: {
+//             picture: updatedPictures
+//         }
+//     });
 
-    return updatedRoom;
-};
+//     return updatedRoom;
+// };
 
 const getRoomCap = async(id)=>{
     const room = await findRoomById(id);
@@ -47,7 +47,7 @@ const getRoomCap = async(id)=>{
 
 module.exports = {
     findRoomById,
-    addRoomPictures,
-    removeRoomPictures,
+    // addRoomPictures,
+    // removeRoomPictures,
     getRoomCap
 };

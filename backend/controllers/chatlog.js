@@ -271,11 +271,67 @@ const deleteChatLog = async(req, res)=>{
     }
 };
 
+const getMyreviews = async(req, res)=>{
+    try {
+        const id = req.user.roleId;
+        const chatlog = await prisma.chatLog.findMany({
+            where: {customerId: id},
+            include: {
+                staff: {
+                    include: {
+                        user: {select: {user_name: true}}
+                    }
+                },
+                service: true,
+                room: true
+            }
+        });
+
+        const formatted = chatlog.map((r) => {
+            let name, image, type;
+            if (r.service){
+                name = r.service.name;
+                image = r.service.picture;
+                type = "service";
+            }else if(r.room){
+                name = r.room.name;
+                image = r.room.picture;
+                type = "room";
+            }
+            
+            return {
+                id: r.id,
+                image: image,
+                name: name,
+                date: r.review_date,
+                nameOfStaffReply: r.staff.user.user_name,
+                readingStatus: r.isRead,
+                type: type,
+                rating: r.rating,
+                userReview: r.review,
+            };
+        });
+
+        formatted.sort((a, b) => {
+            if (a.type === 'room' && b.type === 'service') return -1;
+            if (a.type === 'service' && b.type === 'room') return 1; 
+            return new Date(b.date) - new Date(a.date);
+        });
+        res.status(200).json({success: true, data: formatted});
+    }catch(err){
+        res.status(500).json({
+            success: false,
+            message: "Unable to get your reviews. Please try again later"
+        })
+    }
+};
+
 module.exports = {
     getChatLogs,
     getChatLog,
     createChatLog,
     replyToChatLog,
     deleteChatLog,
-    updateChatLog
+    updateChatLog,
+    getMyreviews
 };
