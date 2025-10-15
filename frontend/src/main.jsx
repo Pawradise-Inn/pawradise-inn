@@ -5,14 +5,17 @@ import App from "./App.jsx";
 import { NotificationProvider } from "./context/notification/NotificationProvider.jsx";
 import { AuthProvider } from "./context/AuthProvider.jsx";
 import "./index.css";
+import { ScrollUpArrowProvider } from "./context/ScrollUpArrowProvider.jsx";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <NotificationProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </AuthProvider>
-    </NotificationProvider>
+    <ScrollUpArrowProvider>
+      <NotificationProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </AuthProvider>
+      </NotificationProvider>
+    </ScrollUpArrowProvider>
   </StrictMode>
 );

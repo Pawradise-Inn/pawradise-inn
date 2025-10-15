@@ -2,10 +2,10 @@ import { motion } from "motion/react";
 import { startUpVariants } from "../styles/animation";
 import { NavLink } from "react-router-dom";
 
-const SideBar = ({ link, currentPage, setCurrentPage }) => {
+const SideBar = ({ link, currentPage, setCurrentPage,showLogout }) => {
   
   return (
-    <motion.aside className="min-h-screen text-center w-60 p-4 flex flex-col gap-y-16 font-semibold mr-10 mt-10 mb-10 border-r border-gray-300 ">
+    <motion.aside className="bg-white text-center w-60 p-4 flex flex-col gap-y-16 font-semibold mr-10 mt-10 mb-10 border-r border-gray-300 ">
       {link.map((data, idx) => {
         return (
           <motion.div
@@ -55,16 +55,18 @@ const SideBar = ({ link, currentPage, setCurrentPage }) => {
           </motion.div>
         );
       })}
+      
       {/* Logout Button */}
-      <motion.div className="button-1 relative px-4 py-4 rounded mt-auto ">
-        <NavLink
-          to="/login" // Redirect to login
-          onClick={() => setCurrentPage('/login')} // Set current page to login
-          className="block w-full text-center font-semibold !text-[var(--cream-color)] bg-[var(--dark-brown-color)] hover:bg-white hover:!text-[var(--dark-brown-color)] py-2 px-4 rounded transition-colors"
-        >
-          Logout
-        </NavLink>
-      </motion.div>
+      {showLogout && 
+        <motion.div className="relative px-4 py-4 rounded">
+          <NavLink
+            to="/login" // Redirect to login
+            onClick={() => setCurrentPage('/login')} // Set current page to login
+            className="block w-full text-center bg-[var(--fail-color-alpha)] !text-[var(--cream-color)] py-3 px-4 rounded hover:bg-[var(--cream-color)] hover:!text-[var(--fail-color-alpha)] transition-all duration-300 "
+          >
+            Logout
+          </NavLink>
+        </motion.div>}
     </motion.aside>
   );
 };

@@ -230,7 +230,7 @@ const RoomEdit = () => {
         )}
       </AnimatePresence>
 
-      <Outlet />
+      <Outlet className="overflow-y-hidden" />
     </main>
   );
 };

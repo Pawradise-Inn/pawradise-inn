@@ -98,7 +98,7 @@ const PetOverall = () => {
               initial="hidden"
               animate="visible"
               custom={1.33}
-              className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-sleek"
+              className="space-y-4 max-h-[300px] pr-2 scrollbar-sleek"
             >
               {<PetCard pet={pet} />}
             </motion.div>
@@ -113,7 +113,7 @@ const PetOverall = () => {
             className="mt-8"
           >
             {stayed.length > 0 && (
-                <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 scrollbar-sleek">
+                <div className="space-y-4 max-h-[350px] pr-2 scrollbar-sleek">
                 {stayed.map((s) => (
                   <BookingCard
                     key={s.room.id}
@@ -139,7 +139,7 @@ const PetOverall = () => {
         >
           {scheduled.length > 0 && (
               <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
-              <div className="space-y-6 overflow-y-auto pr-2 scrollbar-sleek">
+              <div className="space-y-6 pr-2 scrollbar-sleek">
                 {scheduled.map((sch) => (
                   <ServiceCard
                     key={sch.id}

@@ -40,7 +40,7 @@ const Dashboard = () => {
       </div>
 
       {/* Content Area */}
-      <div className="w-full flex justify-center mt-8 px-2 sm:px-0">
+      <div className="w-full flex justify-center mt-8 px-2 sm:px-0 overflow-y-hidden">
         <Outlet />
       </div>
     </div>

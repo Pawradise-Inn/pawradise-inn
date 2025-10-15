@@ -88,7 +88,7 @@ const Review = () => {
   return (
     <div>
       <h1 className="text-4xl font-bold mx-6 mt-6">Pawradise/Review</h1>
-      <div className="min-h-screen flex">
+      <div className="min-h-screen flex overflow-y-hidden">
         <ReviewSideBar badge={badge} />
         <Outlet context={{ user, historys, setHistorys }} />
       </div>
