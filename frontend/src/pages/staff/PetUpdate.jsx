@@ -11,24 +11,21 @@ const PetUpdate = () => {
   const { id } = useParams();
   const [pet, setPet] = useState({});
   const [status, setStatus] = useState("");
+  const [scheduled, setScheduled] = useState([]);
   const fetchPet = async () => {
     const response = await fetchPetAPI(id);
     setPet(response.data);
     setStatus(response.data.status);
+    setScheduled(response.data.scheduled)
+    
+    //setServiceData(response.data.scheduled.service)
   };
+
   useEffect(() => {
     fetchPet();
+    console.log(pet)
   }, []);
-  const [serviceData, setServiceData] = useState([
-    {
-      id: 1,
-      service_name: "Bath & Grooming",
-      pet_type: "Dog",
-      status: "completed",
-      staff_name: "Sarah Johnson",
-      img: "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-    }
-  ]);
+
 
   const navigate = useNavigate();
 
@@ -116,10 +113,10 @@ const PetUpdate = () => {
           <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
             <h2 className="text-2xl font-bold mb-6">History</h2>
             <div className="space-y-6 pr-2 scrollbar-sleek">
-              {serviceData.map((service, index) => (
-                <div key={service.id}>
+              {scheduled.map((sch, index) => (
+                <div key={sch.id}>
                   <ServiceCard
-                    service={service}
+                    service={sch.service}
                     getStatusText={getStatusText}
                     getStatusColor={getRoomStatusColor}
                   />

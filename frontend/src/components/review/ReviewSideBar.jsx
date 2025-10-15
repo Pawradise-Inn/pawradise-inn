@@ -21,6 +21,7 @@ const ReviewSideBar = ({ badge }) => {
       link={link}
       currentPage={currentPage}
       setCurrentPage={setCurrentPage}
+      showLogout={false}
     />
   );
 };
