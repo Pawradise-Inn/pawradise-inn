@@ -123,7 +123,7 @@ const BookingService = () => {
 
       <AnimatePresence initial={true}>
         {popUpStatus ? (
-          <>
+          <div>
             <Overlay
               variants={overlay}
               initial="hidden"
@@ -140,7 +140,7 @@ const BookingService = () => {
               data={popUpData}
               onClick={handlePopUpData}
             />
-          </>
+          </div>
         ) : null}
       </AnimatePresence>
     </div>

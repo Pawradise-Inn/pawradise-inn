@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+/* ---------------------------------- setting html ---------------------------------- */
+
 * {
   box-sizing: border-box;
   color: var(--dark-brown-color);
@@ -19,6 +21,8 @@ body {
   overflow-x: hidden;
   overflow-y: hidden;
 }
+
+/* ---------------------------------- scroll bar ---------------------------------- */
 
 /* Minimal sleek scrollbar */
 .scrollbar-sleek {
@@ -71,6 +75,8 @@ body {
   background: var(--dark-brown-color);
 }
 
+/* ---------------------------------- root ---------------------------------- */
+
 :root {
   /* color */
   --dark-brown-color: rgb(56, 34, 14);
@@ -98,6 +104,8 @@ body {
   --beige-cream-color: rgb(254, 247, 219);
 }
 
+/* ---------------------------------- font ---------------------------------- */
+
 @font-face {
   font-family: "Roboto";
   src: url(../src/assets/Roboto-VariableFont_wdth\wght.ttf);
@@ -107,4 +115,69 @@ body {
   font-family: "Roboto";
   src: url(../src//assets/Roboto-Italic-VariableFont_wdth\wght.ttf);
   font-style: italic;
+}
+
+/* ---------------------------------- react datepicker ---------------------------------- */
+
+.react-datepicker {
+  @apply bg-[var(--light-brown-color)] border-2 border-[var(--dark-brown-color)] z-50;
+}
+
+.react-datepicker__header:not(.react-datepicker__header--has-time-select) {
+  @apply rounded-none z-40 transition-all duration-200;
+}
+
+.react-datepicker__header {
+  @apply bg-[var(--brown-color)] border-none py-3 z-40 transition-all duration-200;
+}
+
+.react-datepicker__current-month {
+  @apply !text-[var(--cream-color)] z-50 transition-all duration-200;
+}
+
+.react-datepicker__navigation {
+  @apply border-none top-0 h-[40px] z-50 transition-all duration-200;
+}
+
+.react-datepicker__navigation-icon::before {
+  @apply border-[var(--cream-color)] translate-y-1/3;
+}
+
+.react-datepicker__day-name {
+  @apply text-sm text-[var(--dark-brown-color)] border-t-0 my-2 z-50 transition-all duration-200;
+}
+
+.react-datepicker__day {
+  @apply inline-flex items-center justify-center rounded-full z-50 transition-all duration-200;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--selected:not([aria-disabled="true"]):hover,
+.react-datepicker__day:not([aria-disabled="true"]):hover,
+.react-datepicker__day--keyboard-selected {
+  @apply bg-[var(--cream-color)] !text-[var(--dark-brown-color)] rounded-full z-50;
+}
+
+.react-datepicker__day {
+  @apply font-normal z-50 transition-all duration-200;
+}
+
+.react-datepicker__triangle {
+  display: none;
+}
+
+.react-datepicker-popper {
+  @apply z-50;
+}
+
+.react-datepicker__month-container {
+  @apply z-50;
+}
+
+.react-datepicker__month {
+  @apply z-50;
+}
+
+.react-datepicker__week {
+  @apply z-50;
 }

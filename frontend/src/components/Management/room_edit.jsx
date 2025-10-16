@@ -207,7 +207,7 @@ const RoomEdit = () => {
       {/* Popup */}
       <AnimatePresence mode="popLayout">
         {isPopupOpen && (
-          <>
+          <div>
             <Overlay
               bgColor="black"
               variants={overlay}
@@ -226,7 +226,7 @@ const RoomEdit = () => {
               onSave={handleSaveRoom}
               onDelete={(id) => handleDeleteRoom(id)}
             />
-          </>
+          </div>
         )}
       </AnimatePresence>
 

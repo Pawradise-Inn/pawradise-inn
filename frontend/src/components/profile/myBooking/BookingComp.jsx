@@ -98,7 +98,7 @@ const BookingComp = () => {
       {/* Cancel Popup with overlay and animation */}
       <AnimatePresence initial={true}>
         {showModal ? (
-          <>
+          <div>
             <Overlay
               variants={overlay}
               initial="hidden"
@@ -115,7 +115,7 @@ const BookingComp = () => {
               onConfirm={handleConfirmCancel}
               onCancel={handleCloseModal}
             />
-          </>
+          </div>
         ) : null}
       </AnimatePresence>
     </div>

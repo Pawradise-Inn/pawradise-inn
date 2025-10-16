@@ -215,7 +215,7 @@ export default function Login({
 
           {/* Register link — โชว์เฉพาะลูกค้า */}
           {role === "customer" && (
-            <>
+            <div>
               <motion.hr
                 className="border-t-2 border-[var(--brown-color)] w-3/4 my-4 mx-auto"
                 variants={startUpVariants}
@@ -238,7 +238,7 @@ export default function Login({
                   Register here
                 </NavLink>
               </motion.p>
-            </>
+            </div>
           )}
 
           {/* Footer links */}

@@ -137,9 +137,9 @@ const ReviewPopup = ({ data, onClick, editable, ...motionProps }) => {
           )}
 
           {!data.nameOfStaffReply && (
-            <>
+            <div>
               {editable ? (
-                <>
+                <div>
                   <button
                     // !dataStatus, editable
                     onClick={() =>
@@ -173,7 +173,7 @@ const ReviewPopup = ({ data, onClick, editable, ...motionProps }) => {
                   >
                     Delete
                   </button>
-                </>
+                </div>
               ) : (
                 <button
                   // !dataStatus, !editable
@@ -197,7 +197,7 @@ const ReviewPopup = ({ data, onClick, editable, ...motionProps }) => {
                   Submit
                 </button>
               )}{" "}
-            </>
+            </div>
           )}
         </div>
       </div>

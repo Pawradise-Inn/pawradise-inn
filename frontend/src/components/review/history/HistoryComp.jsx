@@ -49,7 +49,7 @@ const HistoryComp = () => {
 
       <AnimatePresence initial={true}>
         {popUpStatus ? (
-          <>
+          <div>
             <Overlay
               variants={overlay}
               initial="hidden"
@@ -66,7 +66,7 @@ const HistoryComp = () => {
               editable={popUpEditable}
               onClick={() => handlePopUpData({}, false)}
             />
-          </>
+          </div>
         ) : null}
       </AnimatePresence>
     </div>

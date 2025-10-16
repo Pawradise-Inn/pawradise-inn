@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useState } from "react";
+import { forwardRef, useCallback, useEffect, useState } from "react";
 import BookingPopup from "../../components/booking/BookingPopup";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import Overlay from "../../components/Overlay";
@@ -9,10 +9,11 @@ import {
   fetchAvailableRoomsAPI,
 } from "../../hooks/roomAPI";
 import { overlay, popUP, startUpVariants } from "../../styles/animation";
-import { handleFormDataChange } from "../../utils/handleForm";
 import { removeWindowScroll } from "../../utils/handlePopup";
 import { getDateValidation } from "../../utils/handleValidation";
 import DropDownList from "../../components/DropDownList";
+import "react-datepicker/dist/react-datepicker.css";
+import DateDropDown from "../../components/DateDropDown";
 
 const BookingRoom = () => {
   const petTypes = [null, "DOG", "CAT", "MOUSE", "RABBIT", "BIRD"];
@@ -30,9 +31,18 @@ const BookingRoom = () => {
   const [popUpStatus, setPopUpStatus] = useState(false);
   const [popUpData, setPopUpData] = useState([]);
 
-  useEffect(() => {
-    console.log(filterRoom);
-  }, [filterRoom]);
+
+  const CheckInRef = forwardRef(({ value, onClick, className }, ref) => (
+    <button type="button" ref={ref} onClick={onClick} className={className}>
+      {value || "mm/dd/yyyy"}
+    </button>
+  ));
+
+  const CheckOutRef = forwardRef(({ value, onClick, className }, ref) => (
+    <button type="button" ref={ref} onClick={onClick} className={className}>
+      {value || "mm/dd/yyyy"}
+    </button>
+  ));
 
   //   if filter.petType is not null return data with filter with petType else return data itself back
   //   @params: filteredRoom -> data that want to filter
@@ -164,22 +174,26 @@ const BookingRoom = () => {
         <div className="flex flex-col justify-start items-center gap-6 w-7/10 py-4 px-8">
           <p className="text-xl font-bold">Booking date</p>
           <div className="relative w-full rounded-xl bg-[var(--brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1 before:border-white">
-            <input
-              required
-              type="date"
-              className="relative w-1/2 !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer"
-              onChange={(e) => handleFormDataChange(e, setFilter)}
-              onFocus={() => setMounted(true)}
-              name="entryDate"
-            />
-            <input
-              required
-              type="date"
-              className="relative w-1/2 !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer"
-              onChange={(e) => handleFormDataChange(e, setFilter)}
-              onFocus={() => setMounted(true)}
-              name="exitDate"
-            />
+            <div className="relative w-1/2 inline-block">
+            <DateDropDown
+                value={filter.entryDate}
+                onChange={(date) => setFilter((prev) => ({ ...prev, entryDate: date }))}
+                onFocus={() => setMounted(true)}
+                customInput={
+                  <CheckInRef className="w-full !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer text-start" />
+                }
+              />
+            </div>
+            <div className="relative w-1/2 inline-block">
+              <DateDropDown
+                value={filter.exitDate}
+                onChange={(date) => setFilter((prev) => ({ ...prev, exitDate: date }))}
+                onFocus={() => setMounted(true)}
+                customInput={
+                  <CheckOutRef className="w-full !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer text-start" />
+                }
+              />
+            </div>
           </div>
         </div>
       </motion.form>
@@ -221,7 +235,7 @@ const BookingRoom = () => {
 
       <AnimatePresence mode="popLayout" initial={true}>
         {popUpStatus ? (
-          <>
+          <div>
             <Overlay
               variants={overlay}
               initial="hidden"
@@ -238,7 +252,7 @@ const BookingRoom = () => {
               data={popUpData}
               onClick={handlePopUpData}
             />
-          </>
+          </div>
         ) : null}
       </AnimatePresence>
     </div>

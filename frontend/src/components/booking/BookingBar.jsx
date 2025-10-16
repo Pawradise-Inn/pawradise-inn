@@ -1,7 +1,7 @@
 // this file still have to fetch userId from token
 
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import { createBookedRoom } from "../../hooks/bookedRoomAPI";
 import { createBookedService } from "../../hooks/bookedServiceAPI";
 import { fetchCustomerPets, fetchAvailablePetAPI } from "../../hooks/petAPI";
@@ -10,8 +10,6 @@ import {
   fetchServiceReviewsAPI,
   getServiceStatusAPI,
 } from "../../hooks/serviceAPI";
-import "../../styles/bookingBarStyle.css";
-import { handleFormDataChange } from "../../utils/handleForm";
 import { getDateValidation } from "../../utils/handleValidation";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import CommentCard from "./CommentCard";
@@ -21,6 +19,7 @@ import { useAuth } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { notification, startUpVariants } from "../../styles/animation";
 import DropDownList from "../DropDownList";
+import DateDropDown from "../DateDropDown";
 
 // data: { image, name, review, forwhich, price, size, maxsize, headerType } of service and room
 const BookingBar = ({ data, popupStatus, onClick }) => {
@@ -42,6 +41,24 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     exitDate: "",
     entryTime: "",
   });
+
+  const CheckInRef = forwardRef(({ value, onClick, className }, ref) => (
+    <div ref={ref}>
+      <button type="button" onClick={onClick} className={className}>
+        {value || "mm/dd/yyyy"}
+      </button>
+      {/* <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i> */}
+    </div>
+  ));
+
+  const CheckOutRef = forwardRef(({ value, onClick, className }, ref) => (
+    <div ref={ref}>
+      <button type="button" onClick={onClick} className={className}>
+        {value || "mm/dd/yyyy"}
+      </button>
+      {/* <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i> */}
+    </div>
+  ));
 
   //  calculate date is valid or not
   //  @return: validDateStatus which contain 1)status, 2)warningText
@@ -349,25 +366,29 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
           />
         </div>
         <form onSubmit={handleFormSubmit}>
-          <b className="mb-2 text-3xl inline-block w-1/2 ">Entry date</b>
+          <div className="w-1/2 mb-2 inline-block">
+            <b className="text-3xl">Entry date</b>
+          </div>
           {data.headerType == "Service" ? (
-            <>
-              <b className="mb-2 text-3xl inline-block w-1/2">Entry time</b>
-            </>
+            <div className="w-1/2 mb-2 inline-block">
+              <b className="text-3xl">Entry time</b>
+            </div>
           ) : (
-            <>
-              <b className="mb-2 text-3xl inline-block w-1/2">Exit date</b>
-            </>
+            <div className="w-1/2 mb-2 inline-block">
+              <b className="text-3xl">Exit date</b>
+            </div>
           )}
           <div className="grid grid-cols-2 relative mb-4 w-full rounded-xl text-2xl bg-[var(--light-brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1  before:border-[var(--dark-brown-color)]">
             <div className="w-full relative">
-              <input
-                type="date"
-                className="relative w-full rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
-                onChange={(e) => handleFormDataChange(e, setFormData)}
-                name="entryDate"
+              <DateDropDown
+                value={formData.entryDate}
+                onChange={(date) =>
+                  setFormData((prev) => ({ ...prev, entryDate: date }))
+                }
+                customInput={
+                  <CheckInRef className="relative w-full rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer text-start" />
+                }
               />
-              <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
             </div>
             {data.headerType === "Service" ? (
               <DropDownList
@@ -386,13 +407,15 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
               />
             ) : (
               <div className="w-full">
-                <input
-                  type="date"
-                  className="relative w-full rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer"
-                  onChange={(e) => handleFormDataChange(e, setFormData)}
-                  name="exitDate"
+                <DateDropDown
+                  value={formData.exitDate}
+                  onChange={(date) =>
+                    setFormData((prev) => ({ ...prev, exitDate: date }))
+                  }
+                  customInput={
+                    <CheckOutRef className="relative w-full rounded-2xl px-4 py-2 text-2xl outline-0 cursor-pointer text-start" />
+                  }
                 />
-                <i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
               </div>
             )}
           </div>

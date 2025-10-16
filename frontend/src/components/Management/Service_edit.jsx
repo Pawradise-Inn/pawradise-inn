@@ -160,7 +160,7 @@ const ServiceEdit = () => {
       {/* Popup (unchanged, but now calls the updated handlers) */}
       <AnimatePresence mode="popLayout">
         {isPopupOpen && (
-        <>
+        <div>
           <Overlay
             bgColor="black"
             variants={overlay}
@@ -179,7 +179,7 @@ const ServiceEdit = () => {
             onSave={handleSaveService}
             onDelete={handleDeleteService}
           />
-        </>
+        </div>
       )}
       </AnimatePresence>
 

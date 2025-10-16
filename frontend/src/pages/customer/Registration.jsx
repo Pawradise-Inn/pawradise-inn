@@ -144,7 +144,7 @@ const Registration = () => {
   }, []);
 
   return (
-    <>
+    <div>
       <div className="flex flex-row w-full bg-[var(--cream-color)]">
         <motion.div
           className="w-3/5"
@@ -281,7 +281,7 @@ const Registration = () => {
           </form>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

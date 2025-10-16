@@ -283,7 +283,7 @@ const DashboardTab1 = () => {
       )}{" "}
       <AnimatePresence mode="popLayout">
         {isPopupOpen && (
-          <>
+          <div>
             <Overlay
               variants={overlay}
               initial="hidden"
@@ -300,7 +300,7 @@ const DashboardTab1 = () => {
               onClose={handleClosePopup}
               onSave={handleSaveItem}
             />
-          </>
+          </div>
         )}
       </AnimatePresence>
       <Outlet className="overflow-y-hidden" />{" "}

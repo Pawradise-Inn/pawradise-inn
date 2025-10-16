@@ -19,10 +19,10 @@ const HistoryCard = ({ data, onClick, ...motionProps }) => {
   const getDateBlock = (dateWithTime) => {
     const [date, time] = dateWithTime.replace(".000Z", "").split("T");
     return (
-      <>
+      <div>
         <span className={ `py-1 px-3 rounded-xl mr-2 ${getStatusColor("IDLE")}`}>{date}</span>
         <span className={ `py-1 px-3 rounded-xl mr-2 ${getStatusColor("IDLE")}`}>{time}</span>
-      </>
+      </div>
     );
   };
 

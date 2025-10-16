@@ -25,6 +25,14 @@ const dropDown = {
       scaleY: { duration: 0.2 },
     },
   },
+  exit: {
+    opacity: 0,
+    scaleY: 0,
+    transition: {
+      opacity: { duration: 0.1 },
+      scaleY: { duration: 0.2 },
+    },
+  },
 };
 
 const notification = {
