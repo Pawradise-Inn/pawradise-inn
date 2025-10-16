@@ -114,7 +114,6 @@ const NewPet = () => {
                   pictureUrl = await uploadImageAPI(formData.petImage);
                   console.log(pictureUrl)
           }
-          
                 // 2. PREPARE NEW PET DATA
                 const newPet = {
                   name: formData.petName,
@@ -137,13 +136,13 @@ const NewPet = () => {
 
                 // 4. UPDATE CUSTOMER'S LOCAL PET LIST (DB & Context)
                 // Safely get current pets or initialize to an empty array
-                const currentPets = user.customer.pets || [];
+                const currentPets = user.pets || [];
                 
                 // Create a NEW array and push the new pet (Avoids mutating state)
                 const updatedPetsArr = [...currentPets, newPet]; 
                 
                 // Prepare the customer object with the updated pets list
-                const updatedCustomerData = { ...user.customer, pets: updatedPetsArr }; 
+                const updatedCustomerData = { ...user, pets: updatedPetsArr }; 
 
                 // 5. UPDATE CUSTOMER IN DB (to link the new pet list)
                 await updateCustomerAPI(user.customer.id, updatedCustomerData);
@@ -278,6 +277,7 @@ const NewPet = () => {
             </button>
             <button
               onClick={handleConfirm}
+              disabled={!user || !user.id}
               className="!text-white px-6 py-2 bg-[var(--dark-brown-color)] rounded hover:scale-90 transition-all duration-300 cursor-pointer"
             >
               Done

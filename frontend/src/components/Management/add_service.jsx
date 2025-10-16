@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import DropDownList from "../DropDownList";
 import { motion } from "motion/react";
+import { useNotification } from "../../context/notification/NotificationProvider";
+import { fetchPetTypesAPI } from "../../hooks/serviceAPI";
 
 const AddServicePopup = ({
   title = "Add service",
@@ -10,17 +12,32 @@ const AddServicePopup = ({
   onDelete,
   ...motionProps
 }) => {
+  const { createNotification } = useNotification();
+
   const [name, setName] = useState(initialData?.name || "");
-  const [petType, setPetType] = useState(initialData?.petType || "");
+  const [petType, setPetType] = useState(initialData?.petType?.[0] || "");
   const [price, setPrice] = useState(initialData?.price ?? "");
   const [image, setImage] = useState(initialData?.image || "");
+  const [petTypeOptions, setPetTypeOptions] = useState([]);
 
   useEffect(() => {
     setName(initialData?.name || "");
-    setPetType(initialData?.petType || "");
+    setPetType(initialData?.petType?.[0] || "");
     setPrice(initialData?.price ?? "");
     setImage(initialData?.image || "");
   }, [initialData]);
+
+  useEffect(() => {
+    const loadPetTypes = async () => {
+      try {
+        const response = await fetchPetTypesAPI();
+        setPetTypeOptions(response.data);
+      } catch(err) {
+        console.error("Failed to fetch pet types: ", err);
+      }
+    };
+    loadPetTypes();
+  }, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
@@ -29,16 +46,21 @@ const AddServicePopup = ({
 
   const handleSubmit = (e) => {
     e.preventDefault?.();
-    const payload = { name, petType, price: Number(price), image };
+    const payload = { name, petType: [petType.toUpperCase()], price: Number(price), image };
     onSave && onSave(payload);
   };
 
   const handleDelete = () => {
     if (!initialData?.id) return;
-    const ok = window.confirm(`Delete "${name}"? This cannot be undone.`);
-    if (ok) {
-      onDelete && onDelete(initialData.id);
-    }
+    
+    createNotification(
+        "warning",
+        "Confirm Deletion",
+        `Are you sure you want to delete "${name}"? This cannot be undone.`,
+        () => {
+          onDelete?.(initialData.id);
+        }
+    );
   };
 
   return (
@@ -80,12 +102,12 @@ const AddServicePopup = ({
             </label>
             <DropDownList
               startText="Select..."
-              options={["dog", "cat", "other"].map((type) => ({
+              options={petTypeOptions.map((type) => ({
                 name: type,
                 value: type,
               }))}
               value={petType}
-              onChange={(value) => setPetType(value)}
+              onChange={(option) => setPetType(option.value)}
               inputSyle="mt-1 border rounded-md px-3 py-2"
               dropDownStyle="bg-white border border-$var(--brown-color) origin-top translate-y-1"
               arrowColor="var(--light-brown-color)"
