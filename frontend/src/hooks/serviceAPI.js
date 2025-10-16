@@ -52,7 +52,7 @@ export const updateServiceAPI = async (id, serviceData) => {
 
 //requiement 6
 export const getServiceStatusAPI = async (name, entryDate) => {
-  const response = await axiosInstance.get(`${API_URL}/status`, { params: { name: name, entryDate: entryDate } });
+  const response = await axiosInstance.get(`${API_URL}/status`, { params: { name: name, entry_date_with_time: entryDate } });
   return response.data;
 };
 // --- Custom Requirement Operations ---

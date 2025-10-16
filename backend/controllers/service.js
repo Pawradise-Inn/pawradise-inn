@@ -116,8 +116,12 @@ const updateService = async (req, res) => {
         const dataToUpdate = {};
         if (req.body.name !== undefined) dataToUpdate.name = req.body.name;
         if (req.body.price !== undefined) dataToUpdate.price = req.body.price;
-        if (req.body.petType !== undefined) dataToUpdate.petType = req.body.petType;
-        if (req.body.petType !== undefined) dataToUpdate.petType = req.body.petType;
+        if (req.body.petType !== undefined){
+            const petTypes = Array.isArray(req.body.petType)
+                ? req.body.petType.map(p => p.toUpperCase())
+                : [req.body.petType.toUpperCase()];
+            dataToUpdate.petType = petTypes;
+        }
         if (req.body.picture !== undefined) dataToUpdate.picture = req.body.picture;
 
         if(Object.keys(dataToUpdate).length === 0) return res.status(400).json({success: false, msg: "Please provide details to update"});
@@ -287,18 +291,6 @@ const getServiceReviews = async (req, res) => { //requirement: 5
   }
 };
 
-const getPetTypes = (req, res) => {
-    try {
-        const petTypes = Object.values(Prisma.PetType || {});
-        if (petTypes.length === 0) {
-            res.status(200).json({ success: true, data: ['DOG', 'CAT', 'MOUSE', 'RABBIT', 'BIRD']});
-        }
-        res.status(200).json({ success: true, data: petTypes});
-    } catch(err) {
-        res.status(500).json({ success: false, message: "Could not fetch pet types." });
-    }
-};
-
 
 module.exports = {
     getServices,
@@ -310,6 +302,5 @@ module.exports = {
     deletePicturesFromService,
     getServiceStatus,
     getServicesWithPagination,
-    getServiceReviews,
-    getPetTypes
+    getServiceReviews
 };
