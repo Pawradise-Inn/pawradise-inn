@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import HistoryCard from "./HistoryCard";
-import { getChatLogsAPI } from "../../../hooks/chatlogAPI";
 import { useNotification } from "../../../context/notification/NotificationProvider";
 import ReviewPopup from "../ReviewPopUp";
 import Overlay from "../../Overlay";
 import { overlay, popUP, startUpVariants } from "../../../styles/animation";
 import { AnimatePresence } from "motion/react";
+import { useState } from "react";
+import { updateChatLogAPI } from "../../../hooks/chatlogAPI";
 
 const HistoryComp = () => {
   const { createNotification } = useNotification();
@@ -14,25 +14,6 @@ const HistoryComp = () => {
   const [popUpStatus, setPopUpStatus] = useState(false);
   const [popUpData, setPopUpData] = useState({});
   const [popUpEditable, setPopUpEditable] = useState(false);
-
-  // img, name, petName, date, staffName, staffReply, status, type("Service" or "Room")
-
-  useEffect(() => {
-    if (user) {
-      // getChatLogsAPI({ customerId: user.customer.id })
-      //   .then((data) => {
-      //     console.log(data)
-      //     setHistorys(data.data);
-      //   })
-      //   .catch((err) => {
-      //     createNotification(
-      //       "fail",
-      //       "Failed to get comment history.",
-      //       err.message
-      //     );
-      //   });
-    }
-  }, [user]);
 
   const handlePopUpData = (data, editable) => {
     setPopUpStatus(!popUpStatus);
@@ -48,10 +29,20 @@ const HistoryComp = () => {
             variants={startUpVariants}
             initial="hidden"
             animate="visible"
-            custom={idx/3 + 1}
+            custom={idx / 3 + 1}
             data={history}
-            onClick={() => handlePopUpData(history, true)}
             key={history.id}
+            onClick={() => {
+              handlePopUpData(history, true);
+              if (!history.readingStatus && history.nameOfStaffReply) {
+                updateChatLogAPI(history.id, { isRead: true });
+                setHistorys((prev) => {
+                  const newHistorys = [...prev];
+                  newHistorys[idx].readingStatus = true;
+                  return newHistorys;
+                });
+              }
+            }}
           />
         );
       })}
@@ -72,7 +63,6 @@ const HistoryComp = () => {
               animate="visible"
               exit="hidden"
               data={popUpData}
-              setHistorys={setHistorys}
               editable={popUpEditable}
               onClick={() => handlePopUpData({}, false)}
             />

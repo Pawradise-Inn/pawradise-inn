@@ -1,11 +1,12 @@
-import { motion } from "motion/react";
-import {  useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useAuth } from "../../../context/AuthProvider";
 import { updateCustomerAPI } from "../../../hooks/customerAPI";
-import { startUpVariants } from "../../../styles/animation";
+import { overlay, popUP, startUpVariants } from "../../../styles/animation";
 import { useNotification } from "../../../context/notification/NotificationProvider";
 import { deleteMeAPI } from "../../../hooks/authAPI";
+import Overlay from "../../Overlay";
 
 const ProfileComp = () => {
   const { createNotification } = useNotification();
@@ -27,6 +28,9 @@ const ProfileComp = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [password, setPassword] = useState("");
   const [submitErr, setSubmitErr] = useState("");
+
+  const role = user?.role?.toString?.().toLowerCase?.();
+  const isStaff = role === "staff";
 
   const fields = [
     {
@@ -58,63 +62,88 @@ const ProfileComp = () => {
   }, [user]);
 
   const handleCancel = () => {
-    createNotification({status: "warning",header: "Are you sure to cancel your change?",text: "Your modified infomation will be discarded.",onClick: () => {
-      if(user) setNewUser({id: user.id, ... user})
-    }})
+    createNotification(
+      "warning",
+      "Are you sure to cancel your change?",
+      "Your modified infomation will be discarded.",
+      () => {
+        if (user) setNewUser({ id: user.id, ...user });
+      }
+    );
   };
+
   const handleConfirm = async (e) => {
     e.preventDefault();
     if (!newUser.id) return;
-    createNotification({
-      status: "warning",
-      header: "Confirmation.",
-      text: "Are you sure to update the data?",
-      onClick: async () => {
+    createNotification(
+      "warning",
+      "Confirmation.",
+      "Are you sure to update the data?",
+      async () => {
         try {
           const { id, ...userObjected } = newUser;
-          const data = await updateCustomerAPI(user.customer.id, userObjected);
-          setUser?.(data.data); 
-          createNotification({
-            status: "success",
-            header: "Profile updated successfully!",
-            text: "Your update has been saved."
-        });
+          const data = await updateCustomerAPI(user.id, userObjected);
+          setUser?.(data.data);
+          createNotification(
+            "success",
+            "Profile updated successfully!",
+            "Your update has been saved."
+          );
         } catch (err) {
           console.error("Update failed:", err);
-          // The axios interceptor will handle showing the error notification
+          // handled by axios interceptor
         }
       }
-  });
+    );
   };
+
   const openDeleteModal = () => {
+    // Safety: แม้ปุ่มจะถูกซ่อนอยู่แล้ว แต่กันไว้เผื่อถูกเรียกใช้ทางอื่น
+    if (isStaff) {
+      createNotification(
+        "warning",
+        "Action not allowed",
+        "Staff profile cannot delete account."
+      );
+      return;
+    }
     setPassword("");
     setSubmitErr("");
     setShowDeleteModal(true);
   };
 
   const confirmDelete = () => {
+    // Safety: กันการลบจาก staff
+    if (isStaff) {
+      createNotification(
+        "warning",
+        "Action not allowed",
+        "Staff profile cannot delete account."
+      );
+      return;
+    }
+
     if (!password) {
       setSubmitErr("Please enter your password.");
       return;
     }
 
     setShowDeleteModal(false);
-    setUser?.(null); 
-    deleteMeAPI().then((data) => {
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("token");
-      createNotification({
-        status: "success",
-        header: "Account deletion confirmed",
-        text: "Your account would be deleted. Any active bookings (if any) would be automatically declined."
+    setUser?.(null);
+    deleteMeAPI()
+      .then(() => {
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        createNotification(
+          "success",
+          "Account deletion confirmed",
+          "Your account would be deleted. Any active bookings (if any) would be automatically declined."
+        );
+        navigate("/register");
+      })
+      .catch((err) => {
+        console.error(err);
       });
-      navigate("/register", { replace: true })
-    })
-    .catch((err) => {
-      createNotification("fail", "Delete failed", "Failed to delete.");
-    });
-
-
   };
 
   return (
@@ -166,102 +195,128 @@ const ProfileComp = () => {
             ))}
           </div>
 
-          {/* actions */}
-          <div className="flex justify-between items-center mt-8 pt-6 border-t border-[var(--brown-color)]">
-            <button
-              type="button"
-              onClick={openDeleteModal}
-              className="px-6 py-2 font-bold bg-white rounded shadow 
-                         transition-all duration-300 !text-red-600 hover:bg-red-400 hover:!text-white"
-            >
-              Delete account
-            </button>
+          {/* Action Buttons Section */}
+          <div className={`
+            flex items-center mt-8 pt-6 
+            border-t border-[var(--brown-color)]
+            ${isStaff ? "justify-end" : "justify-between"}
+          `}>
+            {/* Delete Account Button - Only shown for non-staff */}
+            {!isStaff && (
+              <button
+                type="button"
+                onClick={openDeleteModal}
+                className="px-6 py-2 font-bold rounded shadow cursor-pointer
+                          bg-white !text-red-600 
+                          hover:bg-red-400 hover:!text-white
+                          transition-all duration-300"
+              >   
+                Delete account
+              </button>
+            )}
 
+            {/* Cancel and Done Buttons */}
             <div className="flex space-x-8">
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-6 py-2 rounded hover:bg-[var(--light-brown-color)] hover:scale-90 transition-all duration-300 cursor-pointer"
+                className="px-6 py-2 rounded cursor-pointer
+                          hover:bg-[var(--light-brown-color)] hover:scale-90
+                          transition-all duration-300"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="!text-white px-6 py-2 bg-[var(--dark-brown-color)] rounded hover:scale-90 transition-all duration-300 cursor-pointer"
+                className="px-6 py-2 rounded cursor-pointer
+                          !text-white bg-[var(--dark-brown-color)]
+                          hover:scale-90
+                          transition-all duration-300"
               >
                 Done
               </button>
             </div>
           </div>
-        </motion.div>
-      </form>
 
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/60"
-            onClick={() => setShowDeleteModal(false)}
-          />
-          <div className="relative z-10 w-[min(680px,90vw)] rounded-2xl bg-white p-8 shadow-2xl">
-            <button
+          </motion.div>
+          </form>
+
+          <AnimatePresence mode="popLayout">
+        {showDeleteModal && !isStaff && (
+          <>
+            <Overlay
+              variants={overlay}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              bgColor="black"
               onClick={() => setShowDeleteModal(false)}
-              className="absolute right-4 top-3 text-2xl leading-none hover:opacity-70"
-              aria-label="Close"
+            />
+            <motion.div
+              variants={popUP}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[min(680px,90vw)] rounded-2xl bg-white p-8 shadow-2xl"
             >
-              
-            </button>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="absolute right-4 top-3 text-2xl leading-none hover:opacity-70"
+                aria-label="Close"
+              ></button>
 
-            <h2 className="text-center text-3xl font-extrabold mb-6">
-              Are you sure ?
-            </h2>
+              <h2 className="text-center text-3xl font-extrabold mb-6">
+                Are you sure ?
+              </h2>
 
-            <div className="px-2">
-              <h3 className="text-lg font-semibold mb-2">Delete account</h3>
+              <div className="px-2">
+                <h3 className="text-lg font-semibold mb-2">Delete account</h3>
 
-              <p className="text-[var(--brown-color)]/80 mb-4">
-                Deleting your account is permanent.&nbsp;
-                <span className="font-semibold">
-                  {typeof activeBookingCount === "number"
-                    ? `You currently have ${activeBookingCount} active booking${
-                        activeBookingCount > 1 ? "s" : ""
-                      }; they will be automatically declined.`
-                    : "Any active bookings (if any) will be automatically declined."}
-                </span>
-              </p>
+                <p className="text-[var(--brown-color)]/80 mb-4">
+                  Deleting your account is permanent.&nbsp;
+                  <span className="font-semibold">
+                    {typeof activeBookingCount === "number"
+                      ? `You currently have ${activeBookingCount} active booking${
+                          activeBookingCount > 1 ? "s" : ""
+                        }; they will be automatically declined.`
+                      : "Any active bookings (if any) will be automatically declined."}
+                  </span>
+                </p>
 
-              <div className="space-y-3">
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border-2 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none"
-                />
-                {submitErr && (
-                  <p className="text-[var(--fail-color)] text-sm">
-                    {submitErr}
-                  </p>
-                )}
+                <div className="space-y-3">
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border-2 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none"
+                  />
+                  {submitErr && (
+                    <p className="text-[var(--fail-color)] text-sm">
+                      {submitErr}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-center gap-6 mt-8">
+                  <button
+                    onClick={confirmDelete}
+                    className="cursor-pointer px-8 py-2 rounded-lg !text-white bg-[var(--dark-brown-color)] hover:opacity-90 transition"
+                  >
+                    confirm
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    className="cursor-pointer px-8 py-2 rounded-lg text-[var(--dark-brown-color)] bg-[var(--light-brown-color)] hover:opacity-90 transition"
+                  >
+                    cancel
+                  </button>
+                </div>
               </div>
-
-              <div className="flex items-center justify-center gap-6 mt-8">
-                <button
-                  onClick={confirmDelete}
-                  className="px-8 py-2 rounded-lg !text-white bg-[var(--dark-brown-color)] hover:opacity-90 transition"
-                >
-                  confirm
-                </button>
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="px-8 py-2 rounded-lg text-[var(--dark-brown-color)] bg-[var(--light-brown-color)] hover:opacity-90 transition"
-                >
-                  cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

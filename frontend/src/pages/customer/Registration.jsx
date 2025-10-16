@@ -10,7 +10,6 @@ import { startUpVariants } from "../../styles/animation";
 import { useScrollUpArrow } from "../../context/ScrollUpArrowProvider";
 
 const Registration = () => {
-
   const { createNotification } = useNotification();
   const { setShow } = useScrollUpArrow();
   const [form, setForm] = useState({
@@ -22,70 +21,72 @@ const Registration = () => {
     confirmPassword: "",
     phoneNumber: "",
   });
-  
 
   const [consentChecked, setConsentChecked] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const navigate = useNavigate();
-  const {setUser} = useAuth();
+  const { setUser } = useAuth();
 
-  
-const fields = [
-  {
-    label: "Firstname",
-    name: "firstname",
-    type: "text",
-    placeholder: "First Name",
-    autoComplete: "true",
-  },
-  {
-    label: "Lastname",
-    name: "lastname",
-    type: "text",
-    placeholder: "Last Name",
-    autoComplete: "true",
-  },
-  {
-    label: "Email",
-    name: "email",
-    type: "email",
-    placeholder: "Email",
-    autoComplete: "true",
-  },
-  {
-    label: "Username",
-    name: "userName",
-    type: "text",
-    placeholder: "Username (For Login)",
-    autoComplete: "true",
-  },
-  {
-    label: "Password",
-    name: "password",
-    type: "password",
-    placeholder: "Password",
-    autoComplete: "false",
-  },
-  {
-    label: "Confirm Password *",
-    name: "confirmPassword",
-    type: "password",
-    placeholder: "Confirm Password",
-    autoComplete: "false",
-  },
-  {
-    label: "Phone Number",
-    name: "phoneNumber",
-    type: "tel",
-    placeholder: "0xxxxxxxxx",
-    autoComplete: "true",
-  },
-];
+  const fields = [
+    {
+      label: "Firstname",
+      name: "firstname",
+      type: "text",
+      placeholder: "First Name",
+      autoComplete: "true",
+    },
+    {
+      label: "Lastname",
+      name: "lastname",
+      type: "text",
+      placeholder: "Last Name",
+      autoComplete: "true",
+    },
+    {
+      label: "Email",
+      name: "email",
+      type: "email",
+      placeholder: "Email",
+      autoComplete: "true",
+    },
+    {
+      label: "Username",
+      name: "userName",
+      type: "text",
+      placeholder: "Username (For Login)",
+      autoComplete: "true",
+    },
+    {
+      label: "Password",
+      name: "password",
+      type: "password",
+      placeholder: "Password",
+      autoComplete: "false",
+    },
+    {
+      label: "Confirm Password *",
+      name: "confirmPassword",
+      type: "password",
+      placeholder: "Confirm Password",
+      autoComplete: "false",
+    },
+    {
+      label: "Phone Number",
+      name: "phoneNumber",
+      type: "tel",
+      placeholder: "0xxxxxxxxx",
+      autoComplete: "true",
+    },
+  ];
 
   // post Customer data to database
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isFormValid && validateFormPassword(form, createNotification) && validateFormTel(form, createNotification)) {
+    if (
+      isFormValid &&
+      validateFormPassword(form, createNotification) &&
+      validateFormTel(form, createNotification)
+    ) {
       // const { confirmPassword, ...formData } = form;
       // registerAPI(formData).then((res) => {
       //   if (res.token) {
@@ -106,17 +107,20 @@ const fields = [
         const { confirmPassword, ...formData } = form;
         const res = await registerAPI(formData);
 
-        createNotification({
-          status: 'success',
-          header: 'Registration Successful!',
-          text: 'Welcome! You will be redirected shortly'
-        })
+        createNotification(
+          "success",
+          "Registration Successful!",
+          "Welcome! You will be redirected shortly"
+        );
 
-        localStorage.setItem('token', res.token);
+        localStorage.setItem("token", res.token);
         setUser(res.user);
         navigate("/room");
       } catch (err) {
-        console.error("Registrarion failed, notification handled by interceptor:", err);
+        console.error(
+          "Registrarion failed, notification handled by interceptor:",
+          err
+        );
       }
     }
   };
@@ -142,7 +146,7 @@ const fields = [
   return (
     <>
       <div className="flex flex-row w-full bg-[var(--cream-color)]">
-        <motion.div 
+        <motion.div
           className="w-3/5"
           initial={{ x: -100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -155,7 +159,7 @@ const fields = [
           />
         </motion.div>
 
-        <div 
+        <div
           className="w-2/5 flex flex-col items-center justify-center py-8"
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -181,13 +185,13 @@ const fields = [
             custom={1}
           >
             {fields.map((field, index) => (
-              <motion.div 
-                key={field.name} 
+              <motion.div
+                key={field.name}
                 className="flex flex-col w-full"
                 variants={startUpVariants}
                 initial="hidden"
                 animate="visible"
-                custom={index /3+ 1}
+                custom={index / 3 + 1}
               >
                 <label
                   className="text-[var(--brown-color)] font-semibold text-left mb-1"
@@ -209,7 +213,7 @@ const fields = [
               </motion.div>
             ))}
 
-            <motion.div 
+            <motion.div
               className="flex items-center mt-2"
               variants={startUpVariants}
               initial="hidden"
@@ -242,7 +246,7 @@ const fields = [
               </label>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="flex flex-col md:flex-row gap-4 mt-2 w-full justify-end"
               variants={startUpVariants}
               initial="hidden"

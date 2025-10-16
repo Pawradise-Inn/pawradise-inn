@@ -18,6 +18,11 @@ export const getChatLogByIdAPI = async (id) => {
   return res.data;
 };
 
+export const getChatLogAndReplyAPI = async () => {
+  const res = await axiosInstance.get(`${API_URL}/mine`);
+  return res.data;
+};
+
 // Create a new chat log (review)
 // Required: { review, rating, customerId, serviceId }
 export const createChatLogAPI = async (chatlogData) => {
