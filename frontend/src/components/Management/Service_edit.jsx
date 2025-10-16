@@ -86,7 +86,6 @@ const ServiceEdit = () => {
       closePopup();
     } catch (err) {
       console.error("Failed to save service:", err);
-      createNotification("fail", "Save Failed", "Failed to save service.");
     }
   };
 
@@ -94,11 +93,16 @@ const ServiceEdit = () => {
   const handleDeleteService = async (id) => {
     try {
       await deleteServiceAPI(id);
+      createNotification(
+        "success",
+        "Delete Successful!",
+        "The service has been deleted."
+      );
+
       setServices((prev) => prev.filter((s) => s.id !== id));
       closePopup();
     } catch (err) {
       console.error("Failed to delete service:", err);
-      createNotification("fail", "Delete Failed", "Failed to delete service.");
     }
   };
 
@@ -160,7 +164,7 @@ const ServiceEdit = () => {
       {/* Popup (unchanged, but now calls the updated handlers) */}
       <AnimatePresence mode="popLayout">
         {isPopupOpen && (
-        <>
+        <div>
           <Overlay
             bgColor="black"
             variants={overlay}
@@ -179,7 +183,7 @@ const ServiceEdit = () => {
             onSave={handleSaveService}
             onDelete={handleDeleteService}
           />
-        </>
+        </div>
       )}
       </AnimatePresence>
 

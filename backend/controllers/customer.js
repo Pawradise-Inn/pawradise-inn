@@ -53,6 +53,7 @@ const updateCustomerProfile = async(req, res)=>{
                 id: customerId
             }
         });
+        console.log(customer);
         if (!customer) {
             return res.status(404).json({
                 success: false,
