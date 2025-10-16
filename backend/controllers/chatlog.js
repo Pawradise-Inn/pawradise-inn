@@ -304,11 +304,11 @@ const getMyreviews = async(req, res)=>{
                 image: image,
                 name: name,
                 date: r.review_date,
-                nameOfStaffReply: r.staff.user.user_name,
+                nameOfStaffReply: r.staff?.user?.user_name ?? 'N/A',
                 readingStatus: r.isRead,
                 type: type,
-                rating: r.rating,
-                userReview: r.review,
+                rating: r.rating ?? null,
+                userReview: r.review ?? null,
             };
         });
 
@@ -321,6 +321,7 @@ const getMyreviews = async(req, res)=>{
     }catch(err){
         res.status(500).json({
             success: false,
+            err: err.message,
             message: "Unable to get your reviews. Please try again later"
         })
     }
