@@ -31,8 +31,8 @@ const BookingRoom = () => {
   const [popUpData, setPopUpData] = useState([]);
 
   useEffect(() => {
-    console.log(filterRoom)
-  }, [filterRoom])
+    console.log(filterRoom);
+  }, [filterRoom]);
 
   //   if filter.petType is not null return data with filter with petType else return data itself back
   //   @params: filteredRoom -> data that want to filter
@@ -87,11 +87,11 @@ const BookingRoom = () => {
           }
         } else {
           // FIXED: Changed createNotification to use the new object style.
-          createNotification({
-            status: "fail",
-            header: "Date is invalid",
-            text: validatedDate.warningText,
-          });
+          createNotification(
+            "fail",
+            "Date is invalid",
+            validatedDate.warningText
+          );
           setFilterRoom([]);
         }
       } else {

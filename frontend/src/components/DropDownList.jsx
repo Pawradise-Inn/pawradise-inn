@@ -21,14 +21,14 @@ const DropDownList = ({
   const { createNotification } = useNotification();
 
   const handleDropDown = () => {
-    if (options.length === 0) {
-      createNotification(
-        "fail",
-        "You have no pet",
-        "Please add you pet first before operate this."
-      );
-      return;
-    }
+    // if (options.length === 0) {
+    //   createNotification(
+    //     "fail",
+    //     "You have no pet",
+    //     "Please add you pet first before operate this."
+    //   );
+    //   return;
+    // }
     setDropDownStatus(!dropDownStatus);
   };
 

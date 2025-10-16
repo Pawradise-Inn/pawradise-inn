@@ -193,13 +193,6 @@ const getCustomerPets = async (req, res) => {
       select
     });
 
-    if (!pets || pets.length === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "No pets found for this customer" 
-      });
-    }
-
     res.status(200).json({ success: true, data: pets });
   } catch (err) {
     res.status(500).json({ success: false, message: "Unable to fetch pets. Please try again later" });
