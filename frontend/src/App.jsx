@@ -69,19 +69,19 @@ const App = () => {
         <Route
           path="/room"
           element={
-            <>
+            <div>
               <BookingRoom />
               <Footer />
-            </>
+            </div>
           }
         />
         <Route
           path="/service"
           element={
-            <>
+            <div>
               <BookingService />
               <Footer />
-            </>
+            </div>
           }
         />
 

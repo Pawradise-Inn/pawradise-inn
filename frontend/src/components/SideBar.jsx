@@ -36,7 +36,7 @@ const SideBar = ({ link, currentPage, setCurrentPage,showLogout }) => {
               end
             >
               {data.path === currentPage ? (
-                <>
+                <div>
                   <motion.div
                     layoutId={`myProfileSelecting${link[0].text}`}
                     className="block w-full h-full absolute top-0 left-0 bg-[var(--dark-brown-color)] rounded -z-10"
@@ -49,7 +49,7 @@ const SideBar = ({ link, currentPage, setCurrentPage,showLogout }) => {
                   >
                     {data.text}
                   </motion.span>
-                </>
+                </div>
               ) : null}
             </NavLink>
           </motion.div>

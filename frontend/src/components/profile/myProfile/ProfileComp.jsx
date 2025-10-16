@@ -204,7 +204,7 @@ const ProfileComp = () => {
 
       <AnimatePresence mode="popLayout">
         {showDeleteModal && (
-          <>
+          <div>
             <Overlay
               variants={overlay}
               initial="hidden"
@@ -275,7 +275,7 @@ const ProfileComp = () => {
                 </div>
               </div>
             </motion.div>
-          </>
+          </div>
         )}
       </AnimatePresence>
     </div>

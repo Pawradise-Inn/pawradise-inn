@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef, useRef } from "react";
 import ReviewCard from "../../../components/staffReview/ReviewCard";
 import StarFilter from "../../../components/staffReview/StarFilter";
 import { AnimatePresence } from "motion/react";
 import Pagination from "../../../components/Pagination";
+import DateDropDown from "../../../components/DateDropDown";
 
 // --- Mock Data ---
 const demoReviews = [
@@ -576,6 +577,26 @@ const StaffReviewPage = () => {
   const [isStarDropdownOpen, setIsStarDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 3;
+  const ref = useRef(null);
+
+  const DateFilterRef = forwardRef(({ value, onClick, className }, ref) => (
+    <button type="button" onClick={onClick} className={className} ref={ref}>
+      {value || "mm/dd/yyyy"}
+    </button>
+  ));
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        setIsStarDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref]);
+
   useEffect(() => {
     setReviews(demoReviews);
   }, []);
@@ -612,8 +633,8 @@ const StaffReviewPage = () => {
     setCurrentPage(1);
     setIsStarDropdownOpen(false);
   };
-  const handleDateChange = (e) => {
-    setDateFilter(e.target.value);
+  const handleDateChange = (value) => {
+    setDateFilter(value);
     setCurrentPage(1);
   };
   const clearDateFilter = () => {
@@ -640,21 +661,21 @@ const StaffReviewPage = () => {
             <div className="flex items-center">
               <i className="bi bi-search pr-2 opacity-50"></i>{" "}
               <input
-                className="w-full bg-transparent outline-none"
+                className="w-9/12 bg-transparent outline-none"
                 placeholder="search"
                 onChange={(e) => setSearch(e.target.value)}
                 value={search}
               />{" "}
             </div>{" "}
           </div>{" "}
-          <div className="relative flex h-full items-center rounded-xl bg-[var(--brown-color)] px-6 py-3 text-lg">
-            {" "}
-            <input
-              type="date"
+          <div className="relative flex h-full w-2/12 items-center rounded-xl bg-[var(--brown-color)] text-lg">
+            <DateDropDown
               value={dateFilter}
-              onChange={handleDateChange}
-              className="cursor-pointer border-none bg-transparent !text-white outline-none"
-            />{" "}
+              onChange={(value) => handleDateChange(value)}
+              customInput={
+                <DateFilterRef className="relative cursor-pointer border-none !text-white outline-none px-6 py-3 w-full text-start" />
+              }
+            />
             {dateFilter && (
               <button
                 onClick={clearDateFilter}
@@ -664,25 +685,31 @@ const StaffReviewPage = () => {
               </button>
             )}{" "}
           </div>{" "}
-          <div className="relative">
-            {" "}
-            <button
-              onClick={() => setIsStarDropdownOpen((prev) => !prev)}
-              className="h-full cursor-pointer whitespace-nowrap rounded-xl bg-[var(--brown-color)] px-6 py-3 text-lg !text-white transition-opacity hover:opacity-90 pr-15"
-            >
-              star{" "}
-              <i
-                className={`bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl cursor-pointer pointer-events-none transition-all duration-200 !text-[var(--cream-color)] ${
-                  isStarDropdownOpen && "rotate-180"
-                }`}
-              ></i>{" "}
-            </button>{" "}
-            <AnimatePresence>
-              {isStarDropdownOpen && (
-                <StarFilter onFilterChange={handleStarFilterChange} />
-              )}
-            </AnimatePresence>{" "}
-          </div>{" "}
+          <div className=" w-1/12" ref={ref}>
+            <div className="relative w-full" >
+              {" "}
+              <button
+              
+                onClick={() => setIsStarDropdownOpen(!isStarDropdownOpen)}
+                className="h-full w-full cursor-pointer whitespace-nowrap rounded-xl bg-[var(--brown-color)] px-6 py-3 text-lg !text-white transition-opacity hover:opacity-90 pr-15"
+              >
+                star{" "}
+                <i
+                  className={`bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl cursor-pointer pointer-events-none transition-all duration-200 !text-[var(--cream-color)] ${
+                    isStarDropdownOpen && "rotate-180"
+                  }`}
+                ></i>{" "}
+              </button>{" "}
+              <AnimatePresence>
+                {isStarDropdownOpen && (
+                  <StarFilter
+                    onFilterChange={handleStarFilterChange}
+                    setIsStarDropdownOpen={setIsStarDropdownOpen}
+                  />
+                )}
+              </AnimatePresence>{" "}
+            </div>{" "}
+          </div>
         </div>{" "}
       </div>{" "}
       <div className="mx-auto mt-8 max-w-7xl">

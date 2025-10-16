@@ -65,7 +65,7 @@ const NotificationCard = ({
         <section className="py-2 px-4 w-full bg-[var(--cream-color)]">
           <b>{notification.text}</b>
           {notification.status === "warning" ? (
-            <>
+            <div>
               <hr className="my-3 scale-105" />
               <div className="flex justify-end items-center gap-4">
                 <button
@@ -90,7 +90,7 @@ const NotificationCard = ({
                   Confirm
                 </button>
               </div>
-            </>
+            </div>
           ) : null}
         </section>
       )}

@@ -13,10 +13,10 @@ const CommentStarSelector = ({ star, onClick, commentStarSelect, style }) => {
       {star === null ? (
         "All"
       ) : (
-        <>
+        <div>
           {star}{" "}
           <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
-        </>
+        </div>
       )}
       <AnimatePresence mode="wait">
         {commentStarSelect === star && (

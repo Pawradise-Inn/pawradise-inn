@@ -39,7 +39,7 @@ const ReviewComp = () => {
       })}
 
       {popUpStatus ? (
-        <>
+        <div>
           <Overlay bgColor="black" />
           <ToBeReViewedPopUp
             data={popUpData}
@@ -47,7 +47,7 @@ const ReviewComp = () => {
             editable={popUpEditable}
             onClick={() => handlePopUpData({}, false)}
           />
-        </>
+        </div>
       ) : null}
     </div>
   );

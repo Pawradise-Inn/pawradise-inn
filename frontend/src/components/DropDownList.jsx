@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNotification } from "../context/notification/NotificationProvider";
 import { AnimatePresence, motion } from "motion/react";
 import { dropDown } from "../styles/animation";
@@ -19,6 +19,7 @@ const DropDownList = ({
 }) => {
   const [dropDownStatus, setDropDownStatus] = useState(false);
   const { createNotification } = useNotification();
+  const ref = useRef(null);
 
   const handleDropDown = () => {
     if (options.length === 0) {
@@ -32,8 +33,20 @@ const DropDownList = ({
     setDropDownStatus(!dropDownStatus);
   };
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        setDropDownStatus(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref]);
+
   return (
-    <motion.div className={`w-full relative ${mainStyle}`} {...motionProps}>
+    <motion.div ref={ref} className={`w-full relative ${mainStyle}`} {...motionProps}>
       <div
         onClick={handleDropDown}
         className={`relative inline-block w-full cursor-pointer ${inputSyle} ${
@@ -52,6 +65,7 @@ const DropDownList = ({
       <AnimatePresence>
         {dropDownStatus && (
           <motion.div
+            onClick={() => setDropDownStatus(false)}
             key="dropDownBlock"
             variants={dropDown}
             initial="hidden"
