@@ -29,6 +29,9 @@ const ProfileComp = () => {
   const [password, setPassword] = useState("");
   const [submitErr, setSubmitErr] = useState("");
 
+  const role = user?.role?.toString?.().toLowerCase?.();
+  const isStaff = role === "staff";
+
   const fields = [
     {
       label: "Firstname",
@@ -68,6 +71,7 @@ const ProfileComp = () => {
       }
     );
   };
+
   const handleConfirm = async (e) => {
     e.preventDefault();
     if (!newUser.id) return;
@@ -78,7 +82,6 @@ const ProfileComp = () => {
       async () => {
         try {
           const { id, ...userObjected } = newUser;
-          console.log(user)
           const data = await updateCustomerAPI(user.id, userObjected);
           setUser?.(data.data);
           createNotification(
@@ -88,18 +91,38 @@ const ProfileComp = () => {
           );
         } catch (err) {
           console.error("Update failed:", err);
-          // The axios interceptor will handle showing the error notification
+          // handled by axios interceptor
         }
       }
     );
   };
+
   const openDeleteModal = () => {
+    // Safety: แม้ปุ่มจะถูกซ่อนอยู่แล้ว แต่กันไว้เผื่อถูกเรียกใช้ทางอื่น
+    if (isStaff) {
+      createNotification(
+        "warning",
+        "Action not allowed",
+        "Staff profile cannot delete account."
+      );
+      return;
+    }
     setPassword("");
     setSubmitErr("");
     setShowDeleteModal(true);
   };
 
   const confirmDelete = () => {
+    // Safety: กันการลบจาก staff
+    if (isStaff) {
+      createNotification(
+        "warning",
+        "Action not allowed",
+        "Staff profile cannot delete account."
+      );
+      return;
+    }
+
     if (!password) {
       setSubmitErr("Please enter your password.");
       return;
@@ -108,7 +131,7 @@ const ProfileComp = () => {
     setShowDeleteModal(false);
     setUser?.(null);
     deleteMeAPI()
-      .then((data) => {
+      .then(() => {
         localStorage.removeItem("token");
         sessionStorage.removeItem("token");
         createNotification(
@@ -119,7 +142,7 @@ const ProfileComp = () => {
         navigate("/register");
       })
       .catch((err) => {
-        console.err(err);
+        console.error(err);
       });
   };
 
@@ -172,28 +195,45 @@ const ProfileComp = () => {
             ))}
           </div>
 
-          {/* actions */}
-          <div className="flex justify-between items-center mt-8 pt-6 border-t border-[var(--brown-color)]">
-            <button
-              type="button"
-              onClick={openDeleteModal}
-              className="px-6 py-2 font-bold bg-white rounded shadow cursor-pointer
-                         transition-all duration-300 !text-red-600 hover:bg-red-400 hover:!text-white"
-            >
-              Delete account
-            </button>
+          {/* Action Buttons Section */}
+          <div
+            className={`
+            flex items-center mt-8 pt-6 
+            border-t border-[var(--brown-color)]
+            ${isStaff ? "justify-end" : "justify-between"}
+          `}
+          >
+            {/* Delete Account Button - Only shown for non-staff */}
+            {!isStaff && (
+              <button
+                type="button"
+                onClick={openDeleteModal}
+                className="px-6 py-2 font-bold rounded shadow cursor-pointer
+                          bg-white !text-red-600 
+                          hover:bg-red-400 hover:!text-white
+                          transition-all duration-300"
+              >
+                Delete account
+              </button>
+            )}
 
+            {/* Cancel and Done Buttons */}
             <div className="flex space-x-8">
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-6 py-2 rounded hover:bg-[var(--light-brown-color)] hover:scale-90 transition-all duration-300 cursor-pointer"
+                className="px-6 py-2 rounded cursor-pointer
+                          hover:bg-[var(--light-brown-color)] hover:scale-90
+                          transition-all duration-300"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="!text-white px-6 py-2 bg-[var(--dark-brown-color)] rounded hover:scale-90 transition-all duration-300 cursor-pointer"
+                className="px-6 py-2 rounded cursor-pointer
+                          !text-white bg-[var(--dark-brown-color)]
+                          hover:scale-90
+                          transition-all duration-300"
               >
                 Done
               </button>
@@ -203,7 +243,7 @@ const ProfileComp = () => {
       </form>
 
       <AnimatePresence mode="popLayout">
-        {showDeleteModal && (
+        {showDeleteModal && !isStaff && (
           <div>
             <Overlay
               variants={overlay}
