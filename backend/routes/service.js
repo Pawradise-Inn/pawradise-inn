@@ -11,7 +11,8 @@ const {
     deletePicturesFromService,
     getServicesWithPagination,
     getServiceStatus,
-    getServiceReviews
+    getServiceReviews,
+    // getPetTypes
 } = require('../controllers/service');
 
 const {protect, authorize} = require('../middleware/auth');
@@ -24,6 +25,8 @@ router.route('/status')
 
 router.route('/reviews')
     .get(getServicesWithPagination);
+
+// router.get('/pet-types', getPetTypes);
 
 router.route('/')
     .get(getServices)      
@@ -40,5 +43,6 @@ router.route('/:id/pictures')
 
 router.route('/:id/reviews')
     .get(getServiceReviews);
+
 
 module.exports = router;

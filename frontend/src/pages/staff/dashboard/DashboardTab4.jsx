@@ -41,11 +41,11 @@ const DashboardCard = ({ data, onClick, onStatusChange }) => {
   const cardStyle = {
     display: "flex",
     alignItems: "center",
-    border: "1px solid #ccc",
-    borderRadius: "8px",
-    padding: "16px",
+    border: "2px solid var(--brown-color)",
+    borderRadius: "12px",
+    padding: "25px",
     cursor: "pointer",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "var(--cream-color)",
     width: "100%",
     marginBottom: "1rem",
   };
@@ -105,7 +105,7 @@ const DashboardCard = ({ data, onClick, onStatusChange }) => {
 
   return (
     <div style={cardStyle} onClick={onClick}>
-      <div style={imagePlaceholderStyle}></div>
+      <image src={data.image} style={imagePlaceholderStyle}></image>
       <div style={textContainerStyle}>
         <p style={nameStyle}>{data.serviceName}</p>
         <p style={detailStyle}>{data.petName}</p>
