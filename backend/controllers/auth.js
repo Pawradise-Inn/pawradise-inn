@@ -18,6 +18,10 @@ exports.register = async (req, res, next) => {
     const username = req.body.userName ?? req.body.user_name;
     const password = req.body.password;
     const role = (req.body.role ?? "CUSTOMER").toUpperCase();
+    let bankAccount;
+    if (role == "STAFF"){
+      bankAccount = req.body.account;
+    }
 
     if (!firstname || !lastname || !email || !phone || !username || !password) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
@@ -41,7 +45,7 @@ exports.register = async (req, res, next) => {
       await prisma.customer.create({ data: { userId: user.id } });
       }
     if (user.role === "STAFF") {
-      await prisma.staff.create({ data: { userId: user.id, wages: 0, bank_account: "TBD" } });
+      await prisma.staff.create({ data: { userId: user.id, wages: 0, bank_account: bankAccount } });
     }
 
     sendTokenResponse(user, 200, res);

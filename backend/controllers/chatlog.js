@@ -93,7 +93,7 @@ const getChatLogs = async (req, res) => {
       id: r.id,
       commenter_name: r.customer?.user.user_name || "Anonymous",
       commenter_detail: r.review,
-      commenter_star: r.rating,
+      commenter_star: r.rating
     }));
 
     const pagination = {};
