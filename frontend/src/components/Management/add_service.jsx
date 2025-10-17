@@ -46,7 +46,7 @@ const AddServicePopup = ({
 
   const handleSubmit = (e) => {
     e.preventDefault?.();
-    const payload = { name, petType: [petType.toUpperCase()], price: Number(price), image };
+    const payload = { name, petType, price: Number(price), image };
     onSave && onSave(payload);
   };
 
@@ -107,7 +107,7 @@ const AddServicePopup = ({
                 value: type,
               }))}
               value={petType}
-              onChange={(option) => setPetType(option.value)}
+              onChange={(value) => setPetType(value)}
               inputSyle="mt-1 border rounded-md px-3 py-2"
               dropDownStyle="bg-white border border-$var(--brown-color) origin-top translate-y-1"
               arrowColor="var(--light-brown-color)"
