@@ -37,9 +37,9 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   const [petData, setPetData] = useState([]);
   const [size, setSize] = useState(0);
   const [formData, setFormData] = useState({
-    entryDate: "",
-    exitDate: "",
-    entryTime: "",
+    entryDate: null,
+    exitDate: null,
+    entryTime: null,
   });
 
   const CheckInRef = forwardRef(({ value, onClick, className }, ref) => (
