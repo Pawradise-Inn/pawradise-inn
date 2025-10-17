@@ -14,11 +14,11 @@ import { getDateValidation } from "../../utils/handleValidation";
 import DropDownList from "../../components/DropDownList";
 import "react-datepicker/dist/react-datepicker.css";
 import DateDropDown from "../../components/DateDropDown";
+import { fetchPetTypesAPI } from "../../hooks/petAPI";
 
 const BookingRoom = () => {
-  const petTypes = [null, "DOG", "CAT", "MOUSE", "RABBIT", "BIRD"];
-
   const { createNotification } = useNotification();
+  const [petTypes, setPetTypes] = useState([null]);
   const [mounted, setMounted] = useState(false);
   const [room, setRoom] = useState([]);
   const [filter, setFilter] = useState({
@@ -68,7 +68,17 @@ const BookingRoom = () => {
         console.error("Failed to load initial rooms:", error);
       }
     };
+
+    const loadInitialPetTypes = async () => {
+      try {
+        const petTypesData = await fetchPetTypesAPI();
+        setPetTypes([null, ...petTypesData.data]);
+      } catch (error) {
+        console.error("Failed to load initial pet types:", error);
+      }
+    };
     loadInitialRooms();
+    loadInitialPetTypes();
   }, []);
 
   // if entryDate and exitDate is fill select 2 route

@@ -232,6 +232,15 @@ const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
     }
 }
 
+const getPetTypes = async (req, res) => {
+    try {
+        res.status(200).json({ success: true, data: ['DOG', 'CAT', 'MOUSE', 'RABBIT', 'BIRD']});
+    } catch(err) {
+        res.status(500).json({ success: false, message: "Could not fetch pet types." });
+    }
+};
+
+
 module.exports = {
   register,
   getPet,
@@ -240,5 +249,6 @@ module.exports = {
   deletePet,
   getCustomerPets,
   getCustomerPetNamesWithAvailable,
-  getAllPets
+  getAllPets,
+  getPetTypes
 }
