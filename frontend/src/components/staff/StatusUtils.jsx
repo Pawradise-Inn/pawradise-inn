@@ -21,8 +21,12 @@ export const getStatusText = (status) => {
         return "Queue";
       case "IN_PROGRESS":
         return "In progress";
-      case "COMPLETE":
+      case "COMPLETED":
         return "Completed";
+      case "CHECKED_IN":
+        return "Checked in";
+      case "CHECKED_OUT":
+        return "Chceked out";
       default:
         return status;
     }
