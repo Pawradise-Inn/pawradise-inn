@@ -182,6 +182,7 @@ const getTodayRooms = async (req, res) => {
       petName: br.pet?.name ?? null,
       checkIn: br.checkIn,
       checkOut: br.checkOut,
+      petStatus: br.pet?.status ?? null,
     }));
 
     res.status(200).json({ success: true, data: formattedRooms });
