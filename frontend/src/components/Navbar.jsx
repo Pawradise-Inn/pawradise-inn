@@ -30,7 +30,7 @@ const Navbar = ({
       {/* Logo */}
       {topNavBar && (
         <div className="flex items-center space-x-3">
-          <NavLink to="/" className="flex items-center">
+          <NavLink to="/room" className="flex items-center">
             <img src={Logo} alt="logo" className="h-10 w-auto" />
             <span className="font-semibold text-lg text-gray-800 ml-2">
               Pawradise Inn.
