@@ -81,7 +81,8 @@ const NewPet = () => {
         !formData.petType ||
         !formData.petBreed ||
         !formData.medicalCondition ||
-        !formData.foodAllergy
+        !formData.foodAllergy ||
+        isNaN(formData.petAge)
     ) {
         if(isNaN(formData.petAge)) {
           createNotification(
@@ -106,7 +107,7 @@ const NewPet = () => {
         "Confirmation",
         "Create this new pet?",
         async () => {
-            let pictureUrl = "default.img"; // Default image if no file is selected
+            let pictureUrl = "https://storage.googleapis.com/paw_image/unnamed.jpg"; // Default image if no file is selected
 
         // 1. UPLOAD IMAGE TO GCS
           if (formData.petImage) {
