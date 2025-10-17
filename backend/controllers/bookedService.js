@@ -181,6 +181,7 @@ const getTodayService = async (req, res) => {
       petId: bs.petId,
       petName: bs.pet?.name ?? null,
       timeBooked: bs.scheduled,
+      petStatus: bs.pet?.status ?? null 
     }));
 
     res.status(200).json({ success: true, data: formattedServices });
