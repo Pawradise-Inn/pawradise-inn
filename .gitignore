@@ -124,3 +124,6 @@ Icon?
 # package-lock.json
 # yarn.lock
 # pnpm-lock.yaml
+/generated/prisma
+prisma/schema.prisma
+.gitignore
