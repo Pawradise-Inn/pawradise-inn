@@ -137,17 +137,19 @@ const NewPet = () => {
 
                 // 4. UPDATE CUSTOMER'S LOCAL PET LIST (DB & Context)
                 // Safely get current pets or initialize to an empty array
-                const currentPets = user.pets || [];
+                console.log(user)
+                const currentPets = user.customer.pets || [];
                 
                 // Create a NEW array and push the new pet (Avoids mutating state)
                 const updatedPetsArr = [...currentPets, newPet]; 
+                console.log()
                 
                 // Prepare the customer object with the updated pets list
                 const updatedCustomerData = { ...user, pets: updatedPetsArr }; 
 
                 // 5. UPDATE CUSTOMER IN DB (to link the new pet list)
                 await updateCustomerAPI(user.customer.id, updatedCustomerData);
-
+                console.log(updatedCustomerData)
                 // 6. UPDATE LOCAL AUTH CONTEXT
                 setUser({ ...user, customer: updatedCustomerData });
 
