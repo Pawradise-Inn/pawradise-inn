@@ -31,7 +31,6 @@ const BookingRoom = () => {
   const [popUpStatus, setPopUpStatus] = useState(false);
   const [popUpData, setPopUpData] = useState([]);
 
-
   const CheckInRef = forwardRef(({ value, onClick, className }, ref) => (
     <button type="button" ref={ref} onClick={onClick} className={className}>
       {value || "mm/dd/yyyy"}
@@ -175,9 +174,11 @@ const BookingRoom = () => {
           <p className="text-xl font-bold">Booking date</p>
           <div className="relative w-full rounded-xl bg-[var(--brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1 before:border-white">
             <div className="relative w-1/2 inline-block">
-            <DateDropDown
+              <DateDropDown
                 value={filter.entryDate}
-                onChange={(date) => setFilter((prev) => ({ ...prev, entryDate: date }))}
+                onChange={(date) =>
+                  setFilter((prev) => ({ ...prev, entryDate: date }))
+                }
                 onFocus={() => setMounted(true)}
                 customInput={
                   <CheckInRef className="w-full !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer text-start" />
@@ -187,7 +188,9 @@ const BookingRoom = () => {
             <div className="relative w-1/2 inline-block">
               <DateDropDown
                 value={filter.exitDate}
-                onChange={(date) => setFilter((prev) => ({ ...prev, exitDate: date }))}
+                onChange={(date) =>
+                  setFilter((prev) => ({ ...prev, exitDate: date }))
+                }
                 onFocus={() => setMounted(true)}
                 customInput={
                   <CheckOutRef className="w-full !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer text-start" />
