@@ -12,7 +12,7 @@ const {
     getServicesWithPagination,
     getServiceStatus,
     getServiceReviews,
-    // getPetTypes
+    getPetTypes
 } = require('../controllers/service');
 
 const {protect, authorize} = require('../middleware/auth');
@@ -26,7 +26,7 @@ router.route('/status')
 router.route('/reviews')
     .get(getServicesWithPagination);
 
-// router.get('/pet-types', getPetTypes);
+router.get('/pet-types', getPetTypes);
 
 router.route('/')
     .get(getServices)      
