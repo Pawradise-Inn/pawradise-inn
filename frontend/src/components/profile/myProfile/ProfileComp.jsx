@@ -7,6 +7,7 @@ import { overlay, popUP, startUpVariants } from "../../../styles/animation";
 import { useNotification } from "../../../context/notification/NotificationProvider";
 import { deleteMeAPI } from "../../../hooks/authAPI";
 import Overlay from "../../Overlay";
+import { updateStaffProfileAPI } from "../../../hooks/staffAPI";
 
 const ProfileComp = () => {
   const { createNotification } = useNotification();
@@ -81,9 +82,18 @@ const ProfileComp = () => {
       "Are you sure to update the data?",
       async () => {
         try {
-          const { id, ...userObjected } = newUser;
-          const data = await updateCustomerAPI(user.id, userObjected);
-          setUser?.(data.data);
+          console.log(user.role)
+          if(user.role === 'CUSTOMER'){
+            const { id, ...userObjected } = newUser;
+            const data = await updateCustomerAPI(user.customer.id, userObjected);
+            setUser?.(data.data);
+          }
+          else if(user.role === 'STAFF'){
+            const { id, customer, ...userObjected } = newUser;
+            const data = await updateStaffProfileAPI(user.id, userObjected);
+            console.log(data)
+            setUser?.(data.data.updatedUser);
+          }
           createNotification(
             "success",
             "Profile updated successfully!",
