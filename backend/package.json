@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:push:local": "dotenv -e config/config.env.local -- npx prisma db push",
-    "dev": "nodemon server.js"
+    "db:push:cloud": "dotenv -e config/config.env -- npx prisma db push",
+    "dev": "dotenv -e config/config.env.local nodemon server.js",
+    "dev:cloud": "dotenv -e config/config.env nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -16,12 +18,16 @@
   "author": "",
   "type": "commonjs",
   "dependencies": {
+    "@google-cloud/storage": "^7.17.2",
     "@prisma/client": "^6.16.1",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "swagger-jsdoc": "^6.2.8"
   },
   "devDependencies": {
     "dotenv-cli": "^10.0.0",

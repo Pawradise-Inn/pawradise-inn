@@ -1,21 +1,28 @@
 @import "tailwindcss";
 
+/* ---------------------------------- setting html ---------------------------------- */
+
 * {
-	box-sizing: border-box;
-	color: var(--dark-brown-color);
-	font-family: Roboto, sans-serif;
+  box-sizing: border-box;
+  color: var(--dark-brown-color);
+  font-family: Roboto, sans-serif;
 }
 
 html {
-	scroll-behavior: smooth;
-	overflow-x: hidden;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
-	background-color: #FFFFFF;
-	height: 100vh;
-	width: 100vw;
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
+
+/* ---------------------------------- scroll bar ---------------------------------- */
 
 /* Minimal sleek scrollbar */
 .scrollbar-sleek {
@@ -48,7 +55,7 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 8px; 
+  width: 8px;
 }
 
 /* Track (background) */
@@ -68,29 +75,117 @@ body {
   background: var(--dark-brown-color);
 }
 
+/* ---------------------------------- root ---------------------------------- */
+
 :root {
-	/* color */
-	--dark-brown-color: #38220E;
-	--brown-color: #654225;
-	--light-brown-color: #D9C4AF;
-	--cream-color: #FDFAEE;
-	--warning-color: #FF6467;
-	--beige-cream-color: #FEF7DB;
+  /* color */
+  --dark-brown-color: rgb(56, 34, 14);
+  --brown-color: rgb(101, 66, 37);
+  --light-brown-color: rgb(217, 196, 175);
+  --cream-color: rgb(253, 250, 238);
+
+  --service-complete-color: rgb(117, 158, 60);
+  --service-available-color: rgb(117, 187, 240);
+  --service-inprogress-color: rgb(245, 194, 54);
+  --service-unavailable-color: rgb(46, 25, 22);
+
+  --room-available-color: rgb(117, 158, 60);
+  --room-reserved-color: rgb(245, 194, 54);
+  --room-full-color-color: rgb(186, 30, 7);
+
+  --success-color: rgb(117, 158, 60);
+  --warning-color: rgb(245, 194, 54);
+  --fail-color: rgb(186, 30, 7);
+
+  --success-color-alpha: rgb(158, 187, 118);
+  --warning-color-alpha: rgb(248, 212, 114);
+  --fail-color-alpha: rgb(206, 97, 81);
+
+  --beige-cream-color: rgb(254, 247, 219);
+}
+
+/* ---------------------------------- font ---------------------------------- */
+
+@font-face {
+  font-family: "Roboto";
+  src: url(../src/assets/Roboto-VariableFont_wdth\wght.ttf);
 }
 
 @font-face {
-	font-family: 'Roboto';
-	src: url(../src/assets/Roboto-VariableFont_wdth\,wght.ttf);
+  font-family: "Roboto";
+  src: url(../src//assets/Roboto-Italic-VariableFont_wdth\wght.ttf);
+  font-style: italic;
 }
 
-@font-face {
-	font-family: 'Roboto';
-	src: url(../src//assets/Roboto-Italic-VariableFont_wdth\,wght.ttf);
-	font-style: italic;
+/* ---------------------------------- react datepicker ---------------------------------- */
+
+.react-datepicker {
+  @apply bg-[var(--light-brown-color)] border-2 border-[var(--dark-brown-color)] z-50;
 }
 
-* {
-	box-sizing: border-box;
-	color: var(--dark-brown-color);
-	font-family: Roboto, sans-serif;
+.react-datepicker__header:not(.react-datepicker__header--has-time-select) {
+  @apply rounded-none z-40 transition-all duration-200;
+}
+
+.react-datepicker__header {
+  @apply bg-[var(--brown-color)] border-none py-3 z-40 transition-all duration-200;
+}
+
+.react-datepicker__current-month {
+  @apply !text-[var(--cream-color)] z-50 transition-all duration-200;
+}
+
+.react-datepicker__navigation {
+  @apply border-none top-0 h-[40px] z-50 transition-all duration-200;
+}
+
+.react-datepicker__navigation-icon::before {
+  @apply border-[var(--cream-color)] translate-y-1/3;
+}
+
+.react-datepicker__day-name {
+  @apply text-sm text-[var(--dark-brown-color)] border-t-0 my-2 z-50 transition-all duration-200;
+}
+
+.react-datepicker__day {
+  @apply inline-flex items-center justify-center rounded-full z-50 transition-all duration-200;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--selected:not([aria-disabled="true"]):hover,
+.react-datepicker__day:not([aria-disabled="true"]):hover,
+.react-datepicker__day--keyboard-selected {
+  @apply bg-[var(--cream-color)] !text-[var(--dark-brown-color)] rounded-full z-50;
+}
+
+.react-datepicker__day {
+  @apply font-normal z-50 transition-all duration-200;
+}
+
+.react-datepicker__triangle {
+  display: none;
+}
+
+.react-datepicker-popper {
+  @apply z-50;
+}
+
+.react-datepicker__month-container {
+  @apply z-50;
+}
+
+.react-datepicker__month {
+  @apply z-50;
+}
+
+.react-datepicker__week {
+  @apply z-50;
+}
+
+.react-datepicker__close-icon::after {
+  @apply bg-transparent !text-[var(--cream-color)]
+}
+
+.react-datepicker__close-icon {
+  @apply scale-150 transition-all duration-200 hover:scale-200
 }

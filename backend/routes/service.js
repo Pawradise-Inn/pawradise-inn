@@ -9,31 +9,37 @@ const {
     deleteService,
     addPicturesToService,
     deletePicturesFromService,
-    getAllServiceComments,
+    getServicesWithPagination,
     getServiceStatus,
     getServiceReviews
 } = require('../controllers/service');
 
-router.route('/status')
-    .get(getServiceStatus); //
+const {protect, authorize} = require('../middleware/auth');
 
-router.route('/comments')
-    .get(getAllServiceComments); //
+const chatlogs = require('./chatlog');
+router.use('/:serviceName/comments', chatlogs);
+
+router.route('/status')
+    .get(getServiceStatus);
 
 router.route('/reviews')
-    .get(getServiceReviews);
+    .get(getServicesWithPagination);
 
 router.route('/')
-    .get(getServices)       //
-    .post(createService);   //
+    .get(getServices)      
+    .post(protect, authorize("STAFF"), createService);  
 
 router.route('/:id')
-    .get(getService)        //
-    .patch(updateService)   //
-    .delete(deleteService);
+    .get(getService)        
+    .patch(protect, authorize("STAFF"), updateService)  
+    .delete(protect, authorize("STAFF"), deleteService);
 
 router.route('/:id/pictures')
-    .post(addPicturesToService) //
-    .delete(deletePicturesFromService); //
+    .post(protect, authorize("STAFF"), addPicturesToService) 
+    .delete(protect, authorize("STAFF"), deletePicturesFromService); 
+
+router.route('/:id/reviews')
+    .get(getServiceReviews);
+
 
 module.exports = router;

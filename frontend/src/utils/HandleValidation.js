@@ -1,13 +1,15 @@
-const getWarningTextForDateValidation = (entryDate, exitDate) => {
-	let warningText = "";
-	if (entryDate == exitDate) {
-		warningText = "Sorry, you cannot booking at the same day";
-	} else if (new Date(entryDate) > new Date(exitDate)) {
-		warningText = "Invalid date booking";
-	} else {
-		warningText = "";
-	}
-	return warningText;
+const getDateValidation = (entryDate, exitDate) => {
+  let data = { status: true, warningText: "" };
+  console.log(entryDate, entryDate.getDateValidation)
+  if (entryDate.getTime() === exitDate.getTime()) {
+    data.status = false;
+    data.warningText = "Entry and exit date cannot be the same.";
+  }
+  if (entryDate.getTime() > exitDate.getTime()) {
+    data.status = false;
+    data.warningText = "Entry date must be earlier than exit date.";
+  }
+  return data;
 };
 
-export { getWarningTextForDateValidation }
+export { getDateValidation };
