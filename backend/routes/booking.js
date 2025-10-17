@@ -8,22 +8,27 @@ const {
     createBooking,
     deleteBooking,
     getMyBookings,
-    cancelBooking
+    cancelBooking,
+    putBooking
 } = require('../controllers/booking');
 
+const {protect, authorize} = require('../middleware/auth');
+
 router.route('/mine')
-    .get(getMyBookings);
+    .get(protect, getMyBookings);
+
+router.route('/cancel/:id')
+    .patch(protect, cancelBooking);
 
 router.route('/')
-    .get(getBookings)
-    .post(createBooking);
+    .get(protect, authorize("STAFF", "CUSTOMER"), getBookings)
+    .post(protect, authorize("STAFF", "CUSTOMER"), createBooking);
 
 router.route('/:id')
-    .get(getBooking)
-    .delete(deleteBooking)
-    .patch(updateBookingStatus);
+    .get(protect, authorize("STAFF", "CUSTOMER"),getBooking)
+    .delete(protect, authorize("STAFF", "CUSTOMER"),deleteBooking)
+    .patch(protect, authorize("STAFF", "CUSTOMER"),updateBookingStatus)
+    .put(protect, authorize("STAFF", "CUSTOMER"),putBooking);
 
-router.route('/:id/cancel')
-    .patch(cancelBooking);
 
 module.exports = router;

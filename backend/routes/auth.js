@@ -1,14 +1,16 @@
 const express = require('express');
-const {register, getMe, updateMe, deleteMe} = require('../controllers/auth');
+const {register, getMe, updateMe, deleteMe, login, logout} = require('../controllers/auth');
 const {protect} = require('../middleware/auth');
 
 const router = express.Router();
 
-router.post('/register', register);
+router.get('/me', protect, getMe);      // no :id, user id comes from token
+router.put('/me', protect, updateMe);   // update logged-in user
+router.delete('/me', protect, deleteMe);// delete logged-in user
 
-router.route('/:id')
-    .get(getMe)
-    .put(updateMe)
-    .delete(deleteMe);
+// Auth routes
+router.post('/register', register);
+router.post('/login', login);
+router.post('/logout', protect, logout);
 
 module.exports = router;

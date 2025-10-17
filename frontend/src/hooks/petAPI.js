@@ -1,28 +1,54 @@
-import axios from 'axios';
+import axiosInstance from "../api/axiosInstance";
 
-const API_URL = 'http://localhost:5000/pets'
+const API_URL = "/api/v1/pet";
 
-export const fetchAllPetAPI = async() => {
-    const response = await axios.get(API_URL);
-    return response.data;
-}
+export const fetchAllPetAPI = async () => {
+  const response = await axiosInstance.get(API_URL);
+  return response.data;
+};
 
 export const fetchPetAPI = async (id) => {
-    const response = await axios.get(`${API_URL}/${id}`)
-    return response.data
-}
-
-export const addPetAPI = async (pet) => {
-    const response = await axios.post(API_URL, pet)
-    return response.data
-}
-
-export const deletePetAPI = async (id) => {
-    const response = await axios.delete(`${API_URL}/${id}`)
-    return response.data
-}
+  const response = await axiosInstance.get(`${API_URL}/${id}`);
+  return response.data;
+};
 
 export const updatePetAPI = async (id, pet) => {
-    const response = await axios.put(`${API_URL}/${id}`, pet)
-    return response.data
-}
+  const response = await axiosInstance.put(`${API_URL}/${id}`, pet);
+  return response.data;
+};
+
+export const deletePetAPI = async (id) => {
+  const response = await axiosInstance.delete(`${API_URL}/${id}`);
+  return response.data;
+};
+
+export const updatePetStatusAPI = async (id, status) => {
+  const response = await axiosInstance.patch(`${API_URL}/${id}`, {status});
+  return response.data;
+};
+
+export const registerPetAPI = async (customerId, pet) => {
+  const response = await axiosInstance.post(`${API_URL}/register`, {...pet, customerId});
+  return response.data;
+};
+
+export const fetchAvailablePetAPI = async (
+  customerId) => {
+  const response = await axiosInstance.get(`${API_URL}/${customerId}/available`);
+  return response.data;
+};
+
+export const fetchCustomerPets = async (customerId, fields) => {
+  const params = {};
+  fields.forEach((field) => {
+    params[field] = true;
+  });
+
+  const response = await axiosInstance.get(`${API_URL}/${customerId}/available`, { params });
+  return response.data;
+};
+
+export const fetchPetTypesAPI = async () => {
+  const response = await axiosInstance.get(`${API_URL}/pet-types`);
+  return response.data;
+};

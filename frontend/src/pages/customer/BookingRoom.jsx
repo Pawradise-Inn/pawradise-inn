@@ -1,203 +1,275 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { forwardRef, useCallback, useEffect, useState } from "react";
+import BookingPopup from "../../components/booking/BookingPopup";
+import { useNotification } from "../../context/notification/NotificationProvider";
+import Overlay from "../../components/Overlay";
 import RoomCard from "../../components/room/RoomCard";
-import testImg from "../../assets/test.png"; // to be replaced by API data. don't forget to delete.
-import BookingPopup from "../../components/BookingPopup";
-import { getWarningTextForDateValidation } from "../../utils/HandleValidation";
-import { handleFormDataChange } from "../../utils/HandleForm";
+import {
+  fetchAllRoomsWithPaginationAPI,
+  fetchAvailableRoomsAPI,
+} from "../../hooks/roomAPI";
+import { overlay, popUP, startUpVariants } from "../../styles/animation";
+import { removeWindowScroll } from "../../utils/handlePopup";
+import { getDateValidation } from "../../utils/handleValidation";
+import DropDownList from "../../components/DropDownList";
+import "react-datepicker/dist/react-datepicker.css";
+import DateDropDown from "../../components/DateDropDown";
+import { fetchPetTypesAPI } from "../../hooks/petAPI";
 
 const BookingRoom = () => {
-	const petType = ["Dog", "Cat", "Bird", "Raccoon", "Fish  :)"];
+  const { createNotification } = useNotification();
+  const [petTypes, setPetTypes] = useState([null]);
+  const [mounted, setMounted] = useState(false);
+  const [room, setRoom] = useState([]);
+  const [filter, setFilter] = useState({
+    petType: null,
+    entryDate: null,
+    exitDate: null,
+  });
+  const [filterRoom, setFilterRoom] = useState([]);
+  const [noResult, setNoResult] = useState(false);
+  const [popUpStatus, setPopUpStatus] = useState(false);
+  const [popUpData, setPopUpData] = useState([]);
 
-	const demoData = [
-		{
-			image: testImg,
-			status: "full",
-			roomId: 1,
-			review: 4.5,
-			forwhich: "small",
-			price: 2000,
-			size: 10,
-			maxsize: 20,
-			pageAmount: 30,
-		}, // to be replaced by API data. don't forget to delete.
-		{
-			image: testImg,
-			status: "full",
-			roomId: 2,
-			review: 4.0,
-			forwhich: "big",
-			price: 1500,
-			size: 5,
-			maxsize: 10,
-			pageAmount: 10,
-		}, // to be replaced by API data. don't forget to delete.
-		{
-			image: testImg,
-			status: "full",
-			roomId: 3,
-			review: 4.8,
-			forwhich: "small",
-			price: 3000,
-			size: 2,
-			maxsize: 5,
-			pageAmount: 2,
-		}, // to be replaced by API data. don't forget to delete.
-		{
-			image: testImg,
-			status: "full",
-			roomId: 4,
-			review: 4.2,
-			forwhich: "big",
-			price: 500,
-			size: 8,
-			maxsize: 15,
-			pageAmount: 35,
-		}, // to be replaced by API data. don't forget to delete.
-		{
-			image: testImg,
-			status: "full",
-			roomId: 5,
-			review: 4.7,
-			forwhich: "small",
-			price: 2500,
-			size: 1,
-			maxsize: 3,
-			pageAmount: 50,
-		}, // to be replaced by API data. don't forget to delete.
-		{
-			image: testImg,
-			status: "available",
-			roomId: 6,
-			review: 4.3,
-			forwhich: "big",
-			price: 1800,
-			size: 12,
-			maxsize: 20,
-			pageAmount: 100,
-		}, // to be replaced by API data. don't forget to delete.
-	];
-	
-	const [room, setRoom] = useState(demoData);
-	const [formData, setFormData] = useState({
-		entryDate: " ",
-		exitDate: "z",
-		entryTime: "13:00",
-		exitTime: "10:00",
-	});
-	const [popUpStatus, setPopUpStatus] = useState(false);
-	const [popUpData, setPopUpData] = useState([]);
+  const CheckInRef = forwardRef(({ value, onClick, className }, ref) => (
+    <button type="button" ref={ref} onClick={onClick} className={className}>
+      {value || "mm/dd/yyyy"}
+    </button>
+  ));
 
-	// fetch room data from backend and setRoom
-	useEffect(() => {
-		// fetch room data from backend and setRoom
-		// fetch room data from backend and setRoom
-		// fetch room data from backend and setRoom
-		// fetch room data from backend and setRoom
-		// fetch room data from backend and setRoom
+  const CheckOutRef = forwardRef(({ value, onClick, className }, ref) => (
+    <button type="button" ref={ref} onClick={onClick} className={className}>
+      {value || "mm/dd/yyyy"}
+    </button>
+  ));
 
-		room.forEach((data) => {
-			data.headerType = "Room";
-			data.roomId = data.roomId.toString().padStart(3, 0);
-		});
-	});
+  //   if filter.petType is not null return data with filter with petType else return data itself back
+  //   @params: filteredRoom -> data that want to filter
+  //  @return: filteredRoom with filtered with petType or not filter if petType is null
+  const filterWithPet = (filteredRoom) => {
+    if (filter.petType) {
+      return filteredRoom.filter((r) => r.forWhich === filter.petType);
+    }
+    return filteredRoom;
+  };
 
-	// check if there is no result after filtering
-	const noResult = useMemo(() => {
-		if (
-			getWarningTextForDateValidation(formData.entryDate, formData.exitDate) !==
-			""
-		) {
-			return true;
-		} else {
-			if (room.length === 0) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}, [formData, room]);
+  // fetch room data from backend and setRoom
+  useEffect(() => {
+    const loadInitialRooms = async () => {
+      try {
+        const roomsData = await fetchAllRoomsWithPaginationAPI();
+        roomsData.data.forEach((room) => {
+          room.headerType = "Room";
+          room.reviewStar = room.reviewStar.toFixed(1);
+        });
 
-	// handle popup data and status
-	const handlePopUpData = useCallback((data, status) => {
-		setPopUpStatus(status);
-		setPopUpData(data);
-	}, []);
+        setRoom(roomsData.data);
+      } catch (error) {
+        console.error("Failed to load initial rooms:", error);
+      }
+    };
 
-	return (
-		<div className="w-full max-w-6xl mx-auto py-12">
-			<b className="text-7xl text-center block m-8 mt-0">Room Type</b>
-			<form className="m-8 relative flex justify-center content-between border-2 border-(--brown-color) rounded-xl mx-auto w-6/10 max-w-[720px] pb-4 before:content-[''] before:w-px before:h-3/4 before:absolute before:top-1/2 before:left-3/10 before:-translate-x-1/2 before:-translate-y-1/2 before:border-1 before:border-(--brown-color)">
-				<div className="flex flex-col justify-start items-center gap-6 w-3/10 py-4 px-8">
-					<p className="text-xl font-bold">Pet type</p>
-					<div className="relative mx-auto text-xl bg-(--brown-color) rounded-lg w-full">
-						<select className="!text-white w-full  px-4 py-2 outline-0 appearance-none cursor-pointer">
-							{petType.map((type, idx) => {
-								return (
-									<option className="bg-(--light-brown-color)" key={idx}>
-										{type}
-									</option>
-								);
-							})}
-						</select>
-						<i className="bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl !text-white pointer-events-none"></i>
-					</div>
-				</div>
-				<div className="flex flex-col justify-start items-center gap-6 w-7/10 py-4 px-8">
-					<p className="text-xl font-bold">Booking date</p>
-					<div className="relative w-full rounded-xl bg-(--brown-color) before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1 before:border-white">
-						<input
-							required
-							type="date"
-							className="relative w-1/2 !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer"
-							onChange={(e) => handleFormDataChange(e, setFormData)}
-							name="entryDate"
-						/>
-						<input
-							required
-							type="date"
-							className="relative w-1/2 !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer"
-							onChange={(e) => handleFormDataChange(e, setFormData)}
-							name="exitDate"
-						/>
-					</div>
-					<span className="text-center block w-full">
-						<i className="!text-(--warning-color)">
-							{getWarningTextForDateValidation(
-								formData.entryDate,
-								formData.exitDate
-							)}
-						</i>
-					</span>
-				</div>
-			</form>
+    const loadInitialPetTypes = async () => {
+      try {
+        const petTypesData = await fetchPetTypesAPI();
+        setPetTypes([null, ...petTypesData.data]);
+      } catch (error) {
+        console.error("Failed to load initial pet types:", error);
+      }
+    };
+    loadInitialRooms();
+    loadInitialPetTypes();
+  }, []);
 
-			{noResult ? (
-				<p className="text-2xl w-full text-center mt-32 italic">
-					Sorry, your desired service is not on operation now.
-				</p>
-			) : (
-				<div className="m-8 grid grid-cols-2 gap-y-4 gap-x-8">
-					{room.map((data, idx) => {
-						return (
-							<RoomCard
-								key={idx}
-								data={data}
-								onClick={handlePopUpData}
-							/>
-						);
-					})}
-				</div>
-			)}
+  // if entryDate and exitDate is fill select 2 route
+  //   1) if petType === null filterRoom = []
+  //   2) if petType !== null call API and store in filterRoom
+  // if entryDate and exitDate isn't fill filterRoom = Room
+  useEffect(() => {
+    const filterRooms = async () => {
+      if (filter.entryDate && filter.exitDate) {
+        const validatedDate = getDateValidation(
+          filter.entryDate,
+          filter.exitDate
+        );
+        if (validatedDate.status) {
+          try {
+            const availableRooms = await fetchAvailableRoomsAPI(
+              filter.entryDate,
+              filter.exitDate
+            );
+            setFilterRoom(filterWithPet(availableRooms.data));
+          } catch (error) {
+            console.error("Failed to fetch available rooms:", error);
+            setFilterRoom([]);
+            // Interceptor handles the fail notification.
+          }
+        } else {
+          // FIXED: Changed createNotification to use the new object style.
+          createNotification(
+            "fail",
+            "Date is invalid",
+            validatedDate.warningText
+          );
+          setFilterRoom([]);
+        }
+      } else {
+        setFilterRoom(filterWithPet(room));
+      }
+    };
 
-			{
-				<BookingPopup
-					status={popUpStatus}
-					data={popUpData}
-					onClick={handlePopUpData}
-				/>
-			}
-		</div>
-	);
+    filterRooms();
+  }, [filter, room]);
+
+  //  if filterRoom is empty === no result
+  useEffect(() => {
+    if (filterRoom.length === 0) {
+      setNoResult(true);
+    } else {
+      setNoResult(false);
+    }
+  }, [filterRoom]);
+
+  // handle popup data and status
+  const handlePopUpData = useCallback((data, status) => {
+    setPopUpStatus(status);
+    setPopUpData(data);
+  }, []);
+
+  removeWindowScroll(popUpStatus);
+
+  return (
+    <div className="w-full max-w-6xl mx-auto py-12">
+      <b className="text-7xl text-center block m-8 mt-0">
+        {"Room Reservation".split(" ").map((word, idx) => {
+          return (
+            <motion.p
+              variants={startUpVariants}
+              initial="hidden"
+              animate="visible"
+              custom={idx}
+              key={idx}
+            >
+              {word}
+            </motion.p>
+          );
+        })}
+      </b>
+      <motion.form
+        variants={startUpVariants}
+        initial="hidden"
+        animate="visible"
+        custom={2}
+        className="m-8 relative flex justify-center content-between border-2 border-[var(--brown-color)] rounded-xl mx-auto w-8/10 max-w-[800px] pb-4 before:content-[''] before:w-px before:h-3/4 before:absolute before:top-1/2 before:left-3/10 before:-translate-x-1/2 before:-translate-y-1/2 before:border-1 before:border-[var(--brown-color)]"
+      >
+        <div className="flex flex-col justify-start items-center gap-6 w-3/10 py-4 px-8">
+          <p className="text-xl font-bold">Pet type</p>
+          <DropDownList
+            startText="-- Select --"
+            options={petTypes.map((type) => {
+              if (type === null) return { name: "-- Select --", value: null };
+              return { name: type, value: type };
+            })}
+            onChange={(value) => {
+              setFilter((prev) => ({ ...prev, petType: value }));
+              setMounted(true);
+            }}
+            value={filter.petType}
+            arrowColor="white"
+            inputSyle="!text-white px-4 py-2 outline-0 text-xl bg-(--brown-color) rounded-lg"
+            element="selectPetType"
+          />
+        </div>
+        <div className="flex flex-col justify-start items-center gap-6 w-7/10 py-4 px-8">
+          <p className="text-xl font-bold">Booking date</p>
+          <div className="relative w-full rounded-xl bg-[var(--brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1 before:border-white">
+            <div className="relative w-1/2 inline-block">
+              <DateDropDown
+                value={filter.entryDate}
+                onChange={(date) =>
+                  setFilter((prev) => ({ ...prev, entryDate: date }))
+                }
+                onFocus={() => setMounted(true)}
+                customInput={
+                  <CheckInRef className="w-full !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer text-start" />
+                }
+              />
+            </div>
+            <div className="relative w-1/2 inline-block">
+              <DateDropDown
+                value={filter.exitDate}
+                onChange={(date) =>
+                  setFilter((prev) => ({ ...prev, exitDate: date }))
+                }
+                onFocus={() => setMounted(true)}
+                customInput={
+                  <CheckOutRef className="w-full !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer text-start" />
+                }
+              />
+            </div>
+          </div>
+        </div>
+      </motion.form>
+
+      {noResult ? (
+        <AnimatePresence mode="popLayout">
+          <motion.p
+            variants={startUpVariants}
+            initial="hidden"
+            animate={mounted ? "found" : "visible"}
+            exit="exit"
+            className="text-2xl w-full text-center min-h-[220px] italic flex justify-center items-center"
+          >
+            Sorry, no available rooms match your desire.
+          </motion.p>
+        </AnimatePresence>
+      ) : (
+        <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+          <AnimatePresence mode="popLayout">
+            {filterRoom.map((data, idx) => {
+              return (
+                <RoomCard
+                  layout
+                  variants={startUpVariants}
+                  initial="hidden"
+                  animate={mounted ? "found" : "visible"}
+                  exit="exit"
+                  whileHover={{ scale: 1.05 }}
+                  custom={idx / 3 + 2}
+                  key={`room-${data.id}`}
+                  data={data}
+                  onClick={handlePopUpData}
+                />
+              );
+            })}
+          </AnimatePresence>
+        </div>
+      )}
+
+      <AnimatePresence mode="popLayout" initial={true}>
+        {popUpStatus ? (
+          <div>
+            <Overlay
+              variants={overlay}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              bgColor="black"
+            />
+            <BookingPopup
+              variants={popUP}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              status={popUpStatus}
+              data={popUpData}
+              onClick={handlePopUpData}
+            />
+          </div>
+        ) : null}
+      </AnimatePresence>
+    </div>
+  );
 };
 
 export default BookingRoom;

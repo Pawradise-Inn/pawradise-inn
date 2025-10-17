@@ -1,6 +1,6 @@
 const prisma = require('../prisma/prisma');
-const {createBookedRoom} = require('./bookedRoom');
-const {createBookedService} = require('./bookedService');
+const {createBookedRoomWithCondition} = require('./logics/bookedRoom');
+const {createBookedServiceWithCondition} = require('./logics/bookedService');
 
 const getBookings = async (req, res) => {
     try {
@@ -21,7 +21,7 @@ const getBookings = async (req, res) => {
         });
         res.status(200).json({success: true, data: bookings});
     } catch(err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to fetch bookings. Please try again later"});
     }
 };
 
@@ -43,11 +43,14 @@ const getBooking = async (req, res) => {
             select
         });
         if(!booking){
-            return res.status(404).json({success: false, error: 'Booking not found'});
+            return res.status(404).json({success: false, message: 'Booking not found'});
         }
         res.status(200).json({success: true, data: booking});
     } catch(err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({
+            success: false, 
+            message: "Unable to fetch booking details. Please try again later"
+        });
     }
 }
 
@@ -55,6 +58,10 @@ const updateBookingStatus = async (req, res) => {
     try {
         const bookingId = req.params.id;
         const status = req.body.status;
+        const allowedStatuses = ["BOOKED", "CANCELLED", "COMPLETED"];
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({ success: false, message: "Invalid booking status. Please select a valid status" });
+        }
         const booking = await prisma.booking.update({
             where: {
                 id: Number(bookingId)
@@ -64,63 +71,61 @@ const updateBookingStatus = async (req, res) => {
             }
         });
 
-        if (status === 'BOOKED'){
-            const {bookedRoomData, bookedServiceData} = req.body;
-
-            if (bookedRoomData && bookedRoomData.length > 0){
-                for (const room of bookedRoomData){
-                    await createBookedRoom({
-                        body: {
-                            roomId: room.roomId,
-                            petId: room.petId,
-                            bookingId: booking.id,
-                            checkIn: room.checkIn,
-                            checkOut: room.checkOut
-                        }
-                    },{
-                        status: () => {},
-                        json: () => {}
-                    });
-                }
+        if (status === "BOOKED") {
+            if (bookedRoomData?.length > 0) {
+                await Promise.all(
+                    bookedRoomData.map(room =>
+                    createBookedRoomWithCondition({
+                        roomId: room.roomId,
+                        petId: room.petId,
+                        bookingId: booking.id,
+                        checkIn: room.checkIn,
+                        checkOut: room.checkOut
+                    })
+                ));
             }
 
-            if (bookedServiceData && bookedServiceData.length > 0){
-                for (const service of bookedServiceData){
-                    await createBookedService({
-                        body: {
-                            serviceId: service.serviceId,
-                            petId: service.petId,
-                            bookingId: booking.id,
-                            scheduled: service.scheduled
-                        }
-                    },{
-                        status: () => {},
-                        json: () => {}
-                    });
-                }
+            if (bookedServiceData?.length > 0) {
+                await Promise.all(
+                    bookedServiceData.map(service =>
+                    createBookedServiceWithCondition({
+                        serviceId: service.serviceId,
+                        petId: service.petId,
+                        bookingId: booking.id,
+                        scheduled: service.scheduled
+                    })
+                ));
             }
         }
         res.status(200).json({success: true, data: booking});
     } catch(err) {
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({
+            success: false, 
+            message: "Unable to update booking status. Please try again later"
+        });
     }
 };
 
 const createBooking = async (req, res) => {
     try {
         const bookingDate = req.body.date;
-        const customerId = req.body.customerId;
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id }
+        });
         const booking = await prisma.booking.create({
             data: {
-                customerId: customerId,
+                customerId: req.user.roleId,
                 date: new Date(bookingDate),
                 status: 'PENDING',
-                payment: 'PENDING'
+                // payment: 'PENDING',
+                customerName: user.firstname + ' ' + user.lastname,
+                customerEmail: user.email,
+                customerNumber: user.phone_number
             }
         });
         res.status(201).json({success: true, data: booking});
     } catch(err){
-        res.status(400).json({success: false, error: err.message});
+        res.status(500).json({success: false, message: "Unable to create booking. Please try again later"});
     }
 };
 
@@ -132,7 +137,13 @@ const deleteBooking = async (req, res) => {
         });
         res.status(200).json({success: true, data: {}});
     } catch(err) {
-        res.status(400).json({success: false, error: err.message});
+        if (err.code === 'P2025') {
+            return res.status(404).json({
+                success: false, 
+                message: "This booking no longer exists"
+            });
+        }
+        res.status(500).json({success: false, message: "Unable to cancel booking. Please try again later"});
     }
 };
 
@@ -144,59 +155,62 @@ const checkBookingStatus = async (req, res) => {
         }
     });
 
-    if(!booking) res
+    if (!booking) {
+        return res.status(404).json({success: false, message: 'Booking not found'});
+    }
+    return res.status(200).json({success: true, data: booking});
 };
 
 const getMyBookings = async (req, res) => {
   try {
-    const customerId = req.query.customerId;
-    if (!customerId) {
-      return res.status(401).json({ success: false, msg: 'Unauthorized' });
-    }
+    const customerId = Number(req.user.roleId);
+    console.log(customerId)
 
     const bookings = await prisma.booking.findMany({
       where: { customerId },
       include: {
-        booked_room: { include: { room: true, pet: true } },
-        booked_service: { include: { service: true, pet: true } }
+        booked_room: { 
+            include: { 
+                room: true, 
+                pet: {
+                    select:{
+                        name:true,
+                        type:true
+                    }
+                }
+            } 
+        },
+        booked_service: { 
+            include: { 
+                service: {
+                    select:{
+                        name: true,
+                        picture: true
+                    }
+                }, 
+                pet: true 
+            } 
+        }
       },
     });
+    console.log(bookings)
 
-    const formattedBookings = bookings.map(b => ({
-      bookingId: b.id,
-      date: b.date,
-      status: b.status,
-      rooms: b.booked_room.map(br => ({
-        id: br.id,
-        image: br.room.picture[0] ?? null,
-        roomId: br.room.id,
-        checkIn: br.checkIn,
-        checkOut: br.checkOut,
-        petId: br.petId,
-        pet: br.pet ? { id: br.pet.id, name: br.pet.name, type: br.pet.type } : null
-      })),
-      services: b.booked_service.map(bs => ({
-        id: bs.id,
-        image: bs.service.picture ?? null,
-        serviceId: bs.service.id,
-        scheduled: bs.scheduled,
-        petId: bs.petId,
-        pet: bs.pet ? { id: bs.pet.id, name: bs.pet.name, type: bs.pet.type } : null
-      }))
-    }));
-
-    res.status(200).json({ success: true, data: formattedBookings });
+    res.status(200).json({ success: true, data: bookings });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ 
+        success: false, 
+        message: "Unable to fetch your bookings. Please try again later" 
+    });
   }
 };
 
 const cancelBooking = async(req, res) =>{
     try {
     const id = Number(req.params.id);
-
     const booking = await prisma.booking.findUnique({
-      where: { id: id }
+        where: {
+            id: id
+        }
     });
 
     if (!booking) {
@@ -204,9 +218,9 @@ const cancelBooking = async(req, res) =>{
     }
 
     if (booking.status !== "BOOKED" && booking.status !== "PENDING") {
-      return res.status(400).json({
+      return res.status(409).json({
         success: false,
-        message: "Booking cannot be cancelled"
+        message: "This booking cannot be cancelled"
       });
     }
 
@@ -217,8 +231,87 @@ const cancelBooking = async(req, res) =>{
 
     res.status(200).json({ success: true, booking: updatedBooking });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, message: "Unable to cancel booking. Please try again later" });
   }
+};
+
+
+const putBooking = async (req, res) => {
+    try {
+        const bookingId = Number(req.params.id);
+        const {
+            date,
+            status,
+            customerName,
+            customerEmail,
+            customerNumber,
+            ...otherData // Catch any other unexpected fields
+        } = req.body;
+
+        // Fetch the existing booking with its customer
+        const existingBooking = await prisma.booking.findUnique({
+            where: { id: bookingId },
+            include: { customer: true }
+        });
+
+        if (!existingBooking) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Booking not found" 
+            });
+        }
+
+        // Prepare the data to update the Booking model
+        const updateBookingData = {};
+        if (date) {
+            updateBookingData.date = new Date(date);
+        }
+        if (status) {
+            updateBookingData.status = status;
+        }
+        // Prepare the data to update the Customer model
+        const updateCustomerData = {};
+        if (customerName) {
+            updateCustomerData.name = customerName;
+        }
+        if (customerEmail) {
+            updateCustomerData.email = customerEmail;
+        }
+        if (customerNumber) {
+            updateCustomerData.number = customerNumber;
+        }
+
+        // Use a Prisma transaction to ensure both updates succeed or fail together
+        const [updatedBooking, updatedCustomer] = await prisma.$transaction([
+            // Update the Booking record with the new booking data
+            prisma.booking.update({
+                where: { id: bookingId },
+                data: updateBookingData,
+            }),
+            // Update the related Customer record if there's customer data to update
+            Object.keys(updateCustomerData).length > 0 ?
+                prisma.customer.update({
+                    where: { id: existingBooking.customerId },
+                    data: updateCustomerData,
+                }) :
+                prisma.customer.findUnique({ where: { id: existingBooking.customerId } }) // A no-op to keep transaction consistent
+        ]);
+
+        // Reconstruct the response object in the desired format
+        const responseData = {
+            id: updatedBooking.id,
+            date: updatedBooking.date,
+            status: updatedBooking.status,
+            customerId: updatedBooking.customerId,
+            customerName: updatedCustomer.name,
+            customerEmail: updatedCustomer.email,
+            customerNumber: updatedCustomer.number
+        };
+
+        res.status(200).json({ success: true, data: responseData });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Unable to update booking. Please try again later" });
+    }
 };
 
 module.exports = {
@@ -228,5 +321,6 @@ module.exports = {
     createBooking,
     deleteBooking,
     getMyBookings,
-    cancelBooking
+    cancelBooking,
+    putBooking
 };

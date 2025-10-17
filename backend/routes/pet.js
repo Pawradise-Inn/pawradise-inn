@@ -1,24 +1,44 @@
-const express = require('express');
+const express = require("express");
 const {
   register,
   getPet,
   updatePet,
   updatePetStatus,
   deletePet,
+  getAllPets,
   getCustomerPets,
-  getCustomerPetNamesWithAvailable
-} = require('../controllers/pet');
-const {protect, authorize} = require('../middleware/auth');
+  getCustomerPetNamesWithAvailable,
+  getPetTypes,
+} = require("../controllers/pet");
+const { protect, authorize } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.post('/register', protect, authorize('CUSTOMER'),register);
-router.get("/:id", getPet);
-router.get("/", getCustomerPets);
-router.put("/:id", updatePet);
-router.delete("/:id", deletePet);
+router.route("/").get(getAllPets);
 
-router.patch('/:id', updatePetStatus);
-router.get('/:id/available', getCustomerPetNamesWithAvailable);
+router
+  .route("/register")
+  .post(protect, authorize("CUSTOMER", "STAFF"), register);
+
+router
+  .route("/available")
+  .get(
+    protect,
+    authorize("CUSTOMER", "STAFF"),
+    getCustomerPetNamesWithAvailable
+  );
+
+router.route("/pet-types").get(getPetTypes);
+
+router
+  .route("/:id")
+  .get(protect, authorize("CUSTOMER", "STAFF"), getPet)
+  .put(protect, authorize("CUSTOMER", "STAFF"), updatePet)
+  .delete(protect, authorize("CUSTOMER", "STAFF"), deletePet)
+  .patch(protect, authorize("CUSTOMER", "STAFF"), updatePetStatus);
+
+router
+  .route("/:id/available")
+  .get(protect, authorize("CUSTOMER", "STAFF"), getCustomerPets);
 
 module.exports = router;

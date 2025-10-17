@@ -1,13 +1,13 @@
-import axios from 'axios';
+import axiosInstance from "../api/axiosInstance";
 
-const API_URL = 'http://localhost:5000/users'
+const API_URL = "/api/v1/customer";
 
-export const fetchUserAPI = async(id) => {
-    const response = await axios.get(`${API_URL}/${id}`);
-    return response.data;
-}
+export const fetchUserAPI = async (id) => {
+  const response = await axiosInstance.get(`${API_URL}/${id}`);
+  return response.data;
+};
 
-export const updateUserAPI = async(id, updatedUser) => {
-    const response = await axios.put(`${API_URL}/${id}`, updatedUser);
-    return response.data
-}
+export const updateUserAPI = async (id, updatedUser) => {
+  const response = await axiosInstance.put(`${API_URL}/${id}`, updatedUser);
+  return response.data;
+};
