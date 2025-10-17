@@ -181,3 +181,11 @@ body {
 .react-datepicker__week {
   @apply z-50;
 }
+
+.react-datepicker__close-icon::after {
+  @apply bg-transparent !text-[var(--cream-color)]
+}
+
+.react-datepicker__close-icon {
+  @apply scale-150 transition-all duration-200 hover:scale-200
+}

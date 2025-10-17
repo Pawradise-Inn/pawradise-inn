@@ -37,6 +37,8 @@ const getBookedRoom = async (req, res) => {
 const createBookedRoom = async (req, res) => {
   try {
     const { roomId, pet_name, bookingId, checkIn, checkOut } = req.body;
+    // const checkInDate = new Date(checkIn);
+    // const checkOutDate = new Date(checkOut);
     const pet = await prisma.pet.findFirst({
       where: { name: pet_name },
     });
@@ -67,6 +69,7 @@ const createBookedRoom = async (req, res) => {
         message: "This room is fully booked for the selected dates"
       });
     }
+    console.log(err)
     //   if (err.duplicatedDates) {
     //     return res.status(400).json({
     //       success: false,
