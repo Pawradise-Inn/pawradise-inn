@@ -1,4 +1,4 @@
-const ServiceCard = ({ service, getStatusText, getStatusColor, status}) => {
+const ServiceCard = ({ service}) => {
   console.log(service)
   return (
     <div className="bg-[var(--light-brown-color)] rounded-lg p-4 shadow-lg flex items-center justify-between">

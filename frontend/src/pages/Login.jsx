@@ -1,50 +1,39 @@
-// src/pages/Login.jsx
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import Login_Image from "../assets/login.png";
 import PawLogo from "../assets/logo.png";
 import { getMeAPI, loginAPI } from "../hooks/authAPI";
 import { useAuth } from "../context/AuthProvider";
-import { startUpVariants } from "../styles/animation";
-import {useNotification} from "../context/notification/NotificationProvider"
+import { useNotification } from "../context/notification/NotificationProvider";
 import { useScrollUpArrow } from "../context/ScrollUpArrowProvider";
+import { startUpVariants } from "../styles/animation";
 
-export default function Login({
-  role: roleProp,
-  redirectTo: redirectProp,
-  title: titleProp,
-}) {
+export default function Login() {
   const { createNotification } = useNotification();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { user, setUser } = useAuth();
   const { setShow } = useScrollUpArrow();
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  // Hide scroll-up button while on login page
   useEffect(() => {
     setShow(false);
     return () => setShow(true);
   }, []);
 
+  // Determine role from path for UI purposes only
   const role = useMemo(() => {
-    if (roleProp) return roleProp;
     return location.pathname.includes("/staff/") ? "staff" : "customer";
-  }, [location.pathname, roleProp]);
+  }, [location.pathname]);
 
-  const redirectTo = useMemo(() => {
-    if (redirectProp) return redirectProp;
-    return role === "staff" ? "/staff/dashboard/" : "/room/";
-  }, [role, redirectProp]);
-
-  const pageTitle = useMemo(() => {
-    if (titleProp) return titleProp;
-    return role === "staff" ? "Staff Login" : "Pawradise Inn";
-  }, [role, titleProp]);
-
+  // Page title
+  const pageTitle = role === "staff" ? "Staff Login" : "Pawradise Inn";
   useEffect(() => {
     document.title = pageTitle;
   }, [pageTitle]);
 
+  // Form state
   const [form, setForm] = useState({ Username: "", Password: "" });
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -63,28 +52,76 @@ export default function Login({
     setErr("");
     setLoading(true);
     try {
-      // ปรับให้ตรงกับ backend: ถ้า loginAPI เดิมไม่รองรับ role ให้ลบบรรทัด role ทิ้ง
       const res = await loginAPI(form.Username, form.Password);
-      if (res?.token) {
+      console.log(res)
+      if (res?.token && res?.user) {
+        // Store token and user data from login response
+
         localStorage.setItem("token", res.token);
-        const userData = await getMeAPI();
-        if (userData?.data) {
-          setUser(userData.data);
-          localStorage.setItem("user", JSON.stringify(userData.data));
+        localStorage.setItem("user", JSON.stringify(res.user));
+        localStorage.setItem("role", res.user.role);
+        if(res.user.role === "CUSTOMER"){
+          const userData = await getMeAPI();
+          setUser(userData.data)
         }
+        // Set user in context
+        else{
+          setUser(res.user);
+        }
+        
+        // Determine redirect path based on actual user role
+        const userRole = res.user.role;
+        const redirectPath = (userRole === "STAFF" || userRole === "ADMIN") 
+          ? "/staff/dashboard" 
+          : "/room";
+
         createNotification(
-          'success',
-          'Login Successful!',
-          'Welcome! You will be redirected shortly'
+          "success",
+          "Login Successful!",
+          "Welcome! Redirecting..."
         );
-        navigate(redirectTo, { replace: true });
+
+        navigate(redirectPath, { replace: true });
+      } else if (res?.token) {
+        // Fallback: if login response doesn't include user data, try getMeAPI
+        localStorage.setItem("token", res.token);
+        
+        try {
+          // Add small delay to ensure token is set in interceptors
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          const userData = await getMeAPI();
+          if (userData?.data) {
+            setUser(userData.data);
+            localStorage.setItem("user", JSON.stringify(userData.data));
+            localStorage.setItem("role", userData.data.role);
+            
+            // Determine redirect path based on actual user role
+            const userRole = userData.data.role;
+            const redirectPath = (userRole === "STAFF" || userRole === "ADMIN") 
+              ? "/staff/dashboard" 
+              : "/room";
+
+            createNotification(
+              "success",
+              "Login Successful!",
+              "Welcome! Redirecting..."
+            );
+
+            navigate(redirectPath, { replace: true });
+          } else {
+            setErr("Unable to retrieve user information.");
+          }
+        } catch (getMeError) {
+          console.error("GetMe API error:", getMeError);
+          setErr("Login successful but unable to retrieve user details. Please try refreshing the page.");
+        }
       } else {
-        setErr("Login failed. Please check your username or password.");
+        setErr("Invalid username or password.");
       }
     } catch (e2) {
-      //const msg = e2?.response?.data?.message || "Cannot sign in right now.";
-      //setErr(msg);
       console.error("Login error:", e2);
+      setErr("Cannot sign in right now.");
     } finally {
       setLoading(false);
     }
@@ -92,6 +129,7 @@ export default function Login({
 
   return (
     <div className="flex flex-col md:flex-row w-full h-dvh overflow-hidden bg-[var(--cream-color)]">
+      {/* Left Image */}
       <motion.div
         className="w-full md:w-3/5 h-64 md:h-auto flex-shrink-0"
         initial={{ x: -100, opacity: 0 }}
@@ -101,10 +139,11 @@ export default function Login({
         <img
           className="w-full h-full object-cover"
           src={Login_Image}
-          alt="Image login"
+          alt="Login"
         />
       </motion.div>
 
+      {/* Login Form */}
       <div className="w-full md:w-2/5 flex flex-col items-center justify-center p-6">
         <motion.img
           src={PawLogo}
@@ -115,6 +154,7 @@ export default function Login({
           animate="visible"
           custom={1}
         />
+
         <motion.h1
           className="text-2xl md:text-4xl text-[var(--dark-brown-color)] font-bold mt-4 md:mt-6"
           variants={startUpVariants}
@@ -144,7 +184,7 @@ export default function Login({
               Username
             </label>
             <input
-              className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full transition-all duration-200 hover:shadow-md outline-0"
+              className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full transition-all duration-200 hover:shadow-md"
               type="text"
               name="Username"
               placeholder={
@@ -171,7 +211,7 @@ export default function Login({
               Password
             </label>
             <input
-              className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full transition-all duration-200 hover:shadow-md outline-0"
+              className="border-[var(--brown-color)] border-2 rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--light-brown-color)] w-full transition-all duration-200 hover:shadow-md"
               type="password"
               name="Password"
               placeholder="Password"
@@ -181,7 +221,7 @@ export default function Login({
             />
           </motion.div>
 
-          {/* Error */}
+          {/* Error Message */}
           {err && (
             <motion.p
               className="text-red-600 text-sm mt-2 text-center"
@@ -200,7 +240,7 @@ export default function Login({
             disabled={!isFormValid || loading}
             className={`w-full md:w-40 h-10 mt-5 rounded shadow px-4 py-2 mx-auto ${
               isFormValid && !loading
-                ? "!text-[var(--cream-color)] bg-[var(--dark-brown-color)] hover:bg-[var(--brown-color)] hover:!text-[var(--cream-color)] transition-colors cursor-pointer"
+                ? "!text-[var(--cream-color)] bg-[var(--dark-brown-color)] hover:bg-[var(--brown-color)] transition-colors cursor-pointer"
                 : "bg-[var(--light-brown-color)] cursor-not-allowed"
             }`}
             variants={startUpVariants}
@@ -213,9 +253,9 @@ export default function Login({
             {loading ? "Signing in..." : "Login"}
           </motion.button>
 
-          {/* Register link — โชว์เฉพาะลูกค้า */}
+          {/* Register link (only for customers) */}
           {role === "customer" && (
-            <div>
+            <>
               <motion.hr
                 className="border-t-2 border-[var(--brown-color)] w-3/4 my-4 mx-auto"
                 variants={startUpVariants}
@@ -233,35 +273,13 @@ export default function Login({
                 Don't have an account?
                 <NavLink
                   to="/register"
-                  className="text-l ml-2 !text-[var(--fail-color)] font-bold hover:underline transition-all duration-200"
+                  className="ml-2 !text-[var(--fail-color)] font-bold hover:underline"
                 >
                   Register here
                 </NavLink>
               </motion.p>
-            </div>
+            </>
           )}
-
-          {/* Footer links */}
-          <motion.p
-            className="text-center text-xs md:text-sm font-normal !text-[var(--brown-color)] mt-4"
-            variants={startUpVariants}
-            initial="hidden"
-            animate="visible"
-            custom={3.8}
-          >
-            <a
-              href="/"
-              className="underline hover:text-[var(--dark-brown-color)] transition-colors duration-200"
-            >
-              Terms of Service
-            </a>
-            <a
-              href="/"
-              className="ml-3 underline hover:text-[var(--dark-brown-color)] transition-colors duration-200"
-            >
-              Privacy Policy
-            </a>
-          </motion.p>
         </form>
       </div>
     </div>
