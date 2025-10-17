@@ -3,11 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "motion/react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { fetchPetAPI, updatePetAPI } from "../../hooks/petAPI";
-import {
-  getStatusColor,
-  getRoomStatusColor,
-  getStatusText,
-} from "../../components/staff/StatusUtils";
+import {getStatusColor, getStatusText, getRoomStatusColor} from "../../components/staff/StatusUtils"
 import PetCard from "../../components/staff/PetUpdateCard";
 import ServiceCard from "../../components/staff/ServiceCard";
 import DropDownList from "../../components/DropDownList";
@@ -144,7 +140,7 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
       {/* Header */}
       <div className="flex items-center space-x-3 mb-6">
         <h2 className="text-2xl font-bold text-[var(--dark-brown-color)]">
-          Add Status
+          Change status
         </h2>
       </div>
 
@@ -154,8 +150,8 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
         <div className="flex flex-row justify-start items-center">
           <label className="font-semibold mb-1 mr-4">Status:</label>
           <DropDownList
-            value={status}
-            options={OPERATE_STATUS.map((os) => ({ name: os, value: os }))}
+            value={getStatusText(status)}
+            options={OPERATE_STATUS.map((os) => ({ name: getStatusText(os), value: os }))}
             onChange={(value) => {
               setStatus(value);
             }}
@@ -168,14 +164,14 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
         </div>
 
         {/* Note Input */}
-        <div className="flex flex-col">
+        {/* <div className="flex flex-col">
           <label className="font-semibold mb-1">Note:</label>
           <textarea
             rows="4"
             placeholder="Write a note here..."
             className="p-2 border rounded-lg focus:ring-2 focus:ring-[var(--dark-brown-color)] focus:outline-none resize-none transition-all duration-200"
           ></textarea>
-        </div>
+        </div> */}
 
         {/* Submit Button */}
         <div className="flex-1">
