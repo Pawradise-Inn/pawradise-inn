@@ -54,7 +54,7 @@ const DashboardCard = ({ data, onClick}) => {
     <div style={cardStyle} onClick={onClick}>
       <img src={data.serviceImage ||data.roomImage} className="object-center rounded-2xl w-[140px] h-[140px]"></img>
       <div style={textContainerStyle}>
-        <p style={nameStyle}>{data.roomId ? "Room Id " : null}{data.serviceName || data.roomId}</p>
+        <p style={nameStyle}>{data.serviceName || data.roomName}</p>
         <p style={detailStyle}>{data.petName}</p>
         <div style={detailStyle}>
         {data.timeBooked ? (
