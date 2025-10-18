@@ -180,7 +180,7 @@ const getTodayRooms = async (req, res) => {
     const formattedRooms = bookedRooms.map((br) => ({
       bookingId: br.bookingId,
       roomId: br.roomId,
-      roomImage: br.room.picture[0] ?? null,
+      roomImage: br.room.picture ?? null,
       petId: br.petId,
       petName: br.pet?.name ?? null,
       checkIn: br.checkIn,
