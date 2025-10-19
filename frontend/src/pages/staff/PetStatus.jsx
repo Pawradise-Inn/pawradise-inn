@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchAllPetAPI } from "../../hooks/petAPI";
-import PetCard  from "../../components/staff/PetCard"
+import PetCard from "../../components/staff/PetCard"
 
 const PetStatus = () => {
   const [pets, setPets] = useState([]);
@@ -10,10 +10,10 @@ const PetStatus = () => {
     try {
       const response = await fetchAllPetAPI();
       console.log(response)
-      if(response.success){
+      if (response.success) {
         setPets(response.data);
       }
-      
+
     } catch (err) {
       console.error(err);
     }
