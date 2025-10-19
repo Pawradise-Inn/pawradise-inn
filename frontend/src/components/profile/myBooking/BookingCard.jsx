@@ -7,7 +7,7 @@ export const BookingServiceCard = ({ book, onCancelClick, ...motionProps }) => {
       {...motionProps}
     >
       <img
-        src={book.picture}
+        src={book.service.picture}
         alt={book.pet.name || ""}
         className="w-50 h-50 rounded object-cover shadow mr-10"
       />
