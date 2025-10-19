@@ -4,15 +4,6 @@ const {createCareWithCheck} = require('./logics/care');
 const getCares = async (req, res) => {
     let options = {};
     let check = true;
-
-
-    if (!req.query.bookedServiceId){
-        options.where = {bs_id: Number(req.query.BookedServiceId)};
-        check = true;
-    }else if(!req.query.bookedRoomId){
-        options.where = {br_id: Number(req.query.BookedServiceId)};
-        check = false;
-    }
     if (req.query.filter){
         let filter = JSON.parse(req.query.filter);
         options.where = {...options.where, ...filter};
@@ -54,42 +45,29 @@ const getCares = async (req, res) => {
                 msg: "No care found"
             });
         }
-
-        if (check){
-            options.include = {
-                staff: {
-                    include: {
-                        user: {
-                            select:{user_name:true}
-                        }
-                    }
-                },
-                bookedService: {
-                    include: {
-                        pet: {
-                            select: {name: true}
-                        }
+        options.include = {
+            staff: {
+                include: {
+                    user: {
+                        select:{user_name:true}
                     }
                 }
-            };
-        }else{
-            options.include = {
-                staff: {
-                    include: {
-                        user: {
-                            select:{user_name:true}
-                        }
-                    }
-                },
-                bookedRoom: {
-                    include: {
-                        pet: {
-                            select: {name: true}
-                        }
+            },
+            bookedRoom: {
+                include: {
+                    pet: {
+                        select: {name: true, customerId: true}
                     }
                 }
-            };
-        }
+            },
+            bookedService: {
+                include: {
+                    pet: {
+                        select: {name: true, customerId: true}
+                    }
+                }
+            }
+        };
         
         const care = await prisma.care.findMany(options);
 

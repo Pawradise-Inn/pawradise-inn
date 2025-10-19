@@ -355,6 +355,98 @@ const getMyreviews = async (req, res) => {
   }
 };
 
+const getToBeReview = async(req, res) => {
+    const customerId = req.user.roleId;
+    try{
+      const chatlog = await prisma.chatLog.findMany({
+        where: {
+          customerId: customerId,
+        },
+        select:{
+          serviceId: true,
+          roomId: true
+        }
+      });
+
+      const serviceDone = [...new Set(
+        chatlog
+          .map(log => log.serviceId)
+          .filter(id => id)         
+      )];
+      const roomDone = [...new Set(
+        chatlog
+          .map(log => log.roomId)
+          .filter(id => id)
+      )];
+
+      const care = await prisma.care.findMany({
+        where: {
+          pet: {
+            customerId: customerId,
+          },
+          status: {
+            in: ["COMPLETED", "CHECKED_OUT"],
+          }
+        },
+        select: {
+          date: true,
+          staff: {
+            select: { user: {select: {user_name: true}}}
+          },
+          pet: {select: {name: true}},
+          bookedRoom: {
+            select: { room: {select: {id: true, name: true, picture: true}}}
+          },
+          bookedService: {
+            select: { service: {select: {id: true, name: true, picture: true}}}
+          }
+        }
+      });
+
+      let roomsToBeReview = new Set();
+      let servicesToBeReview = new Set();
+
+      care.forEach((c) => {
+        const roomId = c.bookedRoom?.room.id;
+
+        if (roomId && !roomDone.includes(roomId)){
+          roomsToBeReview.add({
+            "pic": c.bookedRoom.room.picture, 
+            "roomName": c.bookedRoom.room.name,
+            "petName": c.pet.name, 
+            "date": c.date,
+            "staffName": c.staff.user.user_name,
+          });
+        }
+
+        const serviceId = c.bookedService?.service.id;
+        if (serviceId && !serviceDone.includes(serviceId)){
+          servicesToBeReview.add({
+            "pic": c.bookedService.service.picture, 
+            "roomName": c.bookedService.service.name,
+            "petName": c.pet.name, 
+            "date": c.date,
+            "staffName": c.staff.user.user_name,
+          });
+        }
+      })
+
+      const waited = {
+        rooms: [...roomsToBeReview],
+        services: [...servicesToBeReview],
+      }
+
+      res.status(200).json({ success: true, data: waited });
+    }catch(err){
+        res.status(500).json({
+        success: false,
+        err: err.message,
+        message: "Unable to get service or room waited to be reviews. Please try again later",
+      });
+    }
+    
+};
+
 module.exports = {
   getChatLogs,
   getChatLog,
@@ -363,4 +455,5 @@ module.exports = {
   deleteChatLog,
   updateChatLog,
   getMyreviews,
+  getToBeReview
 };
