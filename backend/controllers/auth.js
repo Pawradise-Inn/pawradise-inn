@@ -73,6 +73,7 @@ exports.register = async (req, res, next) => {
 exports.getMe = async (req, res) => {
   try {
     const userId = req.user.id;
+    const role = req.user.role
 
     const user = await prisma.user.findUnique({
       where: { id: Number(userId) },

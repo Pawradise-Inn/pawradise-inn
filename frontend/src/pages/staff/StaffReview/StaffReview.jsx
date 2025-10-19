@@ -573,7 +573,7 @@ const StaffReviewPage = () => {
   const [reviews, setReviews] = useState([]);
   const [search, setSearch] = useState("");
   const [starFilter, setStarFilter] = useState(null);
-  const [dateFilter, setDateFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState(null);
   const [isStarDropdownOpen, setIsStarDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 3;
@@ -616,7 +616,7 @@ const StaffReviewPage = () => {
       if (!dateFilter) return true; // Create date objects at midnight UTC to avoid timezone issues
       const reviewDate = new Date(review.reviewDate);
       reviewDate.setUTCHours(0, 0, 0, 0);
-      const filterDate = new Date(dateFilter);
+      const filterDate = dateFilter;
       filterDate.setUTCHours(0, 0, 0, 0);
       return reviewDate.getTime() === filterDate.getTime();
     });
@@ -635,10 +635,6 @@ const StaffReviewPage = () => {
   };
   const handleDateChange = (value) => {
     setDateFilter(value);
-    setCurrentPage(1);
-  };
-  const clearDateFilter = () => {
-    setDateFilter("");
     setCurrentPage(1);
   };
 
@@ -676,14 +672,6 @@ const StaffReviewPage = () => {
                 <DateFilterRef className="relative cursor-pointer border-none !text-white outline-none px-6 py-3 w-full text-start" />
               }
             />
-            {dateFilter && (
-              <button
-                onClick={clearDateFilter}
-                className="absolute right-2.5 top-1/2 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-none bg-white/20 font-bold leading-none text-white transition-opacity hover:opacity-80"
-              >
-                &times;{" "}
-              </button>
-            )}{" "}
           </div>{" "}
           <div className=" w-1/12" ref={ref}>
             <div className="relative w-full" >

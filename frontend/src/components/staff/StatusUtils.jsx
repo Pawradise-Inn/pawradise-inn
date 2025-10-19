@@ -1,45 +1,45 @@
 export const getStatusColor = (status) => {
-    switch (status) {
-      case "IDLE":         
-        return "bg-blue-100 text-blue-800";
-      case "QUEUE":        
-        return "bg-yellow-100 text-yellow-800";
-      case "IN_PROGRESS":  
-        return "bg-orange-100 text-orange-800";
-      case "COMPLETE":     
-        return "bg-green-100 text-green-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  switch (status) {
+    case "IDLE":
+      return "bg-[var(--service-available-color)] text-white";
+    case "QUEUE":
+      return "bg-[var(--warning-color)] text-[var(--dark-brown-color)]";
+    case "IN_PROGRESS":
+      return "bg-[var(--service-inprogress-color)] text-[var(--dark-brown-color)]";
+    case "COMPLETE":
+      return "bg-[var(--service-complete-color)] text-white";
+    default:
+      return "bg-[var(--light-brown-color)] text-[var(--dark-brown-color)]";
+  }
+};
 
 export const getStatusText = (status) => {
-    switch (status) {
-      case "IDLE":
-        return "Idle";
-      case "QUEUE":
-        return "Queue";
-      case "IN_PROGRESS":
-        return "In progress";
-      case "COMPLETED":
-        return "Completed";
-      case "CHECKED_IN":
-        return "Checked in";
-      case "CHECKED_OUT":
-        return "Chceked out";
-      default:
-        return status;
-    }
-  };
+  switch (status) {
+    case "IDLE":
+      return "Idle";
+    case "QUEUE":
+      return "Queue";
+    case "IN_PROGRESS":
+      return "In progress";
+    case "COMPLETED":
+      return "Completed";
+    case "CHECKED_IN":
+      return "Checked in";
+    case "CHECKED_OUT":
+      return "Chceked out";
+    default:
+      return status;
+  }
+};
 export const getRoomStatusColor = (status) => {
-    switch (status) {
-      case "full":
-        return "bg-red-100 text-red-800 border border-red-200";
-      case "reserved":
-        return "bg-amber-100 text-amber-800 border border-amber-200";
-      case "available":
-        return "bg-emerald-100 text-emerald-800 border border-emerald-200";
-      default:
-        return "bg-gray-100 text-gray-800 border border-gray-200";
-    }
-  };
+  switch (status) {
+    case "full":
+      return "bg-[var(--room-full-color-color)] text-white border border-[var(--fail-color-alpha)]";
+    case "reserved":
+      return "bg-[var(--room-reserved-color)] text-[var(--dark-brown-color)] border border-[var(--warning-color-alpha)]";
+    case "available":
+      return "bg-[var(--room-available-color)] text-white border border-[var(--success-color-alpha)]";
+    default:
+      return "bg-[var(--light-brown-color)] text-[var(--dark-brown-color)] border border-[var(--brown-color)]";
+  }
+};
