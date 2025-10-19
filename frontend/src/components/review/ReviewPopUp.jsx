@@ -139,7 +139,7 @@ const ReviewPopup = ({ data, onClick, editable, ...motionProps }) => {
           {!data.nameOfStaffReply && (
             <div>
               {editable ? (
-                <div>
+                <div className="flex flex-col gap-2">
                   <button
                     // !dataStatus, editable
                     onClick={() =>

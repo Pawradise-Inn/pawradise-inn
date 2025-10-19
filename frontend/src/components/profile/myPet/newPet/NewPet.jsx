@@ -75,93 +75,90 @@ const NewPet = () => {
   const handleConfirm = () => {
     // Check for missing form data (initial synchronous validation)
     if (
-        !formData.petName ||
-        !formData.petGender ||
-        !formData.petAge ||
-        !formData.petType ||
-        !formData.petBreed ||
-        !formData.medicalCondition ||
-        !formData.foodAllergy ||
-        isNaN(formData.petAge)
+      !formData.petName ||
+      !formData.petGender ||
+      !formData.petAge ||
+      !formData.petType ||
+      !formData.petBreed ||
+      !formData.medicalCondition ||
+      !formData.foodAllergy ||
+      isNaN(formData.petAge)
     ) {
-        if(isNaN(formData.petAge)) {
-          createNotification(
-              "fail",
-              "Invalid Age",
-              "Please provide a valid number for pet age."
-          );
-        }
-        else{
-          createNotification(
-            "fail",
-            "Fail to create a pet",
-            "Please provide all required pet information."
-          );
-        }
-        return; // Stop execution if validation fails
+      if (isNaN(formData.petAge)) {
+        createNotification(
+          "fail",
+          "Invalid Age",
+          "Please provide a valid number for pet age."
+        );
+      } else {
+        createNotification(
+          "fail",
+          "Fail to create a pet",
+          "Please provide all required pet information."
+        );
+      }
+      return; // Stop execution if validation fails
     }
 
     // Launch confirmation notification, which executes the async logic upon confirmation
     createNotification(
-        "warning",
-        "Confirmation",
-        "Create this new pet?",
-        async () => {
-            let pictureUrl = "https://storage.googleapis.com/paw_image/unnamed.jpg"; // Default image if no file is selected
+      "warning",
+      "Confirmation",
+      "Create this new pet?",
+      async () => {
+        let pictureUrl = "https://storage.googleapis.com/paw_image/unnamed.jpg"; // Default image if no file is selected
 
         // 1. UPLOAD IMAGE TO GCS
-          if (formData.petImage) {
-            // This API call sends the file object via multipart/form-data
-                  pictureUrl = await uploadImageAPI(formData.petImage);
-                  console.log(pictureUrl)
-          }
-                // 2. PREPARE NEW PET DATA
-                const newPet = {
-                  name: formData.petName,
-                  sex: formData.petGender,
-                  age: Number(formData.petAge), // Ensure age is a number
-                  type: formData.petType,
-                  status: "IDLE", // Assuming IDLE is the initial status
-                  breed: formData.petBreed,
-                  disease: [formData.medicalCondition],
-                  allergic: [formData.foodAllergy],
-                  picture: pictureUrl.imageUrl, // **Use the GCS URL here**
-                  customerId: user.customer.id,
-                };
-                console.log(newPet)
+        if (formData.petImage) {
+          // This API call sends the file object via multipart/form-data
+          pictureUrl = await uploadImageAPI(formData.petImage);
+          console.log(pictureUrl);
+        }
+        // 2. PREPARE NEW PET DATA
+        const newPet = {
+          name: formData.petName,
+          sex: formData.petGender,
+          age: Number(formData.petAge), // Ensure age is a number
+          type: formData.petType,
+          status: "IDLE", // Assuming IDLE is the initial status
+          breed: formData.petBreed,
+          disease: [formData.medicalCondition],
+          allergic: [formData.foodAllergy],
+          picture: pictureUrl.imageUrl, // **Use the GCS URL here**
+          customerId: user.customer.id,
+        };
+        console.log(newPet);
 
-                // 3. REGISTER PET IN DATABASE
-                // Assuming registerPetAPI handles the actual insertion into the 'pet' table
-                // and returns the pet object with its database-generated ID (if needed)
-                await registerPetAPI(user.customer.id, newPet); 
+        // 3. REGISTER PET IN DATABASE
+        // Assuming registerPetAPI handles the actual insertion into the 'pet' table
+        // and returns the pet object with its database-generated ID (if needed)
+        await registerPetAPI(user.customer.id, newPet);
 
-                // 4. UPDATE CUSTOMER'S LOCAL PET LIST (DB & Context)
-                // Safely get current pets or initialize to an empty array
-                console.log(user)
-                const currentPets = user.customer.pets || [];
-                
-                // Create a NEW array and push the new pet (Avoids mutating state)
-                const updatedPetsArr = [...currentPets, newPet]; 
-                console.log()
-                
-                // Prepare the customer object with the updated pets list
-                const updatedCustomerData = { ...user, pets: updatedPetsArr }; 
+        // 4. UPDATE LOCAL AUTH CONTEXT WITH NEW PET
+        // The pet is already created in DB via registerPetAPI with correct customerId
+        // No need to update Customer table - pets are linked via foreign key
+        console.log(user);
+        const currentPets = user.customer.pets || [];
 
-                // 5. UPDATE CUSTOMER IN DB (to link the new pet list)
-                await updateCustomerAPI(user.customer.id, updatedCustomerData);
-                console.log(updatedCustomerData)
-                // 6. UPDATE LOCAL AUTH CONTEXT
-                setUser({ ...user, customer: updatedCustomerData });
+        // Create a NEW array and add the new pet
+        const updatedPetsArr = [...currentPets, newPet];
 
-                // 7. SUCCESS & REDIRECT
-                createNotification(
-                    "success",
-                    "Pet has been created!",
-                    "Your pet has been successfully saved."
-                );
-                navigate("/profile/pet");
-            }
-)}
+        // Update only the customer's pets in local context
+        const updatedCustomerData = { ...user.customer, pets: updatedPetsArr };
+
+        // 5. UPDATE LOCAL AUTH CONTEXT
+        setUser({ ...user, customer: updatedCustomerData });
+
+        // 7. SUCCESS & REDIRECT
+        createNotification(
+          "success",
+          "Pet has been created!",
+          "Your pet has been successfully saved."
+        );
+        navigate("/profile/pet");
+      }
+    );
+  };
 
   const handleCancel = () => {
     navigate("/profile/pet");

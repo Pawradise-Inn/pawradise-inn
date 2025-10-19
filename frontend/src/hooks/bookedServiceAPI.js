@@ -7,6 +7,7 @@ export const getTodayService = async () => {
   return response.data;
 };
 
+
 export const createBookedService = async (bookedServiceData) => {
   const response = await axiosInstance.post(API_URL, bookedServiceData);
   return response.data;

@@ -36,9 +36,15 @@ const getBookedRoom = async (req, res) => {
 
 const createBookedRoom = async (req, res) => {
   try {
+    const customerId = req.user.roleId;
     const { roomId, pet_name, bookingId, checkIn, checkOut } = req.body;
+    // const checkInDate = new Date(checkIn);
+    // const checkOutDate = new Date(checkOut);
     const pet = await prisma.pet.findFirst({
-      where: { name: pet_name },
+      where: { 
+        name: pet_name ,
+        customerId: customerId
+      },
     });
     const bookedRoom = await createBookedRoomWithCondition(
       roomId,
@@ -67,6 +73,7 @@ const createBookedRoom = async (req, res) => {
         message: "This room is fully booked for the selected dates"
       });
     }
+    console.log(err)
     //   if (err.duplicatedDates) {
     //     return res.status(400).json({
     //       success: false,
@@ -177,11 +184,13 @@ const getTodayRooms = async (req, res) => {
     const formattedRooms = bookedRooms.map((br) => ({
       bookingId: br.bookingId,
       roomId: br.roomId,
-      roomImage: br.room.picture[0] ?? null,
+      roomImage: br.room.picture ?? null,
       petId: br.petId,
       petName: br.pet?.name ?? null,
       checkIn: br.checkIn,
       checkOut: br.checkOut,
+      petStatus: br.pet?.status ?? null,
+      roomName: br.room.name,
     }));
 
     res.status(200).json({ success: true, data: formattedRooms });
