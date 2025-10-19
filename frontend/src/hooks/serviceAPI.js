@@ -104,7 +104,3 @@ export const fetchServiceStatusAPI = async ({ name, entryDate }) => {
   return response.data;
 };
 
-export const fetchPetTypesAPI = async () => {
-  const response = await axiosInstance.get(`${API_URL}/pet-types`);
-  return response.data;
-}

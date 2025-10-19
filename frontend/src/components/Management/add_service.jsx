@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import DropDownList from "../DropDownList";
 import { motion } from "motion/react";
 import { useNotification } from "../../context/notification/NotificationProvider";
-import { fetchPetTypesAPI } from "../../hooks/serviceAPI";
+import { fetchPetTypesAPI } from "../../hooks/petAPI";
 
 const AddServicePopup = ({
   title = "Add service",

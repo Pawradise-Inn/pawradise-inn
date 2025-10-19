@@ -1,17 +1,13 @@
 const DashboardCard = ({ data, onClick}) => {
 
-  const handleStatusBoxClick = (e) => {
-    e.stopPropagation();
-    setIsDropdownOpen((prev) => !prev);
-  };
-
-
   const getStatusColor = (status) => {
-    if (status === "completed") return "limegreen";
-    if (status === "cancelled") return "grey";
-    return "gold";
+      if (status === "CHECKED_IN") return "var(--checkIn-color)";
+      if (status === "CHECKED_OUT") return "var(--checkOut-color)";
+      if (status === "QUEUE") return "var(--queue-color)";
+      if (status === "IN_PROGRESS") return "var(--inProgress-color)";
+    if (status === "COMPLETED") return "var(--complete-color)";
+    return "var(--idle-color)";
   };
-
   const cardStyle = {
     display: "flex",
     alignItems: "center",
@@ -26,11 +22,12 @@ const DashboardCard = ({ data, onClick}) => {
 
   const textContainerStyle = { textAlign: "left", flexGrow: 1, marginLeft: "3rem"};
   const nameStyle = { margin: "0", fontSize: "1.2rem", fontWeight: "bold" };
-  const detailStyle = { margin: "4px 0 0", color: "#666" };
-  const dropdownContainerStyle = { position: "relative", marginLeft: "16px" };
-  const dropdownBoxStyle = {
-    width: "100px",
-    height: "30px",
+  const detailStyle = { margin: "10px 0 10px", color: "var(--dark-brown-color)" ,fontSize: "1.5 rem",
+    fontWeight: "600" };
+  const statusBoxContainerStyle = { position: "relative", marginLeft: "16px" };
+  const statusBox= {
+    width: "150px",
+    height: "40px",
     backgroundColor: "white",
     border: "1px solid var(--brown-color)",
     borderRadius: "8px",
@@ -42,35 +39,48 @@ const DashboardCard = ({ data, onClick}) => {
   const statusCircleStyle = {
     width: "12px",
     height: "12px",
-    backgroundColor: getStatusColor(data.status),
+    backgroundColor: getStatusColor(data.petStatus),
     borderRadius: "50%",
 
   };
   const statusTextStyle = {
     fontSize: "0.9rem",
     fontWeight: "500",
-    color: "#333",
+    color: "var(--dark-brown-color)",
     marginLeft: "6px",
     textTransform: "capitalize",
   };
   return (
     <div style={cardStyle} onClick={onClick}>
-      <img src={data.serviceImage} className="object-center rounded-2xl w-[140px] h-[140px]"></img>
+      <img src={data.serviceImage ||data.roomImage} className="object-center rounded-2xl w-[140px] h-[140px]"></img>
       <div style={textContainerStyle}>
-        <p style={nameStyle}>{data.serviceName}</p>
+        <p style={nameStyle}>{data.serviceName || data.roomName}</p>
         <p style={detailStyle}>{data.petName}</p>
-        <p style={detailStyle}>
-          {new Date(data.timeBooked).toLocaleString("en-US", {
-            month: "short", // "Sep"
-            day: "numeric", // "17"
-            hour: "numeric", // "2"
-            minute: "2-digit", // "44"
-            hour12: true, // "AM/PM"
-          })}
-        </p>
+        <div style={detailStyle}>
+        {data.timeBooked ? (
+          <p style={detailStyle}>
+            {new Date(data.timeBooked).toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            })}
+          </p>
+        ) : (
+          <>
+            <p style={detailStyle}>
+              Check-in: {new Date(data.checkIn).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric"})}
+            </p>
+            <p style={detailStyle}>
+              Check-out: {new Date(data.checkOut).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric"})}
+            </p>
+          </>
+        )}
+        </div>
       </div>
-      <div style={dropdownContainerStyle}>
-        <div style={dropdownBoxStyle} onClick={handleStatusBoxClick}>
+      <div style={statusBoxContainerStyle}>
+        <div style={statusBox}>
           <div style={statusCircleStyle}></div>
           <span style={statusTextStyle}>{data.petStatus}</span>
         </div>

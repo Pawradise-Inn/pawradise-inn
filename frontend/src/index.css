@@ -102,6 +102,13 @@ body {
   --fail-color-alpha: rgb(206, 97, 81);
 
   --beige-cream-color: rgb(254, 247, 219);
+
+  --idle-color: rgb(192, 192, 192);
+  --queue-color: rgb(255, 215, 0);
+  --checkIn-color: rgb(60, 179, 113);
+  --checkOut-color: rgb(219, 112, 147);
+  --inProgress-color: rgb(100, 149, 237);
+  --complete-color: rgb(177, 129, 211);
 }
 
 /* ---------------------------------- font ---------------------------------- */
@@ -180,4 +187,12 @@ body {
 
 .react-datepicker__week {
   @apply z-50;
+}
+
+.react-datepicker__close-icon::after {
+  @apply bg-transparent !text-[var(--cream-color)]
+}
+
+.react-datepicker__close-icon {
+  @apply scale-150 transition-all duration-200 hover:scale-200
 }

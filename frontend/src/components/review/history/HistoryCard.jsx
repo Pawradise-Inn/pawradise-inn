@@ -19,9 +19,13 @@ const HistoryCard = ({ data, onClick, ...motionProps }) => {
   const getDateBlock = (dateWithTime) => {
     const [date, time] = dateWithTime.replace(".000Z", "").split("T");
     return (
-      <div>
-        <span className={ `py-1 px-3 rounded-xl mr-2 ${getStatusColor("IDLE")}`}>{date}</span>
-        <span className={ `py-1 px-3 rounded-xl mr-2 ${getStatusColor("IDLE")}`}>{time}</span>
+      <div className="inline-block">
+        <span className={`py-1 px-3 rounded-xl mr-2 ${getStatusColor("IDLE")}`}>
+          {date}
+        </span>
+        <span className={`py-1 px-3 rounded-xl mr-2 ${getStatusColor("IDLE")}`}>
+          {time}
+        </span>
       </div>
     );
   };
@@ -39,13 +43,13 @@ const HistoryCard = ({ data, onClick, ...motionProps }) => {
         className="w-40 h-40 object-cover object-center rounded-lg"
       />
       <div className="flex justify-between items-cente w-full mx-10">
-        <div className="flex flex-col gap-2 justify-center items-start">
+        <div className="flex flex-col gap-2 justify-center items-start w-2/3">
           {data.type === "service" ? (
             <b>service: {data.name}</b>
           ) : (
             <b>room_{data.name.toString().padStart(3, 0)}</b>
           )}
-          <p>finished date {getDateBlock(data.date)}</p>
+          <div>finished date {getDateBlock(data.date)}</div>
         </div>
         <div className="flex flex-col gap-2 justify-center items-start w-2/10">
           <Tooltip text={data.nameOfStaffReply}>

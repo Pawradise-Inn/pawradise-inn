@@ -37,9 +37,9 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   const [petData, setPetData] = useState([]);
   const [size, setSize] = useState(0);
   const [formData, setFormData] = useState({
-    entryDate: "",
-    exitDate: "",
-    entryTime: "",
+    entryDate: null,
+    exitDate: null,
+    entryTime: null,
   });
 
   const CheckInRef = forwardRef(({ value, onClick, className }, ref) => (
@@ -60,9 +60,21 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     </div>
   ));
 
+  const changeDateTime = (date, time) => {
+    const hour = time.split(":")[0];
+
+    date.setHours(Number(hour));
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+
+    return date;
+  };
+
   //  calculate date is valid or not
   //  @return: validDateStatus which contain 1)status, 2)warningText
   const validDateStatus = useMemo(() => {
+    if (!formData.entryDate || !formData.exitDate) return { status: true };
     return getDateValidation(formData.entryDate, formData.exitDate);
   }, [formData]);
 
@@ -121,9 +133,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         service_name: data.name,
         pet_name: currentPet,
         bookingId: 1,
-        scheduled: new Date(
-          `${formData.entryDate}T${formData.entryTime}:00.00Z`
-        ),
+        scheduled: changeDateTime(formData.entryDate, formData.entryTime),
       };
 
       createBookedService(body)
@@ -145,8 +155,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         roomId: data.id,
         pet_name: currentPet,
         bookingId: 1,
-        checkIn: new Date(`${formData.entryDate}T00:00:00.00Z`),
-        checkOut: new Date(`${formData.exitDate}T00:00:00.00Z`),
+        checkIn: formData.entryDate,
+        checkOut: formData.exitDate,
       };
 
       createBookedRoom(body)
@@ -182,7 +192,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     if (data.headerType == "Service") {
       getServiceStatusAPI(
         data.name,
-        `${formData.entryDate}T${formData.entryTime}:00.00Z`
+        changeDateTime(formData.entryDate, formData.entryTime)
       ).then((res) => {
         setSize(res.count);
         res.count < 3
@@ -216,6 +226,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     const fetchPetData = async () => {
       if (!user) return;
 
+      console.log("Fetching pet data for:", data.headerType);
+      console.log("Using customer ID:", user.customer.id);
       try {
         let response;
         if (data.headerType === "Service") {
@@ -226,6 +238,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         } else {
           response = await fetchAvailablePetAPI(user.customer.id);
         }
+        console.log("Pet data response:", response.data);
         setPetData(response.data);
       } catch (err) {
         console.error("Failed to fetch pet data:", err);
@@ -347,7 +360,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
             }}
             onClick={() => {
               navigate("/profile/pet");
-              onClick([], false);
+              onClick(data, false);
             }}
             className="text-xl bi bi-plus inline-flex justify-center items-center cursor-pointer bg-[var(--dark-brown-color)] rounded-full !text-white"
           ></motion.i>

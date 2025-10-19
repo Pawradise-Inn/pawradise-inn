@@ -47,3 +47,8 @@ export const fetchCustomerPets = async (customerId, fields) => {
   const response = await axiosInstance.get(`${API_URL}/${customerId}/available`, { params });
   return response.data;
 };
+
+export const fetchPetTypesAPI = async () => {
+  const response = await axiosInstance.get(`${API_URL}/pet-types`);
+  return response.data;
+};

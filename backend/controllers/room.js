@@ -225,13 +225,6 @@ const getRoomStatus = async (req, res) => {
     const checkIn = new Date(req.query.entry_date);
     const checkOut = new Date(req.query.exit_date);
 
-    if (checkIn >= checkOut) {
-      return res.status(400).json({
-        success: false,
-        msg: "Check-in date must be before check-out date",
-      });
-    }
-
     const room = await findRoomById(id);
     if (!room)
       return res
