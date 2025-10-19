@@ -1,4 +1,5 @@
 const prisma = require('../prisma/prisma');
+const {createCareWithCheck} = require("./logics/care");
 
 const register = async (req, res) => {
   try {
@@ -136,8 +137,9 @@ const updatePet = async (req, res) => {
 
 const updatePetStatus = async (req, res) => {
   try {
+    const staffId = req.user.roleId;
     const petId = Number(req.params.id);
-    const { status } = req.body;
+    const {status, type, bookedId } = req.body;
     
     if (!status) {
       return res.status(400).json({ 
@@ -146,11 +148,19 @@ const updatePetStatus = async (req, res) => {
       });
     }
 
+    if (!type || !bookedId) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Please provide a type (room or service) with the id" 
+      });
+    }
+
     const pet = await prisma.pet.update({
       where: { id: petId },
       data: { status },
     });
-
+    console.log(pet);
+    const log = await createCareWithCheck(bookedId, type, petId, staffId, new Date(), status);    
     res.status(200).json({ success: true, data: pet });
   } catch (err) {
     if (err.code === 'P2025') {

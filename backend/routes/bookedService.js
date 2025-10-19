@@ -12,7 +12,7 @@ const {
 const { authorize, protect } = require('../middleware/auth');
 
 router.route('/dashboard')
-    .get(protect, authorize("CUSTOMER", "STAFF"), getTodayService);
+    .get(protect, authorize("STAFF"), getTodayService);
 
 router.route('/')
     .get(getBookedServices)
