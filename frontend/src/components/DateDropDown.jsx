@@ -9,10 +9,10 @@ const DateDropDown = ({ value, customInput, onChange, onFocus = null }) => {
 
   return (
     <DatePicker
+      isClearable
       disabledKeyboardNavigation
       selected={value}
       onChange={onChange}
-      onFocus={onFocus}
       wrapperClassName="w-full"
       onMonthChange={(date) => setCurrentMonth(date.getMonth())}
       dayClassName={(date) =>
@@ -20,7 +20,10 @@ const DateDropDown = ({ value, customInput, onChange, onFocus = null }) => {
       }
       customInput={customInput}
       open={isOpen}
-      onInputClick={() => setIsOpen(!isOpen)}
+      onInputClick={() => {
+        setIsOpen(!isOpen);
+        onFocus?.();
+      }}
       onSelect={() => setIsOpen(false)}
       onClickOutside={() => {
         setIsOpen(false);

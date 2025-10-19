@@ -14,11 +14,11 @@ import { getDateValidation } from "../../utils/handleValidation";
 import DropDownList from "../../components/DropDownList";
 import "react-datepicker/dist/react-datepicker.css";
 import DateDropDown from "../../components/DateDropDown";
+import { fetchPetTypesAPI } from "../../hooks/petAPI";
 
 const BookingRoom = () => {
-  const petTypes = [null, "DOG", "CAT", "MOUSE", "RABBIT", "BIRD"];
-
   const { createNotification } = useNotification();
+  const [petTypes, setPetTypes] = useState([null]);
   const [mounted, setMounted] = useState(false);
   const [room, setRoom] = useState([]);
   const [filter, setFilter] = useState({
@@ -30,7 +30,6 @@ const BookingRoom = () => {
   const [noResult, setNoResult] = useState(false);
   const [popUpStatus, setPopUpStatus] = useState(false);
   const [popUpData, setPopUpData] = useState([]);
-
 
   const CheckInRef = forwardRef(({ value, onClick, className }, ref) => (
     <button type="button" ref={ref} onClick={onClick} className={className}>
@@ -69,7 +68,17 @@ const BookingRoom = () => {
         console.error("Failed to load initial rooms:", error);
       }
     };
+
+    const loadInitialPetTypes = async () => {
+      try {
+        const petTypesData = await fetchPetTypesAPI();
+        setPetTypes([null, ...petTypesData.data]);
+      } catch (error) {
+        console.error("Failed to load initial pet types:", error);
+      }
+    };
     loadInitialRooms();
+    loadInitialPetTypes();
   }, []);
 
   // if entryDate and exitDate is fill select 2 route
@@ -175,9 +184,11 @@ const BookingRoom = () => {
           <p className="text-xl font-bold">Booking date</p>
           <div className="relative w-full rounded-xl bg-[var(--brown-color)] before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-px before:h-2/4 before:border-1 before:border-white">
             <div className="relative w-1/2 inline-block">
-            <DateDropDown
+              <DateDropDown
                 value={filter.entryDate}
-                onChange={(date) => setFilter((prev) => ({ ...prev, entryDate: date }))}
+                onChange={(date) =>
+                  setFilter((prev) => ({ ...prev, entryDate: date }))
+                }
                 onFocus={() => setMounted(true)}
                 customInput={
                   <CheckInRef className="w-full !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer text-start" />
@@ -187,7 +198,9 @@ const BookingRoom = () => {
             <div className="relative w-1/2 inline-block">
               <DateDropDown
                 value={filter.exitDate}
-                onChange={(date) => setFilter((prev) => ({ ...prev, exitDate: date }))}
+                onChange={(date) =>
+                  setFilter((prev) => ({ ...prev, exitDate: date }))
+                }
                 onFocus={() => setMounted(true)}
                 customInput={
                   <CheckOutRef className="w-full !text-white rounded-2xl px-4 py-2 text-xl outline-0 cursor-pointer text-start" />

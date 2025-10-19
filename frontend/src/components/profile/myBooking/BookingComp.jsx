@@ -3,19 +3,22 @@ import { AnimatePresence } from "motion/react";
 import {  useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthProvider";
 import { deleteBookedService } from "../../../hooks/bookedServiceAPI";
+import { deleteBookedRoom } from "../../../hooks/bookedRoomAPI";
 import { createBooking, fetchMyBookingAPI, fetchMyBookings } from "../../../hooks/bookingAPI"; // Import cancelBooking
 import { overlay, popUP, startUpVariants } from "../../../styles/animation";
 import { removeWindowScroll } from "../../../utils/handlePopup";
 import Overlay from "../../Overlay";
 import CancelModal from "../CancelModal";
 import SuccessMessage from "../SuccessMessage";
-import BookingCard from "./BookingCard";
+import {BookingRoomCard, BookingServiceCard }from "./BookingCard";
 
 const BookingComp = () => {
   const { user, setUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [allBookedService, setAllBookedService] = useState([]);
+  const [allBookedRoom, setAllBookedRoom] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [bookingType, setBookingType] = useState(null); // 'service' or 'room'
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [cancelledBooking, setCanceledBooking] = useState(null);
 
@@ -28,6 +31,8 @@ const BookingComp = () => {
         // Flatten all booked_service into one array
         const allServices = data.data.flatMap((book) => book.booked_service);
         setAllBookedService(allServices);
+        const allRooms = data.data.flatMap((book) => book.booked_room);
+        setAllBookedRoom(allRooms);
       } catch (error) {
         console.error("Failed to fetch bookings:", error);
       }
@@ -35,21 +40,32 @@ const BookingComp = () => {
     getMyBookings();
   }, [user]);
 
-  const handleCancelClick = (book) => {
+  const handleCancelClick = (book, type) => {
     setSelectedBooking(book);
+    setBookingType(type);
     setShowModal(true);
   };
 
-  const handleConfirmCancel = () => {
+  const handleConfirmCancel = async () => {
     try {
-      deleteBookedService(selectedBooking.id);
-      const filterBookingService = allBookedService.filter(
-        (ab) => ab.id != selectedBooking.id
-      );
-      setAllBookedService(filterBookingService);
+      if (bookingType === 'service') {
+        await deleteBookedService(selectedBooking.id);
+        const filterBookingService = allBookedService.filter(
+          (ab) => ab.id !== selectedBooking.id
+        );
+        setAllBookedService(filterBookingService);
+      } else if (bookingType === 'room') {
+        await deleteBookedRoom(selectedBooking.id);
+        const filterBookingRoom = allBookedRoom.filter(
+          (ar) => ar.id !== selectedBooking.id
+        );
+        setAllBookedRoom(filterBookingRoom);
+      }
+      
       setCanceledBooking(selectedBooking);
       setShowModal(false);
       setSelectedBooking(null);
+      setBookingType(null);
       setShowSuccessMessage(true);
       setTimeout(() => {
         setShowSuccessMessage(false);
@@ -59,12 +75,14 @@ const BookingComp = () => {
       // Handle the error, maybe show an error message to the user
       setShowModal(false);
       setSelectedBooking(null);
+      setBookingType(null);
     }
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedBooking(null);
+    setBookingType(null);
   };
 
   const handleCloseSuccessMessage = () => {
@@ -83,16 +101,29 @@ const BookingComp = () => {
 
       {allBookedService.map((book, idx) => {
         return (
-          <BookingCard
+          <BookingServiceCard
             variants={startUpVariants}
             initial="hidden"
             animate="visible"
             custom={idx / 3 + 1}
             key={book.id}
             book={book}
-            onCancelClick={(book) => handleCancelClick(book)}
+            onCancelClick={(book) => handleCancelClick(book, 'service')}
           />
         );
+      })}
+      {allBookedRoom.map((room, idx) => {
+        return (
+          <BookingRoomCard 
+            variants={startUpVariants}
+            initial="hidden"
+            animate="visible"
+            custom={idx / 3 + 1}
+            key={room.roomId}
+            room={room}
+            onCancelClick={(room) => handleCancelClick(room, 'room')}
+          />
+        )
       })}
 
       {/* Cancel Popup with overlay and animation */}

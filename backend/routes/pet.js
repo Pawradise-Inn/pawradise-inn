@@ -8,19 +8,13 @@ const {
   getAllPets,
   getCustomerPets,
   getCustomerPetNamesWithAvailable,
+  getPetTypes,
 } = require("../controllers/pet");
 const { protect, authorize } = require("../middleware/auth");
 
 const router = express.Router();
 
 router.route("/").get(getAllPets);
-
-router
-  .route("/:id")
-  .get(protect, authorize("CUSTOMER", "STAFF"), getPet)
-  .put(protect, authorize("CUSTOMER", "STAFF"), updatePet)
-  .delete(protect, authorize("CUSTOMER", "STAFF"), deletePet)
-  .patch(protect, authorize("CUSTOMER", "STAFF"), updatePetStatus);
 
 router
   .route("/register")
@@ -33,6 +27,15 @@ router
     authorize("CUSTOMER", "STAFF"),
     getCustomerPetNamesWithAvailable
   );
+
+router.route("/pet-types").get(getPetTypes);
+
+router
+  .route("/:id")
+  .get(protect, authorize("CUSTOMER", "STAFF"), getPet)
+  .put(protect, authorize("CUSTOMER", "STAFF"), updatePet)
+  .delete(protect, authorize("CUSTOMER", "STAFF"), deletePet)
+  .patch(protect, authorize("CUSTOMER", "STAFF"), updatePetStatus);
 
 router
   .route("/:id/available")
