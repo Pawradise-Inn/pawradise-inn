@@ -22,7 +22,7 @@ const ReviewCard = ({
   }, [review?.staffReply, review?.id]);
 
   const ratingText = useMemo(() => {
-    const n = Number(review?.rating);
+    const n = Number(review?.commenter_star);
     return Number.isFinite(n) ? `${n.toFixed(1)}/5.0` : "-/5.0";
   }, [review?.rating]);
 
@@ -76,7 +76,7 @@ const ReviewCard = ({
           <div className="flex-shrink-0 pt-1">
             <p className="text-base font-bold">{review?.serviceName}</p>
             <p className="my-1 text-gray-600">{review?.petName}</p>
-            <p className="text-sm text-gray-500">{review?.reviewDate}</p>
+            <p className="text-sm text-gray-500">{new Date(review?.reviewDate).toLocaleDateString()}</p>
           </div>
 
           <div className="w-px bg-gray-200" />
@@ -84,14 +84,14 @@ const ReviewCard = ({
           {/* right content */}
           <div className="flex flex-grow flex-col min-w-0">
             <div className="flex justify-between gap-3">
-              <p className="font-bold truncate">{review?.customerName}</p>
+              <p className="font-bold truncate">{review?.commenter_name}</p>
               <p className="flex-shrink-0 text-gray-600">
                 {ratingText} <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
               </p>
             </div>
 
             <p className="mb-4 mt-2 italic text-gray-700 break-words">
-              “{review?.reviewText}”
+              “{review?.commenter_detail}”
             </p>
 
             {/* staff reply editor (มีให้ทุกการ์ดเสมอ) */}
