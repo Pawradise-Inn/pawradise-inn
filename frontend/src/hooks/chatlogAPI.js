@@ -3,12 +3,9 @@ import axiosInstance from "../api/axiosInstance";
 const API_URL = "/api/v1/chatlog";
 
 // Get all chat logs with optional filters (customerId, serviceId, staffId)
-export const getChatLogsAPI = async (filters = {}) => {
-  const params = new URLSearchParams();
-  if (filters.customerId) params.append("customerId", filters.customerId);
-  if (filters.serviceId) params.append("serviceId", filters.serviceId);
-  if (filters.staffId) params.append("staffId", filters.staffId);
-  const res = await axiosInstance.get(`${API_URL}?${params.toString()}`);
+export const getChatLogsAPI = async (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  const res = await axiosInstance.get(`${API_URL}?${query}`);
   return res.data;
 };
 

@@ -9,11 +9,14 @@ import { getChatLogsAPI } from "../../../hooks/chatlogAPI";
 // --- Main Component ---
 const StaffReviewPage = () => {
   const [reviews, setReviews] = useState([]);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  
   const [search, setSearch] = useState("");
   const [starFilter, setStarFilter] = useState(null);
   const [dateFilter, setDateFilter] = useState(null);
+  
   const [isStarDropdownOpen, setIsStarDropdownOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 3;
   const ref = useRef(null);
 
@@ -38,42 +41,47 @@ const StaffReviewPage = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await getChatLogsAPI();
+        const params = {
+          page: currentPage,
+          limit: reviewsPerPage,
+          sort: 'review_date:desc',
+        };
+
+        const filters = {};
+        if (starFilter !== null) {
+          filters.rating = starFilter;
+        }
+        if (dateFilter) {
+          filters.review_date = dateFilter.toISOString().split('T')[0];
+        }
+        if (search) {
+          filters.search = search;
+        }
+
+        if (Object.keys(filters).length > 0) {
+          params.filter = JSON.stringify(filters);
+        }
+
+        const response = await getChatLogsAPI(params);
         setReviews(response.data);
+        setTotalReviews(response.count || 0);
       } catch(err) {
         console.error("Failed to fetch reviews:",err);
         setReviews([]);
+        setTotalReviews(0);
       }
     }
     fetchReviews();
-  }, []);
+  }, [currentPage, search, starFilter, dateFilter]);
 
   const handleDeleteReview = (reviewId) => {
     setReviews((prevReviews) =>
       prevReviews.filter((review) => review.id !== reviewId)
     );
+    setTotalReviews(prev => prev - 1);
   };
 
-  const filteredReviews = reviews
-    .filter((review) => {
-      if (starFilter === null) return true;
-      return Math.round(review.rating) === starFilter;
-    })
-    .filter((review) => {
-      if (!dateFilter) return true; // Create date objects at midnight UTC to avoid timezone issues
-      const reviewDate = new Date(review.reviewDate);
-      reviewDate.setUTCHours(0, 0, 0, 0);
-      const filterDate = dateFilter;
-      filterDate.setUTCHours(0, 0, 0, 0);
-      return reviewDate.getTime() === filterDate.getTime();
-    });
-
-  const indexOfLastReview = currentPage * reviewsPerPage;
-  const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
-  const currentReviews = filteredReviews.slice(
-    indexOfFirstReview,
-    indexOfLastReview
-  );
+  const totalPages = Math.ceil(totalReviews / reviewsPerPage);
 
   const handleStarFilterChange = (starValue) => {
     setStarFilter(starValue);
@@ -149,8 +157,8 @@ const StaffReviewPage = () => {
       </div>{" "}
       <div className="mx-auto mt-8 max-w-7xl">
         {" "}
-        {currentReviews.length > 0 ? (
-          currentReviews.map((review) => (
+        {reviews.length > 0 ? (
+          reviews.map((review) => (
             <ReviewCard
               key={review.id}
               review={review}
@@ -163,12 +171,12 @@ const StaffReviewPage = () => {
           </p>
         )}{" "}
       </div>{" "}
-      {filteredReviews.length > 1 && (
+      {totalReviews > reviewsPerPage && (
         <div className="mx-auto max-w-7xl">
           {" "}
           <Pagination
             currentPage={currentPage}
-            pageAmount={filteredReviews.length}
+            pageAmount={totalReviews}
             onClick={setCurrentPage}
             commentPerPage={reviewsPerPage}
           />{" "}
