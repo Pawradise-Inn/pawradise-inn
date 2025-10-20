@@ -86,6 +86,7 @@ const getChatLogs = async (req, res) => {
 
     options.include = {
       customer: { include: { user: { select: { user_name: true } } } },
+      service: { select: { name: true }}
     };
 
     const reviews = await prisma.chatLog.findMany(options);
@@ -93,7 +94,9 @@ const getChatLogs = async (req, res) => {
       id: r.id,
       commenter_name: r.customer?.user.user_name || "Anonymous",
       commenter_detail: r.review,
-      commenter_star: r.rating
+      commenter_star: r.rating,
+      serviceName: r.service?.name,
+      reviewDate: r.review_date
     }));
 
     const pagination = {};
@@ -118,6 +121,7 @@ const getChatLogs = async (req, res) => {
         count: total,
       });
   } catch (err) {
+    console.error("🔥 ERROR fetching reviews:", err);
     res.status(500).json({
       success: false,
       message: "Unable to fetch reviews. Please try again later",
