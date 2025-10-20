@@ -71,7 +71,7 @@ const ReviewPopup = ({ data, onClick, editable, ...motionProps }) => {
           className="bi bi-x-lg flex justify-center items-center absolute top-0 right-0 -translate-x-1/2 translate-y-1/2 text-3xl cursor-pointer transition-all duration-200 hover:scale-125"
         />
         <img
-          src={testImage}
+          src={data.image}
           alt="serviceImg"
           className="w-1/2 h-auto rounded-2xl object-center object-cover"
         />

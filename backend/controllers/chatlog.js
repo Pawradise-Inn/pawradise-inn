@@ -237,6 +237,8 @@ const createChatLog = async (req, res) => {
       type = "room";
     }
 
+    chatlog.isRead = chatlog.isRead || !chatlog.staff?.user?.user_name;
+
     const formatted = {
       id: chatlog.id,
       image: image,
