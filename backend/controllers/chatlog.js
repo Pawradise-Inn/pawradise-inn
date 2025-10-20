@@ -152,6 +152,8 @@ const getChatLog = async (req, res) => {
 
 const createChatLog = async (req, res) => {
   let data = {};
+  console.log("req.body");
+  console.log("req.body", req);
   if (req.body.rating) {
     data.rating = Number(req.body.rating);
   }
@@ -415,6 +417,7 @@ const getToBeReview = async(req, res) => {
 
         if (roomId && !roomDone.includes(roomId)){
           roomsToBeReview.add({
+            "id":roomId,
             "pic": c.bookedRoom.room.picture, 
             "roomName": c.bookedRoom.room.name,
             "petName": c.pet.name, 
@@ -426,6 +429,7 @@ const getToBeReview = async(req, res) => {
         const serviceId = c.bookedService?.service.id;
         if (serviceId && !serviceDone.includes(serviceId)){
           servicesToBeReview.add({
+            "id":serviceId,
             "pic": c.bookedService.service.picture, 
             "serviceName": c.bookedService.service.name,
             "petName": c.pet.name, 
