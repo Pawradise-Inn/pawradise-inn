@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import DashboardCard from "../../../components/dashboard/DashboardCard";
 import { getTodayRoom } from "../../../hooks/bookedRoomAPI";
+import { Outlet } from "react-router-dom";
+
 
 const DashboardTab2 = () => {
     const [items, setItems] = useState([]);
@@ -55,7 +57,6 @@ const DashboardTab2 = () => {
     const fetchCheckIn = async () => {
       try {
         const response = await getTodayRoom();
-        console.log(response.data);
         setCheckIn(response);
       } catch(err) {
         console.error("Failed to fetch check-ins:", err);
