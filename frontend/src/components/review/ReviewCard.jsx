@@ -40,10 +40,10 @@ const ReviewCard = ({ data, onClick, type, ...motionProps }) => {
       />
       <div className="flex justify-between items-center w-full mx-10">
         <div className="flex flex-col gap-2 justify-center items-start">
-          {type === "Service" ? (
-            <b>service: {data.serviceName}</b>
+          {type == "Service" ? (
+            <b>{data.serviceName}</b>
           ) : (
-            <b>room: {data.roomName}</b>
+            <b>{data.roomName}</b>
           )}
           <p>pet name: {data.petName}</p>
           <div>finish date: {getDateBlock(data.date)}</div>
