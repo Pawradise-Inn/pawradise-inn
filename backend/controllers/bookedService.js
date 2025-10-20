@@ -160,12 +160,12 @@ const getTodayService = async (req, res) => {
 
     const bookedServices = await prisma.bookedService.findMany({
       // just comment for a test data in postgres
-      //   where: {
-      //     scheduled: {
-      //       gte: todayStart,
-      //       lte: todayEnd
-      //     }
-      //   },
+        where: {
+          scheduled: {
+            gte: todayStart,
+            lte: todayEnd
+          }
+        },
       include: {
         service: true,
         pet: true,

@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { NavLink } from "react-router-dom";
+import {petStatusColor} from "../../staff/StatusUtils";
 
 const PetCard = ({ pet, ...motionProps }) => {
   return (
@@ -14,7 +15,7 @@ const PetCard = ({ pet, ...motionProps }) => {
             />
           </div>
           <div className="flex justify-between mb-3">
-            <span className="px-5 py-1 !text-white text-xs rounded-full bg-[var(--dark-brown-color)] font-semibold">
+            <span className= {`px-5 py-1  text-sm ${petStatusColor(pet.status)} rounded-full font-semibold text-center inline-block whitespace-nowrap shadow-md border`}>
               {pet.status}
             </span>
             <div className="text-center">

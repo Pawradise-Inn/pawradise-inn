@@ -199,6 +199,46 @@ const getTodayRooms = async (req, res) => {
   }
 };
 
+const getTodayCheckOuts = async (req, res) => {
+  try {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const bookedRooms = await prisma.bookedRoom.findMany({
+      where: {
+        checkOut: {
+          gte: todayStart,
+          lte: todayEnd,
+        },
+      },
+      include: {
+        room: true,
+        pet: true,
+        booking: true,
+      },
+    });
+
+    const formattedRooms = bookedRooms.map((br) => ({
+      bookingId: br.bookingId,
+      roomId: br.roomId,
+      roomImage: br.room.picture ?? null,
+      petId: br.petId,
+      petName: br.pet?.name ?? null,
+      checkIn: br.checkIn,
+      checkOut: br.checkOut,
+      petStatus: br.pet?.status ?? null,
+      roomName: br.room.name,
+    }));
+
+    res.status(200).json({ success: true, data: formattedRooms });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Unable to fetch today's check out rooms. Please try again later" });
+  }
+};
+
 module.exports = {
   getBookedRooms,
   getBookedRoom,
@@ -206,4 +246,5 @@ module.exports = {
   updateBookedRoom,
   deleteBookedRoom,
   getTodayRooms,
+  getTodayCheckOuts,
 };

@@ -41,6 +41,27 @@ const getChatLogs = async (req, res) => {
   if (req.query.filter) {
     let filter = JSON.parse(req.query.filter);
     options.where = { ...options.where, ...filter };
+
+    if (filter.rating) {
+      const star = filter.rating;
+      if (star === 5) {
+        options.where.rating = { gte: 5 };
+      } else {
+        options.where.rating = { gte: star, lt: star + 1 };
+      }
+    }
+
+    if (filter.search && filter.search.length > 0) {
+      options.where.customer = {
+        user: {
+          user_name: {
+            contains: filter.search,
+            mode: 'insensitive',
+          }
+        }
+      }
+    }
+    delete options.where.search;
   }
 
   //Select fields
@@ -152,6 +173,8 @@ const getChatLog = async (req, res) => {
 
 const createChatLog = async (req, res) => {
   let data = {};
+  console.log("req.body");
+  console.log("req.body", req);
   if (req.body.rating) {
     data.rating = Number(req.body.rating);
   }
@@ -415,6 +438,7 @@ const getToBeReview = async(req, res) => {
 
         if (roomId && !roomDone.includes(roomId)){
           roomsToBeReview.add({
+            "id":roomId,
             "pic": c.bookedRoom.room.picture, 
             "roomName": c.bookedRoom.room.name,
             "petName": c.pet.name, 
@@ -426,8 +450,9 @@ const getToBeReview = async(req, res) => {
         const serviceId = c.bookedService?.service.id;
         if (serviceId && !serviceDone.includes(serviceId)){
           servicesToBeReview.add({
+            "id":serviceId,
             "pic": c.bookedService.service.picture, 
-            "roomName": c.bookedService.service.name,
+            "serviceName": c.bookedService.service.name,
             "petName": c.pet.name, 
             "date": c.date,
             "staffName": c.staff.user.user_name,
