@@ -1,8 +1,7 @@
 import { motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/AuthProvider";
-import { updateCustomerAPI } from "../../../../hooks/customerAPI";
 import { registerPetAPI } from "../../../../hooks/petAPI";
 import { startUpVariants } from "../../../../styles/animation";
 import PetInput from "./PetInput";

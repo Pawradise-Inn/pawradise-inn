@@ -124,7 +124,6 @@ const RoomEdit = () => {
       closePopup();
     } catch (err) {
       console.error("Failed to save room:", err);
-      createNotification("fail", "Save Failed", "Failed to save room.");
     }
   };
 
@@ -135,7 +134,6 @@ const RoomEdit = () => {
       closePopup();
     } catch (err) {
       console.error("Failed to delete room:", err);
-      createNotification("fail", "Delete Failed", "Failed to delete room.");
     }
   };
 

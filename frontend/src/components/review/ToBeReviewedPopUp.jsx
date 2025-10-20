@@ -1,7 +1,6 @@
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 import { useNotification } from "../../context/notification/NotificationProvider";
-import testImage from "../../assets/test.png";
 import { createChatLogAPI } from "../../hooks/chatlogAPI";
 import { useOutletContext } from "react-router-dom";
 
@@ -15,7 +14,7 @@ const ToBeReviewedPopUp = ({
   ...motionProps
 }) => {
   const { createNotification } = useNotification();
-  const { user, historys, setHistorys } = useOutletContext();
+  const { historys, setHistorys } = useOutletContext();
   const [currentRating, setCurrentRating] = useState(data.rating || 0);
   const [reviewText, setReviewText] = useState(data.review || "");
   const [hoverRating, setHoverRating] = useState(0);
@@ -61,11 +60,6 @@ const ToBeReviewedPopUp = ({
       onClick();
     } catch (error) {
       console.error("Failed to submit review:", error);
-      createNotification(
-        "fail",
-        "Submission Failed",
-        "There was an error submitting your review."
-      );
     }
   };
 

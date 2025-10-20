@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "motion/react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { fetchPetAPI, updatePetAPI } from "../../hooks/petAPI";
-import {getStatusColor, getStatusText, getRoomStatusColor} from "../../components/staff/StatusUtils"
+import {getStatusText, getRoomStatusColor} from "../../components/staff/StatusUtils"
 import PetCard from "../../components/staff/PetUpdateCard";
 import ServiceCard from "../../components/staff/ServiceCard";
 import DropDownList from "../../components/DropDownList";

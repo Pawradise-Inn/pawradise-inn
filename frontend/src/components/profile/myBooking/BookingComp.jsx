@@ -1,20 +1,15 @@
 // BookingComp.js
-import { AnimatePresence } from "motion/react";
 import {  useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthProvider";
 import { deleteBookedService } from "../../../hooks/bookedServiceAPI";
 import { deleteBookedRoom } from "../../../hooks/bookedRoomAPI";
-import { createBooking, fetchMyBookingAPI, fetchMyBookings } from "../../../hooks/bookingAPI"; // Import cancelBooking
-import { overlay, popUP, startUpVariants } from "../../../styles/animation";
-import { removeWindowScroll } from "../../../utils/handlePopup";
-import Overlay from "../../Overlay";
-import CancelModal from "../CancelModal";
-import SuccessMessage from "../SuccessMessage";
+import { fetchMyBookings } from "../../../hooks/bookingAPI"; // Import cancelBooking
+import { startUpVariants } from "../../../styles/animation";
 import {BookingRoomCard, BookingServiceCard }from "./BookingCard";
 import { useNotification } from "../../../context/notification/NotificationProvider";
 
 const BookingComp = () => {
-  const { user, setUser } = useAuth();
+  const { user } = useAuth();
   const [allBookedService, setAllBookedService] = useState([]);
   const [allBookedRoom, setAllBookedRoom] = useState([]);
   const {createNotification} = useNotification();
@@ -62,7 +57,6 @@ const BookingComp = () => {
           createNotification("success", "Delete successfully", "The booking has been deleted");
         } catch (error) {
           console.error("Failed to cancel booking:", error);
-          createNotification("fail", "Delete failed", "Failed to delete booking.");
         }
       }
     );
