@@ -18,37 +18,11 @@ const ReviewComp = () => {
     setPopUpStatus(!popUpStatus);
     setPopUpData(data);
     setPopUpEditable(editable);
+    console.log();
   };
 
   return (
     <div>
-      {/* Room to be reviewed */}
-      <div className="p-6 flex-1">
-        {room.map((r) => {
-          return (
-            <ReviewCard
-              key={r.id}
-              data={r}
-              onClick={() => handlePopUpData(r, true)}
-              type="Room"
-            />
-          );
-        })}
-
-        {popUpStatus ? (
-          <div>
-            <Overlay bgColor="black" />
-            <ToBeReViewedPopUp
-              data={popUpData}
-              setHistorys={setHistorys}
-              editable={popUpEditable}
-              onClick={() => handlePopUpData({}, false)}
-            />
-          </div>
-        ) : null}
-      </div>
-
-
       {/* Service to be reviewed */}
       <div className="p-6 flex-1">
         {service.map((s) => {
@@ -67,8 +41,37 @@ const ReviewComp = () => {
             <Overlay bgColor="black" />
             <ToBeReViewedPopUp
               data={popUpData}
-              setHistorys={setHistorys}
+              setTobeReviewed={setHistorys}
               editable={popUpEditable}
+              service={service}
+              type="Service"
+              onClick={() => handlePopUpData({}, false)}
+            />
+          </div>
+        ) : null}
+      </div>
+      {/* Room to be reviewed */}
+      <div className="p-6 flex-1">
+        {room.map((r) => {
+          return (
+            <ReviewCard
+              key={r.id}
+              data={r}
+              onClick={() => handlePopUpData(r, true)}
+              type="Room"
+            />
+          );
+        })}
+
+        {popUpStatus ? (
+          <div>
+            <Overlay bgColor="black" />
+            <ToBeReViewedPopUp
+              data={popUpData}
+              setTobeReviewed={setHistorys}
+              editable={popUpEditable}
+              room={room}
+              type="Room"
               onClick={() => handlePopUpData({}, false)}
             />
           </div>

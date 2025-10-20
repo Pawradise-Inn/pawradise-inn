@@ -25,7 +25,7 @@ const Review = () => {
       setService(data.data.services);
       console.log("data",data);
     });
-  });
+  },[user]);
 
   useEffect(() => {
     let badgeCount = 0;
