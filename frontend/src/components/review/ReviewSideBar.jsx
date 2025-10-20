@@ -6,7 +6,11 @@ const ReviewSideBar = ({ badge }) => {
   const location = useLocation();
   const pathList = location.pathname.split("/");
   const link = [
-    { text: "To be reviewed", to: "/review", path: "me" },
+    {
+      text: "To be reviewed",
+      to: "/review",
+      path: "me" 
+    },
     {
       text: "History",
       to: "/review/history",

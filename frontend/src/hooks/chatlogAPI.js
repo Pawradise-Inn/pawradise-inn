@@ -48,3 +48,9 @@ export const deleteChatLogAPI = async (id) => {
   const res = await axiosInstance.delete(`${API_URL}/${id}`);
   return res.data;
 };
+
+//get all room and service that need to be review
+export const getToBeReviewAPI = async () => {
+  const res = await axiosInstance.get(`${API_URL}/mine/waiting`);
+  return res.data;
+};
