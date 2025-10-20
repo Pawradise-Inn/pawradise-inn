@@ -1,84 +1,110 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import ReviewCard from "./ReviewCard";
-import { getChatLogsAPI , getToBeReviewAPI} from "../../hooks/chatlogAPI";
-import { useNotification } from "../../context/notification/NotificationProvider";
-import ReviewPopup from "./ReviewPopUp";
 import ToBeReViewedPopUp from "./ToBeReviewedPopUp";
 import Overlay from "../Overlay";
+import { overlay, popUP, startUpVariants } from "../../styles/animation";
+import { AnimatePresence } from "motion/react";
 
 const ReviewComp = () => {
-  const { createNotification } = useNotification();
-  const { user, historys, setHistorys , room , setRoom , service , setService} = useOutletContext();
+  const { user, setHistorys, room, service } = useOutletContext();
   const [popUpStatus, setPopUpStatus] = useState(false);
   const [popUpData, setPopUpData] = useState({});
-  const [popUpEditable, setPopUpEditable] = useState(false);
-  console.log(user)
+  console.log(user);
 
-  const handlePopUpData = (data, editable) => {
+  const handlePopUpData = (data, type) => {
     setPopUpStatus(!popUpStatus);
-    setPopUpData(data);
-    setPopUpEditable(editable);
+    setPopUpData({ data: data, type: type });
     console.log();
   };
 
   return (
-    <div>
+    <div className="flex-1 p-6">
       {/* Service to be reviewed */}
-      <div className="p-6 flex-1">
-        {service.map((s) => {
+      <div>
+        {service.map((s, idx) => {
           return (
             <ReviewCard
+              variants={startUpVariants}
+              initial="hidden"
+              animate="visible"
+              custom={idx / 3 + 1}
               key={s.id}
               data={s}
-              onClick={() => handlePopUpData(s, true)}
+              onClick={() => handlePopUpData(s, "service")}
               type="Service"
             />
           );
         })}
 
-        {popUpStatus ? (
-          <div>
-            <Overlay bgColor="black" />
-            <ToBeReViewedPopUp
-              data={popUpData}
-              setTobeReviewed={setHistorys}
-              editable={popUpEditable}
-              service={service}
-              type="Service"
-              onClick={() => handlePopUpData({}, false)}
-            />
-          </div>
-        ) : null}
+        <AnimatePresence initial={true}>
+          {popUpStatus && popUpData.type === "service" ? (
+            <div>
+              <Overlay
+                variants={overlay}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                bgColor="black"
+              />
+              <ToBeReViewedPopUp
+                variants={popUP}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                data={popUpData.data}
+                setTobeReviewed={setHistorys}
+                service={service}
+                type="Service"
+                onClick={() => handlePopUpData({}, "service")}
+              />
+            </div>
+          ) : null}
+        </AnimatePresence>
       </div>
       {/* Room to be reviewed */}
-      <div className="p-6 flex-1">
-        {room.map((r) => {
+      <div>
+        {room.map((r, idx) => {
           return (
             <ReviewCard
+              variants={startUpVariants}
+              initial="hidden"
+              animate="visible"
+              custom={idx / 3 + service.length / 3 + 1}
               key={r.id}
               data={r}
-              onClick={() => handlePopUpData(r, true)}
+              onClick={() => handlePopUpData(r, "room")}
               type="Room"
             />
           );
         })}
 
-        {popUpStatus ? (
-          <div>
-            <Overlay bgColor="black" />
-            <ToBeReViewedPopUp
-              data={popUpData}
-              setTobeReviewed={setHistorys}
-              editable={popUpEditable}
-              room={room}
-              type="Room"
-              onClick={() => handlePopUpData({}, false)}
-            />
-          </div>
-        ) : null}
+        <AnimatePresence initial={true}>
+          {popUpStatus && popUpData.type === "room" ? (
+            <div>
+              <Overlay
+                variants={overlay}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                bgColor="black"
+              />
+              <ToBeReViewedPopUp
+                variants={popUP}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                data={popUpData.data}
+                setTobeReviewed={setHistorys}
+                room={room}
+                type="Room"
+                onClick={() => handlePopUpData({}, "room")}
+              />
+            </div>
+          ) : null}
+        </AnimatePresence>
       </div>
-    </div> 
+    </div>
   );
 };
 

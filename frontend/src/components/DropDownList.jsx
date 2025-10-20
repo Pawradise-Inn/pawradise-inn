@@ -18,18 +18,9 @@ const DropDownList = ({
   ...motionProps
 }) => {
   const [dropDownStatus, setDropDownStatus] = useState(false);
-  const { createNotification } = useNotification();
   const ref = useRef(null);
 
   const handleDropDown = () => {
-    // if (options.length === 0) {
-    //   createNotification(
-    //     "fail",
-    //     "You have no pet",
-    //     "Please add you pet first before operate this."
-    //   );
-    //   return;
-    // }
     setDropDownStatus(!dropDownStatus);
   };
 
