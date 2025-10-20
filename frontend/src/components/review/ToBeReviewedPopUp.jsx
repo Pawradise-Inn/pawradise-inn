@@ -36,8 +36,7 @@ const ToBeReviewedPopUp = ({
         });
         console.log("response", response);
         const data2 = response.data;
-        historys.push(data2);
-        setHistorys([...historys]);
+        setHistorys([data2, ...historys]);
       }
       else if (data.roomName){
         const response = await createChatLogAPI({
@@ -47,8 +46,7 @@ const ToBeReviewedPopUp = ({
         });
         console.log("response", response);
         const data2 = response.data;
-        historys.push(data2);
-        setHistorys([...historys]);
+        setHistorys([data2, ...historys]);
       }
 
       setTobeReviewed((prevItems) =>
