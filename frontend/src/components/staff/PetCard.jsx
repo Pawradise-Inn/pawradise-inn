@@ -39,7 +39,7 @@ const PetCard = ({ pet }) => {
                     pet.status
                   )}`}
                 >
-                  {(pet.status)}
+                  {getStatusText(pet.status)}
                 </span>
               </div>
             </div>
