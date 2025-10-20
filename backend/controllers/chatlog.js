@@ -41,6 +41,27 @@ const getChatLogs = async (req, res) => {
   if (req.query.filter) {
     let filter = JSON.parse(req.query.filter);
     options.where = { ...options.where, ...filter };
+
+    if (filter.rating) {
+      const star = filter.rating;
+      if (star === 5) {
+        options.where.rating = { gte: 5 };
+      } else {
+        options.where.rating = { gte: star, lt: star + 1 };
+      }
+    }
+
+    if (filter.search && filter.search.length > 0) {
+      options.where.customer = {
+        user: {
+          user_name: {
+            contains: filter.search,
+            mode: 'insensitive',
+          }
+        }
+      }
+    }
+    delete options.where.search;
   }
 
   //Select fields
