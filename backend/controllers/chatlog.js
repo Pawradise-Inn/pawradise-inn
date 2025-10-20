@@ -423,7 +423,7 @@ const getToBeReview = async(req, res) => {
         if (serviceId && !serviceDone.includes(serviceId)){
           servicesToBeReview.add({
             "pic": c.bookedService.service.picture, 
-            "roomName": c.bookedService.service.name,
+            "serviceName": c.bookedService.service.name,
             "petName": c.pet.name, 
             "date": c.date,
             "staffName": c.staff.user.user_name,
