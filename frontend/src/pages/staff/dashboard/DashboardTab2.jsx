@@ -1,9 +1,7 @@
+import { useEffect, useState } from "react";
 import DashboardCard from "../../../components/dashboard/DashboardCard";
-import { useState ,useEffect} from "react";
-import { Outlet } from "react-router-dom";
-import {
-  getTodayRoom,
-} from "../../../hooks/bookedRoomAPI";
+import { getTodayRoom } from "../../../hooks/bookedRoomAPI";
+
 const DashboardTab2 = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -48,6 +46,38 @@ const DashboardTab2 = () => {
     marginTop: "8rem",
     fontStyle: "italic",
   };
+
+  const [checkIn, setCheckIn] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCheckIn = async () => {
+      try {
+        const response = await getTodayRoom();
+        console.log(response.data);
+        setCheckIn(response);
+      } catch(err) {
+        console.error("Failed to fetch check-ins:", err);
+        setError("Could not load check-in data. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCheckIn();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="text-center mt-16 text-lg">
+        Loading today's check-ins...
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-center mt-16 text-red-500">{error}</div>;
+  }
 
   return (
     <main style={mainStyle}>
