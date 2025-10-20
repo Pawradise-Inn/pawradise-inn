@@ -2,15 +2,20 @@ import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import testImage from "../../assets/test.png";
-import { updateChatLogAPI } from "../../hooks/chatlogAPI";
+import { createChatLogAPI } from "../../hooks/chatlogAPI";
+import { useOutletContext } from "react-router-dom";
 
 const ToBeReviewedPopUp = ({
   data,
-  setHistorys,
+  setTobeReviewed,
   onClick,
+  room,
+  service,
+  type,
   ...motionProps
 }) => {
   const { createNotification } = useNotification();
+  const { user, historys, setHistorys } = useOutletContext();
   const [currentRating, setCurrentRating] = useState(data.rating || 0);
   const [reviewText, setReviewText] = useState(data.review || "");
   const [hoverRating, setHoverRating] = useState(0);
@@ -18,16 +23,35 @@ const ToBeReviewedPopUp = ({
   useEffect(() => {
     setCurrentRating(data.rating || 0);
     setReviewText(data.review || "");
+    console.log("type in popup", type);
   }, [data]);
 
   const handleSubmitReview = async () => {
     try {
-      await updateChatLogAPI(data.id, {
-        review: reviewText,
-        rating: currentRating,
-      });
+      if (data.serviceName){
+        const response = await createChatLogAPI({
+          review: reviewText,
+          rating: currentRating,
+          serviceId: data.id,
+        });
+        console.log("response", response);
+        const data2 = response.data;
+        historys.push(data2);
+        setHistorys([...historys]);
+      }
+      else if (data.roomName){
+        const response = await createChatLogAPI({
+          review: reviewText,
+          rating: currentRating,
+          roomId: data.id,
+        });
+        console.log("response", response);
+        const data2 = response.data;
+        historys.push(data2);
+        setHistorys([...historys]);
+      }
 
-      setHistorys((prevItems) =>
+      setTobeReviewed((prevItems) =>
         prevItems.filter((item) => item.id !== data.id)
       );
 
@@ -74,14 +98,14 @@ const ToBeReviewedPopUp = ({
           className="bi bi-x-lg flex justify-center items-center absolute top-0 right-0 -translate-x-1/2 translate-y-1/2 text-3xl cursor-pointer transition-all duration-200 hover:scale-125"
         />
         <img
-          src={testImage}
+          src={data.pic}
           alt="serviceImg"
           className="w-1/2 h-auto rounded-2xl object-center object-cover"
         />
         <div className="flex flex-col justify-between gap-2 w-1/2">
           <p className="text-2xl mb-2 ">
             <b>
-              {data.type} : {data.name}
+              {data.serviceName || data.roomName}
             </b>
           </p>
           <p className="text-2xl mb-1">

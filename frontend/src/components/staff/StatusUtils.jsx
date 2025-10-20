@@ -43,3 +43,22 @@ export const getRoomStatusColor = (status) => {
       return "bg-[var(--light-brown-color)] text-[var(--dark-brown-color)] border border-[var(--brown-color)]";
   }
 };
+
+export const petStatusColor =(status) => {
+  switch (status) {
+    case "IDLE":
+      return "bg-[var(--idle-color)] !text-[var(--dark-brown-color)]";
+    case "QUEUE":
+      return "bg-[var(--queue-color)] !text-[var(--dark-brown-color)]";
+    case "IN_PROGRESS":
+      return "bg-[var(--inProgress-color)] !text-[var(--dark-brown-color)]";
+    case "COMPLETED":
+      return "bg-[var(--complete-color)] !text-[var(--dark-brown-color)]";
+    case "CHECKED_IN":
+      return "bg-[var(--checkIn-color)] !text-[var(--dark-brown-color)]";
+    case "CHECKED_OUT":
+      return "bg-[var(--checkOut-color)] !text-[var(--dark-brown-color)]";
+    default:
+      return "bg-[var(--idle-color)] !text-[var(--dark-brown-color)]";
+  }
+};
