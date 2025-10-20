@@ -7,12 +7,15 @@ const {
     createBookedRoom,
     updateBookedRoom,
     deleteBookedRoom,
-    getTodayRooms
+    getTodayRooms,
+    getTodayCheckOuts
 } = require('../controllers/bookedRoom');
 
 const {protect, authorize} = require('../middleware/auth');
 
-router.get('/dashboard', getTodayRooms);
+router.get('/dashboard/checkins', getTodayRooms);
+router.get('/dashboard/checkouts', getTodayCheckOuts);
+
 router.route('/')
     .get(protect, authorize("STAFF", "CUSTOMER"), getBookedRooms)
     .post(protect, authorize("STAFF", "CUSTOMER"),createBookedRoom);

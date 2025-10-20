@@ -3,9 +3,14 @@ import axiosInstance from "../api/axiosInstance";
 const API_URL = "/api/v1/bookedRoom";
 
 export const getTodayRoom = async () => {
-  const response = await axiosInstance.get(`${API_URL}/dashboard`);
+  const response = await axiosInstance.get(`${API_URL}/dashboard/checkins`);
   return response.data;
 };
+
+export const getTodayCheckOuts = async () => {
+  const response = await axiosInstance.get(`${API_URL}/dashboard/checkouts`);
+  return response.data;
+}
 
 export const createBookedRoom = async (bookedRoom) => {
   const response = await axiosInstance.post(API_URL, bookedRoom);

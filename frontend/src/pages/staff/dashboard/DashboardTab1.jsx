@@ -22,7 +22,6 @@ const DashboardTab1 = () => {
         setLoading(true);
         const response = await getTodayRoom();
         // Ensure we're setting an array, even if empty
-        console.log(response);
         setItems(Array.isArray(response?.data) ? response.data : []);
       } catch (error) {
         console.error("Failed to fetch rooms:", error);
