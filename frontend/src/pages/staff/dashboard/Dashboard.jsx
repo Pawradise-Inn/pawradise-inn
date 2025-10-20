@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
 import Navbar from "../../../components/Navbar";
 import { useState ,useEffect } from "react";
-import { getTodayRoom } from "../../../hooks/bookedRoomAPI";
+import { getTodayRoom, getTodayCheckOuts } from "../../../hooks/bookedRoomAPI";
 import { getTodayService } from "../../../hooks/bookedServiceAPI";
 const Dashboard = () => {
   const [data, setData] = useState(null);
@@ -21,16 +21,18 @@ const Dashboard = () => {
         const [
           roomResponse,
           serviceResponse,
+          checkOutResponse,
         ] = await Promise.all([
           getTodayRoom(),
           getTodayService(),
+          getTodayCheckOuts(),
         ]);
 
         // Put the data into a single state object
         const allData = {
           roomBookings: Array.isArray(roomResponse?.data) ? roomResponse.data : [],
           // checkIn: Array.isArray(checkInResponse?.data) ? checkInResponse.data : [],
-          // checkOut: Array.isArray(checkOutResponse?.data) ? checkOutResponse.data : [],
+          checkOut: Array.isArray(checkOutResponse?.data) ? checkOutResponse.data : [],
           serviceBookings: Array.isArray(serviceResponse?.data) ? serviceResponse.data : [],
         };
         
@@ -40,7 +42,7 @@ const Dashboard = () => {
         setCounts({
           rooms: allData.roomBookings.length,
           // checkIn: allData.checkIn.length,
-          // checkOut: allData.checkOut.length,
+          checkOut: allData.checkOut.length,
           services: allData.serviceBookings.length,
         });
 
@@ -71,7 +73,7 @@ const Dashboard = () => {
               "Service Bookings",
             ]}
             paths={["", "check-in", "check-out", "service-booked"]}
-            counts={[counts.rooms,counts.rooms,counts.rooms,counts.services]}
+            counts={[counts.rooms,counts.rooms,counts.checkOut,counts.services]}
             pathIdxHighlight={3}
             prevPath="/staff/dashboard"
             mainStyle="flex-shrink-0 px-12 py-6 rounded-xl transition-all duration-300

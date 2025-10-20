@@ -2,7 +2,7 @@ import DashboardCard from "../../../components/dashboard/DashboardCard";
 import { useState ,useEffect} from "react";
 import { Outlet } from "react-router-dom";
 import {
-  getTodayRoom,
+  getTodayCheckOuts,
 } from "../../../hooks/bookedRoomAPI";
 const DashboardTab3 = () => {
     const [items, setItems] = useState([]);
@@ -12,9 +12,8 @@ const DashboardTab3 = () => {
       const loadRooms = async () => {
         try {
           setLoading(true);
-          const response = await getTodayRoom();
+          const response = await getTodayCheckOuts();
           // Ensure we're setting an array, even if empty
-          console.log(response);
           setItems(Array.isArray(response?.data) ? response.data : []);
         } catch (error) {
           console.error("Failed to fetch rooms:", error);
