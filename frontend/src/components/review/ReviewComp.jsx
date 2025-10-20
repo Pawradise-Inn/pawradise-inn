@@ -13,6 +13,7 @@ const ReviewComp = () => {
   const [popUpStatus, setPopUpStatus] = useState(false);
   const [popUpData, setPopUpData] = useState({});
   const [popUpEditable, setPopUpEditable] = useState(false);
+  console.log(user)
 
   useEffect(() => {
     if (user) {
