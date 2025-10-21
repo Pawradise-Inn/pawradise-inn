@@ -11,12 +11,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
   const [draftReply, setDraftReply] = useState();
   const lastIdRef = useRef(reviewId);
   const { user } = useAuth();
-  
-
-  const [hidden, setHidden] = useState(review?.show === false);
-  useEffect(() => {
-    setHidden(review?.show === false);
-  }, [review?.show]);
+  const [hidden, setHidden] = useState(review?.show);
 
   const initialFromProps = () => {
     getChatLogByIdAPI(reviewId).then(
@@ -62,8 +57,11 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
     }
   };
 
-  const handleHide = () => toggleShow(false);
-  const handleUnhide = () => toggleShow(true);
+  const handleHide = () => {
+    if (hidden) toggleShow(true);
+    else toggleShow(false);
+    console.log("hidden state:", hidden);
+  }
 
   const handleDelete  = async () => {
     if(!reviewId) return;
@@ -199,9 +197,9 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
                   className={`cursor-pointer rounded-lg bg-[var(--light-brown-color)] px-7 py-2.5 text-sm font-semibold transition-opacity ${
                     isToggling ? "opacity-60" : "hover:opacity-90"
                   }`}
-                  onClick={hidden ? handleUnhide : handleHide}
+                  onClick={() => handleHide()}
                 >
-                  {hidden ? "UnHide" : "Hide"}
+                  {hidden === false ? "UnHide" : "Hide"}
                 </button>
               </div>
             </div>
