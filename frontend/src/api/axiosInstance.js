@@ -47,21 +47,21 @@ export const setUpInterceptors = (logout) => {
           createNotification(
             "fail",
             "Unauthorized",
-            "Your session has expired"
+            errorMessage || "Your session has expired"
           );
           break;
         case 403:
           createNotification(
             "fail",
             "Forbidden",
-            "You don't have permission to access this resource"
+            errorMessage || "You don't have permission to access this resource"
           );
           break;
         case 404:
           createNotification(
             "fail",
             "Not Found",
-            "The requested resource was not found"
+            errorMessage || "The requested resource was not found"
           );
           break;
         case 409:
@@ -75,7 +75,7 @@ export const setUpInterceptors = (logout) => {
           createNotification(
             "fail",
             "Server Error",
-            "Internal server error occurred"
+            errorMessage || "Internal server error occurred"
           );
           break;
         default:

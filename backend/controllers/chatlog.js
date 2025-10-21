@@ -31,9 +31,15 @@ const getChatLogs = async (req, res) => {
       const service = await prisma.service.findFirst({
         where: { name: req.params.serviceName },
       });
+
+      if (!service) {
+        return res.status(404).json({ success: false, message: `Service '${req.params.serviceName}' not found.` });
+      }
+
       options.where = { serviceId: service.id };
     } catch (err) {
-      res.status(400).json({ success: true, error: err.message });
+      console.error("Database error:", err.message);
+      res.status(500).json({ success: true, message: "Something went wrong while trying to find the service. Please try again." });
     }
   } else if (req.params.roomId) {
     options.where = { roomId: Number(req.params.roomId) };
@@ -409,7 +415,6 @@ const getMyreviews = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      err: err.message,
       message: "Unable to get your reviews. Please try again later",
     });
   }
@@ -500,7 +505,6 @@ const getToBeReview = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      err: err.message,
       message:
         "Unable to get service or room waited to be reviews. Please try again later",
     });

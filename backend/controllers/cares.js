@@ -150,7 +150,7 @@ const deleteCare = async(req, res)=> {
         if (err.code === "P2025")
             return res.status(404).json({
                 success: false,
-                msg: "care is not found or already deleted",
+                msg: "Care is not found or already deleted",
             });
         res.status(500).json({ 
             success: false, 
