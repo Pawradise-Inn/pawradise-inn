@@ -5,6 +5,8 @@ import { replyToChatLogAPI } from "../../hooks/chatlogAPI";
 import { useAuth } from "../../context/AuthProvider";
 
 const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) => {
+
+  console.assert(review);
   const reviewId = review?.id;
   const [draftReply, setDraftReply] = useState();
   const lastIdRef = useRef(reviewId);
@@ -20,14 +22,9 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
     
     getChatLogByIdAPI(reviewId).then(
       (res) => {
-      const v1 = res;
-      console.log("res in review card:", v1); 
-      console.log("staffId:", res?.data?.staffId);
-      console.log("date:", res?.data?.review_date);
       const v2 = res?.data?.reply ?? res?.data?.staffReply ?? "";
       setDraftReply(v2)
-      console.log("staffId:", res?.data?.staffId);
-      console.log("date:", res?.data?.review_date);
+
     }
   )};
 
@@ -132,11 +129,12 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
       ) : (
         <div className="flex gap-6 justify-start">
           {/* thumbnail */}
-          <div className="h-[120px] w-[120px] flex-shrink-0 rounded-xl bg-gray-100" />
+          <img src={review?.serviceImg || review?.roomImg} className="object-center rounded-2xl w-[180px] h-[180px]"/>
+    
 
           {/* left info */}
           <div className="flex-shrink-0 pt-1">
-            <p className="text-base font-bold">{review?.serviceName}</p>
+            <p className="text-base font-bold">{review?.serviceName || review?.roomName}</p>
             <p className="my-1 text-gray-600">{review?.petName}</p>
             <p className="text-sm text-gray-500">
               {/* your list uses 'review_date' (snake_case). Fall back if needed */}
