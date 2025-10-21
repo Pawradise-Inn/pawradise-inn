@@ -11,7 +11,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
   const [draftReply, setDraftReply] = useState();
   const lastIdRef = useRef(reviewId);
   const { user } = useAuth();
-  const [hidden, setHidden] = useState(review?.show);
+  const [isVisible, setIsVisible] = useState(true);
 
   const initialFromProps = () => {
     getChatLogByIdAPI(reviewId).then(
@@ -20,6 +20,8 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
       const testsrId = res?.data?.serviceId ?? res?.data?.roomId ?? "";
       console.log("Fetched review ID:", reviewId, "Service/Room ID:", testsrId);
       setDraftReply(v2)
+      console.log("Show value from API:", res.data.show)
+      setIsVisible(res.data.show)
     }
   )};
 
@@ -28,7 +30,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
     if (reviewId !== lastIdRef.current) {
       lastIdRef.current = reviewId;
     }
-  }, [reviewId]);
+  }, []);
 
   const [isSavingReply, setIsSavingReply] = useState(false);
   const [justSavedReply, setJustSavedReply] = useState(false);
@@ -39,17 +41,21 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
     return Number.isFinite(n) ? `${n.toFixed(1)}/5.0` : "-/5.0";
   }, [review?.commenter_star, review?.rating]);
 
-  const toggleShow = async (nextShow) => {
+  const toggleShow = async () => {
     if (!reviewId) return;
-    setHidden(!nextShow);
     setIsToggling(true);
+    
+    const newVisibility = !isVisible;
+    setIsVisible(newVisibility);
+    
     try {
-      const resp = await updateChatLogAPI(reviewId, { show: nextShow });
+      const resp = await updateChatLogAPI(reviewId, { show: newVisibility });
+      console.log("Updated visibility to:", newVisibility);
       if (!resp?.success) throw new Error("success=false");
-      onAfterHideChange?.(reviewId, nextShow);
+      onAfterHideChange?.(reviewId, newVisibility);
     } catch (e) {
-      // rollback
-      setHidden((prev) => !prev);
+      // rollback on error
+      setIsVisible(isVisible);
       console.error("Failed to toggle visibility", e);
       alert("Failed to update visibility. Please try again.");
     } finally {
@@ -57,11 +63,6 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
     }
   };
 
-  const handleHide = () => {
-    if (hidden) toggleShow(true);
-    else toggleShow(false);
-    console.log("hidden state:", hidden);
-  }
 
   const handleDelete  = async () => {
     if(!reviewId) return;
@@ -75,7 +76,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
      }
      onDelete?.(reviewId);
    } catch (error) {
-      console.error("Failed to delete review", e);
+      console.error("Failed to delete review", error);
    }
   }
 
@@ -197,9 +198,9 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
                   className={`cursor-pointer rounded-lg bg-[var(--light-brown-color)] px-7 py-2.5 text-sm font-semibold transition-opacity ${
                     isToggling ? "opacity-60" : "hover:opacity-90"
                   }`}
-                  onClick={() => handleHide()}
+                  onClick={() => toggleShow()}
                 >
-                  {hidden === false ? "UnHide" : "Hide"}
+                  {isVisible ? "Hide" : "Unhide"}
                 </button>
               </div>
             </div>
