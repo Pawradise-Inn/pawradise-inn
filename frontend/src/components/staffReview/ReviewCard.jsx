@@ -57,7 +57,10 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
     }
   };
 
-  const handleHide = () => {
+  const handleHide = async () => {
+    const showRes = await getChatLogByIdAPI(reviewId);
+    const showStatus = showRes?.data?.show;
+    setHidden(showStatus);
     if (hidden) toggleShow(true);
     else toggleShow(false);
     console.log("hidden state:", hidden);
@@ -197,7 +200,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
                   className={`cursor-pointer rounded-lg bg-[var(--light-brown-color)] px-7 py-2.5 text-sm font-semibold transition-opacity ${
                     isToggling ? "opacity-60" : "hover:opacity-90"
                   }`}
-                  onClick={() => handleHide()}
+                  onClick={handleHide}
                 >
                   {hidden === false ? "UnHide" : "Hide"}
                 </button>
