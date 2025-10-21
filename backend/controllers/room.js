@@ -391,6 +391,7 @@ const getRoomReviews = async (req, res) => {
         roomId: Number(roomId),
         review: { not: null },
         rating: star ? { equals: Number(star) } : undefined,
+        show: true
       },
       skip,
       take,
