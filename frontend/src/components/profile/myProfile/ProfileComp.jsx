@@ -149,7 +149,7 @@ const ProfileComp = () => {
           "Account deletion confirmed",
           "Your account would be deleted. Any active bookings (if any) would be automatically declined."
         );
-        navigate("/register");
+        navigate("/login");
       })
       .catch((err) => {
         console.error(err);
