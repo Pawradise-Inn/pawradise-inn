@@ -2,15 +2,18 @@ import { motion } from "motion/react";
 import { startUpVariants } from "../styles/animation";
 import { NavLink , useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
+import { useNotification } from "../context/notification/NotificationProvider";
 
 const SideBar = ({ link, currentPage, setCurrentPage, showLogout }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { createNotification } = useNotification();
 
   const handleLogout = () => {
-  // Remove user token from local storage or wherever it's stored
-  logout(); // Call the logout function from context
-  navigate('/login'); // Set current page to login
+    // Remove user token from local storage or wherever it's stored
+    logout(); // Call the logout function from context
+    navigate('/login'); // Set current page to login
+    createNotification('success', 'Logout Successful', 'You have been logged out successfully.');
   };
 
   return (
