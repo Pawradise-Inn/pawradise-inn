@@ -63,7 +63,6 @@ const StaffReviewPage = () => {
         }
 
         const response = await getChatLogsAPI(params);
-        console.log("respone",response);
         setReviews(response.data);
         setTotalReviews(response.count || 0);
       } catch(err) {
@@ -174,7 +173,7 @@ const StaffReviewPage = () => {
             />
           ))
         ) : (
-          <p className="mt-16 text-center text-xl italic text-gray-500">
+          <p className="py-32 text-center text-xl italic text-gray-500">
             No reviews available.
           </p>
         )}{" "}
