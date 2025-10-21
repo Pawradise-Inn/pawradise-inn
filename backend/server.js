@@ -54,7 +54,7 @@ app.use("/api/v1/customer", customer);
 app.use("/api/v1/cares", care);
 app.use("/api/v1/image", picture);
 
-const PORT = process.env.PORT || 5050;
+const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log(
