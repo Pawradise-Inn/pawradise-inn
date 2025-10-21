@@ -58,13 +58,36 @@ const getChatLogs = async (req, res) => {
     }
 
     if (filter.search && filter.search.length > 0) {
-      options.where.customer = {
-        user: {
-          user_name: {
+        options.where.OR = [
+      {
+        service: {
+          name: {
             contains: filter.search,
             mode: "insensitive",
           },
         },
+      },
+      {
+        room: {
+          name: {
+            contains: filter.search,
+            mode: "insensitive",
+          },
+        },
+      },
+    ];
+    }
+    if (filter.review_date) {
+      const date = new Date(filter.review_date);//เช่น "2025-10-21"
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      options.where.review_date = {
+        gte: startOfDay,
+        lt: endOfDay
       };
     }
     delete options.where.search;
@@ -113,7 +136,14 @@ const getChatLogs = async (req, res) => {
 
     options.include = {
       customer: { include: { user: { select: { user_name: true } } } },
-      service: { select: { name: true } },
+      service: { select: {
+         name: true,
+         picture: true,
+      } },
+      room: {select:{
+        name: true,
+        picture: true,
+      }},
     };
 
     const reviews = await prisma.chatLog.findMany(options);
@@ -124,6 +154,9 @@ const getChatLogs = async (req, res) => {
       commenter_star: r.rating,
       serviceName: r.service?.name,
       reviewDate: r.review_date,
+      roomName:r.room?.name,
+      roomImg: r.room?.picture ?? null,
+      serviceImg: r.service?.picture ?? null,
     }));
 
     const pagination = {};

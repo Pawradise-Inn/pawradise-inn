@@ -39,7 +39,6 @@ const StaffReviewPage = () => {
   }, [ref]);
 
   useEffect(() => {
-    console.log(reviews)
     const fetchReviews = async () => {
       try {
         const params = {
@@ -53,7 +52,7 @@ const StaffReviewPage = () => {
           filters.rating = starFilter;
         }
         if (dateFilter) {
-          filters.review_date = dateFilter.toISOString().split('T')[0];
+          filters.review_date = dateFilter;
         }
         if (search) {
           filters.search = search;
@@ -64,6 +63,7 @@ const StaffReviewPage = () => {
         }
 
         const response = await getChatLogsAPI(params);
+        console.log("respone",response);
         setReviews(response.data);
         setTotalReviews(response.count || 0);
       } catch(err) {
@@ -96,6 +96,11 @@ const StaffReviewPage = () => {
     setCurrentPage(1);
   };
 
+  const handleSearchChange = (e) =>{
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  }
+
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-8">
       {" "}
@@ -116,8 +121,8 @@ const StaffReviewPage = () => {
               <i className="bi bi-search pr-2 opacity-50"></i>{" "}
               <input
                 className="w-9/12 bg-transparent outline-none"
-                placeholder="search"
-                onChange={(e) => setSearch(e.target.value)}
+                placeholder="search by room or service name"
+                onChange={handleSearchChange}
                 value={search}
               />{" "}
             </div>{" "}
