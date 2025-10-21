@@ -39,6 +39,7 @@ const StaffReviewPage = () => {
   }, [ref]);
 
   useEffect(() => {
+    console.log(reviews)
     const fetchReviews = async () => {
       try {
         const params = {
@@ -75,6 +76,8 @@ const StaffReviewPage = () => {
   }, [currentPage, search, starFilter, dateFilter]);
 
   const handleDeleteReview = (reviewId) => {
+    console.log("Deleting review with ID:", reviewId);
+    console.log("Current reviews before deletion:", reviews);
     setReviews((prevReviews) =>
       prevReviews.filter((review) => review.id !== reviewId)
     );

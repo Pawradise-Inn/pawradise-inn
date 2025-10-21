@@ -1,49 +1,84 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { updateChatLogAPI } from "../../hooks/chatlogAPI";
+import { getChatLogByIdAPI } from "../../hooks/chatlogAPI";
 
-const ReviewCard = ({
-  review,
-  onDelete,
-  onReply, // (id, text) => void | Promise<void>
-  hidden: controlledHidden,
-  onHideChange,
-}) => {
-  // hidden (controlled by parent if prop is given)
-  const [uncontrolledHidden, setUncontrolledHidden] = useState(false);
-  const hidden = controlledHidden ?? uncontrolledHidden;
+const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) => {
+  const reviewId = review?.id;
 
-  // editable reply draft
-  const [draftReply, setDraftReply] = useState(review?.staffReply ?? "");
-  const [isSaving, setIsSaving] = useState(false);
-  const [justSaved, setJustSaved] = useState(false);
-
-  // ถ้า prop review.staffReply เปลี่ยน ให้ sync เข้า textarea
+  const [hidden, setHidden] = useState(review?.show === false);
   useEffect(() => {
-    setDraftReply(review?.staffReply ?? "");
-  }, [review?.staffReply, review?.id]);
+    setHidden(review?.show === false);
+  }, [review?.show]);
+
+  const initialFromProps = () => {
+    console.log(review)
+    console.log("review reply", review?.reply, review?.staffReply);
+    getChatLogByIdAPI(reviewId).then(
+      (res) => {
+      console.log("fetched review data:", res);
+      const v2 = res?.data?.reply ?? res?.data?.staffReply ?? "";
+    }
+  )};
+  
+
+  const [draftReply, setDraftReply] = useState(initialFromProps());
+  const lastIdRef = useRef(reviewId);
+
+  useEffect(() => {
+    if (reviewId !== lastIdRef.current) {
+      setDraftReply(initialFromProps());
+      lastIdRef.current = reviewId;
+    }
+  }, [reviewId]);
+
+  const [isSavingReply, setIsSavingReply] = useState(false);
+  const [justSavedReply, setJustSavedReply] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
 
   const ratingText = useMemo(() => {
-    const n = Number(review?.commenter_star);
+    const n = Number(review?.commenter_star ?? review?.rating);
     return Number.isFinite(n) ? `${n.toFixed(1)}/5.0` : "-/5.0";
-  }, [review?.rating]);
+  }, [review?.commenter_star, review?.rating]);
 
-  const handleHide = () => {
-    if (controlledHidden === undefined) setUncontrolledHidden(true);
-    onHideChange?.(true, review?.id);
+  const toggleShow = async (nextShow) => {
+    if (!reviewId) return;
+    setHidden(!nextShow);
+    setIsToggling(true);
+    try {
+      const resp = await updateChatLogAPI(reviewId, { show: nextShow });
+      if (!resp?.success) throw new Error("success=false");
+      onAfterHideChange?.(reviewId, nextShow);
+    } catch (e) {
+      // rollback
+      setHidden((prev) => !prev);
+      console.error("Failed to toggle visibility", e);
+      alert("Failed to update visibility. Please try again.");
+    } finally {
+      setIsToggling(false);
+    }
   };
-  const handleUnhide = () => {
-    if (controlledHidden === undefined) setUncontrolledHidden(false);
-    onHideChange?.(false, review?.id);
-  };
+
+  const handleHide = () => toggleShow(false);
+  const handleUnhide = () => toggleShow(true);
 
   const handleSaveReply = async () => {
+    if (!reviewId) return;
+    const payload = (draftReply ?? "").trim();
+    setIsSavingReply(true);
+    setJustSavedReply(false);
     try {
-      setIsSaving(true);
-      setJustSaved(false);
-      await onReply?.(review?.id, draftReply?.trim() ?? "");
-      setJustSaved(true);
-      setTimeout(() => setJustSaved(false), 1200);
+      const resp = await updateChatLogAPI(reviewId, { reply: payload });
+      if (!resp?.success) throw new Error("success=false");
+
+      // Lock in our local text as the source of truth
+      onAfterReplySave?.(reviewId, payload);
+      setJustSavedReply(true);
+      setTimeout(() => setJustSavedReply(false), 1200);
+    } catch (e) {
+      console.error("Failed to save reply", e);
+      alert("Failed to save reply. Please try again.");
     } finally {
-      setIsSaving(false);
+      setIsSavingReply(false);
     }
   };
 
@@ -61,10 +96,13 @@ const ReviewCard = ({
           <p className="truncate italic text-gray-600">This review is hidden</p>
           <button
             type="button"
-            className="cursor-pointer rounded-md bg-[var(--light-brown-color)] px-4 py-1.5 text-sm font-semibold transition-opacity hover:opacity-90"
+            disabled={isToggling}
+            className={`cursor-pointer rounded-md bg-[var(--light-brown-color)] px-4 py-1.5 text-sm font-semibold transition-opacity ${
+              isToggling ? "opacity-60" : "hover:opacity-90"
+            }`}
             onClick={handleUnhide}
           >
-            Unhide
+            {isToggling ? "…" : "Unhide"}
           </button>
         </div>
       ) : (
@@ -76,7 +114,14 @@ const ReviewCard = ({
           <div className="flex-shrink-0 pt-1">
             <p className="text-base font-bold">{review?.serviceName}</p>
             <p className="my-1 text-gray-600">{review?.petName}</p>
-            <p className="text-sm text-gray-500">{new Date(review?.reviewDate).toLocaleDateString()}</p>
+            <p className="text-sm text-gray-500">
+              {/* your list uses 'review_date' (snake_case). Fall back if needed */}
+              {review?.review_date
+                ? new Date(review.review_date).toLocaleDateString()
+                : review?.reviewDate
+                ? new Date(review.reviewDate).toLocaleDateString()
+                : ""}
+            </p>
           </div>
 
           <div className="w-px bg-gray-200" />
@@ -84,17 +129,20 @@ const ReviewCard = ({
           {/* right content */}
           <div className="flex flex-grow flex-col min-w-0">
             <div className="flex justify-between gap-3">
-              <p className="font-bold truncate">{review?.commenter_name}</p>
+              <p className="font-bold truncate">
+                {review?.commenter_name ?? review?.customerName ?? "Customer"}
+              </p>
               <p className="flex-shrink-0 text-gray-600">
-                {ratingText} <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
+                {ratingText}{" "}
+                <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center" />
               </p>
             </div>
 
             <p className="mb-4 mt-2 italic text-gray-700 break-words">
-              “{review?.commenter_detail}”
+              “{review?.commenter_detail ?? review?.review ?? ""}”
             </p>
 
-            {/* staff reply editor (มีให้ทุกการ์ดเสมอ) */}
+            {/* staff reply editor */}
             <div className="mt-2">
               <p className="mb-2 font-bold">Staff reply</p>
 
@@ -110,20 +158,20 @@ const ReviewCard = ({
                     {draftReply.length} chars
                   </span>
                   <div className="flex items-center gap-3">
-                    {justSaved && (
+                    {justSavedReply && (
                       <span className="text-xs font-semibold text-green-700">
                         Saved
                       </span>
                     )}
                     <button
                       type="button"
-                      disabled={isSaving}
+                      disabled={isSavingReply}
                       onClick={handleSaveReply}
                       className={`cursor-pointer rounded-lg px-5 py-2 text-sm font-semibold !text-white transition-opacity ${
-                        isSaving ? "opacity-60" : "hover:opacity-90"
+                        isSavingReply ? "opacity-60" : "hover:opacity-90"
                       } bg-[var(--brown-color)]`}
                     >
-                      {isSaving ? "Saving..." : "Reply"}
+                      {isSavingReply ? "Saving..." : "Reply"}
                     </button>
                   </div>
                 </div>
@@ -135,19 +183,21 @@ const ReviewCard = ({
               <button
                 type="button"
                 className="cursor-pointer rounded-lg bg-[var(--brown-color)] px-7 py-2.5 text-sm font-semibold !text-white transition-opacity hover:opacity-90"
-                onClick={() => onDelete?.(review?.id)}
+                onClick={() => onDelete?.(reviewId)}
               >
                 Delete
               </button>
               <div className="flex gap-4">
                 <button
                   type="button"
-                  className="cursor-pointer rounded-lg bg-[var(--light-brown-color)] px-7 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
+                  disabled={isToggling}
+                  className={`cursor-pointer rounded-lg bg-[var(--light-brown-color)] px-7 py-2.5 text-sm font-semibold transition-opacity ${
+                    isToggling ? "opacity-60" : "hover:opacity-90"
+                  }`}
                   onClick={handleHide}
                 >
-                  Hide
+                  {isToggling ? "…" : "Hide"}
                 </button>
-                {/* ปุ่ม Reply หลักอยู่ใต้ textarea แล้ว */}
               </div>
             </div>
           </div>
