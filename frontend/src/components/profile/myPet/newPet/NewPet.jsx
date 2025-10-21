@@ -123,7 +123,7 @@ const NewPet = () => {
           breed: formData.petBreed,
           disease: [formData.medicalCondition],
           allergic: [formData.foodAllergy],
-          picture: pictureUrl.imageUrl, // **Use the GCS URL here**
+          picture: pictureUrl.message.details.imageUrl, // **Use the GCS URL here**
           customerId: user.customer.id,
         };
         console.log(newPet);
@@ -148,12 +148,6 @@ const NewPet = () => {
         // 5. UPDATE LOCAL AUTH CONTEXT
         setUser({ ...user, customer: updatedCustomerData });
 
-        // 7. SUCCESS & REDIRECT
-        createNotification(
-          "success",
-          "Pet has been created!",
-          "Your pet has been successfully saved."
-        );
         navigate("/profile/pet");
       }
     );
