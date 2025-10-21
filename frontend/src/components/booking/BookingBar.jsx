@@ -243,6 +243,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
             commentStarSelect,
             currentPage
           );
+          console.log(commentResponse)
         } else {
           commentResponse = await fetchRoomReviewsAPI(
             data.id,

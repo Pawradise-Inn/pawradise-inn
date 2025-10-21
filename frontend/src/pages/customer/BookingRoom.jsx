@@ -62,7 +62,7 @@ const BookingRoom = () => {
           room.headerType = "Room";
           room.reviewStar = room.reviewStar.toFixed(2);
         });
-
+        console.log(roomsData);
         setRoom(roomsData.data);
       } catch (error) {
         console.error("Failed to load initial rooms:", error);
