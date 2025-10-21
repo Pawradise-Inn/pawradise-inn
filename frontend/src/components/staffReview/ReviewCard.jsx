@@ -19,19 +19,18 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
   }, [review?.show]);
 
   const initialFromProps = () => {
-    
     getChatLogByIdAPI(reviewId).then(
       (res) => {
       const v2 = res?.data?.reply ?? res?.data?.staffReply ?? "";
+      const testsrId = res?.data?.serviceId ?? res?.data?.roomId ?? "";
+      console.log("Fetched review ID:", reviewId, "Service/Room ID:", testsrId);
       setDraftReply(v2)
-
     }
   )};
 
   useEffect(() => {
     initialFromProps();
     if (reviewId !== lastIdRef.current) {
-      // initialFromProps();
       lastIdRef.current = reviewId;
     }
   }, [reviewId]);
@@ -82,8 +81,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
    }
   }
 
-  const handleSaveReply = async () => {     
-    if (!reviewId) return;
+  const handleSaveReply = async () => {
     const payload = (draftReply ?? "").trim();
     setIsSavingReply(true);
     setJustSavedReply(false);
@@ -107,26 +105,11 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
     <div
       data-probe="REVIEW-CARD-ACTIVE"
       className={`mb-6 bg-white border border-[var(--brown-color)] rounded-2xl ${
-        hidden ? "p-3 h-12 overflow-hidden" : "p-6"
+         "p-6"
       }`}
       role="article"
       aria-label={`Review card for ${review?.serviceName ?? "service"}`}
     >
-      {hidden ? (
-        <div className="flex items-center justify-between gap-3">
-          <p className="truncate italic text-gray-600">This review is hidden</p>
-          <button
-            type="button"
-            disabled={isToggling}
-            className={`cursor-pointer rounded-md bg-[var(--light-brown-color)] px-4 py-1.5 text-sm font-semibold transition-opacity ${
-              isToggling ? "opacity-60" : "hover:opacity-90"
-            }`}
-            onClick={handleUnhide}
-          >
-            {isToggling ? "…" : "Unhide"}
-          </button>
-        </div>
-      ) : (
         <div className="flex gap-6 justify-start">
           {/* thumbnail */}
           <img src={review?.serviceImg || review?.roomImg} className="object-center rounded-2xl w-[180px] h-[180px]"/>
@@ -212,19 +195,18 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
               <div className="flex gap-4">
                 <button
                   type="button"
-                  disabled={isToggling}
+                  // disabled={isToggling}
                   className={`cursor-pointer rounded-lg bg-[var(--light-brown-color)] px-7 py-2.5 text-sm font-semibold transition-opacity ${
                     isToggling ? "opacity-60" : "hover:opacity-90"
                   }`}
-                  onClick={handleHide}
+                  onClick={hidden ? handleUnhide : handleHide}
                 >
-                  {isToggling ? "…" : "Hide"}
+                  {hidden ? "UnHide" : "Hide"}
                 </button>
               </div>
             </div>
           </div>
         </div>
-      )}
     </div>
   );
 };
