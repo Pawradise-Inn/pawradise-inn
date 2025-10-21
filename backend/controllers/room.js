@@ -190,7 +190,6 @@ const addPicturesToRoom = async (req, res) => {
       return res.status(404).json({ success: false, msg: "Room is not found" });
     res.status(500).json({
       success: false,
-      error: err.message,
       message: "Unable to add pictures to room. Please try again later",
     });
   }
@@ -212,7 +211,6 @@ const deletePicturesFromRoom = async (req, res) => {
       return res.status(404).json({ success: false, msg: "Room is not found" });
     res.status(500).json({
       success: false,
-      error: err.message,
       message: "Unable to delete pictures from room. Please try again later",
     });
   }
@@ -303,7 +301,6 @@ const getAvailableRooms = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      error: err.message,
       message: "Unable to fetch available rooms. Please try again later",
     });
   }
@@ -367,7 +364,6 @@ const getRoomsWithPagination = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      error: err.message,
       message: "Unable to fetch rooms. Please try again later",
     });
   }

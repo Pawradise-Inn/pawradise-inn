@@ -16,7 +16,7 @@ const getBookedRooms = async (req, res) => {
         .json({ success: false, msg: "No room bookings found" });
     res.status(200).json({ success: true, data: bookedRooms });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch room bookings. Please try again later" });
+    res.status(500).json({ success: false, message: "Unable to fetch room bookings. Please try again later" });
   }
 };
 
@@ -30,7 +30,7 @@ const getBookedRoom = async (req, res) => {
         .json({ success: false, msg: "Room booking not found" });
     res.status(200).json({ success: true, data: bookedRoom });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch booking details. Please try again later" });
+    res.status(500).json({ success: false, message: "Unable to fetch booking details. Please try again later" });
   }
 };
 

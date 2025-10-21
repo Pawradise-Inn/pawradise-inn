@@ -55,9 +55,17 @@ exports.register = async (req, res, next) => {
     // Handle unique constraint violations
     if (error.code === 'P2002') {
       const field = error.meta?.target[0];
+
+      const filedMap = {
+        'user_name': 'username',
+        'phone_number': 'phone number',
+      };
+
+      const friendlyField = filedMap[field] || field;
+
       return res.status(409).json({ 
         success: false, 
-        message: `This ${field} is already taken` 
+        message: `This ${friendlyField} is already taken` 
       });
     }
     
@@ -65,7 +73,6 @@ exports.register = async (req, res, next) => {
     return res.status(500).json({ 
       success: false, 
       message: 'Unable to create account. Please try again later.', 
-      error: error.message
     });
   }
 };
@@ -160,7 +167,7 @@ exports.deleteMe = async (req, res) => {
     });
     res.status(200).json({ success: true, message: 'Deleted and Logged out' });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message, message: "Unable to delete profile. Please try again later" });
+    res.status(500).json({ success: false, message: "Unable to delete profile. Please try again later" });
   }
 };
 
