@@ -17,24 +17,18 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
   }, [review?.show]);
 
   const initialFromProps = () => {
-    
     getChatLogByIdAPI(reviewId).then(
       (res) => {
-      const v1 = res;
-      console.log("res in review card:", v1); 
-      console.log("staffId:", res?.data?.staffId);
-      console.log("date:", res?.data?.review_date);
       const v2 = res?.data?.reply ?? res?.data?.staffReply ?? "";
+      const testsrId = res?.data?.serviceId ?? res?.data?.roomId ?? "";
+      console.log("Fetched review ID:", reviewId, "Service/Room ID:", testsrId);
       setDraftReply(v2)
-      console.log("staffId:", res?.data?.staffId);
-      console.log("date:", res?.data?.review_date);
     }
   )};
 
   useEffect(() => {
     initialFromProps();
     if (reviewId !== lastIdRef.current) {
-      // initialFromProps();
       lastIdRef.current = reviewId;
     }
   }, [reviewId]);
@@ -85,8 +79,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
    }
   }
 
-  const handleSaveReply = async () => {     
-    if (!reviewId) return;
+  const handleSaveReply = async () => {
     const payload = (draftReply ?? "").trim();
     setIsSavingReply(true);
     setJustSavedReply(false);
@@ -136,7 +129,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
 
           {/* left info */}
           <div className="flex-shrink-0 pt-1">
-            <p className="text-base font-bold">{review?.serviceName}</p>
+            <p className="text-base font-bold">{review?.serviceName || review?.roomName}</p>
             <p className="my-1 text-gray-600">{review?.petName}</p>
             <p className="text-sm text-gray-500">
               {/* your list uses 'review_date' (snake_case). Fall back if needed */}
