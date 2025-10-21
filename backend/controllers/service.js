@@ -258,7 +258,8 @@ const getServiceReviews = async (req, res) => { //requirement: 5
       where: {
         serviceId: service.id,
         review: { not: null },
-        rating: star ? { equals: Number(star) } : undefined
+        rating: star ? { equals: Number(star) } : undefined,
+        show: true
       },
       skip,
       take,
