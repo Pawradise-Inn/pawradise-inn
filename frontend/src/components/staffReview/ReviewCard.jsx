@@ -5,6 +5,8 @@ import { replyToChatLogAPI } from "../../hooks/chatlogAPI";
 import { useAuth } from "../../context/AuthProvider";
 
 const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) => {
+
+  console.assert(review);
   const reviewId = review?.id;
   const [draftReply, setDraftReply] = useState();
   const lastIdRef = useRef(reviewId);
@@ -125,7 +127,8 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
       ) : (
         <div className="flex gap-6 justify-start">
           {/* thumbnail */}
-          <div className="h-[120px] w-[120px] flex-shrink-0 rounded-xl bg-gray-100" />
+          <img src={review?.serviceImg || review?.roomImg} className="object-center rounded-2xl w-[180px] h-[180px]"/>
+    
 
           {/* left info */}
           <div className="flex-shrink-0 pt-1">
@@ -176,7 +179,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
                   </span>
                   <div className="flex items-center gap-3">
                     {justSavedReply && (
-                      <span className="text-xs font-semibold text-green-700">
+                      <span className="text-xs font-semibold !text-green-700">
                         Saved
                       </span>
                     )}
