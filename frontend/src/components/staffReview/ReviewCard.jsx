@@ -1,9 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { updateChatLogAPI } from "../../hooks/chatlogAPI";
 import { getChatLogByIdAPI } from "../../hooks/chatlogAPI";
+import { replyToChatLogAPI } from "../../hooks/chatlogAPI";
+import { useAuth } from "../../context/AuthProvider";
 
 const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) => {
   const reviewId = review?.id;
+  const [draftReply, setDraftReply] = useState();
+  const lastIdRef = useRef(reviewId);
+  const { user } = useAuth();
+  
 
   const [hidden, setHidden] = useState(review?.show === false);
   useEffect(() => {
@@ -11,22 +17,24 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
   }, [review?.show]);
 
   const initialFromProps = () => {
-    console.log(review)
-    console.log("review reply", review?.reply, review?.staffReply);
+    
     getChatLogByIdAPI(reviewId).then(
       (res) => {
-      console.log("fetched review data:", res);
+      const v1 = res;
+      console.log("res in review card:", v1); 
+      console.log("staffId:", res?.data?.staffId);
+      console.log("date:", res?.data?.review_date);
       const v2 = res?.data?.reply ?? res?.data?.staffReply ?? "";
+      setDraftReply(v2)
+      console.log("staffId:", res?.data?.staffId);
+      console.log("date:", res?.data?.review_date);
     }
   )};
-  
-
-  const [draftReply, setDraftReply] = useState(initialFromProps());
-  const lastIdRef = useRef(reviewId);
 
   useEffect(() => {
+    initialFromProps();
     if (reviewId !== lastIdRef.current) {
-      setDraftReply(initialFromProps());
+      // initialFromProps();
       lastIdRef.current = reviewId;
     }
   }, [reviewId]);
@@ -61,13 +69,15 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
   const handleHide = () => toggleShow(false);
   const handleUnhide = () => toggleShow(true);
 
-  const handleSaveReply = async () => {
+  const handleSaveReply = async () => {     
     if (!reviewId) return;
     const payload = (draftReply ?? "").trim();
     setIsSavingReply(true);
     setJustSavedReply(false);
     try {
-      const resp = await updateChatLogAPI(reviewId, { reply: payload });
+      // const resp = await updateChatLogAPI(reviewId, { reply: payload, reply_date: timestamp });
+      console.log("user in review card:", user.staffId);
+      const resp = await replyToChatLogAPI(reviewId, { staffId:user.staffId ,reply: payload });
       if (!resp?.success) throw new Error("success=false");
 
       // Lock in our local text as the source of truth
@@ -155,7 +165,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
                 />
                 <div className="mt-2 flex items-center justify-between">
                   <span className="text-xs text-gray-500">
-                    {draftReply.length} chars
+                    {/* {draftReply.length} characters */}
                   </span>
                   <div className="flex items-center gap-3">
                     {justSavedReply && (
