@@ -21,7 +21,33 @@ export const setUpInterceptors = (logout) => {
   );
 
   axiosInstance.interceptors.response.use(
-    (response) => response,
+    (response) => {
+      // Handle success notifications only for meaningful user actions
+      const { createNotification } = window.notificationprovider;
+      const responseData = response.data;
+      const method = response.config.method?.toLowerCase();
+      
+      const display = [responseData.message.type, responseData.message.content];
+      console.log(display.join('\n'), responseData);
+
+      // Only show success notifications for actions that modify data
+      const shouldShowNotification =
+        method && ["post", "put", "patch", "delete"].includes(method);
+
+      // Check if response has success message format and should show notification
+      if (
+        shouldShowNotification &&
+        responseData.success &&
+        responseData.message &&
+        responseData.message.header &&
+        responseData.message.content
+      ) {
+        const { header, content } = responseData.message;
+        createNotification("success", header, content);
+      }
+
+      return response;
+    },
 
     async (error) => {
       const { createNotification } = window.notificationprovider;
@@ -32,54 +58,25 @@ export const setUpInterceptors = (logout) => {
       }
 
       const status = error.response.status;
-      const errorMessage = error.response.data.message || "Unexpected error";
+      const errorData = error.response.data;
 
-      switch (status) {
-        case 400:
-          createNotification(
-            "fail",
-            "Bad Request",
-            errorMessage || "Invalid request data"
-          );
-          break;
-        case 401:
+      const display = [errorData.error.type, errorData.error.content];
+      console.log(display.join('\n'), errorData);
+
+      // Handle new standardized error format
+      if (
+        !errorData.success &&
+        errorData.error &&
+        errorData.error.header &&
+        errorData.error.content
+      ) {
+        const { header, content } = errorData.error;
+        createNotification("fail", header, content);
+
+        // Special handling for 401 errors
+        if (status === 401) {
           logout();
-          createNotification(
-            "fail",
-            "Unauthorized",
-            "Your session has expired"
-          );
-          break;
-        case 403:
-          createNotification(
-            "fail",
-            "Forbidden",
-            "You don't have permission to access this resource"
-          );
-          break;
-        case 404:
-          createNotification(
-            "fail",
-            "Not Found",
-            "The requested resource was not found"
-          );
-          break;
-        case 409:
-          createNotification(
-            "fail",
-            "Conflict",
-            errorMessage || "Resource conflict occurred"
-          );
-          break;
-        case 500:
-          createNotification(
-            "fail",
-            "Server Error",
-            "Internal server error occurred"
-          );
-          break;
-        default:
-          createNotification("fail", "Request Failed", errorMessage);
+        }
       }
 
       return Promise.reject(error);

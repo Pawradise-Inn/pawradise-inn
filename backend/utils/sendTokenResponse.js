@@ -1,6 +1,7 @@
 const { getSignedJwtToken } = require("../controllers/logics/auth");
+const { sendSuccessResponse } = require("./responseHandler");
 
-exports.sendTokenResponse = (user, statusCode, res) => {
+exports.sendTokenResponse = (user, statusCode, res, successType) => {
   const token = getSignedJwtToken(user.id);
 
   const days = Number(process.env.JWT_COOKIE_EXPIRE || 7);
@@ -12,6 +13,10 @@ exports.sendTokenResponse = (user, statusCode, res) => {
 
   if (process.env.NODE_ENV === "production") {
     options.secure = true;
+  }
+  
+  if (statusCode === 200) {
+    return sendSuccessResponse(res, 200, successType, null, { user, token }, null)
   }
   res
     .status(statusCode)

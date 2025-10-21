@@ -20,7 +20,7 @@ const ServiceCard = ({ data, onClick, ...motionProps }) => {
       <div className="flex flex-wrap justify-between items-center">
         <p>{data.name}</p>
         <p className="block bg-[var(--light-brown-color)] rounded py-1 px-3">
-          {data.reviewStar}/5.0{" "}
+          {data.reviewStar} / 5.00{" "}
           <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
         </p>
       </div>

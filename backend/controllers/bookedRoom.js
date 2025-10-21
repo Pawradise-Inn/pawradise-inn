@@ -1,5 +1,9 @@
 const prisma = require("../prisma/prisma");
 const {
+  sendErrorResponse,
+  sendSuccessResponse,
+} = require("../utils/responseHandler");
+const {
   findBookedRoomById,
   overlappingRoom,
   duplicatedRoom,
@@ -11,12 +15,26 @@ const getBookedRooms = async (req, res) => {
   try {
     const bookedRooms = await prisma.bookedRoom.findMany();
     if (bookedRooms.length === 0)
-      return res
-        .status(404)
-        .json({ success: false, msg: "No room bookings found" });
-    res.status(200).json({ success: true, data: bookedRooms });
+      return sendErrorResponse(
+        res,
+        404,
+        "NO_DATA_FOUND",
+        "No room bookings found"
+      );
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Room bookings loaded",
+      bookedRooms
+    );
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch room bookings. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load room bookings. Please refresh and try again"
+    );
   }
 };
 
@@ -25,12 +43,26 @@ const getBookedRoom = async (req, res) => {
     const bookedRoomId = req.params.id;
     const bookedRoom = await findBookedRoomById(bookedRoomId);
     if (!bookedRoom)
-      return res
-        .status(404)
-        .json({ success: false, msg: "Room booking not found" });
-    res.status(200).json({ success: true, data: bookedRoom });
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "Room booking not found"
+      );
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Room booking details loaded",
+      bookedRoom
+    );
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch booking details. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load booking details. Please refresh and try again"
+    );
   }
 };
 
@@ -41,9 +73,9 @@ const createBookedRoom = async (req, res) => {
     // const checkInDate = new Date(checkIn);
     // const checkOutDate = new Date(checkOut);
     const pet = await prisma.pet.findFirst({
-      where: { 
-        name: pet_name ,
-        customerId: customerId
+      where: {
+        name: pet_name,
+        customerId: customerId,
       },
     });
     const bookedRoom = await createBookedRoomWithCondition(
@@ -53,38 +85,45 @@ const createBookedRoom = async (req, res) => {
       checkIn,
       checkOut
     );
-    res.status(201).json({ success: true, data: bookedRoom });
+    return sendSuccessResponse(
+      res,
+      201,
+      "BOOKING_CREATED",
+      "Room booking created successfully",
+      bookedRoom
+    );
   } catch (err) {
     if (err.code === "PET_NOT_SUIT") {
-      return res.status(409).json({
-        success: false, 
-        message: "This room type is not suitable for your pet"
-      });
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "This room type is not suitable for your pet"
+      );
     }
     if (err.code === "BOOKING_DUPLICATE") {
-      return res.status(409).json({
-        success: false, 
-        message: "Your pet already has a booking for these dates"
-      });
+      return sendErrorResponse(
+        res,
+        409,
+        "DUPLICATE_BOOKING",
+        "Your pet already has a booking for these dates"
+      );
     }
     if (err.code === "ROOM_FULL") {
-      return res.status(409).json({
-        success: false, 
-        message: "This room is fully booked for the selected dates"
-      });
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "This room is fully booked for the selected dates"
+      );
     }
-    console.log(err)
-    //   if (err.duplicatedDates) {
-    //     return res.status(400).json({
-    //       success: false,
-    //       message: err.message,
-    //       duplicatedDates: err.duplicatedDates,
-    //     });
-    //   }
-    res.status(500).json({ 
-      success: false, 
-      message: "Unable to create booking. Please try again later" 
-    });
+    console.log(err);
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_SAVE",
+      "Unable to create room booking. Please try again"
+    );
   }
 };
 
@@ -93,25 +132,34 @@ const updateBookedRoom = async (req, res) => {
     const bookedId = Number(req.params.id);
     const { checkIn, checkOut } = req.body;
     if ((!checkIn, !checkOut)) {
-      return res.status(400).json({ success: false, msg: "Please provide check-in and check-out dates" });
+      return sendErrorResponse(
+        res,
+        400,
+        "MISSING_FIELDS",
+        "Please provide check-in and check-out dates"
+      );
     }
 
     const bookedRoom = await findBookedRoomById(bookedId);
     const count = await overlappingRoom(bookedRoom.roomId, checkIn, checkOut);
     const cap = await getRoomCap(roomId);
     if (count >= cap) {
-      res.status(409).json({ success: false, msg: "This room is not available for the selected dates" });
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "This room is not available for the selected dates"
+      );
     }
 
-    const check = await duplicatedRoom(
-      bookedRoom.petId,
-      checkIn,
-      checkOut
-    );
+    const check = await duplicatedRoom(bookedRoom.petId, checkIn, checkOut);
     if (check.length > 0) {
-      return res
-        .status(409)
-        .json({ success: false, msg: "Your pet already has a booking during these dates." });
+      return sendErrorResponse(
+        res,
+        409,
+        "DUPLICATE_BOOKING",
+        "Your pet already has a booking during these dates"
+      );
     }
 
     const updateBookedRoom = await prisma.bookedRoom.update({
@@ -121,19 +169,27 @@ const updateBookedRoom = async (req, res) => {
         checkOut: new Date(checkOut),
       },
     });
-    res.status(200).json({ success: true, data: updateBookedRoom });
+    return sendSuccessResponse(
+      res,
+      200,
+      "BOOKING_UPDATED",
+      "Room booking updated successfully",
+      updateBookedRoom
+    );
   } catch (err) {
     if (err.code === "P2025")
-      return res
-        .status(404)
-        .json({
-          success: false,
-          msg: "Booked room is not found or already deleted",
-        });
-    res.status(500).json({ 
-      success: false, 
-      message: "Unable to update booking. Please try again later" 
-    });
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "Room booking not found or already deleted"
+      );
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_UPDATE",
+      "Unable to update booking. Please try again"
+    );
   }
 };
 
@@ -143,19 +199,27 @@ const deleteBookedRoom = async (req, res) => {
     const bookedRoom = await prisma.bookedRoom.delete({
       where: { id: Number(bookedRoomId) },
     });
-    res.status(200).json({ success: true, data: {} });
+    return sendSuccessResponse(
+      res,
+      200,
+      "DELETED_SUCCESSFULLY",
+      "Room booking cancelled successfully",
+      {}
+    );
   } catch (err) {
     if (err.code === "P2025")
-      return res
-        .status(404)
-        .json({
-          success: false,
-          msg: "Booked room is not found or already deleted",
-        });
-    res.status(500).json({ 
-      success: false, 
-      message: "Unable to cancel booking. Please try again later" 
-    });
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "Room booking not found or already deleted"
+      );
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_DELETE",
+      "Unable to cancel booking. Please try again"
+    );
   }
 };
 
@@ -193,9 +257,20 @@ const getTodayRooms = async (req, res) => {
       roomName: br.room.name,
     }));
 
-    res.status(200).json({ success: true, data: formattedRooms });
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Today's room bookings loaded",
+      formattedRooms
+    );
   } catch (err) {
-    res.status(500).json({ success: false, message: "Unable to fetch today's room bookings. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load today's room bookings. Please refresh and try again"
+    );
   }
 };
 
@@ -233,9 +308,20 @@ const getTodayCheckOuts = async (req, res) => {
       roomName: br.room.name,
     }));
 
-    res.status(200).json({ success: true, data: formattedRooms });
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Today's check-out rooms loaded",
+      formattedRooms
+    );
   } catch (err) {
-    res.status(500).json({ success: false, message: "Unable to fetch today's check out rooms. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load today's check-out rooms. Please refresh and try again"
+    );
   }
 };
 

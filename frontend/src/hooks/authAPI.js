@@ -11,6 +11,7 @@ export const registerAPI = async (user) => {
 // Login
 export const loginAPI = async (userName, password) => {
   const res = await axiosInstance.post(`${API_URL}/login`, { userName, password });
+  console.log(res.data)
   return res.data;
 };
 
@@ -28,7 +29,7 @@ export const updateMeAPI = async (user) => {
 
 // Logout
 export const logoutAPI = async () => {
-  const res = await axiosInstance.post(`${API_URL}/logout`,{});
+  const res = await axiosInstance.post(`${API_URL}/logout`);
   return res.data;
 };
 

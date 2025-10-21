@@ -107,14 +107,9 @@ const Registration = () => {
         const { confirmPassword, ...formData } = form;
         const res = await registerAPI(formData);
 
-        createNotification(
-          "success",
-          "Registration Successful!",
-          "Welcome! You will be redirected shortly"
-        );
-
-        localStorage.setItem("token", res.token);
-        setUser(res.user);
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("role", "CUSTOMER");
+        setUser(res.data.user);
         navigate("/room");
       } catch (err) {
         console.error(

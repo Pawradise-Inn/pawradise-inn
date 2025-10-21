@@ -50,7 +50,7 @@ const RoomCard = ({
             {/* Review - hide in compact mode */}
             {!compact && (
               <p className="inline-block">
-                {data.reviewStar} / 5.0{" "}
+                {data.reviewStar} / 5.00{" "}
                 <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
               </p>
             )}

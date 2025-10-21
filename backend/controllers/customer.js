@@ -1,4 +1,5 @@
 const prisma = require('../prisma/prisma');
+const { sendErrorResponse } = require("../utils/responseHandler");
 
 const getCustomerProfile = async(req, res)=>{ //requirement: 2
     try{
@@ -26,17 +27,11 @@ const getCustomerProfile = async(req, res)=>{ //requirement: 2
             }
         });
         if(!customerWithPets) {
-            return res.status(404).json({
-                success: false, 
-                message: "Customer profile not found"
-            });
+            return sendErrorResponse(res, 404, "NOT_FOUND", "Customer profile not found");
         }
-        res.status(200).json({success: true, data: customerWithPets});
+        return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Customer profile loaded", customerWithPets);
     }catch(err){
-        res.status(500).json({
-            success: false, 
-            message: "Unable to fetch customer profile. Please try again later"
-        });
+        return sendErrorResponse(res, 500, "UNABLE_TO_LOAD", "Unable to load customer profile. Please refresh and try again");
     }
 };
 
@@ -55,10 +50,7 @@ const updateCustomerProfile = async(req, res)=>{
         });
         
         if (!customer) {
-            return res.status(404).json({
-                success: false,
-                message: "Customer profile not found"
-            });
+            return sendErrorResponse(res, 404, "NOT_FOUND", "Customer profile not found");
         }
         const user = await prisma.user.update({
             where: {id: customer.userId},
@@ -70,15 +62,12 @@ const updateCustomerProfile = async(req, res)=>{
                 user_name,
             }
         });
-        res.status(200).json({success: true, data: user});
+        return sendSuccessResponse(res, 200, "PROFILE_UPDATED", "Customer profile updated successfully", user);
     }catch(err){
         if (err.code === 'P2002') {
-            return res.status(409).json({
-                success: false,
-                message: "This email or username is already in use"
-            });
+            return sendErrorResponse(res, 409, "ALREADY_EXISTS", "This email or username is already in use");
         }
-        res.status(500).json({success: false, message: "Unable to update customer profile. Please try again later"});
+        return sendErrorResponse(res, 500, "SERVER_ERROR", "Unable to update customer profile. Please try again");
     }
 }
 
