@@ -18,9 +18,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
       (res) => {
       const v2 = res?.data?.reply ?? res?.data?.staffReply ?? "";
       const testsrId = res?.data?.serviceId ?? res?.data?.roomId ?? "";
-      console.log("Fetched review ID:", reviewId, "Service/Room ID:", testsrId);
       setDraftReply(v2)
-      console.log("Show value from API:", res.data.show)
       setIsVisible(res.data.show)
     }
   )};
