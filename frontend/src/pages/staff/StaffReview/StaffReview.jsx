@@ -74,7 +74,7 @@ const StaffReviewPage = () => {
     }
     fetchReviews();
   }, [currentPage, search, starFilter, dateFilter]);
-  console.log(reviews);
+
   const handleDeleteReview = (reviewId) => {
     console.log("Deleting review with ID:", reviewId);
     console.log("Current reviews before deletion:", reviews);
@@ -95,6 +95,11 @@ const StaffReviewPage = () => {
     setDateFilter(value);
     setCurrentPage(1);
   };
+
+  const handleSearchChange = (e) =>{
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  }
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-8">
@@ -117,7 +122,7 @@ const StaffReviewPage = () => {
               <input
                 className="w-9/12 bg-transparent outline-none"
                 placeholder="search by room or service name"
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={handleSearchChange}
                 value={search}
               />{" "}
             </div>{" "}

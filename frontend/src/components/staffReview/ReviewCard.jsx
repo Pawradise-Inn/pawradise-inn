@@ -181,7 +181,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
                   </span>
                   <div className="flex items-center gap-3">
                     {justSavedReply && (
-                      <span className="text-xs font-semibold text-green-700">
+                      <span className="text-xs font-semibold !text-green-700">
                         Saved
                       </span>
                     )}
