@@ -347,6 +347,8 @@ const getRoomsWithPagination = async (req, res) => {
         exitDate.setDate(exitDate.getDate() + 1);
 
         const count = await overlappingRoom(r.id, entryDate, exitDate);
+
+        const status = count >= r.capacity ? "full" : "available";
         return {
           image: r.picture,
           id: r.id,
@@ -356,6 +358,7 @@ const getRoomsWithPagination = async (req, res) => {
           size: count,
           maxsize: r.capacity,
           commentPages: totalReviews,
+          status: status,
         };
       })
     );
