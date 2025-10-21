@@ -310,6 +310,9 @@ const getRoomsWithPagination = async (req, res) => {
   //requirement: 9
   try {
     const rooms = await prisma.room.findMany({
+      where: {
+        show: true
+      }, 
       select: {
         id: true,
         picture: true,
