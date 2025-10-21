@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { updateChatLogAPI } from "../../hooks/chatlogAPI";
+import { deleteChatLogAPI, updateChatLogAPI } from "../../hooks/chatlogAPI";
 import { getChatLogByIdAPI } from "../../hooks/chatlogAPI";
 import { replyToChatLogAPI } from "../../hooks/chatlogAPI";
 import { useAuth } from "../../context/AuthProvider";
@@ -69,14 +69,28 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
   const handleHide = () => toggleShow(false);
   const handleUnhide = () => toggleShow(true);
 
+  const handleDelete  = async () => {
+    if(!reviewId) return;
+
+   try {
+     const resp = await deleteChatLogAPI(reviewId);
+     if(!resp?.success) {
+       console.error("Failed to delete review");
+       alert("Failed to delete review. Please try again.");
+       return;
+     }
+     onDelete?.(reviewId);
+   } catch (error) {
+      console.error("Failed to delete review", e);
+   }
+  }
+
   const handleSaveReply = async () => {     
     if (!reviewId) return;
     const payload = (draftReply ?? "").trim();
     setIsSavingReply(true);
     setJustSavedReply(false);
     try {
-      // const resp = await updateChatLogAPI(reviewId, { reply: payload, reply_date: timestamp });
-      console.log("user in review card:", user.staffId);
       const resp = await replyToChatLogAPI(reviewId, { staffId:user.staffId ,reply: payload });
       if (!resp?.success) throw new Error("success=false");
 
@@ -193,7 +207,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
               <button
                 type="button"
                 className="cursor-pointer rounded-lg bg-[var(--brown-color)] px-7 py-2.5 text-sm font-semibold !text-white transition-opacity hover:opacity-90"
-                onClick={() => onDelete?.(reviewId)}
+                onClick={handleDelete}
               >
                 Delete
               </button>
