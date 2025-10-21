@@ -139,7 +139,7 @@ const ProfileComp = () => {
       .then(() => {
         localStorage.removeItem("token");
         sessionStorage.removeItem("token");
-        navigate("/register");
+        navigate("/login");
       })
       .catch((err) => {
         console.error(err);

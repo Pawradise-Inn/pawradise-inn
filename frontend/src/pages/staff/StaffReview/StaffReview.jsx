@@ -52,7 +52,7 @@ const StaffReviewPage = () => {
           filters.rating = starFilter;
         }
         if (dateFilter) {
-          filters.review_date = dateFilter.toISOString().split('T')[0];
+          filters.review_date = dateFilter;
         }
         if (search) {
           filters.search = search;
@@ -76,6 +76,8 @@ const StaffReviewPage = () => {
   }, [currentPage, search, starFilter, dateFilter]);
 
   const handleDeleteReview = (reviewId) => {
+    console.log("Deleting review with ID:", reviewId);
+    console.log("Current reviews before deletion:", reviews);
     setReviews((prevReviews) =>
       prevReviews.filter((review) => review.id !== reviewId)
     );
@@ -93,6 +95,11 @@ const StaffReviewPage = () => {
     setDateFilter(value);
     setCurrentPage(1);
   };
+
+  const handleSearchChange = (e) =>{
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  }
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-8">
@@ -114,8 +121,8 @@ const StaffReviewPage = () => {
               <i className="bi bi-search pr-2 opacity-50"></i>{" "}
               <input
                 className="w-9/12 bg-transparent outline-none"
-                placeholder="search"
-                onChange={(e) => setSearch(e.target.value)}
+                placeholder="search by room or service name"
+                onChange={handleSearchChange}
                 value={search}
               />{" "}
             </div>{" "}
@@ -167,7 +174,7 @@ const StaffReviewPage = () => {
             />
           ))
         ) : (
-          <p className="mt-16 text-center text-xl italic text-gray-500">
+          <p className="py-32 text-center text-xl italic text-gray-500">
             No reviews available.
           </p>
         )}{" "}

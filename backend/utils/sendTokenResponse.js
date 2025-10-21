@@ -20,6 +20,7 @@ exports.sendTokenResponse = (user, statusCode, res, successType) => {
   }
   res
     .status(statusCode)
+    .cookie('token', token, options)
     .json({
       success: true,
       token,
