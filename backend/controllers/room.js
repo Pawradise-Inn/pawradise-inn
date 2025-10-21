@@ -332,6 +332,9 @@ const getAvailableRooms = async (req, res) => {
         capacity: true,
         petType: true,
         ChatLog: {
+          where: {
+            show: true,
+          },
           select: {
             rating: true,
           },
@@ -355,22 +358,30 @@ const getAvailableRooms = async (req, res) => {
 
     const formattedRooms = await Promise.all(
       availableRooms.map(async (r) => {
-        const totalBookings = r.bookings.length;
-        const totalReviews = r.ChatLog.length;
+        let totalReviews = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, total: 0 };
+        r.ChatLog.forEach((c) => {
+          totalReviews[c.rating] += 1;
+          totalReviews["total"] += 1;
+        });
+
         const ratings = r.ChatLog.map((c) => c.rating ?? 5);
         const avgRating = ratings.length
           ? ratings.reduce((a, b) => a + b, 0) / ratings.length
-          : 5;
+          : 0;
+
+        const count = await overlappingRoom(r.id, entryDate, exitDate);
+        const status = count >= r.capacity ? "full" : "available";
 
         return {
           image: r.picture,
           id: r.id,
-          reviewStar: avgRating,
+          reviewStar: avgRating.toFixed(2),
           forWhich: r.petType,
           price: r.price,
-          size: totalBookings,
+          size: count,
           maxsize: r.capacity,
-          commentPages: Math.ceil(totalReviews / 3),
+          commentPages: totalReviews,
+          status: status,
         };
       })
     );
@@ -383,6 +394,7 @@ const getAvailableRooms = async (req, res) => {
       formattedRooms
     );
   } catch (err) {
+    console.error(err);
     return sendErrorResponse(
       res,
       500,
@@ -441,7 +453,7 @@ const getRoomsWithPagination = async (req, res) => {
         return {
           image: r.picture,
           id: r.id,
-          reviewStar: avgRating,
+          reviewStar: avgRating.toFixed(2),
           forWhich: r.petType,
           price: r.price,
           size: count,
@@ -490,7 +502,7 @@ const getRoomReviews = async (req, res) => {
         roomId: Number(roomId),
         review: { not: null },
         rating: star ? { equals: Number(star) } : undefined,
-        show: true
+        show: true,
       },
       skip,
       take,

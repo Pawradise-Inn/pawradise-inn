@@ -31,8 +31,12 @@ const RoomCard = ({
               .toString()
               .padStart(3, 0)}`}</p>
             <p className="flex items-center gap-2">
-              <span>Status :</span> 
-              <span className= {`px-3 py-1  text-sm ${getRoomStatusColor(data.status)} !text-[var(--cream-color)] rounded-full text-center inline-block whitespace-nowrap `}>
+              <span>Status :</span>
+              <span
+                className={`px-1.5 py-0.5  text-xs ${getRoomStatusColor(
+                  data.status
+                )} !text-[var(--cream-color)] rounded-full text-center inline-block whitespace-nowrap `}
+              >
                 {data.status}
               </span>
             </p>
@@ -57,17 +61,16 @@ const RoomCard = ({
             {!compact && (
               <p className="inline-block">
                 {data.reviewStar} / 5.00{" "}
-                <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
-
-                <span>
-                  ({data.commentPages.total})
-                </span>
+                <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>{" "}
+                <span className="-translate-y-0.5 inline-block">({data.commentPages.total})</span>
               </p>
             )}
 
             <button
               onClick={() => onClick(data, true)}
-              className= {"py-2 px-8 rounded !text-white font-bold active:scale-90 transition-transform duration-200 cursor-pointer bg-[var(--dark-brown-color)] "}
+              className={
+                "py-2 px-8 rounded !text-white font-bold active:scale-90 transition-transform duration-200 cursor-pointer bg-[var(--dark-brown-color)] "
+              }
             >
               {actionLabel || (compact ? "EDIT" : "BOOK")}
             </button>

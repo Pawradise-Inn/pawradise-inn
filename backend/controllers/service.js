@@ -331,7 +331,7 @@ const getServicesWithPagination = async (req, res) => {
         return {
           image: s.picture,
           name: s.name,
-          reviewStar: avgRating,
+          reviewStar: avgRating.toFixed(2),
           forWhich: s.petType.map((p) => p),
           price: s.price,
           commentPages: totalReviews

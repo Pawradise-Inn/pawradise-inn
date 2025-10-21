@@ -22,7 +22,6 @@ const BookingService = () => {
     fetchAllServiceWithPaginationAPI().then((data) => {
       data.data.forEach((service) => {
         service.headerType = "Service";
-        service.reviewStar = service.reviewStar.toFixed(2);
       });
 
       setService(data.data);
