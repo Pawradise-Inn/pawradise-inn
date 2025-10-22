@@ -86,7 +86,7 @@ const getServices = async (req, res) => {
       "LOADED_SUCCESSFULLY",
       "Services loaded",
       services,
-      { count }
+      total,
     );
   } catch (err) {
     return sendErrorResponse(
@@ -129,6 +129,7 @@ const getService = async (req, res) => {
 const createService = async (req, res) => {
   //requirement: 15
   try {
+    console.log(req.body);
     const { name, price, petType, picture } = req.body;
     const service = await prisma.service.create({
       data: {
@@ -148,6 +149,7 @@ const createService = async (req, res) => {
       service
     );
   } catch (err) {
+    console.log(err)
     return sendErrorResponse(
       res,
       500,
