@@ -282,7 +282,7 @@ const replyToChatLog = async (req, res) => {
     const id = req.params.id;
     const staffId = req.user.roleId;
     const reply = req.body.reply;
-    if (!reply || !staffId) {
+    if (!staffId) {
       return sendErrorResponse(res, 400, "MISSING_FIELDS", "Please provide your reply message");
     }
 
