@@ -140,7 +140,7 @@ const Registration = () => {
 
   return (
     <div>
-      <div className="flex flex-row w-full bg-[var(--cream-color)]">
+      <div className="flex flex-row w-full min-h-screen  bg-[var(--cream-color)]">
         <motion.div
           className="w-3/5"
           initial={{ x: -100, opacity: 0 }}
