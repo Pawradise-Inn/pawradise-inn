@@ -70,6 +70,10 @@ const createErrorResponse = (
       header: "Profile Not Found",
       content: userMessage || "Profile could not be found",
     },
+    NO_REVIEWS_FOUND:{
+      header: "Review Not Found",
+      content: userMessage || "Review could not be found",
+    },
 
     // 409 - Conflict
     ALREADY_EXISTS: {
