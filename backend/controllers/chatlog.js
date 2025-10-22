@@ -291,12 +291,14 @@ const replyToChatLog = async (req, res) => {
       data: {
         reply: reply,
         staffId: staffId,
+        isRead: false,
         reply_date: new Date(),
       },
     });
 
     return sendSuccessResponse(res, 200, "REPLY_POSTED", "Your reply has been posted successfully", chatlog);
   } catch (err) {
+    console.error(err)
     return sendErrorResponse(res, 500, "SERVER_ERROR", "Unable to post your reply. Please try again");
   }
 };
