@@ -109,17 +109,11 @@ const RoomEdit = () => {
             item.roomId === updatedRoom.roomId ? updatedRoom : item
           )
         );
-        createNotification(
-          "success",
-          "Room Updated",
-          "Room updated successfully."
-        );
       } else {
         // ADD MODE - Note: You need to import addRoomAPI
         // const response = await addRoomAPI(payload);
         // const newRoom = response.data;
         // setRooms((prev) => [newRoom, ...prev]);
-        createNotification("success", "Room Added", "Room added successfully.");
       }
       closePopup();
     } catch (err) {

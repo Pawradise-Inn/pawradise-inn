@@ -54,7 +54,6 @@ const BookingComp = () => {
             );
             setAllBookedRoom(filterBookingRoom);
           }
-          createNotification("success", "Delete successfully", "The booking has been deleted");
         } catch (error) {
           console.error("Failed to cancel booking:", error);
         }

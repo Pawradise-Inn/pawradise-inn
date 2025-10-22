@@ -1,5 +1,9 @@
 const prisma = require("../prisma/prisma");
 const {
+  sendErrorResponse,
+  sendSuccessResponse,
+} = require("../utils/responseHandler");
+const {
   findRoomById,
   // addRoomPictures,
   // removeRoomPictures,
@@ -53,10 +57,12 @@ const getRooms = async (req, res) => {
       where: options.where,
     });
     if (total === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No rooms are available at the moment",
-      });
+      return sendErrorResponse(
+        res,
+        404,
+        "NO_DATA_FOUND",
+        "No rooms are available at the moment"
+      );
     }
 
     const rooms = await prisma.room.findMany(options);
@@ -74,14 +80,21 @@ const getRooms = async (req, res) => {
         limit: limit,
       };
     }
-    res
-      .status(200)
-      .json({ success: true, pagination, data: rooms, count: total });
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Rooms loaded successfully",
+      rooms,
+      { count: total }
+    );
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to fetch rooms. Please try again later",
-    });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load rooms. Please refresh and try again"
+    );
   }
 };
 
@@ -90,13 +103,21 @@ const getRoom = async (req, res) => {
     const roomId = req.params.id;
     const room = await findRoomById(roomId);
     if (!room)
-      return res.status(404).json({ success: false, msg: "Room is not found" });
-    res.status(200).json({ success: true, data: room });
+      return sendErrorResponse(res, 404, "ROOM_NOT_FOUND", "Room not found");
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Room details loaded",
+      room
+    );
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to fetch room details. Please try again later",
-    });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load room details. Please refresh and try again"
+    );
   }
 };
 
@@ -112,12 +133,20 @@ const createRoom = async (req, res) => {
         petType: type,
       },
     });
-    res.status(201).json({ success: true, data: room });
+    return sendSuccessResponse(
+      res,
+      201,
+      "CREATED_SUCCESSFULLY",
+      "Room created successfully",
+      room
+    );
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to create room. Please try again later",
-    });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_SAVE",
+      "Unable to create room. Please try again"
+    );
   }
 };
 
@@ -128,28 +157,39 @@ const updateRoom = async (req, res) => {
     if (req.body.price !== undefined) dataToUpdate.price = req.body.price;
     if (req.body.name !== undefined) dataToUpdate.name = req.body.name;
     if (req.body.petType !== undefined) dataToUpdate.petType = req.body.petType;
-    if (req.body.capacity !== undefined) dataToUpdate.capacity = req.body.capacity;
+    if (req.body.capacity !== undefined)
+      dataToUpdate.capacity = req.body.capacity;
     if (req.body.picture !== undefined) dataToUpdate.picture = req.body.picture;
 
     if (Object.keys(dataToUpdate).length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide details to update",
-      });
+      return sendErrorResponse(
+        res,
+        400,
+        "MISSING_FIELDS",
+        "Please provide details to update"
+      );
     }
 
     const room = await prisma.room.update({
       where: { id: Number(roomId) },
       data: dataToUpdate,
     });
-    res.status(200).json({ success: true, data: room });
+    return sendSuccessResponse(
+      res,
+      200,
+      "UPDATED_SUCCESSFULLY",
+      "Room updated successfully",
+      room
+    );
   } catch (err) {
     if (err.code === "P2025")
-      return res.status(404).json({ success: false, msg: "Room is not found" });
-    res.status(500).json({
-      success: false,
-      message: "Unable to update room. Please try again later",
-    });
+      return sendErrorResponse(res, 404, "ROOM_NOT_FOUND", "Room not found");
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_UPDATE",
+      "Unable to update room. Please try again"
+    );
   }
 };
 
@@ -160,17 +200,27 @@ const deleteRoom = async (req, res) => {
     const room = await prisma.room.delete({
       where: { id: Number(roomId) },
     });
-    res.status(200).json({ success: true, data: {} });
+    return sendSuccessResponse(
+      res,
+      200,
+      "DELETED_SUCCESSFULLY",
+      "Room deleted successfully",
+      {}
+    );
   } catch (err) {
     if (err.code === "P2025")
-      return res.status(404).json({
-        success: false,
-        message: "Room not found or has already been deleted",
-      });
-    res.status(500).json({
-      success: false,
-      message: "Unable to delete room. Please try again later",
-    });
+      return sendErrorResponse(
+        res,
+        404,
+        "ROOM_NOT_FOUND",
+        "Room not found or has already been deleted"
+      );
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_DELETE",
+      "Unable to delete room. Please try again"
+    );
   }
 };
 
@@ -181,17 +231,25 @@ const addPicturesToRoom = async (req, res) => {
     const room = await prisma.room.update({
       where: { id: Number(roomId) },
       data: {
-        picture: req.body.picture
+        picture: req.body.picture,
       },
     });
-    res.status(200).json({ success: true, data: room });
+    return sendSuccessResponse(
+      res,
+      200,
+      "UPDATED_SUCCESSFULLY",
+      "Room picture updated successfully",
+      room
+    );
   } catch (err) {
     if (err.code === "P2025")
-      return res.status(404).json({ success: false, msg: "Room is not found" });
-    res.status(500).json({
-      success: false,
-      message: "Unable to add pictures to room. Please try again later",
-    });
+      return sendErrorResponse(res, 404, "ROOM_NOT_FOUND", "Room not found");
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_UPDATE",
+      "Unable to add pictures to room. Please try again"
+    );
   }
 };
 
@@ -202,17 +260,25 @@ const deletePicturesFromRoom = async (req, res) => {
     const room = await prisma.room.update({
       where: { id: Number(roomId) },
       data: {
-        picture: "https://storage.googleapis.com/paw_image/rooms/unnamed.jpg"
-      }
+        picture: "https://storage.googleapis.com/paw_image/rooms/unnamed.jpg",
+      },
     });
-    res.status(200).json({ success: true, data: room });
+    return sendSuccessResponse(
+      res,
+      200,
+      "UPDATED_SUCCESSFULLY",
+      "Room picture removed successfully",
+      room
+    );
   } catch (err) {
     if (err.code === "P2025")
-      return res.status(404).json({ success: false, msg: "Room is not found" });
-    res.status(500).json({
-      success: false,
-      message: "Unable to delete pictures from room. Please try again later",
-    });
+      return sendErrorResponse(res, 404, "ROOM_NOT_FOUND", "Room not found");
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_UPDATE",
+      "Unable to remove pictures from room. Please try again"
+    );
   }
 };
 
@@ -225,17 +291,29 @@ const getRoomStatus = async (req, res) => {
 
     const room = await findRoomById(id);
     if (!room)
-      return res
-        .status(404)
-        .json({ success: false, error: "Room is not found" });
+      return sendErrorResponse(
+        res,
+        404,
+        "ROOM_NOT_FOUND",
+        "This room could not be found"
+      );
 
     const count = await overlappingRoom(id, checkIn, checkOut);
-    res.status(200).json({ success: true, count: count });
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Room availability checked",
+      null,
+      { count }
+    );
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to check room availability. Please try again later",
-    });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to check room availability. Please refresh and try again"
+    );
   }
 };
 
@@ -254,6 +332,9 @@ const getAvailableRooms = async (req, res) => {
         capacity: true,
         petType: true,
         ChatLog: {
+          where: {
+            show: true,
+          },
           select: {
             rating: true,
           },
@@ -277,32 +358,49 @@ const getAvailableRooms = async (req, res) => {
 
     const formattedRooms = await Promise.all(
       availableRooms.map(async (r) => {
-        const totalBookings = r.bookings.length;
-        const totalReviews = r.ChatLog.length;
+        let totalReviews = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, total: 0 };
+        r.ChatLog.forEach((c) => {
+          totalReviews[c.rating] += 1;
+          totalReviews["total"] += 1;
+        });
+
         const ratings = r.ChatLog.map((c) => c.rating ?? 5);
         const avgRating = ratings.length
           ? ratings.reduce((a, b) => a + b, 0) / ratings.length
-          : 5;
+          : 0;
+
+        const count = await overlappingRoom(r.id, entryDate, exitDate);
+        const status = count >= r.capacity ? "full" : "available";
 
         return {
           image: r.picture,
           id: r.id,
-          reviewStar: avgRating,
+          reviewStar: avgRating.toFixed(2),
           forWhich: r.petType,
           price: r.price,
-          size: totalBookings,
+          size: count,
           maxsize: r.capacity,
-          commentPages: Math.ceil(totalReviews / 3),
+          commentPages: totalReviews,
+          status: status,
         };
       })
     );
 
-    res.status(200).json({ success: true, data: formattedRooms });
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Available rooms loaded",
+      formattedRooms
+    );
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to fetch available rooms. Please try again later",
-    });
+    console.error(err);
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load available rooms. Please refresh and try again"
+    );
   }
 };
 
@@ -329,12 +427,12 @@ const getRoomsWithPagination = async (req, res) => {
     });
 
     if (!rooms || rooms.length === 0) {
-      return res.status(404).json({ success: false, msg: "No rooms found" });
+      return sendErrorResponse(res, 404, "NO_DATA_FOUND", "No rooms found");
     }
 
     const formattedRooms = await Promise.all(
       rooms.map(async (r) => {
-        let totalReviews = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, "total": 0 };
+        let totalReviews = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, total: 0 };
         r.ChatLog.forEach((c) => {
           totalReviews[c.rating] += 1;
           totalReviews["total"] += 1;
@@ -343,7 +441,7 @@ const getRoomsWithPagination = async (req, res) => {
         const ratings = r.ChatLog.map((c) => c.rating ?? 5);
         const avgRating = ratings.length
           ? ratings.reduce((a, b) => a + b, 0) / ratings.length
-          : 5;
+          : 0;
 
         let entryDate = new Date();
         let exitDate = new Date(entryDate);
@@ -355,7 +453,7 @@ const getRoomsWithPagination = async (req, res) => {
         return {
           image: r.picture,
           id: r.id,
-          reviewStar: avgRating,
+          reviewStar: avgRating.toFixed(2),
           forWhich: r.petType,
           price: r.price,
           size: count,
@@ -366,12 +464,20 @@ const getRoomsWithPagination = async (req, res) => {
       })
     );
 
-    res.status(200).json({ success: true, data: formattedRooms });
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Rooms loaded",
+      formattedRooms
+    );
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to fetch rooms. Please try again later",
-    });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load rooms. Please refresh and try again"
+    );
   }
 };
 
@@ -384,17 +490,19 @@ const getRoomReviews = async (req, res) => {
     const skip = (page - 1) * take;
 
     if (!roomId) {
-      return res.status(400).json({
-        success: false,
-        message: "Please select a room to view reviews",
-      });
+      return sendErrorResponse(
+        res,
+        400,
+        "MISSING_FIELDS",
+        "Please select a room to view reviews"
+      );
     }
     const reviews = await prisma.chatLog.findMany({
       where: {
         roomId: Number(roomId),
         review: { not: null },
         rating: star ? { equals: Number(star) } : undefined,
-        show: true
+        show: true,
       },
       skip,
       take,
@@ -422,12 +530,20 @@ const getRoomReviews = async (req, res) => {
       comment_star: r.rating,
     }));
 
-    res.status(200).json({ success: true, data: formattedReviews });
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Room reviews loaded",
+      formattedReviews
+    );
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to fetch room reviews. Please try again later",
-    });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load room reviews. Please refresh and try again"
+    );
   }
 };
 

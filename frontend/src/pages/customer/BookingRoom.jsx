@@ -60,9 +60,7 @@ const BookingRoom = () => {
         const roomsData = await fetchAllRoomsWithPaginationAPI();
         roomsData.data.forEach((room) => {
           room.headerType = "Room";
-          room.reviewStar = room.reviewStar.toFixed(1);
         });
-        console.log(roomsData);
         setRoom(roomsData.data);
       } catch (error) {
         console.error("Failed to load initial rooms:", error);
@@ -105,7 +103,6 @@ const BookingRoom = () => {
             // Interceptor handles the fail notification.
           }
         } else {
-          // FIXED: Changed createNotification to use the new object style.
           createNotification(
             "fail",
             "Date is invalid",

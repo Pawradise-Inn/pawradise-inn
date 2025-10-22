@@ -36,11 +36,6 @@ const PetUpdate = () => {
         updatePet.status = status;
         updatePetAPI(id, updatePet);
         setPet(updatePet);
-        createNotification(
-          "success",
-          "Update Successful",
-          "Pet details have been saved."
-        );
         navigate("/staff/pet-status");
       } catch (error) {
         console.error("Interceptor handled the update error:", error);

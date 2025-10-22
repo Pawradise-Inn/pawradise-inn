@@ -3,10 +3,14 @@ const bcrypt = require("../node_modules/bcryptjs/umd/index.js");
 const jwt = require("jsonwebtoken");
 const { sendTokenResponse } = require("../utils/sendTokenResponse.js");
 const {
+  sendErrorResponse,
+  sendSuccessResponse,
+} = require("../utils/responseHandler");
+const {
   hashPassword,
   matchPassword,
   getSignedJwtToken,
-  findUserByUsername
+  findUserByUsername,
 } = require("./logics/auth.js");
 
 exports.register = async (req, res, next) => {
@@ -19,12 +23,17 @@ exports.register = async (req, res, next) => {
     const password = req.body.password;
     const role = (req.body.role ?? "CUSTOMER").toUpperCase();
     let bankAccount;
-    if (role == "STAFF"){
+    if (role == "STAFF") {
       bankAccount = req.body.account;
     }
 
     if (!firstname || !lastname || !email || !phone || !username || !password) {
-      return res.status(400).json({ success: false, message: "Missing required fields" });
+      return sendErrorResponse(
+        res,
+        400,
+        "MISSING_FIELDS",
+        "Please fill in all required fields to create your account"
+      );
     }
 
     const hashed = await hashPassword(password);
@@ -43,44 +52,42 @@ exports.register = async (req, res, next) => {
 
     if (user.role === "CUSTOMER") {
       await prisma.customer.create({ data: { userId: user.id } });
-      }
-    if (user.role === "STAFF") {
-      await prisma.staff.create({ data: { userId: user.id, wages: 0, bank_account: bankAccount } });
     }
-
-    sendTokenResponse(user, 200, res);
-  } catch (error) {
-    console.error(error);
-    
-    // Handle unique constraint violations
-    if (error.code === 'P2002') {
-      const field = error.meta?.target[0];
-
-      const filedMap = {
-        'user_name': 'username',
-        'phone_number': 'phone number',
-      };
-
-      const friendlyField = filedMap[field] || field;
-
-      return res.status(409).json({ 
-        success: false, 
-        message: `This ${friendlyField} is already taken` 
+    if (user.role === "STAFF") {
+      await prisma.staff.create({
+        data: { userId: user.id, wages: 0, bank_account: bankAccount },
       });
     }
-    
+
+    sendTokenResponse(user, 200, res, "REGISTERED_SUCCESSFULLY");
+  } catch (error) {
+    console.error(error);
+
+    // Handle unique constraint violations
+    if (error.code === "P2002") {
+      const field = error.meta?.target[0];
+      return sendErrorResponse(
+        res,
+        409,
+        "ALREADY_EXISTS",
+        `This ${field} is already taken. Please choose a different one`
+      );
+    }
+
     // Handle other errors
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Unable to create account. Please try again later.', 
-    });
+    return sendErrorResponse(
+      res,
+      500,
+      "SERVER_ERROR",
+      "Unable to create your account. Please try again"
+    );
   }
 };
 
 exports.getMe = async (req, res) => {
   try {
     const userId = req.user.id;
-    const role = req.user.role
+    const role = req.user.role;
 
     const user = await prisma.user.findUnique({
       where: { id: Number(userId) },
@@ -106,13 +113,30 @@ exports.getMe = async (req, res) => {
       },
     });
 
-    if (!user)
-      return res.status(404).json({ success: false, message: "Profile not found. Please try again" });
+    if (!user) {
+      return sendErrorResponse(
+        res,
+        404,
+        "NOT_FOUND",
+        "Your profile could not be found"
+      );
+    }
 
-    res.status(200).json({ success: true, data: user });
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Profile loaded",
+      user
+    );
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, error: err.message, message: "Unable to fetch profile. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load your profile. Please refresh and try again"
+    );
   }
 };
 
@@ -145,59 +169,117 @@ exports.updateMe = async (req, res) => {
         role: true,
       },
     });
-    if (!user) return res.status(404).json({ success: false, message: "Profile not found. Please try again" });
-    res.status(200).json({ success: true, data: user });
+    if (!user) {
+      return sendErrorResponse(
+        res,
+        404,
+        "NOT_FOUND",
+        "Your profile could not be found"
+      );
+    }
+    return sendSuccessResponse(
+      res,
+      200,
+      "PROFILE_UPDATED",
+      "Your profile has been updated successfully",
+      user
+    );
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message, message: "Unable to update profile. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "SERVER_ERROR",
+      "Unable to update your profile. Please try again"
+    );
   }
 };
 
 exports.deleteMe = async (req, res) => {
   try {
     const idParam = req.user.id;
-    
+
     const user = await prisma.user.delete({
       where: { id: Number(idParam) },
     });
-    res.cookie('token', '', {
-        httpOnly: true,
-        expires: new Date(0),
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
+    res.cookie("token", "", {
+      httpOnly: true,
+      expires: new Date(0),
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
     });
-    res.status(200).json({ success: true, message: 'Deleted and Logged out' });
+    return sendSuccessResponse(
+      res,
+      200,
+      "DELETED_SUCCESSFULLY",
+      "Account deleted and logged out successfully"
+    );
   } catch (err) {
-    res.status(500).json({ success: false, message: "Unable to delete profile. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "SERVER_ERROR",
+      "Unable to delete your account. Please try again"
+    );
   }
 };
 
 exports.login = async (req, res, next) => {
+  try {
     const { userName, password } = req.body;
 
-    if (!userName || !password) {
-        return res.status(400).json({ success: false, message: 'Please enter both username and password' });
-    }
+  if (!userName || !password) {
+    return sendErrorResponse(
+      res,
+      400,
+      "MISSING_FIELDS",
+      "Please enter both username and password"
+    );
+  }
 
-    const user = await findUserByUsername(userName);
-    if (!user) {
-        return res.status(401).json({ success: false, message: 'Invalid username or password' });
-    }
+  const user = await findUserByUsername(userName);
+  if (!user) {
+    return sendErrorResponse(
+      res,
+      401,
+      "UNAUTHORIZED",
+      "Invalid username or password"
+    );
+  }
 
-    // Match password
-    const isMatch = await matchPassword(password, user.password);
-    if (!isMatch) {
-        return res.status(401).json({ success: false, message: 'username or password are wrong' });
-    }
-    // Create token
-    sendTokenResponse(user, 200, res);
+  // Match password
+  const isMatch = await matchPassword(password, user.password);
+  if (!isMatch) {
+    return sendErrorResponse(
+      res,
+      401,
+      "UNAUTHORIZED",
+      "Invalid username or password"
+    );
+  }
+  // Create token
+  sendTokenResponse(user, 200, res, "LOGIN_SUCCESSFUL");
+  } catch (error) {
+    console.error(error)
+    return sendErrorResponse(
+      res,
+      500,
+      "SERVER_ERROR",
+      "Unable to login your account. Please try again"
+    );
+  }
 };
 
 exports.logout = async (req, res, next) => {
-    res.cookie('token', '', {
-        httpOnly: true,
-        expires: new Date(0),
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-    });
-    res.status(200).json({ success: true, message: 'Logged out' });
+  res.cookie("token", "", {
+    httpOnly: true,
+    expires: new Date(0),
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
+  return sendSuccessResponse(
+    res,
+    200,
+    "LOGOUT_SUCCESSFUL",
+    "You have been logged out successfully"
+  );
 };

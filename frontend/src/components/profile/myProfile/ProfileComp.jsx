@@ -94,11 +94,6 @@ const ProfileComp = () => {
             console.log(data)
             setUser?.(data.data.updatedUser);
           }
-          createNotification(
-            "success",
-            "Profile updated successfully!",
-            "Your update has been saved."
-          );
         } catch (err) {
           console.error("Update failed:", err);
           // handled by axios interceptor
@@ -144,11 +139,6 @@ const ProfileComp = () => {
       .then(() => {
         localStorage.removeItem("token");
         sessionStorage.removeItem("token");
-        createNotification(
-          "success",
-          "Account deletion confirmed",
-          "Your account would be deleted. Any active bookings (if any) would be automatically declined."
-        );
         navigate("/login");
       })
       .catch((err) => {

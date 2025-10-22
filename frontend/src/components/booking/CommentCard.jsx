@@ -12,7 +12,7 @@ const CommentCard = ({ user, star, detail, ...motionProps }) => {
       {...motionProps}
     >
       <b className="inline-block mb-4">
-        {star}/5.0{" "}
+        {star} / 5.0{" "}
         <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
       </b>
       <p className="inline-block ml-4 mb-4">from {user}</p>

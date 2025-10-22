@@ -1,14 +1,12 @@
 const prisma = require('../prisma/prisma');
+const { sendErrorResponse } = require("../utils/responseHandler");
 //const { findUserByUsername, matchPassword, getSignedJwtToken } = require("./logics/auth");
 
 exports.updateMyProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     if (!userId) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "Please log in to update your profile" 
-      });
+      return sendErrorResponse(res, 401, "UNAUTHORIZED", "Please log in to update your profile");
     }
 
     const { firstname, lastname, email, phone_number, user_name, password, wages, bank_company, bank_account} = req.body;
@@ -38,21 +36,15 @@ exports.updateMyProfile = async (req, res) => {
       return { updatedUser, updatedStaff };
     });
 
-    res.status(200).json({ success: true, data: result });
+    return sendSuccessResponse(res, 200, "PROFILE_UPDATED", "Your profile has been updated successfully", result);
   } catch (err) {
     if (err.code === 'P2025') {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Staff profile not found. Please contact an administrator" 
-      });
+      return sendErrorResponse(res, 404, "NOT_FOUND", "Staff profile not found. Please contact an administrator");
     }
     if (err.code === 'P2002') {
-      return res.status(409).json({ 
-        success: false, 
-        message: "This email or username is already in use" 
-      });
+      return sendErrorResponse(res, 409, "ALREADY_EXISTS", "This email or username is already in use");
     }
-    res.status(500).json({ success: false, message: "Unable to update profile. Please try again later" });
+    return sendErrorResponse(res, 500, "SERVER_ERROR", "Unable to update your profile. Please try again");
   }
 };
 
@@ -76,13 +68,10 @@ exports.getStaffProfile = async(req, res)=>{ //requirement: 17
             }
         });
         if(!staffWithInformation) {
-            return res.status(404).json({
-                success: false, 
-                message: "Staff profile not found"
-            });
+            return sendErrorResponse(res, 404, "PROFILE_NOT_FOUND", "Staff profile not found");
         }
-        res.status(200).json({success: true, data: staffWithInformation});
+        return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Staff profile loaded", staffWithInformation);
     }catch(err){
-        res.status(500).json({success: false, message: "Unable to fetch profile. Please try again later"});
+        return sendErrorResponse(res, 500, "UNABLE_TO_LOAD", "Unable to load staff profile. Please refresh and try again");
     }
 };
