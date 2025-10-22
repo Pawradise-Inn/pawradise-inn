@@ -55,7 +55,6 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
       // rollback on error
       setIsVisible(isVisible);
       console.error("Failed to toggle visibility", e);
-      alert("Failed to update visibility. Please try again.");
     } finally {
       setIsToggling(false);
     }
@@ -69,7 +68,6 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
      const resp = await deleteChatLogAPI(reviewId);
      if(!resp?.success) {
        console.error("Failed to delete review");
-       alert("Failed to delete review. Please try again.");
        return;
      }
      onDelete?.(reviewId);
@@ -92,7 +90,6 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
       setTimeout(() => setJustSavedReply(false), 1200);
     } catch (e) {
       console.error("Failed to save reply", e);
-      alert("Failed to save reply. Please try again.");
     } finally {
       setIsSavingReply(false);
     }
