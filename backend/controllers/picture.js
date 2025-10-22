@@ -1,5 +1,6 @@
 const {Storage} = require('@google-cloud/storage');
 const path = require('path');
+const { sendErrorResponse, sendSuccessResponse } = require("../utils/responseHandler");
 
 // Initialize GCS client using credentials
 const storage = new Storage({
@@ -10,10 +11,7 @@ const bucket = storage.bucket('paw_image');
 
 const uploadImage = async (req, res) => {
     if(!req.file){
-        return res.status(400).json({
-            success: false,
-            message: "Please select an image to upload"
-        });
+        return sendErrorResponse(res, 400, "MISSING_FIELDS", "Please select an image to upload");
     }
     
     // 1. Combine filename parts into a single string using template literal
@@ -31,11 +29,8 @@ const uploadImage = async (req, res) => {
     });
 
     blobStream.on('error', (err) => {
-        console.error('GCS Upload Stream Error:', err.message); // Log the specific error message
-        res.status(500).json({
-            success: false,
-            message: "Unable to upload image. Please try again later"
-        });
+        console.error('GCS Upload Stream Error:', err.message);
+        return sendErrorResponse(res, 500, "UNABLE_TO_SAVE", "Unable to upload image. Please try again");
     });
 
     blobStream.on('finish', async () => {
@@ -48,14 +43,11 @@ const uploadImage = async (req, res) => {
             const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
 
             // Send the URL back to the React frontend
-            res.status(201).json({ success: true, imageUrl: publicUrl });
+            return sendSuccessResponse(res, 201, "CREATED_SUCCESSFULLY", "Image uploaded successfully", null, { imageUrl: publicUrl });
         } catch (dbError) {
             // Catch error if subsequent steps fail (e.g., database update logic if it were here)
             console.error('Post-upload processing error:', dbError.message);
-            res.status(500).json({
-                success: false,
-                message: "Image uploaded but couldn't be saved. Please try again"
-            });
+            return sendErrorResponse(res, 500, "UNABLE_TO_SAVE", "Image uploaded but couldn't be saved. Please try again");
         }
     });
 

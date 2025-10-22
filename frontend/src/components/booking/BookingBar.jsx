@@ -137,15 +137,6 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       };
 
       createBookedService(body)
-        .then((res) => {
-          if (res.success) {
-            createNotification(
-              "success",
-              "Booking success",
-              "Create booking successfully."
-            );
-          }
-        })
         .then(() => changeBookingBarStatus())
         .catch((error) => {
           console.error("Booking service error:", error);
@@ -160,15 +151,6 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       };
 
       createBookedRoom(body)
-        .then((res) => {
-          if (res.success) {
-            createNotification(
-              "success",
-              "Booking success",
-              "Create booking successfully."
-            );
-          }
-        })
         .then(() => changeBookingBarStatus())
         .catch((error) => {
           console.error("Booking error:", error);
@@ -194,16 +176,16 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         data.name,
         changeDateTime(formData.entryDate, formData.entryTime)
       ).then((res) => {
-        setSize(res.count);
-        res.count < 3
+        setSize(res.message.details.count);
+        res.message.details.count < 3
           ? setStatus("room available")
           : setStatus("room not available");
       });
     } else {
       fetchRoomStatusAPI(data.id, formData.entryDate, formData.exitDate).then(
         (res) => {
-          setSize(res.count);
-          res.count < data.maxsize
+          setSize(res.message.details.count);
+          res.message.details.count < data.maxsize
             ? setStatus("room available")
             : setStatus("room not available");
         }
@@ -450,7 +432,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       {/* comment section */}
       <section>
         <b className="my-5 text-3xl block">
-          {data.reviewStar}/5.0{" "}
+          {data.reviewStar} / 5.00{" "}
           <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
         </b>
         <div className="my-5 grid grid-cols-3 gap-2 bg-[var(--light-brown-color)]  p-2">

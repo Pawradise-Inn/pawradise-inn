@@ -51,12 +51,6 @@ const ToBeReviewedPopUp = ({
       setTobeReviewed((prevItems) =>
         prevItems.filter((item) => item.id !== data.id)
       );
-
-      createNotification(
-        "success",
-        "Review Submitted",
-        "Your review has been successfully submitted."
-      );
       onClick();
     } catch (error) {
       console.error("Failed to submit review:", error);
@@ -70,11 +64,6 @@ const ToBeReviewedPopUp = ({
       "This action cannot be undone.",
       () => {
         onClick();
-        createNotification(
-          "success",
-          "Review Deleted",
-          "Your review has been deleted (simulated)."
-        );
       }
     );
   };

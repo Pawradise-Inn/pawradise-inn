@@ -63,8 +63,9 @@ const StaffReviewPage = () => {
         }
 
         const response = await getChatLogsAPI(params);
+        console.log(response)
         setReviews(response.data);
-        setTotalReviews(response.count || 0);
+        setTotalReviews(response.message.details.count || 0);
       } catch(err) {
         console.error("Failed to fetch reviews:",err);
         setReviews([]);
