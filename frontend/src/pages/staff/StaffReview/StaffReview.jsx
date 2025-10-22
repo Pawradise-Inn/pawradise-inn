@@ -144,7 +144,7 @@ const StaffReviewPage = () => {
                 onClick={() => setIsStarDropdownOpen(!isStarDropdownOpen)}
                 className="h-full w-full cursor-pointer whitespace-nowrap rounded-xl bg-[var(--brown-color)] px-6 py-3 text-lg !text-white transition-opacity hover:opacity-90 pr-15"
               >
-                star{" "}
+                {starFilter || "All"} <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>{" "}
                 <i
                   className={`bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl cursor-pointer pointer-events-none transition-all duration-200 !text-[var(--cream-color)] ${
                     isStarDropdownOpen && "rotate-180"
