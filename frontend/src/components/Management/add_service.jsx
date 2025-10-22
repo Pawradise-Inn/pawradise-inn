@@ -28,6 +28,7 @@ const AddServicePopup = ({
   }, [initialData]);
 
   useEffect(() => {
+
     const loadPetTypes = async () => {
       try {
         const response = await fetchPetTypesAPI();
@@ -46,7 +47,7 @@ const AddServicePopup = ({
 
   const handleSubmit = (e) => {
     e.preventDefault?.();
-    const payload = { name, petType, price: Number(price), image };
+    const payload = { name, petType:[petType], price: Number(price), image };
     onSave && onSave(payload);
   };
 
