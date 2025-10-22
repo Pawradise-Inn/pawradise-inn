@@ -139,9 +139,9 @@ const ToBeReviewedPopUp = ({
           </button>
           <button
             onClick={handleDeleteReview}
-            className="bg-red-600 !text-white py-1 rounded-lg font-bold text-2xl cursor-pointer transition-all duration-200 active:scale-90 hover:bg-red-700"
+            className="bg-[var(--fail-color)] !text-white py-1 rounded-lg font-bold text-2xl cursor-pointer transition-all duration-200 active:scale-90 hover:bg-red-700"
           >
-            Delete
+            Cancel
           </button>
         </div>
       </div>
