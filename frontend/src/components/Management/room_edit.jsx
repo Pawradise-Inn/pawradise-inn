@@ -109,22 +109,15 @@ const RoomEdit = () => {
             item.roomId === updatedRoom.roomId ? updatedRoom : item
           )
         );
-        createNotification(
-          "success",
-          "Room Updated",
-          "Room updated successfully."
-        );
       } else {
         // ADD MODE - Note: You need to import addRoomAPI
         // const response = await addRoomAPI(payload);
         // const newRoom = response.data;
         // setRooms((prev) => [newRoom, ...prev]);
-        createNotification("success", "Room Added", "Room added successfully.");
       }
       closePopup();
     } catch (err) {
       console.error("Failed to save room:", err);
-      createNotification("fail", "Save Failed", "Failed to save room.");
     }
   };
 
@@ -135,7 +128,6 @@ const RoomEdit = () => {
       closePopup();
     } catch (err) {
       console.error("Failed to delete room:", err);
-      createNotification("fail", "Delete Failed", "Failed to delete room.");
     }
   };
 

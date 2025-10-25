@@ -14,6 +14,7 @@ const DateDropDown = ({ value, customInput, onChange, onFocus = null }) => {
       selected={value}
       onChange={onChange}
       wrapperClassName="w-full"
+      dateFormat="dd/MM/yyyy"
       onMonthChange={(date) => setCurrentMonth(date.getMonth())}
       dayClassName={(date) =>
         date.getMonth() !== currentMonth ? "opacity-50" : ""

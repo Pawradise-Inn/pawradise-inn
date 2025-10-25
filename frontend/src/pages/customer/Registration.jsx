@@ -107,14 +107,9 @@ const Registration = () => {
         const { confirmPassword, ...formData } = form;
         const res = await registerAPI(formData);
 
-        createNotification(
-          "success",
-          "Registration Successful!",
-          "Welcome! You will be redirected shortly"
-        );
-
-        localStorage.setItem("token", res.token);
-        setUser(res.user);
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("role", "CUSTOMER");
+        setUser(res.data.user);
         navigate("/room");
       } catch (err) {
         console.error(
@@ -145,7 +140,7 @@ const Registration = () => {
 
   return (
     <div>
-      <div className="flex flex-row w-full bg-[var(--cream-color)]">
+      <div className="flex flex-row w-full min-h-screen  bg-[var(--cream-color)]">
         <motion.div
           className="w-3/5"
           initial={{ x: -100, opacity: 0 }}

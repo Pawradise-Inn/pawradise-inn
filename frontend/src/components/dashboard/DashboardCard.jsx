@@ -1,18 +1,12 @@
 const DashboardCard = ({ data, onClick}) => {
 
-  const handleStatusBoxClick = (e) => {
-    e.stopPropagation();
-    setIsDropdownOpen((prev) => !prev);
-  };
-
-
   const getStatusColor = (status) => {
-      if (status === "CHECKED_IN") return "var()";
-      if (status === "CHECKED_OUT") return "var()";
-      if (status === "QUEUE") return "var()";
-      if (status === "IN PROGRESS") return "var(--service-inprogress-color)";
-    if (status === "COMPLETED") return "var(--service-complete-color";
-    return "var(--service-available-color)";
+      if (status === "CHECKED_IN") return "var(--checkIn-color)";
+      if (status === "CHECKED_OUT") return "var(--checkOut-color)";
+      if (status === "QUEUE") return "var(--queue-color)";
+      if (status === "IN_PROGRESS") return "var(--inProgress-color)";
+    if (status === "COMPLETED") return "var(--complete-color)";
+    return "var(--idle-color)";
   };
   const cardStyle = {
     display: "flex",
@@ -32,8 +26,8 @@ const DashboardCard = ({ data, onClick}) => {
     fontWeight: "600" };
   const statusBoxContainerStyle = { position: "relative", marginLeft: "16px" };
   const statusBox= {
-    width: "100px",
-    height: "30px",
+    width: "150px",
+    height: "40px",
     backgroundColor: "white",
     border: "1px solid var(--brown-color)",
     borderRadius: "8px",
@@ -60,9 +54,9 @@ const DashboardCard = ({ data, onClick}) => {
     <div style={cardStyle} onClick={onClick}>
       <img src={data.serviceImage ||data.roomImage} className="object-center rounded-2xl w-[140px] h-[140px]"></img>
       <div style={textContainerStyle}>
-        <p style={nameStyle}>{data.roomId ? "Room Id " : null}{data.serviceName || data.roomId}</p>
+        <p style={nameStyle}>{data.serviceName || data.roomName}</p>
         <p style={detailStyle}>{data.petName}</p>
-        <p style={detailStyle}>
+        <div style={detailStyle}>
         {data.timeBooked ? (
           <p style={detailStyle}>
             {new Date(data.timeBooked).toLocaleString("en-US", {
@@ -83,10 +77,10 @@ const DashboardCard = ({ data, onClick}) => {
             </p>
           </>
         )}
-        </p>
+        </div>
       </div>
       <div style={statusBoxContainerStyle}>
-        <div style={statusBox} onClick={handleStatusBoxClick}>
+        <div style={statusBox}>
           <div style={statusCircleStyle}></div>
           <span style={statusTextStyle}>{data.petStatus}</span>
         </div>

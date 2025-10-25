@@ -5,12 +5,10 @@ import Login_Image from "../assets/login.png";
 import PawLogo from "../assets/logo.png";
 import { getMeAPI, loginAPI } from "../hooks/authAPI";
 import { useAuth } from "../context/AuthProvider";
-import { useNotification } from "../context/notification/NotificationProvider";
 import { useScrollUpArrow } from "../context/ScrollUpArrowProvider";
 import { startUpVariants } from "../styles/animation";
 
 export default function Login() {
-  const { createNotification } = useNotification();
   const { setShow } = useScrollUpArrow();
   const { setUser } = useAuth();
   const navigate = useNavigate();
@@ -54,37 +52,31 @@ export default function Login() {
     try {
       const res = await loginAPI(form.Username, form.Password);
       console.log(res)
-      if (res?.token && res?.user) {
+      if (res?.data.token && res?.data.user) {
         // Store token and user data from login response
 
-        localStorage.setItem("token", res.token);
-        localStorage.setItem("user", JSON.stringify(res.user));
-        localStorage.setItem("role", res.user.role);
-        if(res.user.role === "CUSTOMER"){
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        localStorage.setItem("role", res.data.user.role);
+        if(res.data.user.role === "CUSTOMER"){
           const userData = await getMeAPI();
           setUser(userData.data)
         }
         // Set user in context
         else{
-          setUser(res.user);
+          setUser(res.data.user);
         }
         
         // Determine redirect path based on actual user role
-        const userRole = res.user.role;
+        const userRole = res.data.user.role;
         const redirectPath = (userRole === "STAFF" || userRole === "ADMIN") 
           ? "/staff/dashboard" 
           : "/room";
 
-        createNotification(
-          "success",
-          "Login Successful!",
-          "Welcome! Redirecting..."
-        );
-
         navigate(redirectPath, { replace: true });
-      } else if (res?.token) {
+      } else if (res?.data.token) {
         // Fallback: if login response doesn't include user data, try getMeAPI
-        localStorage.setItem("token", res.token);
+        localStorage.setItem("token", res.data.token);
         
         try {
           // Add small delay to ensure token is set in interceptors
@@ -101,12 +93,6 @@ export default function Login() {
             const redirectPath = (userRole === "STAFF" || userRole === "ADMIN") 
               ? "/staff/dashboard" 
               : "/room";
-
-            createNotification(
-              "success",
-              "Login Successful!",
-              "Welcome! Redirecting..."
-            );
 
             navigate(redirectPath, { replace: true });
           } else {

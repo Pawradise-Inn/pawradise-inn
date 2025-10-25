@@ -1,25 +1,27 @@
-const prisma = require('../prisma/prisma');
+const prisma = require("../prisma/prisma");
+const { createCareWithCheck } = require("./logics/care");
+const { sendErrorResponse, sendSuccessResponse } = require("../utils/responseHandler");
 
 const register = async (req, res) => {
   try {
     const customerId = Number(req.user.roleId); // from protect middleware
     // find the customer record that belongs to this user
     const customer = await prisma.customer.findUnique({
-      where: { id : customerId } // requires Customer.userId to be unique
+      where: { id: customerId }, // requires Customer.userId to be unique
     });
     if (!customer) {
-      res.status(400).json({ 
-        success: false, 
-        message: "Customer profile not found." 
-      });
+      return sendErrorResponse(
+        res,
+        400,
+        "NOT_FOUND",
+        "Customer profile not found"
+      );
     }
 
-    const {
-      name, sex, age, type, status, breed,
-      disease, allergic, picture
-    } = req.body;
+    const { name, sex, age, type, status, breed, disease, allergic, picture } =
+      req.body;
     const lastPet = await prisma.pet.findFirst({
-      orderBy: { id: 'desc' }, // descending order, highest id first
+      orderBy: { id: "desc" }, // descending order, highest id first
     });
 
     const newId = lastPet ? lastPet.id + 1 : 1; // if no pets exist, start from 1
@@ -36,210 +38,287 @@ const register = async (req, res) => {
         disease,
         allergic,
         customerId: customer.id,
-        picture: picture? picture:"https://storage.googleapis.com/paw_image/unnamed.jpg",
+        picture: picture
+          ? picture
+          : "https://storage.googleapis.com/paw_image/unnamed.jpg",
       },
     });
-    res.status(201).json({ success: true, data: pet });
+    return sendSuccessResponse(res, 201, "PET_REGISTERED", "Your pet has been registered successfully", pet);
   } catch (err) {
     if (err.code === "P2003") {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Unable to register pet. Please check your customer information" 
-      });
+      return sendErrorResponse(
+        res,
+        400,
+        "INVALID_DATA",
+        "Unable to register pet. Please check your customer information"
+      );
     }
     console.error("pet.register:", err);
-    res.status(500).json({ success: false, message: "Unable to register pet. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "SERVER_ERROR",
+      "Unable to register your pet. Please try again"
+    );
   }
 };
 
 const getAllPets = async (req, res) => {
-    try {
-        const pets = await prisma.pet.findMany({
-            include: {
-                scheduled: {
-                    include: {
-                        service: true
-                    }
-                },
-                stayed: {
-                    include: {
-                        room: true,
-                    }
-                }
-            }
-        });
-        
-        // Check if any pets were found
-        if (pets.length === 0) {
-            return res.status(404).json({ 
-              success: false, 
-              message: "No pets found in our system" 
-            });
-        }
-        res.status(200).json({ success: true, data: pets });
-    } catch (err) {
-        res.status(500).json({ success: false, message: "Unable to fetch pets. Please try again later" });
+  try {
+    const pets = await prisma.pet.findMany({
+      include: {
+        scheduled: {
+          include: {
+            service: true,
+          },
+        },
+        stayed: {
+          include: {
+            room: true,
+          },
+        },
+      },
+    });
+
+    // Check if any pets were found
+    if (pets.length === 0) {
+      return sendErrorResponse(
+        res,
+        404,
+        "NOT_FOUND",
+        "No pets found in our system"
+      );
     }
+    return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "All pets loaded", pets);
+  } catch (err) {
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load pets. Please refresh and try again"
+    );
+  }
 };
 
-const getPet = async (req, res) => {  //Both
-    try {
-        const pet = await prisma.pet.findUnique({
-            where: {
-                id: Number(req.params.id)
-            },
-            include: {
-              scheduled:{
-                include:{
-                  service: true
-                }
-              },
-              stayed: {
-                include:{
-                  room: true,
-                }
-              }
-            }
-        });
-        if (!pet) {
-            return res.status(404).json({
-              success: false, 
-              message: "Pet not found"
-            });
-        }
-        res.status(200).json({success: true, data: pet});
-    } catch(err) {
-        res.status(500).json({success: false, message: "Unable to fetch pet details. Please try again later" });
+const getPet = async (req, res) => {
+  //Both
+  try {
+    const pet = await prisma.pet.findUnique({
+      where: {
+        id: Number(req.params.id),
+      },
+      include: {
+        scheduled: {
+          include: {
+            service: true,
+          },
+        },
+        stayed: {
+          include: {
+            room: true,
+          },
+        },
+      },
+    });
+    if (!pet) {
+      return sendErrorResponse(res, 404, "NOT_FOUND", "Pet not found");
     }
+    return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Pet details loaded", pet);
+  } catch (err) {
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load pet details. Please refresh and try again"
+    );
+  }
 };
 
 const updatePet = async (req, res) => {
-    try {
-        const pet = await prisma.pet.update({
-            where: {id: Number(req.params.id)},
-            data: req.body
-          });
-        if (!pet) {
-            return res.status(404).json({
-              success: false, 
-              message: "Pet not found"
-            });
-        }
-        res.status(200).json({success: true, data: pet});
-    } catch(err) {
-        res.status(500).json({
-          success: false, 
-          message: "Unable to update pet information. Please try again later"
-        });
+  try {
+    const pet = await prisma.pet.update({
+      where: { id: Number(req.params.id) },
+      data: req.body,
+    });
+    if (!pet) {
+      return sendErrorResponse(res, 404, "PET_NOT_FOUND", "Pet not found");
     }
+    return sendSuccessResponse(res, 200, "UPDATED_SUCCESSFULLY", "Pet information updated successfully", pet);
+  } catch (err) {
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_UPDATE",
+      "Unable to update pet information. Please try again"
+    );
+  }
 };
 
 const updatePetStatus = async (req, res) => {
   try {
+    const staffId = req.user.roleId;
     const petId = Number(req.params.id);
-    const { status } = req.body;
-    
+    const { status, type, bookedId } = req.body;
+
     if (!status) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Please provide a status for the pet" 
-      });
+      return sendErrorResponse(
+        res,
+        400,
+        "MISSING_FIELDS",
+        "Please provide a status for the pet"
+      );
+    }
+
+    if (!type || !bookedId) {
+      return sendErrorResponse(
+        res,
+        400,
+        "MISSING_FIELDS",
+        "Please provide a type (room or service) with the id"
+      );
     }
 
     const pet = await prisma.pet.update({
       where: { id: petId },
       data: { status },
     });
-
-    res.status(200).json({ success: true, data: pet });
+    console.log(pet);
+    const log = await createCareWithCheck(
+      bookedId,
+      type,
+      petId,
+      staffId,
+      new Date(),
+      status
+    );
+    return sendSuccessResponse(res, 200, "PET_STATUS_UPDATED", "Pet status updated successfully", pet);
   } catch (err) {
-    if (err.code === 'P2025') {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Pet not found" 
-      });
+    if (err.code === "P2025") {
+      return sendErrorResponse(res, 404, "PET_NOT_FOUND", "Pet not found");
     }
-    res.status(500).json({ success: false, message: "Unable to update pet status. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_UPDATE",
+      "Unable to update pet status. Please try again"
+    );
   }
 };
 
 const deletePet = async (req, res) => {
-    try {
-        const pet = await prisma.pet.delete({
-            where: {id: Number(req.params.id)}
-        });
-        if (!pet) {
-            return res.status(404).json({
-              success: false, 
-              message: "Pet not found"
-            });
-        }
-        res.status(200).json({success: true, data: {}});
-    } catch(err) {
-        res.status(500).json({success: false, message: "Unable to delete pet. Please try again later" });
+  try {
+    const pet = await prisma.pet.delete({
+      where: { id: Number(req.params.id) },
+    });
+    if (!pet) {
+      return sendErrorResponse(res, 404, "PET_NOT_FOUND", "Pet not found");
     }
+    return sendSuccessResponse(res, 200, "DELETED_SUCCESSFULLY", "Pet deleted successfully", {});
+  } catch (err) {
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_DELETE",
+      "Unable to delete pet. Please try again"
+    );
+  }
 };
 
 const getCustomerPets = async (req, res) => {
   try {
     const userId = Number(req.params.id);
-    const fields = req.query.fields ? req.query.fields.split(',') : ['name', 'breed', 'sex', 'age', 'type', 'status','breed', 'disease', 'allergic', 'picture'];
+    const fields = req.query.fields
+      ? req.query.fields.split(",")
+      : [
+          "name",
+          "breed",
+          "sex",
+          "age",
+          "type",
+          "status",
+          "breed",
+          "disease",
+          "allergic",
+          "picture",
+        ];
 
     const select = {};
-    fields.forEach(f => select[f] = true);
+    fields.forEach((f) => (select[f] = true));
 
     const pets = await prisma.pet.findMany({
       where: { customerId: userId },
-      select
+      select,
     });
 
-    res.status(200).json({ success: true, data: pets });
+    return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Customer pets loaded", pets);
   } catch (err) {
-    res.status(500).json({ success: false, message: "Unable to fetch pets. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load pets. Please refresh and try again"
+    );
   }
 };
 
+const getCustomerPetNamesWithAvailable = async (req, res) => {
+  //requirement: 4
+  try {
+    const customerId = Number(req.query.customerId);
+    const bookingDate = new Date();
 
-const getCustomerPetNamesWithAvailable = async (req, res)=> { //requirement: 4
-    try {
-        const customerId = Number(req.query.customerId);
-        const bookingDate = new Date();
-
-        const pets = await prisma.pet.findMany({
-            where: {
-                customerId: customerId,
-                stayed: {
-                    none: {
-                        checkIn: { lte: bookingDate },
-                        checkOut: { gte: bookingDate } 
-                    }
-                }
-            },
-            select: {
-                name: true,
-                type: true
-            }
-        });
-        if(!pets || pets.length === 0) {
-            return res.status(404).json({
-              success: false, 
-              message: "No available pets found for booking"
-            });
-        }
-        res.status(200).json({success: true, data: pets});
-    }catch(err){
-        res.status(500).json({success: false, message: "Unable to check pet availability. Please try again later"});
+    const pets = await prisma.pet.findMany({
+      where: {
+        customerId: customerId,
+        stayed: {
+          none: {
+            checkIn: { lte: bookingDate },
+            checkOut: { gte: bookingDate },
+          },
+        },
+      },
+      select: {
+        name: true,
+        type: true,
+      },
+    });
+    if (!pets || pets.length === 0) {
+      return sendErrorResponse(
+        res,
+        404,
+        "NO_DATA_FOUND",
+        "No available pets found for booking"
+      );
     }
-}
-
-const getPetTypes = async (req, res) => {
-    try {
-        res.status(200).json({ success: true, data: ['DOG', 'CAT', 'MOUSE', 'RABBIT', 'BIRD']});
-    } catch(err) {
-        res.status(500).json({ success: false, message: "Could not fetch pet types." });
-    }
+    return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Available pets loaded", pets);
+  } catch (err) {
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to check pet availability. Please refresh and try again"
+    );
+  }
 };
 
+const getPetTypes = async (req, res) => {
+  try {
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Pet types loaded successfully",
+      ["DOG", "CAT", "MOUSE", "RABBIT", "BIRD"]
+    );
+  } catch (err) {
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Could not load pet types. Please try again"
+    );
+  }
+};
 
 module.exports = {
   register,
@@ -250,5 +329,5 @@ module.exports = {
   getCustomerPets,
   getCustomerPetNamesWithAvailable,
   getAllPets,
-  getPetTypes
-}
+  getPetTypes,
+};

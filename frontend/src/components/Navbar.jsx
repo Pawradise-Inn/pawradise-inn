@@ -9,6 +9,7 @@ const Navbar = ({
   pathIdxHighlight,
   prevPath,
   paths,
+  counts,
   element,
   mainStyle = "bg-white shadow-md px-10 py-4 flex items-center justify-between",
   activeColor = "var(--light-brown-color)",
@@ -64,7 +65,11 @@ const Navbar = ({
               animate="found"
               className="relative z-10 font-semibold "
             >
-              {link}
+            {counts ? (<p className="font-semibold font-style: italic text-center">
+                {counts[idx]} {/* Display the count */}
+              </p>
+            ): null}   
+                {link} {/* Display the text */}
             </motion.span>
           </NavLink>
         ))}

@@ -1,26 +1,18 @@
 // BookingComp.js
-import { AnimatePresence } from "motion/react";
 import {  useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthProvider";
 import { deleteBookedService } from "../../../hooks/bookedServiceAPI";
 import { deleteBookedRoom } from "../../../hooks/bookedRoomAPI";
-import { createBooking, fetchMyBookingAPI, fetchMyBookings } from "../../../hooks/bookingAPI"; // Import cancelBooking
-import { overlay, popUP, startUpVariants } from "../../../styles/animation";
-import { removeWindowScroll } from "../../../utils/handlePopup";
-import Overlay from "../../Overlay";
-import CancelModal from "../CancelModal";
-import SuccessMessage from "../SuccessMessage";
+import { fetchMyBookings } from "../../../hooks/bookingAPI"; // Import cancelBooking
+import { startUpVariants } from "../../../styles/animation";
 import {BookingRoomCard, BookingServiceCard }from "./BookingCard";
+import { useNotification } from "../../../context/notification/NotificationProvider";
 
 const BookingComp = () => {
-  const { user, setUser } = useAuth();
-  const [showModal, setShowModal] = useState(false);
+  const { user } = useAuth();
   const [allBookedService, setAllBookedService] = useState([]);
   const [allBookedRoom, setAllBookedRoom] = useState([]);
-  const [selectedBooking, setSelectedBooking] = useState(null);
-  const [bookingType, setBookingType] = useState(null); // 'service' or 'room'
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [cancelledBooking, setCanceledBooking] = useState(null);
+  const {createNotification} = useNotification();
 
   useEffect(() => {
     if (!user) return;
@@ -40,64 +32,38 @@ const BookingComp = () => {
     getMyBookings();
   }, [user]);
 
-  const handleCancelClick = (book, type) => {
-    setSelectedBooking(book);
-    setBookingType(type);
-    setShowModal(true);
-  };
 
-  const handleConfirmCancel = async () => {
-    try {
-      if (bookingType === 'service') {
-        await deleteBookedService(selectedBooking.id);
-        const filterBookingService = allBookedService.filter(
-          (ab) => ab.id !== selectedBooking.id
-        );
-        setAllBookedService(filterBookingService);
-      } else if (bookingType === 'room') {
-        await deleteBookedRoom(selectedBooking.id);
-        const filterBookingRoom = allBookedRoom.filter(
-          (ar) => ar.id !== selectedBooking.id
-        );
-        setAllBookedRoom(filterBookingRoom);
+  const handleCancel = (obj, type) => {
+    console.log(obj, type);
+    createNotification(
+      "warning",
+      "Confirm Deletion",
+      `Are you sure you want to delete this booking? This cannot be undone.`,
+      async () => {
+        try {
+          if (type === 'service') {
+            await deleteBookedService(obj.id);
+            const filterBookingService = allBookedService.filter(
+              (ab) => ab.id !== obj.id
+            );
+            setAllBookedService(filterBookingService);
+          } else if (type === 'room') {
+            await deleteBookedRoom(obj.id);
+            const filterBookingRoom = allBookedRoom.filter(
+              (ar) => ar.id !== obj.id
+            );
+            setAllBookedRoom(filterBookingRoom);
+          }
+        } catch (error) {
+          console.error("Failed to cancel booking:", error);
+        }
       }
-      
-      setCanceledBooking(selectedBooking);
-      setShowModal(false);
-      setSelectedBooking(null);
-      setBookingType(null);
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 3000);
-    } catch (error) {
-      console.error("Failed to cancel booking:", error);
-      // Handle the error, maybe show an error message to the user
-      setShowModal(false);
-      setSelectedBooking(null);
-      setBookingType(null);
-    }
+    );
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedBooking(null);
-    setBookingType(null);
-  };
-
-  const handleCloseSuccessMessage = () => {
-    setShowSuccessMessage(false);
-  };
-
-  removeWindowScroll(showModal);
 
   return (
     <div>
-      <SuccessMessage
-        show={showSuccessMessage}
-        booking={cancelledBooking}
-        onClose={handleCloseSuccessMessage}
-      />
 
       {allBookedService.map((book, idx) => {
         return (
@@ -106,9 +72,9 @@ const BookingComp = () => {
             initial="hidden"
             animate="visible"
             custom={idx / 3 + 1}
-            key={book.id}
+            key={book.id || idx}
             book={book}
-            onCancelClick={(book) => handleCancelClick(book, 'service')}
+            onCancelClick={(book) => handleCancel(book, 'service')}
           />
         );
       })}
@@ -119,36 +85,13 @@ const BookingComp = () => {
             initial="hidden"
             animate="visible"
             custom={idx / 3 + 1}
-            key={room.roomId}
+            key={room.id || idx}
             room={room}
-            onCancelClick={(room) => handleCancelClick(room, 'room')}
+            onCancelClick={(room) => handleCancel(room, 'room')}
           />
         )
       })}
 
-      {/* Cancel Popup with overlay and animation */}
-      <AnimatePresence initial={true}>
-        {showModal ? (
-          <div>
-            <Overlay
-              variants={overlay}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              bgColor="black"
-            />
-            <CancelModal
-              variants={popUP}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              booking={selectedBooking}
-              onConfirm={handleConfirmCancel}
-              onCancel={handleCloseModal}
-            />
-          </div>
-        ) : null}
-      </AnimatePresence>
     </div>
   );
 };

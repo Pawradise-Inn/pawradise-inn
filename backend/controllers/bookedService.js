@@ -1,5 +1,9 @@
 const prisma = require("../prisma/prisma");
 const {
+  sendErrorResponse,
+  sendSuccessResponse,
+} = require("../utils/responseHandler");
+const {
   findBookedServiceById,
   overlappingService,
   duplicatedService,
@@ -10,15 +14,20 @@ const getBookedServices = async (req, res) => {
   try {
     const bookedServices = await prisma.bookedService.findMany();
     if (bookedServices.length === 0)
-      return res
-        .status(404)
-        .json({ success: false, msg: "No Service bookings found" });
-    res.status(200).json({ success: true, data: bookedServices });
+      return sendErrorResponse(
+        res,
+        404,
+        "NO_DATA_FOUND",
+        "No service bookings found"
+      );
+    return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Service bookings loaded", bookedServices);
   } catch (err) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Unable to fetch service bookings. Please try again later" 
-    });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load service bookings. Please refresh and try again"
+    );
   }
 };
 
@@ -28,15 +37,20 @@ const getBookedService = async (req, res) => {
     const bookedServiceId = Number(req.params.id);
     const bookedService = await findBookedServiceById(bookedServiceId);
     if (!bookedService)
-      return res
-        .status(404)
-        .json({ success: false, msg: "Service booking not found" });
-    res.status(200).json({ success: true, data: bookedService });
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "Service booking not found"
+      );
+    return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Service booking details loaded", bookedService);
   } catch (err) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Unable to fetch booking details. Please try again later" 
-    });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load booking details. Please refresh and try again"
+    );
   }
 };
 
@@ -55,33 +69,52 @@ const createBookedService = async (req, res) => {
       bookingId,
       scheduled
     );
-    res.status(201).json({ success: true, data: bookedService });
+    return sendSuccessResponse(
+      res,
+      201,
+      "BOOKING_CREATED",
+      "Service booking created successfully",
+      bookedService
+    );
   } catch (err) {
     if (err.code === "PET_NOT_SUIT") {
-      return res.status(409).json({
-        success: false, 
-        message: "This service is not suitable for your pet"
-      });
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "This service is not suitable for your pet"
+      );
     }
     if (err.code === "SERVICE_FULL") {
-      return res.status(409).json({
-        success: false, 
-        message: "This service is fully booked for the selected time"
-      });
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "This service is fully booked for the selected time"
+      );
     }
     if (err.code === "SERVICE_DUPLICATE") {
-      return res.status(409).json({
-        success: false, 
-        message: "Your pet already has this service booked for this time"
-      });
+      return sendErrorResponse(
+        res,
+        409,
+        "DUPLICATE_BOOKING",
+        "Your pet already has this service booked for this time"
+      );
     }
     if (err.code === "PET_NOT_FREE") {
-      return res.status(409).json({
-        success: false, 
-        message: "Your pet has another service scheduled at this time"
-      });
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "Your pet has another service scheduled at this time"
+      );
     }
-    res.status(500).json({ success: false, message: "Unable to create booking. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_SAVE",
+      "Unable to create service booking. Please try again"
+    );
   }
 };
 
@@ -90,7 +123,12 @@ const updateBookedService = async (req, res) => {
     const bookedId = Number(req.params.id);
     const scheduled = req.body.scheduled;
     if (!scheduled)
-      return res.status(400).json({ success: false, msg: "Please select a new appointment time" });
+      return sendErrorResponse(
+        res,
+        400,
+        "MISSING_FIELDS",
+        "Please select a new appointment time"
+      );
     const updateScheduled = new Date(scheduled);
     const bookedService = await findBookedServiceById(bookedId);
     const count = await overlappingService(
@@ -98,9 +136,12 @@ const updateBookedService = async (req, res) => {
       updateScheduled
     );
     if (count >= 3) {
-      return res
-        .status(409)
-        .json({ success: false, msg: "This time slot is fully booked. Please choose another time" });
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "This time slot is fully booked. Please choose another time"
+      );
     }
     const check = await duplicatedService(
       bookedService.serviceId,
@@ -108,25 +149,37 @@ const updateBookedService = async (req, res) => {
       updateScheduled
     );
     if (check)
-      return res.status(409).json({
-        success: false,
-        msg: "Your pet had already schedule in this day",
-      });
+      return sendErrorResponse(
+        res,
+        409,
+        "DUPLICATE_BOOKING",
+        "Your pet already has a service scheduled for this day"
+      );
     const updateBookedService = await prisma.bookedService.update({
       where: { id: bookedId },
       data: { scheduled: updateScheduled },
     });
-    res.status(200).json({ success: true, data: updateBookedService });
+    return sendSuccessResponse(
+      res,
+      200,
+      "BOOKING_UPDATED",
+      "Service booking updated successfully",
+      updateBookedService
+    );
   } catch (err) {
     if (err.code === "P2025")
-      return res.status(404).json({
-        success: false,
-        msg: "Booked service is not found or already deleted",
-      });
-    res.status(500).json({ 
-      success: false, 
-      message: "Unable to update booking. Please try again later" 
-    });
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "Service booking not found or already deleted"
+      );
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_UPDATE",
+      "Unable to update booking. Please try again"
+    );
   }
 };
 
@@ -136,17 +189,27 @@ const deleteBookedService = async (req, res) => {
     const bookedService = await prisma.bookedService.delete({
       where: { id: bookedServiceId },
     });
-    res.status(200).json({ success: true, data: {} });
+    return sendSuccessResponse(
+      res,
+      200,
+      "DELETED_SUCCESSFULLY",
+      "Service booking cancelled successfully",
+      {}
+    );
   } catch (err) {
     if (err.code === "P2025")
-      return res.status(404).json({
-        success: false,
-        msg: "Booked service is not found or already deleted",
-      });
-    res.status(500).json({ 
-      success: false, 
-      message: "Unable to cancel service booking. Please try again later" 
-    });
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "Service booking not found or already deleted"
+      );
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_DELETE",
+      "Unable to cancel service booking. Please try again"
+    );
   }
 };
 
@@ -160,12 +223,12 @@ const getTodayService = async (req, res) => {
 
     const bookedServices = await prisma.bookedService.findMany({
       // just comment for a test data in postgres
-      //   where: {
-      //     scheduled: {
-      //       gte: todayStart,
-      //       lte: todayEnd
-      //     }
-      //   },
+      where: {
+        scheduled: {
+          gte: todayStart,
+          lte: todayEnd,
+        },
+      },
       include: {
         service: true,
         pet: true,
@@ -184,12 +247,14 @@ const getTodayService = async (req, res) => {
       petStatus: bs.pet?.status ?? null,
     }));
 
-    res.status(200).json({ success: true, data: formattedServices });
+    return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Today's services loaded", formattedServices);
   } catch (err) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Unable to fetch today's services. Please try again later" 
-    });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load today's services. Please refresh and try again"
+    );
   }
 };
 

@@ -1,326 +1,443 @@
-const prisma = require('../prisma/prisma');
-const {createBookedRoomWithCondition} = require('./logics/bookedRoom');
-const {createBookedServiceWithCondition} = require('./logics/bookedService');
+const prisma = require("../prisma/prisma");
+const { createBookedRoomWithCondition } = require("./logics/bookedRoom");
+const { createBookedServiceWithCondition } = require("./logics/bookedService");
+const {
+  sendErrorResponse,
+  sendSuccessResponse,
+} = require("../utils/responseHandler");
 
 const getBookings = async (req, res) => {
-    try {
-        const {customerId, status, fields} = req.query;
-        const where = {}; 
-        let select = undefined;
-        if (customerId) where.customerId = parseInt(customerId); 
-        if (status) where.status = status; 
-        if (fields) { 
-            select = {}; 
-            fields.split(',').forEach(f => { 
-                select[f.trim()] = true; 
-            }); 
-        }
-        const bookings = await prisma.booking.findMany({
-            where,
-            select
-        });
-        res.status(200).json({success: true, data: bookings});
-    } catch(err) {
-        res.status(500).json({success: false, message: "Unable to fetch bookings. Please try again later"});
+  try {
+    const { customerId, status, fields } = req.query;
+    const where = {};
+    let select = undefined;
+    if (customerId) where.customerId = parseInt(customerId);
+    if (status) where.status = status;
+    if (fields) {
+      select = {};
+      fields.split(",").forEach((f) => {
+        select[f.trim()] = true;
+      });
     }
+    const bookings = await prisma.booking.findMany({
+      where,
+      select,
+    });
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Bookings loaded",
+      bookings
+    );
+  } catch (err) {
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load bookings. Please refresh and try again"
+    );
+  }
 };
 
 const getBooking = async (req, res) => {
-    try {
-        const bookingId = Number(req.params.id);
-        const { fields } = req.query;
-        let select = undefined;
-        if (fields) { 
-            select = {}; 
-            fields.split(',').forEach(f => { 
-                select[f.trim()] = true; 
-            }); 
-        }
-        const booking = await prisma.booking.findUnique({
-            where: {
-                id: bookingId
-            },
-            select
-        });
-        if(!booking){
-            return res.status(404).json({success: false, message: 'Booking not found'});
-        }
-        res.status(200).json({success: true, data: booking});
-    } catch(err) {
-        res.status(500).json({
-            success: false, 
-            message: "Unable to fetch booking details. Please try again later"
-        });
+  try {
+    const bookingId = Number(req.params.id);
+    const { fields } = req.query;
+    let select = undefined;
+    if (fields) {
+      select = {};
+      fields.split(",").forEach((f) => {
+        select[f.trim()] = true;
+      });
     }
-}
-
-const updateBookingStatus = async (req, res) => { 
-    try {
-        const bookingId = req.params.id;
-        const status = req.body.status;
-        const allowedStatuses = ["BOOKED", "CANCELLED", "COMPLETED"];
-        if (!allowedStatuses.includes(status)) {
-            return res.status(400).json({ success: false, message: "Invalid booking status. Please select a valid status" });
-        }
-        const booking = await prisma.booking.update({
-            where: {
-                id: Number(bookingId)
-            },
-            data: {
-                status: status
-            }
-        });
-
-        if (status === "BOOKED") {
-            if (bookedRoomData?.length > 0) {
-                await Promise.all(
-                    bookedRoomData.map(room =>
-                    createBookedRoomWithCondition({
-                        roomId: room.roomId,
-                        petId: room.petId,
-                        bookingId: booking.id,
-                        checkIn: room.checkIn,
-                        checkOut: room.checkOut
-                    })
-                ));
-            }
-
-            if (bookedServiceData?.length > 0) {
-                await Promise.all(
-                    bookedServiceData.map(service =>
-                    createBookedServiceWithCondition({
-                        serviceId: service.serviceId,
-                        petId: service.petId,
-                        bookingId: booking.id,
-                        scheduled: service.scheduled
-                    })
-                ));
-            }
-        }
-        res.status(200).json({success: true, data: booking});
-    } catch(err) {
-        res.status(500).json({
-            success: false, 
-            message: "Unable to update booking status. Please try again later"
-        });
+    const booking = await prisma.booking.findUnique({
+      where: {
+        id: bookingId,
+      },
+      select,
+    });
+    if (!booking) {
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "Booking not found"
+      );
     }
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Booking details loaded",
+      booking
+    );
+  } catch (err) {
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load booking details. Please refresh and try again"
+    );
+  }
+};
+
+const updateBookingStatus = async (req, res) => {
+  try {
+    const bookingId = req.params.id;
+    const status = req.body.status;
+    const allowedStatuses = ["BOOKED", "CANCELLED", "COMPLETED"];
+    if (!allowedStatuses.includes(status)) {
+      return sendErrorResponse(
+        res,
+        400,
+        "INVALID_STATUS",
+        "Invalid booking status. Please select a valid status"
+      );
+    }
+    const booking = await prisma.booking.update({
+      where: {
+        id: Number(bookingId),
+      },
+      data: {
+        status: status,
+      },
+    });
+
+    if (status === "BOOKED") {
+      if (bookedRoomData?.length > 0) {
+        await Promise.all(
+          bookedRoomData.map((room) =>
+            createBookedRoomWithCondition({
+              roomId: room.roomId,
+              petId: room.petId,
+              bookingId: booking.id,
+              checkIn: room.checkIn,
+              checkOut: room.checkOut,
+            })
+          )
+        );
+      }
+
+      if (bookedServiceData?.length > 0) {
+        await Promise.all(
+          bookedServiceData.map((service) =>
+            createBookedServiceWithCondition({
+              serviceId: service.serviceId,
+              petId: service.petId,
+              bookingId: booking.id,
+              scheduled: service.scheduled,
+            })
+          )
+        );
+      }
+    }
+    return sendSuccessResponse(
+      res,
+      200,
+      "UPDATED_SUCCESSFULLY",
+      "Booking status updated successfully",
+      booking
+    );
+  } catch (err) {
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_UPDATE",
+      "Unable to update booking status. Please try again"
+    );
+  }
 };
 
 const createBooking = async (req, res) => {
-    try {
-        const bookingDate = req.body.date;
-        const user = await prisma.user.findUnique({
-            where: { id: req.user.id }
-        });
-        const booking = await prisma.booking.create({
-            data: {
-                customerId: req.user.roleId,
-                date: new Date(bookingDate),
-                status: 'PENDING',
-                // payment: 'PENDING',
-                customerName: user.firstname + ' ' + user.lastname,
-                customerEmail: user.email,
-                customerNumber: user.phone_number
-            }
-        });
-        res.status(201).json({success: true, data: booking});
-    } catch(err){
-        res.status(500).json({success: false, message: "Unable to create booking. Please try again later"});
-    }
+  try {
+    const bookingDate = req.body.date;
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+    });
+    const booking = await prisma.booking.create({
+      data: {
+        customerId: req.user.roleId,
+        date: new Date(bookingDate),
+        status: "PENDING",
+        // payment: 'PENDING',
+        customerName: user.firstname + " " + user.lastname,
+        customerEmail: user.email,
+        customerNumber: user.phone_number,
+      },
+    });
+    return sendSuccessResponse(
+      res,
+      201,
+      "BOOKING_CREATED",
+      "Your booking has been created successfully",
+      booking
+    );
+  } catch (err) {
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_SAVE",
+      "Unable to create your booking. Please try again"
+    );
+  }
 };
 
-const deleteBooking = async (req, res) => { 
-    try {          
-        const bookingId = req.params.id;                         
-        const booking = await prisma.booking.delete({
-            where : {id : Number(bookingId)}
-        });
-        res.status(200).json({success: true, data: {}});
-    } catch(err) {
-        if (err.code === 'P2025') {
-            return res.status(404).json({
-                success: false, 
-                message: "This booking no longer exists"
-            });
-        }
-        res.status(500).json({success: false, message: "Unable to cancel booking. Please try again later"});
+const deleteBooking = async (req, res) => {
+  try {
+    const bookingId = req.params.id;
+    const booking = await prisma.booking.delete({
+      where: { id: Number(bookingId) },
+    });
+    return sendSuccessResponse(
+      res,
+      200,
+      "DELETED_SUCCESSFULLY",
+      "Booking deleted successfully"
+    );
+  } catch (err) {
+    if (err.code === "P2025") {
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "This booking no longer exists"
+      );
     }
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_DELETE",
+      "Unable to cancel booking. Please try again"
+    );
+  }
 };
 
 const checkBookingStatus = async (req, res) => {
-    const bookingId = Number(req.query.id);
-    const booking = await prisma.booking.findUnique({
-        where: {
-            id: bookingId
-        }
-    });
+  const bookingId = Number(req.query.id);
+  const booking = await prisma.booking.findUnique({
+    where: {
+      id: bookingId,
+    },
+  });
 
-    if (!booking) {
-        return res.status(404).json({success: false, message: 'Booking not found'});
-    }
-    return res.status(200).json({success: true, data: booking});
+  if (!booking) {
+    return sendErrorResponse(
+      res,
+      404,
+      "BOOKING_NOT_FOUND",
+      "Booking not found"
+    );
+  }
+  return sendSuccessResponse(
+    res,
+    200,
+    "LOADED_SUCCESSFULLY",
+    "Booking status loaded",
+    booking
+  );
 };
 
 const getMyBookings = async (req, res) => {
   try {
     const customerId = Number(req.user.roleId);
-    console.log(customerId)
+    console.log(customerId);
 
     const bookings = await prisma.booking.findMany({
       where: { customerId },
       include: {
-        booked_room: { 
-            include: { 
-                room: true, 
-                pet: {
-                    select:{
-                        name:true,
-                        type:true
-                    }
-                }
-            } 
+        booked_room: {
+          include: {
+            room: true,
+            pet: {
+              select: {
+                name: true,
+                type: true,
+              },
+            },
+          },
         },
-        booked_service: { 
-            include: { 
-                service: {
-                    select:{
-                        name: true,
-                        picture: true
-                    }
-                }, 
-                pet: true 
-            } 
-        }
+        booked_service: {
+          include: {
+            service: {
+              select: {
+                name: true,
+                picture: true,
+              },
+            },
+            pet: true,
+          },
+        },
       },
     });
-    console.log(bookings)
+    console.log(bookings);
 
-    res.status(200).json({ success: true, data: bookings });
+    return sendSuccessResponse(
+      res,
+      200,
+      "LOADED_SUCCESSFULLY",
+      "Your bookings loaded successfully",
+      bookings
+    );
   } catch (err) {
-    res.status(500).json({ 
-        success: false, 
-        message: "Unable to fetch your bookings. Please try again later" 
-    });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_LOAD",
+      "Unable to load your bookings. Please refresh and try again"
+    );
   }
 };
 
-const cancelBooking = async(req, res) =>{
-    try {
+const cancelBooking = async (req, res) => {
+  try {
     const id = Number(req.params.id);
     const booking = await prisma.booking.findUnique({
-        where: {
-            id: id
-        }
+      where: {
+        id: id,
+      },
     });
 
     if (!booking) {
-      return res.status(404).json({ success: false, message: "Booking not found" });
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "Booking not found"
+      );
     }
 
     if (booking.status !== "BOOKED" && booking.status !== "PENDING") {
-      return res.status(409).json({
-        success: false,
-        message: "This booking cannot be cancelled"
-      });
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "This booking cannot be cancelled"
+      );
     }
 
     const updatedBooking = await prisma.booking.update({
       where: { id: id },
-      data: { status: "CANCELLED" }
+      data: { status: "CANCELLED" },
     });
 
-    res.status(200).json({ success: true, booking: updatedBooking });
+    return sendSuccessResponse(
+      res,
+      200,
+      "BOOKING_CANCELLED",
+      "Your booking has been cancelled",
+      { booking: updatedBooking }
+    );
   } catch (err) {
-    res.status(500).json({ success: false, message: "Unable to cancel booking. Please try again later" });
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_UPDATE",
+      "Unable to cancel booking. Please try again"
+    );
   }
 };
 
-
 const putBooking = async (req, res) => {
-    try {
-        const bookingId = Number(req.params.id);
-        const {
-            date,
-            status,
-            customerName,
-            customerEmail,
-            customerNumber,
-            ...otherData // Catch any other unexpected fields
-        } = req.body;
+  try {
+    const bookingId = Number(req.params.id);
+    const {
+      date,
+      status,
+      customerName,
+      customerEmail,
+      customerNumber,
+      ...otherData // Catch any other unexpected fields
+    } = req.body;
 
-        // Fetch the existing booking with its customer
-        const existingBooking = await prisma.booking.findUnique({
-            where: { id: bookingId },
-            include: { customer: true }
-        });
+    // Fetch the existing booking with its customer
+    const existingBooking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { customer: true },
+    });
 
-        if (!existingBooking) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "Booking not found" 
-            });
-        }
-
-        // Prepare the data to update the Booking model
-        const updateBookingData = {};
-        if (date) {
-            updateBookingData.date = new Date(date);
-        }
-        if (status) {
-            updateBookingData.status = status;
-        }
-        // Prepare the data to update the Customer model
-        const updateCustomerData = {};
-        if (customerName) {
-            updateCustomerData.name = customerName;
-        }
-        if (customerEmail) {
-            updateCustomerData.email = customerEmail;
-        }
-        if (customerNumber) {
-            updateCustomerData.number = customerNumber;
-        }
-
-        // Use a Prisma transaction to ensure both updates succeed or fail together
-        const [updatedBooking, updatedCustomer] = await prisma.$transaction([
-            // Update the Booking record with the new booking data
-            prisma.booking.update({
-                where: { id: bookingId },
-                data: updateBookingData,
-            }),
-            // Update the related Customer record if there's customer data to update
-            Object.keys(updateCustomerData).length > 0 ?
-                prisma.customer.update({
-                    where: { id: existingBooking.customerId },
-                    data: updateCustomerData,
-                }) :
-                prisma.customer.findUnique({ where: { id: existingBooking.customerId } }) // A no-op to keep transaction consistent
-        ]);
-
-        // Reconstruct the response object in the desired format
-        const responseData = {
-            id: updatedBooking.id,
-            date: updatedBooking.date,
-            status: updatedBooking.status,
-            customerId: updatedBooking.customerId,
-            customerName: updatedCustomer.name,
-            customerEmail: updatedCustomer.email,
-            customerNumber: updatedCustomer.number
-        };
-
-        res.status(200).json({ success: true, data: responseData });
-    } catch (err) {
-        res.status(500).json({ success: false, message: "Unable to update booking. Please try again later" });
+    if (!existingBooking) {
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "Booking not found"
+      );
     }
+
+    // Prepare the data to update the Booking model
+    const updateBookingData = {};
+    if (date) {
+      updateBookingData.date = new Date(date);
+    }
+    if (status) {
+      updateBookingData.status = status;
+    }
+    // Prepare the data to update the Customer model
+    const updateCustomerData = {};
+    if (customerName) {
+      updateCustomerData.name = customerName;
+    }
+    if (customerEmail) {
+      updateCustomerData.email = customerEmail;
+    }
+    if (customerNumber) {
+      updateCustomerData.number = customerNumber;
+    }
+
+    // Use a Prisma transaction to ensure both updates succeed or fail together
+    const [updatedBooking, updatedCustomer] = await prisma.$transaction([
+      // Update the Booking record with the new booking data
+      prisma.booking.update({
+        where: { id: bookingId },
+        data: updateBookingData,
+      }),
+      // Update the related Customer record if there's customer data to update
+      Object.keys(updateCustomerData).length > 0
+        ? prisma.customer.update({
+            where: { id: existingBooking.customerId },
+            data: updateCustomerData,
+          })
+        : prisma.customer.findUnique({
+            where: { id: existingBooking.customerId },
+          }), // A no-op to keep transaction consistent
+    ]);
+
+    // Reconstruct the response object in the desired format
+    const responseData = {
+      id: updatedBooking.id,
+      date: updatedBooking.date,
+      status: updatedBooking.status,
+      customerId: updatedBooking.customerId,
+      customerName: updatedCustomer.name,
+      customerEmail: updatedCustomer.email,
+      customerNumber: updatedCustomer.number,
+    };
+
+    return sendSuccessResponse(
+      res,
+      200,
+      "BOOKING_UPDATED",
+      "Booking updated successfully",
+      responseData
+    );
+  } catch (err) {
+    return sendErrorResponse(
+      res,
+      500,
+      "UNABLE_TO_UPDATE",
+      "Unable to update booking. Please try again"
+    );
+  }
 };
 
 module.exports = {
-    getBookings,
-    getBooking,
-    updateBookingStatus,
-    createBooking,
-    deleteBooking,
-    getMyBookings,
-    cancelBooking,
-    putBooking
+  getBookings,
+  getBooking,
+  updateBookingStatus,
+  createBooking,
+  deleteBooking,
+  getMyBookings,
+  cancelBooking,
+  putBooking,
 };

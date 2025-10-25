@@ -39,7 +39,7 @@ const DashboardTab4 = () => {
   const filtered = !search
     ? items
     : items.filter((item) =>
-        item.serviceName.toLowerCase().includes(search.toLowerCase())
+        item.serviceName?.toLowerCase().includes(search.toLowerCase())
       );
 
   // Styles (removed hoveredButton state for simplicity as delete logic is moved)
@@ -78,13 +78,13 @@ const DashboardTab4 = () => {
       {/* UPDATED: Added a loading state indicator */}
       {loading ? (
         <p style={feedbackStyle}>Loading bookings...</p>
-      ) : filtered.length === 0 ? (
+      ) :filtered.length === 0 ? (
         <p style={feedbackStyle}>No results found.</p>
       ) : (
         <div style={listContainerStyle}>
           {filtered.map((item) => (
             <DashboardCard
-              key={item.id}
+              key={item.bookingId}
               data={item}
               //onClick={() => handleEditClick(item)}
               //onStatusChange={handleStatusChange}
