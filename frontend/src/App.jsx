@@ -13,7 +13,7 @@ import BookingComp from "./components/profile/myBooking/BookingComp";
 import NewPet from "./components/profile/myPet/newPet/NewPet";
 import PetComp from "./components/profile/myPet/PetComp";
 import PetOverall from "./components/profile/myPet/petOverAll/PetOverall";
-import ProfileComp from "./components/Profile/myProfile/ProfileComp";
+import ProfileComp from "./components/profile/myProfile/ProfileComp";
 import Management from "./pages/Management";
 import Dashboard from "./pages/staff/dashboard/Dashboard";
 import DashboardTab1 from "./pages/staff/dashboard/DashboardTab1";

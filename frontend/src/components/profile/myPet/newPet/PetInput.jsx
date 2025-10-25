@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { handleFormDataChange } from "../../../../utils/handleForm";
+import { handleFormDataChange } from "../../../../utils/HandleForm";
 
 const PetInput = ({ data, setData, name, label, ...motionProps }) => {
   return (
