@@ -1,6 +1,5 @@
 import { useOutletContext } from "react-router-dom";
 import HistoryCard from "./HistoryCard";
-import { useNotification } from "../../../context/notification/NotificationProvider";
 import ReviewPopup from "../ReviewPopUp";
 import Overlay from "../../Overlay";
 import { overlay, popUP, startUpVariants } from "../../../styles/animation";
@@ -9,8 +8,7 @@ import { useState } from "react";
 import { updateChatLogAPI } from "../../../hooks/chatlogAPI";
 
 const HistoryComp = () => {
-  const { createNotification } = useNotification();
-  const { user, historys, setHistorys } = useOutletContext();
+  const { historys, setHistorys } = useOutletContext();
   const [popUpStatus, setPopUpStatus] = useState(false);
   const [popUpData, setPopUpData] = useState({});
   const [popUpEditable, setPopUpEditable] = useState(false);

@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import { NavLink } from "react-router-dom";
-import { getStatusColor, getStatusText } from "./StatusUtils";
+import { petStatusColor, getStatusText } from "./StatusUtils";
 import { startUpVariants } from "../../styles/animation";
 const PetCard = ({ pet }) => {
   return (
@@ -35,7 +35,7 @@ const PetCard = ({ pet }) => {
                   </h3>
                 </div>
                 <span
-                  className={`px-4 py-2 text-sm font-semibold rounded-full min-w-[120px] text-center inline-block whitespace-nowrap shadow-md border transition-all duration-300 hover:scale-105 ${getStatusColor(
+                  className={`px-4 py-2 text-sm font-semibold rounded-full min-w-[120px] text-center inline-block whitespace-nowrap shadow-md border transition-all duration-300 hover:scale-105 ${petStatusColor(
                     pet.status
                   )}`}
                 >

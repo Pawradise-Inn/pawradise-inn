@@ -1,4 +1,5 @@
 const prisma = require("../prisma/prisma");
+const { sendErrorResponse, sendSuccessResponse } = require("../utils/responseHandler");
 
 const getChatLogs = async (req, res) => {
   let options = {};
@@ -31,9 +32,14 @@ const getChatLogs = async (req, res) => {
       const service = await prisma.service.findFirst({
         where: { name: req.params.serviceName },
       });
+
+      if (!service) {
+        return res.status(404).json({ success: false, message: `Service '${req.params.serviceName}' not found.` });
+      }
+
       options.where = { serviceId: service.id };
     } catch (err) {
-      res.status(400).json({ success: true, error: err.message });
+      return sendErrorResponse(res, 400, "INVALID_DATA", "Invalid service name provided");
     }
   } else if (req.params.roomId) {
     options.where = { roomId: Number(req.params.roomId) };
@@ -41,6 +47,50 @@ const getChatLogs = async (req, res) => {
   if (req.query.filter) {
     let filter = JSON.parse(req.query.filter);
     options.where = { ...options.where, ...filter };
+
+    if (filter.rating) {
+      const star = filter.rating;
+      if (star === 5) {
+        options.where.rating = { gte: 5 };
+      } else {
+        options.where.rating = { gte: star, lt: star + 1 };
+      }
+    }
+
+    if (filter.search && filter.search.length > 0) {
+        options.where.OR = [
+      {
+        service: {
+          name: {
+            contains: filter.search,
+            mode: "insensitive",
+          },
+        },
+      },
+      {
+        room: {
+          name: {
+            contains: filter.search,
+            mode: "insensitive",
+          },
+        },
+      },
+    ];
+    }
+    if (filter.review_date) {
+      const date = new Date(filter.review_date);//เช่น "2025-10-21"
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      options.where.review_date = {
+        gte: startOfDay,
+        lt: endOfDay
+      };
+    }
+    delete options.where.search;
   }
 
   //Select fields
@@ -78,14 +128,19 @@ const getChatLogs = async (req, res) => {
       where: options.where,
     });
     if (total === 0) {
-      return res.status(404).json({
-        success: false,
-        msg: "No reviews found",
-      });
+      return sendErrorResponse(res, 404, "NO_REVIEWS_FOUND", "No reviews found matching your criteria");
     }
 
     options.include = {
       customer: { include: { user: { select: { user_name: true } } } },
+      service: { select: {
+         name: true,
+         picture: true,
+      } },
+      room: {select:{
+        name: true,
+        picture: true,
+      }},
     };
 
     const reviews = await prisma.chatLog.findMany(options);
@@ -94,6 +149,11 @@ const getChatLogs = async (req, res) => {
       commenter_name: r.customer?.user.user_name || "Anonymous",
       commenter_detail: r.review,
       commenter_star: r.rating,
+      serviceName: r.service?.name,
+      reviewDate: r.review_date,
+      roomName:r.room?.name,
+      roomImg: r.room?.picture ?? null,
+      serviceImg: r.service?.picture ?? null,
     }));
 
     const pagination = {};
@@ -109,19 +169,10 @@ const getChatLogs = async (req, res) => {
         limit: limit,
       };
     }
-    res
-      .status(200)
-      .json({
-        success: true,
-        pagination,
-        data: formattedReviews,
-        count: total,
-      });
+    return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Reviews loaded", formattedReviews, { pagination, count: total });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to fetch reviews. Please try again later",
-    });
+    console.error("🔥 ERROR fetching reviews:", err);
+    return sendErrorResponse(res, 500, "UNABLE_TO_LOAD", "Unable to load reviews. Please refresh and try again");
   }
 };
 
@@ -132,17 +183,13 @@ const getChatLog = async (req, res) => {
       where: { id: Number(id) },
     });
 
-    if (!chatlog)
-      return res.status(404).json({ success: false, msg: "Review not found" });
+    if (!chatlog) {
+      return sendErrorResponse(res, 404, "REVIEW_NOT_FOUND", "This review could not be found");
+    }
 
-    res.status(200).json({ success: true, data: chatlog });
+    return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Review details loaded", chatlog);
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Unable to fetch review. Please try again later",
-      });
+    return sendErrorResponse(res, 500, "UNABLE_TO_LOAD", "Unable to load review details. Please try again");
   }
 };
 
@@ -163,10 +210,7 @@ const createChatLog = async (req, res) => {
 
   try {
     if (!data.serviceId && !data.roomId) {
-      return res.status(400).json({
-        success: false,
-        message: "Please select a service or room to review",
-      });
+      return sendErrorResponse(res, 400, "MISSING_FIELDS", "Please select a service or room to review");
     }
     data.customerId = req.user.roleId;
     const existingReview = await prisma.chatLog.findFirst({
@@ -178,28 +222,58 @@ const createChatLog = async (req, res) => {
 
     if (existingReview) {
       if (data.roomId) {
-        return res.status(409).json({
-          success: false,
-          message: "You have already reviewed this room",
-        });
+        return sendErrorResponse(res, 409, "DUPLICATE_REVIEW", "You have already reviewed this room");
       } else {
-        return res.status(409).json({
-          success: false,
-          message: "You have already reviewed this service",
-        });
+        return sendErrorResponse(res, 409, "DUPLICATE_REVIEW", "You have already reviewed this service");
       }
     }
 
-    const chatlog = await prisma.chatLog.create({ data });
+    const chatlog = await prisma.chatLog.create({ 
+      data,
+      include: {
+        room: true,
+        service: true,
+        staff: {
+          include: {
+            user: true
+          }
+        }
+      }
+    });
 
-    res.status(201).json({ success: true, data: chatlog });
+    console.log(chatlog.room)
+
+    let name, image, type;
+    if (chatlog.serviceId) {
+      name = chatlog.service.name;
+      image = chatlog.service.picture;
+      type = "service";
+    } else if (chatlog.roomId) {
+      name = chatlog.roomId;
+      image = chatlog.room.picture;
+      type = "room";
+    }
+
+    chatlog.isRead = chatlog.isRead || !chatlog.staff?.user?.user_name;
+
+    const formatted = {
+      id: chatlog.id,
+      image: image,
+      name: name,
+      date: chatlog.review_date,
+      nameOfStaffReply: chatlog.staff?.user?.user_name,
+      readingStatus: chatlog.isRead,
+      type: type,
+      rating: chatlog.rating ?? null,
+      userReview: chatlog.review ?? null,
+      reply: chatlog.reply ?? null,
+      review: chatlog.review ?? null,
+    };
+
+    return sendSuccessResponse(res, 201, "REVIEW_SUBMITTED", "Thank you for your review", formatted);
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Unable to create review. Please try again later",
-      });
+    console.log(err.message);
+    return sendErrorResponse(res, 500, "SERVER_ERROR", "Unable to submit your review. Please try again");
   }
 };
 
@@ -208,11 +282,8 @@ const replyToChatLog = async (req, res) => {
     const id = req.params.id;
     const staffId = req.user.roleId;
     const reply = req.body.reply;
-    if (!reply || !staffId) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide your reply",
-      });
+    if (!staffId) {
+      return sendErrorResponse(res, 400, "MISSING_FIELDS", "Please provide your reply message");
     }
 
     const chatlog = await prisma.chatLog.update({
@@ -220,16 +291,15 @@ const replyToChatLog = async (req, res) => {
       data: {
         reply: reply,
         staffId: staffId,
+        isRead: false,
         reply_date: new Date(),
       },
     });
 
-    res.status(200).json({ success: true, data: chatlog });
+    return sendSuccessResponse(res, 200, "REPLY_POSTED", "Your reply has been posted successfully", chatlog);
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to post reply. Please try again later",
-    });
+    console.error(err)
+    return sendErrorResponse(res, 500, "SERVER_ERROR", "Unable to post your reply. Please try again");
   }
 };
 
@@ -247,10 +317,7 @@ const updateChatLog = async (req, res) => {
     const id = req.params.id;
 
     if (Object.keys(dataToUpdate).length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No changes were provided to update",
-      });
+      return sendErrorResponse(res, 400, "MISSING_FIELDS", "No changes were provided to update");
     }
 
     const chatlog = await prisma.chatLog.update({
@@ -258,12 +325,9 @@ const updateChatLog = async (req, res) => {
       data: dataToUpdate,
     });
 
-    res.status(200).json({ success: true, data: chatlog });
+    return sendSuccessResponse(res, 200, "UPDATED_SUCCESSFULLY", "Review updated successfully", chatlog);
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to update review. Please try again later",
-    });
+    return sendErrorResponse(res, 500, "SERVER_ERROR", "Unable to update review. Please try again");
   }
 };
 
@@ -274,18 +338,12 @@ const deleteChatLog = async (req, res) => {
       where: { id: Number(id) },
     });
 
-    res.status(200).json({ success: true, data: chatlog });
+    return sendSuccessResponse(res, 200, "DELETED_SUCCESSFULLY", "Review deleted successfully", chatlog);
   } catch (err) {
     if (err.code === "P2025") {
-      return res.status(404).json({
-        success: false,
-        message: "This review no longer exists",
-      });
+      return sendErrorResponse(res, 404, "REVIEW_NOT_FOUND", "This review no longer exists");
     }
-    res.status(500).json({
-      success: false,
-      message: "Unable to delete review. Please try again later",
-    });
+    return sendErrorResponse(res, 500, "SERVER_ERROR", "Unable to delete review. Please try again");
   }
 };
 
@@ -316,7 +374,7 @@ const getMyreviews = async (req, res) => {
         image = r.room.picture;
         type = "room";
       }
-      r.isRead = r.isRead || !r.staff?.user?.user_name
+      r.isRead = r.isRead || !r.staff?.user?.user_name;
 
       return {
         id: r.id,
@@ -329,13 +387,13 @@ const getMyreviews = async (req, res) => {
         rating: r.rating ?? null,
         userReview: r.review ?? null,
         reply: r.reply ?? null,
-        review: r.review ?? null
+        review: r.review ?? null,
       };
     });
 
     formatted.sort((a, b) => {
       // Prioritize unread reviews with staff replies
-    //   Sort by readingStatus: false first, then true
+      //   Sort by readingStatus: false first, then true
       if (!a.readingStatus && b.readingStatus) return -1;
       if (a.readingStatus && !b.readingStatus) return 1;
 
@@ -345,13 +403,96 @@ const getMyreviews = async (req, res) => {
       return new Date(b.date) - new Date(a.date);
     });
     // console.log(formatted);
-    res.status(200).json({ success: true, data: formatted });
+    return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Your reviews loaded", formatted);
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      err: err.message,
-      message: "Unable to get your reviews. Please try again later",
+    return sendErrorResponse(res, 500, "UNABLE_TO_LOAD", "Unable to load your reviews. Please refresh and try again");
+  }
+};
+
+const getToBeReview = async (req, res) => {
+  const customerId = req.user.roleId;
+  try {
+    const chatlog = await prisma.chatLog.findMany({
+      where: {
+        customerId: customerId,
+      },
+      select: {
+        serviceId: true,
+        roomId: true,
+      },
     });
+
+    const serviceDone = [
+      ...new Set(chatlog.map((log) => log.serviceId).filter((id) => id)),
+    ];
+    const roomDone = [
+      ...new Set(chatlog.map((log) => log.roomId).filter((id) => id)),
+    ];
+
+    const care = await prisma.care.findMany({
+      where: {
+        pet: {
+          customerId: customerId,
+        },
+        status: {
+          in: ["COMPLETED", "CHECKED_OUT"],
+        },
+      },
+      select: {
+        date: true,
+        staff: {
+          select: { user: { select: { user_name: true } } },
+        },
+        pet: { select: { name: true } },
+        bookedRoom: {
+          select: { room: { select: { id: true, name: true, picture: true } } },
+        },
+        bookedService: {
+          select: {
+            service: { select: { id: true, name: true, picture: true } },
+          },
+        },
+      },
+    });
+
+    let roomsToBeReview = new Set();
+    let servicesToBeReview = new Set();
+
+    care.forEach((c) => {
+      const roomId = c.bookedRoom?.room.id;
+
+      if (roomId && !roomDone.includes(roomId)) {
+        roomsToBeReview.add({
+          id: roomId,
+          pic: c.bookedRoom.room.picture,
+          roomName: c.bookedRoom.room.name,
+          petName: c.pet.name,
+          date: c.date,
+          staffName: c.staff.user.user_name,
+        });
+      }
+
+      const serviceId = c.bookedService?.service.id;
+      if (serviceId && !serviceDone.includes(serviceId)) {
+        servicesToBeReview.add({
+          id: serviceId,
+          pic: c.bookedService.service.picture,
+          serviceName: c.bookedService.service.name,
+          petName: c.pet.name,
+          date: c.date,
+          staffName: c.staff.user.user_name,
+        });
+      }
+    });
+
+    const waited = {
+      rooms: [...roomsToBeReview],
+      services: [...servicesToBeReview],
+    };
+
+    return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Items to review loaded", waited);
+  } catch (err) {
+    return sendErrorResponse(res, 500, "UNABLE_TO_LOAD", "Unable to load items waiting for review. Please refresh and try again");
   }
 };
 
@@ -363,4 +504,5 @@ module.exports = {
   deleteChatLog,
   updateChatLog,
   getMyreviews,
+  getToBeReview,
 };

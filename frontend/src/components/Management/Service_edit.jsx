@@ -93,11 +93,6 @@ const ServiceEdit = () => {
   const handleDeleteService = async (id) => {
     try {
       await deleteServiceAPI(id);
-      createNotification(
-        "success",
-        "Delete Successful!",
-        "The service has been deleted."
-      );
 
       setServices((prev) => prev.filter((s) => s.id !== id));
       closePopup();

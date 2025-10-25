@@ -1,8 +1,7 @@
 import { motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/AuthProvider";
-import { updateCustomerAPI } from "../../../../hooks/customerAPI";
 import { registerPetAPI } from "../../../../hooks/petAPI";
 import { startUpVariants } from "../../../../styles/animation";
 import PetInput from "./PetInput";
@@ -124,7 +123,7 @@ const NewPet = () => {
           breed: formData.petBreed,
           disease: [formData.medicalCondition],
           allergic: [formData.foodAllergy],
-          picture: pictureUrl.imageUrl, // **Use the GCS URL here**
+          picture: pictureUrl.message.details.imageUrl, // **Use the GCS URL here**
           customerId: user.customer.id,
         };
         console.log(newPet);
@@ -149,12 +148,6 @@ const NewPet = () => {
         // 5. UPDATE LOCAL AUTH CONTEXT
         setUser({ ...user, customer: updatedCustomerData });
 
-        // 7. SUCCESS & REDIRECT
-        createNotification(
-          "success",
-          "Pet has been created!",
-          "Your pet has been successfully saved."
-        );
         navigate("/profile/pet");
       }
     );

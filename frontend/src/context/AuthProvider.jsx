@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { getMeAPI } from "../hooks/authAPI";
-import { setUpInterceptors} from "../api/axiosInstance";
+import { setUpInterceptors } from "../api/axiosInstance";
 
 const AuthContext = createContext();
 
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
   }, [logout]);
 
   return (
-    <AuthContext.Provider value={{ user, setUser,logout}}>
+    <AuthContext.Provider value={{ user, setUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

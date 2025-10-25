@@ -1,5 +1,5 @@
-import testImg from "../../assets/test.png";
 import { motion } from "framer-motion";
+import { getStatusColor } from "../staff/StatusUtils";
 
 const Tooltip = ({ children, text }) => {
   return (
@@ -14,26 +14,39 @@ const Tooltip = ({ children, text }) => {
   );
 };
 
-const ReviewCard = ({ data, onClick, ...motionProps }) => {
+const ReviewCard = ({ data, onClick, type, ...motionProps }) => {
+  const getDateBlock = (dateWithTime) => {
+    const [date, time] = dateWithTime.replace(".000Z", "").split("T");
+    return (
+      <div className="inline-block">
+        <span className={`py-1 px-3 rounded-xl mr-2 ${getStatusColor("IDLE")}`}>
+          {date}
+        </span>
+        <span className={`py-1 px-3 rounded-xl mr-2 ${getStatusColor("IDLE")}`}>
+          {time}
+        </span>
+      </div>
+    );
+  };
   return (
     <motion.div
       className="flex rounded-2xl bg-[var(--cream-color)] p-4 mt-6 shadow relative"
       {...motionProps}
     >
       <img
-        src={testImg}
+        src={data.pic}
         className="w-40 h-40 object-cover object-center rounded-lg"
         alt="Service"
       />
       <div className="flex justify-between items-center w-full mx-10">
         <div className="flex flex-col gap-2 justify-center items-start">
-          {data.type === "Service" ? (
-            <b>service: {data.name}</b>
+          {type == "Service" ? (
+            <b>{data.serviceName}</b>
           ) : (
-            <b>room: {data.name}</b>
+            <b>{data.roomName}</b>
           )}
           <p>pet name: {data.petName}</p>
-          <p>finish date: {data.date}</p>
+          <div>finish date: {getDateBlock(data.date)}</div>
         </div>
         <div className="flex flex-col gap-2 justify-center items-start w-2/10">
           <Tooltip text={data.staffName}>

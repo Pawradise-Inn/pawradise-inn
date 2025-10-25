@@ -25,12 +25,6 @@ const ReviewPopup = ({ data, onClick, editable, ...motionProps }) => {
           return history;
         });
       });
-
-      createNotification(
-        "success",
-        "Review updated",
-        "Your review has been updated successfully."
-      );
     } catch (error) {
       console.error("Failed to update comment:", error);
     }
@@ -40,11 +34,6 @@ const ReviewPopup = ({ data, onClick, editable, ...motionProps }) => {
     const Id = data.id;
     deleteChatLogAPI(Id)
       .then((res) => {
-        createNotification(
-          "success",
-          "Review removed",
-          "Your review have been removed."
-        );
         setHistorys((prev) => prev.filter((history) => history.id !== Id));
       })
       .catch((error) => {
@@ -71,7 +60,7 @@ const ReviewPopup = ({ data, onClick, editable, ...motionProps }) => {
           className="bi bi-x-lg flex justify-center items-center absolute top-0 right-0 -translate-x-1/2 translate-y-1/2 text-3xl cursor-pointer transition-all duration-200 hover:scale-125"
         />
         <img
-          src={testImage}
+          src={data.image}
           alt="serviceImg"
           className="w-1/2 h-auto rounded-2xl object-center object-cover"
         />
@@ -184,11 +173,6 @@ const ReviewPopup = ({ data, onClick, editable, ...motionProps }) => {
                       "This will save your review and rating.",
                       () => {
                         onClick();
-                        createNotification(
-                          "success",
-                          "Review Submitted",
-                          "Your review has been saved successfully."
-                        );
                       }
                     )
                   }

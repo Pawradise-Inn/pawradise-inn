@@ -3,6 +3,7 @@
 // actionLabel: override button text (e.g., "EDIT")
 import { motion } from "motion/react";
 import { memo } from "react";
+import { getRoomStatusColor } from "../staff/StatusUtils";
 
 const RoomCard = ({
   data,
@@ -23,13 +24,22 @@ const RoomCard = ({
       />
 
       <div className="flex justify-between w-full pr-8">
-        <div className="flex flex-col justify-between h-full w-5/12">
+        <div className="flex flex-col justify-between h-full w-6/12">
           {/* Top info */}
           <div className="space-y-1">
             <p className="font-semibold">{`Room_${data.id
               .toString()
               .padStart(3, 0)}`}</p>
-            <p>Status : {data.status}</p>
+            <p className="flex items-center gap-2">
+              <span>Status :</span>
+              <span
+                className={`px-1.5 py-0.5  text-xs ${getRoomStatusColor(
+                  data.status
+                )} !text-[var(--cream-color)] rounded-full text-center inline-block whitespace-nowrap `}
+              >
+                {data.status}
+              </span>
+            </p>
 
             {/* Hide these in compact mode */}
             {!compact && <p>Suitable for {data.forWhich}</p>}
@@ -50,14 +60,17 @@ const RoomCard = ({
             {/* Review - hide in compact mode */}
             {!compact && (
               <p className="inline-block">
-                {data.reviewStar} / 5.0{" "}
-                <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>
+                {data.reviewStar} / 5.00{" "}
+                <i className="bi bi-star-fill !text-yellow-300 inline-flex justify-center items-center"></i>{" "}
+                <span className="-translate-y-0.5 inline-block">({data.commentPages.total})</span>
               </p>
             )}
 
             <button
               onClick={() => onClick(data, true)}
-              className= {"py-2 px-8 rounded !text-white font-bold active:scale-90 transition-transform duration-200 cursor-pointer bg-[var(--dark-brown-color)] "}
+              className={
+                "py-2 px-8 rounded !text-white font-bold active:scale-90 transition-transform duration-200 cursor-pointer bg-[var(--dark-brown-color)] "
+              }
             >
               {actionLabel || (compact ? "EDIT" : "BOOK")}
             </button>
