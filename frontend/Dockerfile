@@ -1,7 +1,5 @@
 # syntax=docker/dockerfile:1
-
-# ---------- 1. Build stage ----------
-FROM node:lts-alpine AS build
+FROM node:lts-alpine
 
 WORKDIR /usr/src/app/frontend
 
@@ -10,14 +8,6 @@ RUN npm ci
 
 COPY . .
 
-RUN npm run build
+EXPOSE 3000
 
-
-# ---------- 2. Serve stage ----------
-FROM nginx:alpine
-
-COPY --from=build /usr/src/app/frontend/dist /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "dev"]
