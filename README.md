@@ -6,12 +6,13 @@ This is the official repository for the Pawradise Inn project. Follow the steps 
 
 * **Prototype Version:** Please note that this is a **prototype** version of the application. The full website, with all services, is scheduled for release at the end of our next sprint (approximately 2 weeks).
 
-* **Security Note:** This project handles sensitive credentials and keys securely.
-    * Image uploads store files on Google Cloud Storage (GCS). Our Google Cloud `keyfile.json` is not exposed or leaked.
-    * All environment variable files (`.env`) are also properly excluded from the build process to protect all sensitive credentials. So this project provided only (`.env.test`)
+* **Security & Limitations:**
+    * **Image Uploads (Disabled):** This project is designed to use Google Cloud Storage (GCS). To prevent leaking our sensitive `keyfile.json`, this file is **not** included in the repository. As a result, all image upload functionality is **currently disabled** in this prototype.
+    * **Environment Files:** Similarly, to protect all sensitive credentials, only the `.env.test` file is provided for local testing. All other `.env` files are securely excluded from the repository.
 
 ## Prerequisites
 
+-   [Git](https://git-scm.com/downloads)
 -   [Docker](https://www.docker.com/get-started)
 -   [Docker Compose](https://docs.docker.com/compose/install/)
 
@@ -19,7 +20,16 @@ This is the official repository for the Pawradise Inn project. Follow the steps 
 
 Follow these instructions to set up and run the project locally.
 
-1.  **Start the Application**
+1.  **Clone the Repository**
+
+    First, clone this project to your local machine and navigate into the project directory:
+
+    ```bash
+    git clone [https://your-repository-url-goes-here.git](https://your-repository-url-goes-here.git)
+    cd your-project-directory-name
+    ```
+
+2.  **Start the Application**
 
     Run the following command from the root directory of the project (where the `docker-compose.yaml` file is located). This will build and start all the necessary services (like the web application and the database) in detached mode (running in the background).
 
@@ -27,13 +37,13 @@ Follow these instructions to set up and run the project locally.
     docker compose up -d
     ```
 
-2.  **Access the Website**
+3.  **Access the Website**
 
     Once the containers are running, your website is live! Open your web browser and navigate to:
 
     [**http://localhost:3000**](http://localhost:3000)
 
-3.  **Initialize the Database**
+4.  **Initialize the Database**
 
     Before registering a new user, you must load the initial database schema. Run this command in your terminal to import the SQL structure:
 
@@ -42,11 +52,11 @@ Follow these instructions to set up and run the project locally.
     ```
     *(Note: `pawradise-inn-db-1` is the container name. If your container has a different name, you can find it by running `docker compose ps`.)*
 
-4.  **Register a New User**
+5.  **Register a New User**
 
     Go back to the website at [http://localhost:3000](http://localhost:3000) and register a new user through the application's sign-up form.
 
-5.  **Apply Post-Registration SQL**
+6.  **Apply Post-Registration SQL**
 
     After successfully registering your user on the website, run the following command to apply additional SQL scripts (this may include setting user roles, adding test data, etc.):
 
@@ -54,6 +64,6 @@ Follow these instructions to set up and run the project locally.
     docker exec -i pawradise-inn-db-1 psql -U postgres -d mydb < sql_after_register.sql
     ```
 
-6.  **You're All Set!**
+7.  **You're All Set!**
 
     The application is now fully initialized. You are free to start using and testing the website.
