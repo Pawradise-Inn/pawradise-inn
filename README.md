@@ -8,7 +8,7 @@ This is the official repository for the Pawradise Inn project. Follow the steps 
 
 * **Security Note:** This project handles sensitive credentials and keys securely.
     * Image uploads store files on Google Cloud Storage (GCS). Our Google Cloud `keyfile.json` is not exposed or leaked.
-    * All environment variable files (`.env`) are also properly excluded from the build process to protect all sensitive credentials.
+    * All environment variable files (`.env`) are also properly excluded from the build process to protect all sensitive credentials. So this project provided only (`.env.test`)
 
 ## Prerequisites
 
