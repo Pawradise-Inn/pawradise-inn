@@ -25,8 +25,8 @@ Follow these instructions to set up and run the project locally.
     First, clone this project to your local machine and navigate into the project directory:
 
     ```bash
-    git clone [https://your-repository-url-goes-here.git](https://your-repository-url-goes-here.git)
-    cd your-project-directory-name
+    git clone https://github.com/Pawradise-Inn/pawradise-inn.git
+    cd pawradise-inn
     ```
 
 2.  **Start the Application**
