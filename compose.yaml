@@ -4,7 +4,7 @@ services:
       context: ./backend
     ports:
       - "5000:5000"
-    env_file: ./backend/config/***REMOVED***
+    env_file: ./backend/***REMOVED***
     depends_on:
       db:
           condition: service_healthy

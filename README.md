@@ -2,10 +2,18 @@
 
 This is the official repository for the Pawradise Inn project. Follow the steps below to get the application up and running on your local machine.
 
+## ⚠️ Project Status & Security
+
+* **Prototype Version:** Please note that this is a **prototype** version of the application. The full website, with all services, is scheduled for release at the end of our next sprint (approximately 2 weeks).
+
+* **Security Note:** This project handles sensitive credentials and keys securely.
+    * Image uploads store files on Google Cloud Storage (GCS). Our Google Cloud `keyfile.json` is not exposed or leaked.
+    * All environment variable files (`.env`) are also properly excluded from the build process to protect all sensitive credentials.
+
 ## Prerequisites
 
-- [Docker](https://www.docker.com/get-started)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+-   [Docker](https://www.docker.com/get-started)
+-   [Docker Compose](https://docs.docker.com/compose/install/)
 
 ## Getting Started
 
