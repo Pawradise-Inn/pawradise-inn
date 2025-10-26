@@ -64,6 +64,6 @@ Follow these instructions to set up and run the project locally.
     docker exec -i pawradise-inn-db-1 psql -U postgres -d mydb < sql_after_register.sql
     ```
 
-7.  **You're All Set!**
+7.  **Refresh webpage and You're All Set!**
 
     The application is now fully initialized. You are free to start using and testing the website.
