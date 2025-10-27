@@ -58,28 +58,28 @@ INSERT INTO "Customer" ("userId") VALUES
 -- Pets (0–3 each customer)
 -- ========================
 INSERT INTO "Pet" ("name","sex","age","type","status","breed","disease","allergic","picture","customerId") VALUES
-('Coco','FEMALE',3,'CAT','IDLE','Persian','{}','{}',NULL,9),
-('Rocky','MALE',2,'DOG','IDLE','Bulldog','{"Hip Dysplasia"}','{"Soy"}',NULL,9),
-('Bella','FEMALE',1,'DOG','IDLE','Poodle','{}','{}',NULL,10),
-('Oscar','MALE',3,'BIRD','IDLE','Parrot','{}','{"Feathers"}',NULL,1),
-('Daisy','FEMALE',2,'CAT','IDLE','Maine Coon','{"Asthma"}','{}',NULL,2);
+('Coco','FEMALE',3,'CAT','IDLE','Persian','{}','{}','',9),
+('Rocky','MALE',2,'DOG','IDLE','Bulldog','{"Hip Dysplasia"}','{"Soy"}','',9),
+('Bella','FEMALE',1,'DOG','IDLE','Poodle','{}','{}','',10),
+('Oscar','MALE',3,'BIRD','IDLE','Parrot','{}','{"Feathers"}','',1),
+('Daisy','FEMALE',2,'CAT','IDLE','Maine Coon','{"Asthma"}','{}','',2);
 
 -- ========================
 -- Services
 -- ========================
 INSERT INTO "Service" ("name","price","petType","picture") VALUES
-('Grooming',500.00,'{"DOG","CAT"}',NULL),
-('Vaccination',700.00,'{"DOG","CAT","RABBIT"}',NULL),
-('Training',1000.00,'{"DOG"}',NULL),
-('Checkup',400.00,'{"DOG","CAT"}',NULL);
+('Grooming',500.00,'{"DOG","CAT"}',''),
+('Vaccination',700.00,'{"DOG","CAT","RABBIT"}',''),
+('Training',1000.00,'{"DOG"}',''),
+('Checkup',400.00,'{"DOG","CAT"}','');
 
 -- ========================
 -- Rooms
 -- ========================
 INSERT INTO "Room" ("capacity","price","picture","petType","name","number") VALUES
-(1,2000.00,NULL,'DOG','Room_1',1),
-(2,3000.00,NULL,'CAT','Room_2',2),
-(1,2500.00,NULL,'RABBIT','Room_3',3);
+(1,2000.00,'','DOG','Room_1',1),
+(2,3000.00,'','CAT','Room_2',2),
+(1,2500.00,'','RABBIT','Room_3',3);
 
 -- ========================
 -- StaffOnService
