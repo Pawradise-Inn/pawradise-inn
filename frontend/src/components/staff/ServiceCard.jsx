@@ -1,3 +1,5 @@
+import testImage from "../../assets/test.png";
+
 const ServiceCard = ({ service}) => {
   console.log(service)
   return (
@@ -6,7 +8,7 @@ const ServiceCard = ({ service}) => {
       <div className="flex items-center space-x-4">
         <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
           <img
-            src={service.picture}
+            src={service.picture || testImage}
             alt={service.staff_name}
             className="w-full h-full object-cover"
           />

@@ -25,11 +25,15 @@ Follow these instructions to set up and run the project locally.
     First, clone this project to your local machine and navigate into the project directory:
 
     ```bash
-    git clone https://github.com/Pawradise-Inn/pawradise-inn.git
+    git clone [https://github.com/Pawradise-Inn/pawradise-inn.git](https://github.com/Pawradise-Inn/pawradise-inn.git)
     cd pawradise-inn
     ```
 
-2.  **Start the Application**
+2.  **Start Docker Desktop**
+
+    Open the Docker Desktop application on your computer and wait for it to fully start. You'll know it's running when its icon (in your taskbar or menu bar) indicates that the Docker engine is running. This is required to manage your containers.
+
+3.  **Start the Application**
 
     Run the following command from the root directory of the project (where the `docker-compose.yaml` file is located). This will build and start all the necessary services (like the web application and the database) in detached mode (running in the background).
 
@@ -37,13 +41,13 @@ Follow these instructions to set up and run the project locally.
     docker compose up -d
     ```
 
-3.  **Access the Website**
+4.  **Access the Website**
 
     Once the containers are running, your website is live! Open your web browser and navigate to:
 
     [**http://localhost:3000**](http://localhost:3000)
 
-4.  **Initialize the Database**
+5.  **Initialize the Database**
 
     Before registering a new user, you must load the initial database schema. Run this command in your terminal to import the SQL structure:
 
@@ -52,11 +56,11 @@ Follow these instructions to set up and run the project locally.
     ```
     *(Note: `pawradise-inn-db-1` is the container name. If your container has a different name, you can find it by running `docker compose ps`.)*
 
-5.  **Register a New User**
+6.  **Register a New User**
 
     Go back to the website at [http://localhost:3000](http://localhost:3000) and register a new user through the application's sign-up form.
 
-6.  **Apply Post-Registration SQL**
+7.  **Apply Post-Registration SQL**
 
     After successfully registering your user on the website, run the following command to apply additional SQL scripts (this may include setting user roles, adding test data, etc.):
 
@@ -64,6 +68,6 @@ Follow these instructions to set up and run the project locally.
     docker exec -i pawradise-inn-db-1 psql -U postgres -d mydb < sql_after_register.sql
     ```
 
-7.  **You're All Set!**
+8.  **Refresh webpage and You're All Set!**
 
-    The application is now fully initialized. You are free to start using and testing the website.
+    Refresh your browser tab at `localhost:3000`. The application is now fully initialized. You are free to start using and testing the website.
