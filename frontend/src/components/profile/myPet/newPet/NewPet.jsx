@@ -9,6 +9,7 @@ import RadioInput from "./RadioInput";
 import { useNotification } from "../../../../context/notification/NotificationProvider";
 import { uploadImageAPI } from "../../../../hooks/imageAPI";
 import DropDownList from "../../../DropDownList";
+import testImage from "../../../../assets/test.png";
 
 const NewPet = () => {
   const { user, setUser } = useAuth();
@@ -184,7 +185,7 @@ const NewPet = () => {
             onClick={handleImageClick}
           >
             <img
-              src={petImagePreview || "default-placeholder-url"}
+              src={petImagePreview || testImage}
               className="w-full h-full rounded-full object-cover"
             />
           </div>

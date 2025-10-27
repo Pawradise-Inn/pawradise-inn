@@ -4,6 +4,7 @@
 // onClick: function to handle click event on the card to show popup
 import { motion } from "motion/react";
 import { memo } from "react";
+import testImage from "../../assets/test.png";
 
 const ServiceCard = ({ data, onClick, ...motionProps }) => {
   return (
@@ -13,7 +14,7 @@ const ServiceCard = ({ data, onClick, ...motionProps }) => {
       {...motionProps}
     >
       <img
-        src={data.image}
+        src={data.image || testImage}
         alt={data.name}
         className="object-cover h-56 rounded-2xl mx-auto my-2"
       />

@@ -72,8 +72,8 @@ VALUES
 
 -- Pets for new customer
 INSERT INTO "Pet" ("name","sex","age","type","status","breed","disease","allergic","picture","customerId") VALUES
-('Buddy','MALE',3,'DOG','IDLE','Beagle','{"Arthritis"}','{"Pollen"}','buddy.jpg',11),
-('Mittens','FEMALE',2,'CAT','IDLE','Siamese','{"Feline Flu"}','{"Dust"}','mittens.jpg',11),
-('Charlie','MALE',4,'DOG','IDLE','Labrador','{}','{"Peanuts"}','charlie.jpg',11),
-('Lola','FEMALE',1,'RABBIT','IDLE','Netherland Dwarf','{"Digestive"}','{}','lola.jpg',11),
-('Max','MALE',5,'DOG','IDLE','Golden Retriever','{"Skin Infection"}','{"Wheat"}','max.jpg',11)
+('Buddy','MALE',3,'DOG','IDLE','Beagle','{"Arthritis"}','{"Pollen"}',NULL,11),
+('Mittens','FEMALE',2,'CAT','IDLE','Siamese','{"Feline Flu"}','{"Dust"}',NULL,11),
+('Charlie','MALE',4,'DOG','IDLE','Labrador','{}','{"Peanuts"}',NULL,11),
+('Lola','FEMALE',1,'RABBIT','IDLE','Netherland Dwarf','{"Digestive"}','{}',NULL,11),
+('Max','MALE',5,'DOG','IDLE','Golden Retriever','{"Skin Infection"}','{"Wheat"}',NULL,11)
