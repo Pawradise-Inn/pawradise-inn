@@ -28,6 +28,7 @@ import Review from "./pages/customer/Review";
 import ReviewComp from "./components/review/ReviewComp";
 import HistoryComp from "./components/review/history/HistoryComp";
 import StaffPayment from "./pages/staff/PaymentComp";
+import Cart from "./pages/customer/Cart";
 
 const App = () => {
   const location = useLocation();
@@ -105,6 +106,15 @@ const App = () => {
           <Route index element={<ReviewComp />} />
           <Route path="history" element={<HistoryComp />} />
         </Route>
+
+        <Route 
+          path="/cart"
+          element={
+            <RequireAuth roles={["CUSTOMER"]}>
+              <Cart />
+            </RequireAuth>
+          }
+        />
 
         <Route path="/" element={<Navigate to="/login" replace />} />
         {/* <Route path="/staff" element={<Navigate to="/staff/login" replace />} /> */}
