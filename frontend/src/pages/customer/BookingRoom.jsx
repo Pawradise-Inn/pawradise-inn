@@ -9,8 +9,8 @@ import {
   fetchAvailableRoomsAPI,
 } from "../../hooks/roomAPI";
 import { overlay, popUP, startUpVariants } from "../../styles/animation";
-import { removeWindowScroll } from "../../utils/handlePopup";
-import { getDateValidation } from "../../utils/handleValidation";
+import { removeWindowScroll } from "../../utils/HandlePopup";
+import { getDateValidation } from "../../utils/HandleValidation";
 import DropDownList from "../../components/DropDownList";
 import "react-datepicker/dist/react-datepicker.css";
 import DateDropDown from "../../components/DateDropDown";

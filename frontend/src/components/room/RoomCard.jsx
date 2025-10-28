@@ -4,6 +4,7 @@
 import { motion } from "motion/react";
 import { memo } from "react";
 import { getRoomStatusColor } from "../staff/StatusUtils";
+import testImage from "../../assets/test.png";
 
 const RoomCard = ({
   data,
@@ -18,7 +19,7 @@ const RoomCard = ({
       {...motionProps}
     >
       <img
-        src={data.image}
+        src={data.image || testImage}
         alt={`Room ${data.id}`}
         className="object-center rounded-2xl w-[180px] h-[180px]"
       />

@@ -3,6 +3,7 @@ import { deleteChatLogAPI, updateChatLogAPI } from "../../hooks/chatlogAPI";
 import { getChatLogByIdAPI } from "../../hooks/chatlogAPI";
 import { replyToChatLogAPI } from "../../hooks/chatlogAPI";
 import { useAuth } from "../../context/AuthProvider";
+import testImage from "../../assets/test.png";
 
 const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) => {
 
@@ -106,7 +107,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
     >
         <div className="flex gap-6 justify-start">
           {/* thumbnail */}
-          <img src={review?.serviceImg || review?.roomImg} className="object-center rounded-2xl w-[180px] h-[180px]"/>
+          <img src={review?.serviceImg || review?.roomImg || testImage} className="object-center rounded-2xl w-[180px] h-[180px]"/>
     
 
           {/* left info */}

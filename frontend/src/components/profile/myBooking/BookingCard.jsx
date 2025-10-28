@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { getStatusColor } from "../../../components/staff/StatusUtils";
+import testImage from "../../../assets/test.png";
 export const BookingServiceCard = ({ book, onCancelClick, ...motionProps }) => {
   return (
     <motion.div
@@ -7,7 +8,7 @@ export const BookingServiceCard = ({ book, onCancelClick, ...motionProps }) => {
       {...motionProps}
     >
       <img
-        src={book.service.picture}
+        src={book.service.picture || testImage}
         alt={book.pet.name || ""}
         className="w-50 h-50 rounded object-cover shadow mr-10"
       />
@@ -54,7 +55,7 @@ export const BookingRoomCard = ({room, onCancelClick, ...motionProps}) => {
       {...motionProps}
     >
       <img
-        src={room.room.picture}
+        src={room.room.picture || testImage}
         alt={room.roomId || ""}
         className="w-50 h-50 rounded object-cover shadow mr-10"
       />

@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import testImage from "../../assets/test.png";
 
 const CancelModal = ({ booking, onConfirm, onCancel, ...motionProps }) => {
   return (
@@ -49,7 +50,7 @@ const CancelModal = ({ booking, onConfirm, onCancel, ...motionProps }) => {
               <div className="bg-[var(--cream-color)] rounded-lg p-4 space-y-2">
                 <div className="flex items-center">
                   <img
-                    src={booking.img}
+                    src={booking.img || testImage}
                     alt={booking.pet_name}
                     className="w-16 h-16 rounded-lg object-cover mr-4"
                   />
