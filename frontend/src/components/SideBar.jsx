@@ -58,6 +58,7 @@ const SideBar = ({ link, currentPage, setCurrentPage, showLogout}) => {
                     initial="hidden"
                     animate="found"
                     className="!text-[var(--cream-color)] z-10"
+                    data-testid="navigatorSidebar"
                   >
                     {data.text}
                   </motion.span>

@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "playwright test --reporter=html && playwright show-report"
+    "test": "npx playwright test --ui"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.12",
