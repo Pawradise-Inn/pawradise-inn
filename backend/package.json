@@ -1,5 +1,5 @@
 {
-  "name": "pawradise-inn",
+  "name": "package.json",
   "version": "1.0.0",
   "description": "SE Project",
   "main": "server.js",
@@ -8,7 +8,8 @@
     "db:push:local": "dotenv -e config/config.env.local -- npx prisma db push",
     "db:push:cloud": "dotenv -e config/config.env -- npx prisma db push",
     "dev": "dotenv -e config/config.env.local nodemon server.js",
-    "dev:cloud": "dotenv -e config/config.env nodemon server.js"
+    "dev:cloud": "dotenv -e config/config.env nodemon server.js",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,10 @@
   "devDependencies": {
     "dotenv-cli": "^10.0.0",
     "nodemon": "^3.1.10",
-    "prisma": "^6.16.1"
-  }
+    "prisma": "^6.17.1"
+  },
+  "bugs": {
+    "url": "https://github.com/Pawradise-Inn/pawradise-inn/issues"
+  },
+  "homepage": "https://github.com/Pawradise-Inn/pawradise-inn#readme"
 }
