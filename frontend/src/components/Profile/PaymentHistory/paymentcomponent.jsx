@@ -39,7 +39,7 @@ const PaymentHistoryCard = ({ items, status, totalPrice }) => {
   const statusDotColor = getStatusDotColor(status);
     
 return (
-      <div className="w-full bg-[var(--cream-color)] rounded-xl p-5 mb-6 border-[1.7px] border-[var(--brown-color)] flex flex-col">
+      <div className="w-full bg-[var(--cream-color)] rounded-xl p-5 mb-6 border-[1.7px] border-[var(--brown-color)] flex flex-col" data-testid={status === "Paid" ? "paymentBlock-success" : "paymentBlock-fail"}>
       {/* Card Header: Payment Status */}
       <div className="flex justify-end mb-4">
         <div 

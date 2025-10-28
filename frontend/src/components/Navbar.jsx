@@ -56,6 +56,7 @@ const Navbar = ({
                 layoutId={element}
                 style={{ backgroundColor: activeColor }}
                 className="block w-full h-full absolute top-0 left-0 rounded-sm -z-10"
+                data-testid="navigatorNavbar"
               />
             ) : null}
             {/* NavLink text */}
