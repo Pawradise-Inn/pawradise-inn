@@ -1,4 +1,6 @@
 import { motion } from "motion/react";
+import testImage from "../../assets/test.png";
+
 const PetCard = ({ pet }) => {
   console.log(pet)
   return (
@@ -9,7 +11,7 @@ const PetCard = ({ pet }) => {
       <div className="flex items-start space-x-6">
         <div className="w-64 h-64 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
           <img
-            src={pet.picture}
+            src={pet.picture || testImage}
             alt={pet.name}
             className="w-full h-full object-cover"
           />

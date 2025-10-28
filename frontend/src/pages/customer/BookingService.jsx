@@ -5,8 +5,8 @@ import Overlay from "../../components/Overlay";
 import ServiceCard from "../../components/service/ServiceCard";
 import { fetchAllServiceWithPaginationAPI } from "../../hooks/serviceAPI";
 import { overlay, popUP, startUpVariants } from "../../styles/animation";
-import { removeWindowScroll } from "../../utils/handlePopup";
-import { filteredObjectByType } from "../../utils/handleSearch";
+import { removeWindowScroll } from "../../utils/HandlePopup";
+import { filteredObjectByType } from "../../utils/HandleSearch";
 
 const BookingService = () => {
   const [mounted, setMounted] = useState(false);

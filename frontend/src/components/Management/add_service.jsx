@@ -3,6 +3,7 @@ import DropDownList from "../DropDownList";
 import { motion } from "motion/react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { fetchPetTypesAPI } from "../../hooks/petAPI";
+import testImage from "../../assets/test.png";
 
 const AddServicePopup = ({
   title = "Add service",
@@ -137,7 +138,7 @@ const AddServicePopup = ({
             <div className="w-40 h-40 flex items-center justify-center border-2 border-dashed rounded-md bg-gray-200 relative">
               {image ? (
                 <img
-                  src={image}
+                  src={image || testImage}
                   alt="preview"
                   className="w-full h-full object-cover rounded-md"
                 />

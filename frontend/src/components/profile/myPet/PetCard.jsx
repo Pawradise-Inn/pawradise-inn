@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { NavLink } from "react-router-dom";
 import {petStatusColor} from "../../staff/StatusUtils";
+import testImage from "../../../assets/test.png";
 
 const PetCard = ({ pet, ...motionProps }) => {
   return (
@@ -9,7 +10,7 @@ const PetCard = ({ pet, ...motionProps }) => {
         <div className="bg-[var(--cream-color)] rounded p-4 shadow-lg flex flex-col space-y-4 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
           <div className="w-full h-full bg-gray-200 rounded mb-4 flex items-center justify-center overflow-hidden">
             <img
-              src={pet.picture}
+              src={pet.picture || testImage}
               alt="pet"
               className="w-full h-64 object-cover"
             />

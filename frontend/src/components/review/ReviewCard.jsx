@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { getStatusColor } from "../staff/StatusUtils";
+import testImage from "../../assets/test.png";
 
 const Tooltip = ({ children, text }) => {
   return (
@@ -34,7 +35,7 @@ const ReviewCard = ({ data, onClick, type, ...motionProps }) => {
       {...motionProps}
     >
       <img
-        src={data.pic}
+        src={data.pic || testImage}
         className="w-40 h-40 object-cover object-center rounded-lg"
         alt="Service"
       />
