@@ -40,6 +40,7 @@ const chatlog = require("./routes/chatlog");
 const customer = require("./routes/customer");
 const care = require("./routes/cares");
 const picture = require("./routes/picture");
+const cart = require("./routes/cart");
 
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/booking", booking);
@@ -53,6 +54,7 @@ app.use("/api/v1/chatlog", chatlog);
 app.use("/api/v1/customer", customer);
 app.use("/api/v1/cares", care);
 app.use("/api/v1/image", picture);
+app.use("/api/v1/cart", cart);
 
 const PORT = process.env.PORT || 5000;
 
