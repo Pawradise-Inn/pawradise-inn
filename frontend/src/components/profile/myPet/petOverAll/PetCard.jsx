@@ -1,10 +1,12 @@
+import testImage from "../../../../assets/test.png";
+
 const PetCard = ({ pet }) => {
   return (
     <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
       <div className="flex items-start space-x-6">
         <div className="w-64 h-64 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
           <img
-            src={pet.picture}
+            src={pet.picture || testImage}
             alt={pet.name}
             className="w-full h-full object-cover"
           />

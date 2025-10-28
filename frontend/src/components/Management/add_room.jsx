@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import DropDownList from "../DropDownList";
-import {motion} from "motion/react"
+import {motion} from "motion/react";
+import testImage from "../../assets/test.png";
 
 const AddRoomPopup = ({
   title = "Add room",
@@ -245,7 +246,7 @@ const AddRoomPopup = ({
               <div className="w-40 h-40 flex items-center justify-center border-2 border-dashed rounded-md bg-gray-100 relative overflow-hidden">
                 {image ? (
                   <img
-                    src={image}
+                    src={image || testImage}
                     alt="preview"
                     className="w-full h-full object-cover rounded-md"
                   />

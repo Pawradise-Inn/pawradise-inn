@@ -5,8 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma/client"
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma/client"
+  binaryTargets = ["native", "linux-musl"]
 }
 
 datasource db {
@@ -51,6 +52,7 @@ model Customer {
   pets     Pet[]
   bookings Booking[]
   payments Payment[]
+  Cart     Cart[]
 }
 
 model ChatLog {
@@ -85,11 +87,13 @@ model Pet {
   allergic String[]  @db.VarChar(30)
   picture  String    @default("https://storage.googleapis.com/paw_image/unnamed.jpg")
 
-  scheduled  BookedService[]
-  stayed     BookedRoom[]
-  customerId Int
-  customer   Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  cares      Care[]
+  scheduled   BookedService[]
+  stayed      BookedRoom[]
+  customerId  Int
+  customer    Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  cares       Care[]
+  CartRoom    CartRoom[]
+  CartService CartService[]
 }
 
 model Room {
@@ -104,12 +108,14 @@ model Room {
   bookings     BookedRoom[]
   staffOnRooms RoomStaff[]
   ChatLog      ChatLog[]
+  CartRoom     CartRoom[]
 }
 
 model BookedRoom {
-  id       Int      @id @default(autoincrement())
-  checkIn  DateTime @db.Timestamp(0)
-  checkOut DateTime @db.Timestamp(0)
+  id       Int              @id @default(autoincrement())
+  checkIn  DateTime         @db.Timestamp(0)
+  checkOut DateTime         @db.Timestamp(0)
+  status   BookedRoomStatus @default(RESERVED)
 
   roomId    Int
   room      Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
@@ -130,11 +136,13 @@ model Service {
   reviews         ChatLog[]
   staffOnServices StaffOnService[]
   bookedServices  BookedService[]
+  CartService     CartService[]
 }
 
 model BookedService {
-  id        Int      @id @default(autoincrement())
-  scheduled DateTime @db.Timestamp(0)
+  id        Int                 @id @default(autoincrement())
+  scheduled DateTime            @db.Timestamp(0)
+  status    BookedServiceStatus @default(RESERVED)
 
   serviceId  Int
   service    Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
@@ -148,7 +156,7 @@ model BookedService {
 model Booking {
   id     Int           @id @default(autoincrement())
   date   DateTime      @db.Timestamp(0)
-  status BookingStatus @default(PENDING)
+  status BookingStatus @default(BOOKED)
 
   booked_service BookedService[]
   booked_room    BookedRoom[]
@@ -159,6 +167,44 @@ model Booking {
   customerName   String   @db.VarChar(60)
   customerEmail  String   @db.VarChar(50)
   customerNumber String   @db.Char(10)
+}
+
+model Cart {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  cartRooms    CartRoom[]
+  cartServices CartService[]
+}
+
+model CartRoom {
+  id     Int  @id @default(autoincrement())
+  cartId Int
+  cart   Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  roomId Int
+  room   Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  petId Int
+  pet   Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  checkIn  DateTime
+  checkOut DateTime
+}
+
+model CartService {
+  id     Int  @id @default(autoincrement())
+  cartId Int
+  cart   Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  serviceId Int
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  petId Int
+  pet   Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  scheduled DateTime
 }
 
 model Payment {
@@ -243,9 +289,22 @@ enum PaymentStatus {
 }
 
 enum BookingStatus {
-  PENDING
   BOOKED
+  CANCELLED
+}
+
+enum BookedRoomStatus {
+  RESERVED
+  QUEUE
+  IN_PROGRESS
   COMPLETED
+  CANCELLED
+}
+
+enum BookedServiceStatus {
+  RESERVED
+  CHECKED_IN
+  CHECKED_OUT
   CANCELLED
 }
 

@@ -1,3 +1,5 @@
+import testImage from "../../../../assets/test.png";
+
 const BookingCard = ({ room, getRoomStatusColor, pet, checkIn, checkOut }) => {
   console.log(room)
   const formatDate = (dateString) => {
@@ -24,7 +26,7 @@ const BookingCard = ({ room, getRoomStatusColor, pet, checkIn, checkOut }) => {
       <div className="flex items-start space-x-6">
         <div className="w-64 h-64 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
           <img
-            src={room.img}
+            src={room.img || testImage}
             alt="Room"
             className="w-full h-full object-cover"
           />

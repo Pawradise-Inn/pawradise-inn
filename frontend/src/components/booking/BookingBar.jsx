@@ -10,7 +10,7 @@ import {
   fetchServiceReviewsAPI,
   getServiceStatusAPI,
 } from "../../hooks/serviceAPI";
-import { getDateValidation } from "../../utils/handleValidation";
+import { getDateValidation } from "../../utils/HandleValidation";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import CommentCard from "./CommentCard";
 import CommentStarSelector from "./CommentStarSelector";

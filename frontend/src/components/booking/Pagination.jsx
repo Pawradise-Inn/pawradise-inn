@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 // onClick: function to handle page change, takes the new page number as argument
 
 import { memo } from "react";
-import { getArrayWithRangeWithMid } from "../../utils/handleArray";
+import { getArrayWithRangeWithMid } from "../../utils/HandleArray";
 
 const Pagination = ({
   id,

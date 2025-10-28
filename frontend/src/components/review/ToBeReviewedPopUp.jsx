@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { createChatLogAPI } from "../../hooks/chatlogAPI";
 import { useOutletContext } from "react-router-dom";
+import testImage from "../../assets/test.png";
 
 const ToBeReviewedPopUp = ({
   data,
@@ -79,7 +80,7 @@ const ToBeReviewedPopUp = ({
           className="bi bi-x-lg flex justify-center items-center absolute top-0 right-0 -translate-x-1/2 translate-y-1/2 text-3xl cursor-pointer transition-all duration-200 hover:scale-125"
         />
         <img
-          src={data.pic}
+          src={data.pic || testImage}
           alt="serviceImg"
           className="w-1/2 h-auto rounded-2xl object-center object-cover"
         />

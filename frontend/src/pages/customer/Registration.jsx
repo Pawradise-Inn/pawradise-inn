@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import registerImg from "../../assets/register.png";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { registerAPI } from "../../hooks/authAPI";
-import { validateFormPassword, validateFormTel } from "../../utils/handleForm";
+import { validateFormPassword, validateFormTel } from "../../utils/HandleForm";
 import { useAuth } from "../../context/AuthProvider";
 import { startUpVariants } from "../../styles/animation";
 import { useScrollUpArrow } from "../../context/ScrollUpArrowProvider";

@@ -13,7 +13,7 @@ import BookingComp from "./components/profile/myBooking/BookingComp";
 import NewPet from "./components/profile/myPet/newPet/NewPet";
 import PetComp from "./components/profile/myPet/PetComp";
 import PetOverall from "./components/profile/myPet/petOverAll/PetOverall";
-import ProfileComp from "./components/Profile/myProfile/ProfileComp";
+import ProfileComp from "./components/profile/myProfile/ProfileComp";
 import Management from "./pages/Management";
 import Dashboard from "./pages/staff/dashboard/Dashboard";
 import DashboardTab1 from "./pages/staff/dashboard/DashboardTab1";
@@ -27,6 +27,7 @@ import RequireAuth from "./utils/RequireAuth";
 import Review from "./pages/customer/Review";
 import ReviewComp from "./components/review/ReviewComp";
 import HistoryComp from "./components/review/history/HistoryComp";
+import StaffPayment from "./pages/staff/PaymentComp";
 
 const App = () => {
   const location = useLocation();
@@ -157,7 +158,7 @@ const App = () => {
         >
           <Route index element={<ServiceEdit />} />
           <Route path="profile" element={<ProfileComp />} />
-          <Route path="payment" element={<div>Manage Payment Page</div>} />
+          <Route path="payment" element={<StaffPayment />} />
           <Route path="room" element={<RoomEdit />} />
         </Route>
       </Routes>

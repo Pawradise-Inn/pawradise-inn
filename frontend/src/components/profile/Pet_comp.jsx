@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, useOutletContext } from "react-router-dom";
+import testImage from "../../assets/test.png";
 
 const Pet_card = ({ pet }) => {
   return (
@@ -8,7 +9,7 @@ const Pet_card = ({ pet }) => {
         <div className="bg-[var(--cream-color)] rounded p-4 shadow-lg flex flex-col space-y-4 hover:shadow-xl hover:scale-110 transition-all duration-300 cursor-pointer">
           <div className="w-full h-full bg-gray-200 rounded mb-4 flex items-center justify-center overflow-hidden">
             <img
-              src={pet.picture}
+              src={pet.picture || testImage}
               alt="pet"
               className="w-full h-64 object-cover"
             />

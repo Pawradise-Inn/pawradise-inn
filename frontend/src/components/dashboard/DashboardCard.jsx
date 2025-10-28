@@ -1,3 +1,5 @@
+import testImage from "../../assets/test.png";
+
 const DashboardCard = ({ data, onClick}) => {
 
   const getStatusColor = (status) => {
@@ -52,7 +54,7 @@ const DashboardCard = ({ data, onClick}) => {
   };
   return (
     <div style={cardStyle} onClick={onClick}>
-      <img src={data.serviceImage ||data.roomImage} className="object-center rounded-2xl w-[140px] h-[140px]"></img>
+      <img src={data.serviceImage ||data.roomImage || testImage} className="object-center rounded-2xl w-[140px] h-[140px]"></img>
       <div style={textContainerStyle}>
         <p style={nameStyle}>{data.serviceName || data.roomName}</p>
         <p style={detailStyle}>{data.petName}</p>
