@@ -28,7 +28,6 @@ const PaymentCard = () => {
           <b>[Username]</b>
           <div>list of service and room with date and time</div>
           <div>list of service and room with date and time</div>
-          <div>list of service and room with date and time</div>
         </div>
       </div>
 
