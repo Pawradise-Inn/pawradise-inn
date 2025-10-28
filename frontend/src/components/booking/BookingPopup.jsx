@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import BookingBar from "./BookingBar";
+import testImage from "../../assets/test.png";
 
 // data: data to be shown in popup
 // onClick: function to close popup
@@ -12,7 +13,7 @@ const BookingPopup = ({ status, data, onClick, ...motionProps }) => {
     >
       <div className="relative p-10 flex gap-4 w-8/10 max-w-7xl bg-white mx-auto my-10 rounded-3xl">
         <img
-          src={data.image}
+          src={data.image || testImage}
           alt="serviceImg"
           className="w-1/2 h-[580px] rounded-2xl object-center"
         />

@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { NavLink } from "react-router-dom";
 import { petStatusColor, getStatusText } from "./StatusUtils";
 import { startUpVariants } from "../../styles/animation";
+import testImage from "../../assets/test.png";
 const PetCard = ({ pet }) => {
   return (
     <AnimatePresence mode="popLayout">
@@ -22,7 +23,7 @@ const PetCard = ({ pet }) => {
             <div className="relative z-10">
               <div className="w-full h-72 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl mb-6 flex items-center justify-center overflow-hidden shadow-inner ring-1 ring-white/50">
                 <img
-                  src={pet.picture}
+                  src={pet.picture || testImage}
                   alt="pet"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
