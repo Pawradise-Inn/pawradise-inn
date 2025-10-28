@@ -127,3 +127,6 @@ Icon?
 /generated/prisma
 prisma/schema.prisma
 .gitignore
+
+/generated/prisma
+prisma.config.ts
