@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import { logoutAPI } from "../hooks/authAPI";
 
-const SideBar = ({ link, currentPage, setCurrentPage, showLogout }) => {
+const SideBar = ({ link, currentPage, setCurrentPage, showLogout}) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -67,7 +67,6 @@ const SideBar = ({ link, currentPage, setCurrentPage, showLogout }) => {
           </motion.div>
         );
       })}
-
       {/* Logout Button */}
       {showLogout && (
         <motion.div className="relative px-4 py-4 rounded">
@@ -80,7 +79,9 @@ const SideBar = ({ link, currentPage, setCurrentPage, showLogout }) => {
           </NavLink>
         </motion.div>
       )}
+
     </motion.aside>
+    
   );
 };
 

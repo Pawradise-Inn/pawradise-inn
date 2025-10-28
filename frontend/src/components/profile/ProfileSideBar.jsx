@@ -9,6 +9,7 @@ const ProfileSideBar = () => {
     { text: "My Profile", to: "/profile", path: "me" },
     { text: "My Booking", to: "/profile/booking", path: "booking" },
     { text: "My Pet", to: "/profile/pet", path: "pet" },
+    { text: "Payment History", to: "/profile/paymentHistory", path: "paymenthistory"}
   ];
   const [currentPage, setCurrentPage] = useState(pathList[2] || "me");
 

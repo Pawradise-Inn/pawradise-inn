@@ -29,7 +29,7 @@ import ReviewComp from "./components/review/ReviewComp";
 import HistoryComp from "./components/review/history/HistoryComp";
 import StaffPayment from "./pages/staff/PaymentComp";
 import Cart from "./pages/customer/Cart";
-
+import PaymentHistory from "./components/Profile/PaymentHistory/paymenthistory";
 const App = () => {
   const location = useLocation();
 
@@ -100,6 +100,7 @@ const App = () => {
           <Route path="pet" element={<PetComp />} />
           <Route path="pet/:id" element={<PetOverall />} />
           <Route path="pet/new" element={<NewPet />} />
+          <Route path="paymentHistory" element={<PaymentHistory/>}/>
         </Route>
 
         <Route path="/review" element={<Review />}>
