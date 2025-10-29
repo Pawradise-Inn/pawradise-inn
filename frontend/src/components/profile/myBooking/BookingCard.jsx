@@ -1,7 +1,10 @@
 import { motion } from "motion/react";
 import { getStatusColor } from "../../../components/staff/StatusUtils";
 import testImage from "../../../assets/test.png";
+import { genqrAPI } from "../../../hooks/qrAPI";
+import { useState } from "react";
 export const BookingServiceCard = ({ book, onCancelClick, ...motionProps }) => {
+  if(!book.pet) return
   return (
     <motion.div
       className="flex items-center bg-[var(--cream-color)] rounded-lg p-4 shadow-lg mb-6"
