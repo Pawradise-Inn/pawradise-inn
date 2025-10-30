@@ -124,7 +124,7 @@ const NewPet = () => {
           breed: formData.petBreed,
           disease: [formData.medicalCondition],
           allergic: [formData.foodAllergy],
-          picture: pictureUrl.message.details.imageUrl, // **Use the GCS URL here**
+          picture: pictureUrl.message?.details?.imageUrl, // **Use the GCS URL here**
           customerId: user.customer.id,
         };
         console.log(newPet);
