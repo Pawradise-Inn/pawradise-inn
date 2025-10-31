@@ -12,6 +12,7 @@ const ServiceCard = ({ data, onClick, ...motionProps }) => {
       onClick={() => onClick(data, true)}
       className="bg-[var(--cream-color)] border-1  border-[var(--dark-brown-color)] rounded-2xl px-4 py-2 cursor-pointer"
       {...motionProps}
+      data-testid="service-card"
     >
       <img
         src={data.image || testImage}
