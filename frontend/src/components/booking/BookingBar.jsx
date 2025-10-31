@@ -178,8 +178,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       ).then((res) => {
         setSize(res.message.details.count);
         res.message.details.count < 3
-          ? setStatus("room available")
-          : setStatus("room not available");
+          ? setStatus("service available")
+          : setStatus("service not available");
       });
     } else {
       fetchRoomStatusAPI(data.id, formData.entryDate, formData.exitDate).then(
@@ -280,8 +280,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
             {data.headerType}{" "}
             {popupStatus
               ? data.headerType == "Service"
-                ? data.name
-                : data.id.toString().padStart(3, 0)
+                ? <span data-testid="name">{data.name}</span>
+                : <span data-testid="name">{data.id.toString().padStart(3, 0)}</span>
               : null}
           </p>
           <div className="text-xl mb-2 flex gap-1 items-center">
@@ -400,6 +400,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
                 }
                 value={formData.entryTime}
                 element="bookingPickTime"
+                data-testid="pick-time"
               />
             ) : (
               <div className="w-full">

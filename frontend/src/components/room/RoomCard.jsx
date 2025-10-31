@@ -17,6 +17,7 @@ const RoomCard = ({
     <motion.div
       className="bg-[var(--cream-color)] border border-[var(--brown-color)] rounded-2xl p-4 flex justify-start gap-4"
       {...motionProps}
+      data-testid="room-card"
     >
       <img
         src={data.image || testImage}
