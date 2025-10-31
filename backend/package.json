@@ -35,7 +35,8 @@
   "devDependencies": {
     "dotenv-cli": "^10.0.0",
     "nodemon": "^3.1.10",
-    "prisma": "^6.17.1"
+    "prisma": "^6.17.1",
+    "swagger-ui-express": "^5.0.1"
   },
   "bugs": {
     "url": "https://github.com/Pawradise-Inn/pawradise-inn/issues"
