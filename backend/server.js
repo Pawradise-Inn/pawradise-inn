@@ -4,6 +4,8 @@ const multer = require("multer");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { PrismaClient } = require("./generated/prisma/client");
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUI = require('swagger-ui-express');
 
 dotenv.config({ path: "./config/config.env" });
 // dotenv.config({path: './config/config.env.local'});
@@ -29,6 +31,26 @@ app.use(
     credentials: false,
   })
 );
+
+const swaggerOptions={
+    swaggerDefinition:{
+        openapi: '3.0.0',
+        info: {
+            title: 'Library API',
+            version: '1.0.0',
+            description: 'A simple Express PawradiseInn API'
+        },
+        servers: [
+            {
+                url: 'http://localhost:5000/api/v1'
+            }
+        ]
+    },
+    apis:['./routes/*.js'],
+};
+
+const swaggerDocs=swaggerJsDoc(swaggerOptions);
+app.use('/api-docs',swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 const booking = require("./routes/booking");
 const bookedRoom = require("./routes/bookedRoom");
