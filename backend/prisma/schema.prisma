@@ -191,7 +191,7 @@ model CartRoom {
 
   checkIn  DateTime
   checkOut DateTime
-  selected Boolean @default(false)
+  selected Boolean  @default(false)
 }
 
 model CartService {
@@ -206,7 +206,7 @@ model CartService {
   pet   Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
 
   scheduled DateTime
-  selected  Boolean @default(false)
+  selected  Boolean  @default(false)
 }
 
 model Payment {
