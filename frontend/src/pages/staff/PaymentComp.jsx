@@ -5,7 +5,7 @@ const PaymentComp = () => {
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const payments = [
+  const [payments, setPayments] = useState([
     {
       picture: "https://via.placeholder.com/150",
       username: "John Doe",
@@ -49,7 +49,7 @@ const PaymentComp = () => {
       totalPrice: 300,
       status: "Success",
     },
-  ];
+  ]);
 
   const handleCheckboxChange = (status) => {
     setSelectedStatuses((prev) =>
@@ -59,6 +59,23 @@ const PaymentComp = () => {
     );
   };
 
+  const updatePaymentStatus = (username, newStatus) => {
+    setPayments((prev) =>
+      prev.map((payment) =>
+        payment.username === username
+          ? { ...payment, status: newStatus }
+          : payment
+      )
+    );
+  };
+
+  // filter
+  const filteredPayments = payments.filter(
+    (payment) =>
+      (selectedStatuses.length === 0 || selectedStatuses.includes(payment.status)) &&
+      payment.username.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="mt-8 flex flex-col items-start px-0">
       <b className="text-4xl mb-2 text-[var(--dark-brown-color)]">
@@ -67,7 +84,7 @@ const PaymentComp = () => {
       <hr className="lg:w-290 md:w-175 sm:w-100 border-1 border-[var(--brown-color)] mt-2 mb-1" />
 
       <div className="flex flex-wrap items-center gap-4 w-full px-4">
-        {/* Search Bar */}
+        {/* search bar */}
         <div className="flex flex-1 min-w-[200px] max-w-[600px] my-4 border-2 rounded-4xl px-5 py-2 text-xl">
           <i className="bi bi-search opacity-50 pr-2 flex justify-center items-center"></i>
           <input
@@ -78,10 +95,13 @@ const PaymentComp = () => {
           />
         </div>
 
-        {/* Status Checkboxes */}
+        {/* check box */}
         <div className="flex flex-wrap items-center gap-4 my-4">
           {["Success", "Failed", "Cancelled"].map((status) => (
-            <label key={status} className="relative flex items-center space-x-2 cursor-pointer font-semibold">
+            <label
+              key={status}
+              className="relative flex items-center space-x-2 cursor-pointer font-semibold"
+            >
               <input
                 type="checkbox"
                 checked={selectedStatuses.includes(status)}
@@ -100,24 +120,27 @@ const PaymentComp = () => {
         </div>
       </div>
 
-      {/* Payment Cards */}
+      {/* PaymentCard */}
       <div className="w-full ml-0">
-        {payments
-          .filter(
-            (payment) =>
-              (selectedStatuses.length === 0 || selectedStatuses.includes(payment.status)) &&
-              payment.username.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-          .map((payment, index) => (
+        {filteredPayments.length === 0 ? (
+          <div className="w-full text-center py-10 text-xl text-[var(--dark-brown-color)]">
+            No matching results
+          </div>
+        ) : (
+          filteredPayments.map((payment) => (
             <PaymentCard
-              key={index}
+              key={payment.username}
               picture={payment.picture}
               username={payment.username}
               bookingDetails={payment.bookingDetails}
               totalPrice={payment.totalPrice}
               status={payment.status}
+              onStatusChange={(newStatus) =>
+                updatePaymentStatus(payment.username, newStatus)
+              }
             />
-          ))}
+          ))
+        )}
       </div>
     </div>
   );
