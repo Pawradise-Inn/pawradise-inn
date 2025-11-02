@@ -60,8 +60,8 @@ model ChatLog {
   review      String?   @db.Text
   reply       String?   @db.Text
   rating      Float?    @default(5) @db.DoublePrecision
-  review_date DateTime  @default(now()) @db.Timestamp(0)
-  reply_date  DateTime? @db.Timestamp(0)
+  review_date DateTime  @default(now()) @db.Date()
+  reply_date  DateTime? @db.Date()
   show        Boolean   @default(true) @db.Boolean
   isRead      Boolean   @default(false) @db.Boolean
 
@@ -162,11 +162,11 @@ model Booking {
   booked_room    BookedRoom[]
   customerId     Int?
   customer       Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
-
-  payment        Payment?
-  customerName   String   @db.VarChar(60)
-  customerEmail  String   @db.VarChar(50)
-  customerNumber String   @db.Char(10)
+  paymentId      Int             @unique
+  payment        Payment         @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  customerName   String          @db.VarChar(60)
+  customerEmail  String          @db.VarChar(50)
+  customerNumber String          @db.Char(10)
 }
 
 model Cart {
@@ -212,17 +212,13 @@ model CartService {
 model Payment {
   id     Int           @id @default(autoincrement())
   cost   Float         @db.DoublePrecision
-  date   DateTime
+  date   DateTime      @default(now()) @db.Timestamp(0)
   status PaymentStatus @default(PENDING)
+  slip   String
 
-  bookingId  Int?      @unique
-  booking    Booking?  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  booking    Booking?
   customerId Int?
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
-
-  customerName   String @db.VarChar(60)
-  customerEmail  String @db.VarChar(50)
-  customerNumber String @db.Char(10)
 }
 
 model Care {
@@ -286,7 +282,7 @@ enum Sex {
 
 enum PaymentStatus {
   PENDING
-  COMPLETED
+  SUCCESS
   FAILED
 }
 
@@ -312,6 +308,7 @@ enum BookedServiceStatus {
 
 enum PetStatus {
   IDLE
+  RESERVED
   CHECKED_IN
   CHECKED_OUT
   QUEUE

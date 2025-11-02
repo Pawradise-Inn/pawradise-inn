@@ -32,11 +32,11 @@ const register = async (req, res) => {
         name,
         sex,
         age: Number(age),
-        type,
+        type: type ? type : "DOG",
         status: "IDLE",
-        breed,
-        disease,
-        allergic,
+        breed: type ? breed : null,
+        disease: disease ? disease : [],
+        allergic: allergic ? allergic : [],
         customerId: customer.id,
         picture: picture
           ? picture

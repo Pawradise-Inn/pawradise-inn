@@ -4,28 +4,6 @@ const { sendErrorResponse, sendSuccessResponse } = require("../utils/responseHan
 const getChatLogs = async (req, res) => {
   let options = {};
 
-  //wait testing 1
-  // if(req.params.serviceId){
-  //     query = chatlogs.findMany({
-  //         where: {serviceId: Number(req.params.serviceId)},
-  //         include: { customer: true, staff: true },
-  //         orderBy: { review_date: 'desc' },
-  //     });
-  // }else if (req.params.roomId){
-  //     query = chatlogs.findMany({
-  //         where: {
-  //             roomId: Number(req.params.roomId),
-  //         },
-  //         include: { customer: true, staff: true },
-  //     });
-  // } else if (req.params.customerId && req.user.role === 'STAFF') {
-  //     query = chatlogs.findMany({
-  //         where: {customerId : Number(req.params.customerId)}
-  //     })
-  // } else {
-  //     query = chatlogs.findMany();
-  // }
-
   //Select filter
   if (req.params.serviceName) {
     try {
@@ -79,16 +57,8 @@ const getChatLogs = async (req, res) => {
     }
     if (filter.review_date) {
       const date = new Date(filter.review_date);//เช่น "2025-10-21"
-      const startOfDay = new Date(date);
-      startOfDay.setHours(0, 0, 0, 0);
 
-      const endOfDay = new Date(date);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      options.where.review_date = {
-        gte: startOfDay,
-        lt: endOfDay
-      };
+      options.where.review_date = date
     }
     delete options.where.search;
   }

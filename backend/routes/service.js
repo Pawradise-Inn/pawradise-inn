@@ -47,40 +47,6 @@ router.route('/:id/reviews')
 
 module.exports = router;
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     Service:
- *       type: object
- *       required:
- *         -name
- *         -petType
- *       properties:
- *         id:
- *           type: int
- *           format: int64
- *           description: The auto-generated id of the service
- *         name:
- *           type: string
- *           maxLength: 30
- *           description: The name of the service
- *         price:
- *           type: float
- *           description: The price of the service
- *           default: 500.00
- *         petType:
- *           type: array
- *           items:
- *             type: string
- *             enum: [DOG, CAT, BIRD, RABBIT, MOUSE]
- *           description: The pet types applicable for the service
- *         picture:
- *           type: string
- *           description: The picture URL of the service
- *       example:
- */
-
 /** 
  * @swagger
  * tags:
