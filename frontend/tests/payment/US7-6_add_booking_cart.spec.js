@@ -3,7 +3,7 @@
 // it mean test data can't not be create
 
 import { test, expect } from "@playwright/test";
-import TestPage from "./TestPage";
+import TestPage from "../TestPage";
 
 let app; // Declare in outer scope
 let petData;

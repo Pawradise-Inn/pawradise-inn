@@ -1,11 +1,16 @@
 import { test, expect } from "@playwright/test";
-import TestPage from "./TestPage";
+import TestPage from "../TestPage";
 
 let app; // Declare in outer scope
 let petData;
 
 let bookedRoom = [];
 let bookedService = [];
+
+// Global image paths for testing
+const valid_slip = "https://storage.googleapis.com/paw_image/valid_slip.jpg";
+const invalid_slip =
+  "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
 
 const findCartCard = async (
   page,
@@ -172,10 +177,8 @@ test.describe("Focus on payment behaviour", () => {
       .locator('input[type="file"]')
       .filter({ hasText: "Upload" });
 
-    // Upload first image
-    const imagePath =
-      "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
-    await uploadInput.setInputFiles(imagePath);
+    // Upload invalid slip
+    await uploadInput.setInputFiles(invalid_slip);
 
     const doneBtn = page.getByRole("button", { name: "Done" });
     await doneBtn.click();
@@ -223,10 +226,8 @@ test.describe("Focus on payment behaviour", () => {
       .locator('input[type="file"]')
       .filter({ hasText: "Upload" });
 
-    // Upload first image
-    const imagePath =
-      "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
-    await uploadInput.setInputFiles(imagePath);
+    // Upload invalid slip
+    await uploadInput.setInputFiles(invalid_slip);
 
     const doneBtn = page.getByRole("button", { name: "Done" });
     await doneBtn.click();
@@ -249,10 +250,8 @@ test.describe("Focus on payment behaviour", () => {
       .locator('input[type="file"]')
       .filter({ hasText: "Upload" });
 
-    // Upload first image
-    const imagePath =
-      "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
-    await uploadInput.setInputFiles(imagePath);
+    // Upload valid slip
+    await uploadInput.setInputFiles(valid_slip);
 
     const doneBtn = page.getByRole("button", { name: "Done" });
     await doneBtn.click();
@@ -303,10 +302,8 @@ test.describe("Focus on payment behaviour", () => {
       .locator('input[type="file"]')
       .filter({ hasText: "Upload" });
 
-    // Upload first image
-    const imagePath =
-      "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
-    await uploadInput.setInputFiles(imagePath);
+    // Upload valid slip
+    await uploadInput.setInputFiles(valid_slip);
 
     const doneBtn = page.getByRole("button", { name: "Done" });
     await doneBtn.click();
@@ -342,9 +339,7 @@ test.describe("Focus on payment behaviour", () => {
     const imageDisplay = page.getByTestId("payment-upload");
 
     // Upload first image
-    const firstImagePath =
-      "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
-    await uploadInput.setInputFiles(firstImagePath);
+    await uploadInput.setInputFiles(invalid_slip);
 
     // Verify first image is displayed
     await expect(imageDisplay).toBeVisible();
@@ -352,9 +347,7 @@ test.describe("Focus on payment behaviour", () => {
     const firstImageSrc = await imageDisplay.getAttribute("src");
 
     // Use re-upload input to upload second image
-    const secondImagePath =
-      "https://storage.googleapis.com/paw_image/unnamed.jpg";
-    await uploadInput.setInputFiles(secondImagePath);
+    await uploadInput.setInputFiles(valid_slip);
 
     // Verify image display is updated with new image
     await expect(imageDisplay).toBeVisible();

@@ -1,11 +1,15 @@
 import { test, expect } from "@playwright/test";
-import TestPage from "./TestPage";
+import TestPage from "../TestPage";
 
 let app; // Declare in outer scope
 let petData;
 
 let bookedRoom = [];
 let bookedService = [];
+
+// Global image paths for testing
+const valid_slip = "https://storage.googleapis.com/paw_image/valid_slip.jpg";
+const invalid_slip = "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
 
 const findStaffPaymentCard = async (
   page,
@@ -89,9 +93,7 @@ test.afterEach(async () => {
 });
 
 test("Staff got payment data with failed slip", async ({ page }) => {
-  app.createPayment(
-    "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg"
-  );
+  app.createPayment(invalid_slip);
   app.loginStaff();
 
   await page.getByRole("link", { name: "management" }).click();
@@ -124,9 +126,7 @@ test("Staff got payment data with failed slip", async ({ page }) => {
 });
 
 test("Staff got payment data with paid slip", async ({ page }) => {
-  app.createPayment(
-    "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg"
-  );
+  app.createPayment(valid_slip);
   app.loginStaff();
 
   await page.getByRole("link", { name: "management" }).click();

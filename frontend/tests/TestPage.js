@@ -1,4 +1,4 @@
-import { formatDate } from ".././Utils";
+import { formatDate } from "./Utils";
 
 const frontendURL = "http://localhost:3000";
 
@@ -19,7 +19,6 @@ const frontendURL = "http://localhost:3000";
 //  always reset database if you test failed
 //  always reset database if you test failed
 //  always reset database if you test failed
-
 
 export class TestPage {
   /**
@@ -169,7 +168,6 @@ export class TestPage {
     await this.page.getByRole("button", { name: "BOOK" }).nth(3).click();
     await this.page.getByRole("button", { name: "Close" }).first().click();
     await this.page.getByRole("button", { name: "Close" }).click();
-    await this.page.locator(".bi.bi-x-lg").first().click();
 
     const name = this.page.getByTestId("name");
     const price = this.page.getByText(/฿/);
@@ -212,7 +210,6 @@ export class TestPage {
       .click();
     await this.page.getByRole("button", { name: "BOOK" }).click();
     await this.page.getByRole("button", { name: "Close" }).click();
-    await this.page.locator(".bi.bi-x-lg").first().click();
 
     const name = this.page.getByTestId("name");
     const price = this.page.getByText(/฿/);
