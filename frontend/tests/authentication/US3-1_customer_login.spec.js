@@ -29,13 +29,13 @@ test.describe("Customer Login", () => {
     // Fill in incorrect username
     await page
       .getByRole("textbox", { name: "Username (For Login)" })
-      .fill("Testja1234");
+      .fill("testja1234");
     await page.getByRole("textbox", { name: "Password" }).fill("1234");
 
     // Verify fields are filled correctly
     await expect(
       page.getByRole("textbox", { name: "Username (For Login)" })
-    ).toHaveValue("Testja1234");
+    ).toHaveValue("testja1234");
     await expect(page.getByRole("textbox", { name: "Password" })).toHaveValue(
       "1234"
     );
@@ -68,7 +68,7 @@ test.describe("Customer Login", () => {
     // Fill in correct username but wrong password
     await page
       .getByRole("textbox", { name: "Username (For Login)" })
-      .fill("Test1234");
+      .fill("test1234");
     await page.getByRole("textbox", { name: "Password" }).fill("WrongPassword123");
 
     // Click login button
@@ -101,13 +101,13 @@ test.describe("Customer Login", () => {
     // Fill in correct credentials
     await page
       .getByRole("textbox", { name: "Username (For Login)" })
-      .fill("Test1234");
+      .fill("test1234");
     await page.getByRole("textbox", { name: "Password" }).fill("1234");
 
     // Verify fields are filled correctly
     await expect(
       page.getByRole("textbox", { name: "Username (For Login)" })
-    ).toHaveValue("Test1234");
+    ).toHaveValue("test1234");
     await expect(page.getByRole("textbox", { name: "Password" })).toHaveValue(
       "1234"
     );
@@ -159,7 +159,7 @@ test.describe("Customer Login", () => {
 
     await page
       .getByRole("textbox", { name: "Username (For Login)" })
-      .fill("Test1234");
+      .fill("test1234");
 
     await expect(loginBtn).toBeDisabled();
 
