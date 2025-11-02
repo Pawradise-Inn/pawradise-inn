@@ -1,3 +1,4 @@
+import { mockSlipOK } from "./MockAPI";
 import { formatDate } from "./Utils";
 
 const frontendURL = "http://localhost:3000";
@@ -230,7 +231,7 @@ export class TestPage {
     };
   }
 
-  async createPayment(imageUrl) {
+  async createPayment(imageUrl, fakeResponse, status) {
     await this.page.getByRole("link", { name: "room" }).click();
     await this.page.getByTestId("cart-icon").click();
     await this.page.getByTestId("check-all").click();
@@ -244,8 +245,7 @@ export class TestPage {
     const imagePath = imageUrl;
     await uploadInput.setInputFiles(imagePath);
 
-    const doneBtn = this.page.getByRole("button", { name: "Done" });
-    await doneBtn.click();
+    await mockSlipOK(page, fakeResponse, status);
   }
 }
 

@@ -27,7 +27,7 @@ const findCard = async (
     .getByTestId("cart-card")
     .filter({ hasText: `${type} ${name}` })
     .filter({ hasText: `for ${pet_name}` })
-    .filter({ hasText: `price ${price.toFixed(2)} THB`  })
+    .filter({ hasText: `price ${price.toFixed(2)} THB` })
     .filter({
       hasText:
         type === "Service"
