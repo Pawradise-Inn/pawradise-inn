@@ -62,3 +62,14 @@ export const petStatusColor =(status) => {
       return "bg-[var(--idle-color)] !text-[var(--dark-brown-color)]";
   }
 };
+
+export const getPaymentStatusColor = (status) => {
+  switch (status) {
+    case "SUCCESS" :
+      return "bg-[var(--service-complete-color)] !text-[var(--dark-brown-color)]";
+    case "FAILED" :
+      return "bg-[var(--fail-color)] !text-[var(--dark-brown-color)]";
+    case "PENDING" :
+      return "bg-[var(--room-reserved-color)] !text-[var(--dark-brown-color)]";
+  }
+}

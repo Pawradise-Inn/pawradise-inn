@@ -130,7 +130,7 @@ test.describe("Focus on payment behaviour", () => {
   test("Initial load element", async ({ page }) => {
     await expect(page.getByText("Waiting for payment")).toBeVisible();
     await expect(page.getByText("Please upload your evidence")).toBeVisible();
-
+    
     await expect(page.getByRole("button", { name: "Upload" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Done" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Cancle" })).toBeVisible();
