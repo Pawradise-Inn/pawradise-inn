@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { getStatusColor } from "../staff/StatusUtils";
+import { getPaymentStatusColor } from "../staff/StatusUtils";
+import DropDownList from "../DropDownList";
 
 const PaymentCard = ({
   picture,
@@ -10,36 +10,23 @@ const PaymentCard = ({
   status,
   onStatusChange,
 }) => {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState(status);
-  const popupRef = useRef(null);
 
-  const statusColor = getStatusColor(currentStatus) || "bg-green-500";
+  const statusColor = getPaymentStatusColor(status) || "bg-green-500";
 
-  const getCircleColor = (statusValue) => {
-    if (statusValue === "Success") return "bg-green-500";
-    if (statusValue === "Failed") return "bg-red-500";
-    if (statusValue === "Cancelled") return "bg-gray-400";
-    return "bg-green-500";
-  };
-
-  const statusOptions = ["Success", "Failed", "Cancelled"];
-
-  // close popup
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (popupRef.current && !popupRef.current.contains(event.target)) {
-        setIsPopupOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const statusOptions = [
+    { name: "Success", value: "SUCCESS" },
+    { name: "Failed", value: "FAILED" },
+    { name: "Pending", value: "PENDING" },
+  ];
 
   return (
-    <motion.div className="flex rounded-2xl bg-[var(--cream-color)] p-4 mt-6 shadow relative w-full mx-2">
+    <motion.div layout 
+      initial={{ opacity: 0, y: 50 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      exit={{ opacity: 0, x: -100 }}
+      transition={{ duration: 0.3 }} 
+      className="flex rounded-2xl bg-[var(--cream-color)] p-4 mt-6   relative w-full mx-2"
+    >
       <img
         src={picture}
         className="w-40 h-40 object-cover object-center rounded-lg"
@@ -59,37 +46,17 @@ const PaymentCard = ({
       </div>
 
       {/* payment status */}
-      <div className="absolute top-4 right-4 z-[999]" ref={popupRef}>
-        <div className="relative">
-          {/* status button */}
-          <div
-            onClick={() => setIsPopupOpen(!isPopupOpen)}
-            className={`py-1 px-3 rounded-full ${statusColor} text-white flex items-center space-x-2 shadow-lg cursor-pointer`}
-          >
-            <div className={`w-3 h-3 rounded-full ${getCircleColor(currentStatus)}`}></div>
-            <span className="text-sm font-semibold tracking-wide">{currentStatus}</span>
-          </div>
-
-          {/* popup */}
-          {isPopupOpen && (
-            <div className="absolute top-full right-0 mt-1 w-40 bg-[var(--light-brown-color)] rounded shadow-lg">
-              {statusOptions.map((option) => (
-                <div
-                  key={option}
-                  className="flex items-center px-3 py-2 cursor-pointer hover:bg-[var(--brown-color)] text-white rounded space-x-2"
-                  onClick={() => {
-                    setCurrentStatus(option);
-                    onStatusChange(option);
-                    setIsPopupOpen(false);
-                  }}
-                >
-                  <div className={`w-3 h-3 rounded-full ${getCircleColor(option)}`}></div>
-                  <span>{option}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+      <div className="absolute top-4 right-4 z-[999] ">
+        <DropDownList
+          options={statusOptions}
+          value={status} 
+          onChange={onStatusChange} 
+          element={`status-dropdown-${username}`}
+          inputSyle={`py-1 pl-3 pr-10 rounded-full ${statusColor} text-sm font-semibold tracking-wide cursor-pointer`}
+          dropDownStyle="border-2 border-[var(--brown-color)] bg-[var(--light-brown-color)] origin-top translate-y-1 top-full right-0" // Aligns dropdown to the right
+          activeColor="var(--cream-color)"
+          // arrowColor="white" 
+        />
       </div>
     </motion.div>
   );
