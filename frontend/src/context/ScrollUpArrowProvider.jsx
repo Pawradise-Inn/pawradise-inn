@@ -39,7 +39,7 @@ const ScrollUpArrowProvider = ({ children }) => {
             exit={{ opacity: 0, y: "-50px" }}
             onClick={handleScrollUp}
             style={{ zIndex: 2000 }}
-            className="bi bi-arrow-up-circle-fill flex justify-center fixed top-10 right-10 items-center !text-[var(--brown-color)] cursor-pointer scale-200"
+            className="bi bi-arrow-up-circle-fill flex justify-center fixed top-20 right-10 items-center !text-[var(--brown-color)] cursor-pointer scale-200"
           ></motion.i>
         )}
       </AnimatePresence>
