@@ -29,15 +29,15 @@ test.describe("Customer Login", () => {
     // Fill in incorrect username
     await page
       .getByRole("textbox", { name: "Username (For Login)" })
-      .fill("TestRegister123");
-    await page.getByRole("textbox", { name: "Password" }).fill("TestRegister123");
+      .fill("Testja1234");
+    await page.getByRole("textbox", { name: "Password" }).fill("1234");
 
     // Verify fields are filled correctly
     await expect(
       page.getByRole("textbox", { name: "Username (For Login)" })
-    ).toHaveValue("TestRegister123");
+    ).toHaveValue("Testja1234");
     await expect(page.getByRole("textbox", { name: "Password" })).toHaveValue(
-      "TestRegister123"
+      "1234"
     );
 
     // Click login button
@@ -68,7 +68,7 @@ test.describe("Customer Login", () => {
     // Fill in correct username but wrong password
     await page
       .getByRole("textbox", { name: "Username (For Login)" })
-      .fill("TestRegister");
+      .fill("Test1234");
     await page.getByRole("textbox", { name: "Password" }).fill("WrongPassword123");
 
     // Click login button
@@ -101,15 +101,15 @@ test.describe("Customer Login", () => {
     // Fill in correct credentials
     await page
       .getByRole("textbox", { name: "Username (For Login)" })
-      .fill("TestRegister");
-    await page.getByRole("textbox", { name: "Password" }).fill("TestRegister123");
+      .fill("Test1234");
+    await page.getByRole("textbox", { name: "Password" }).fill("1234");
 
     // Verify fields are filled correctly
     await expect(
       page.getByRole("textbox", { name: "Username (For Login)" })
-    ).toHaveValue("TestRegister");
+    ).toHaveValue("Test1234");
     await expect(page.getByRole("textbox", { name: "Password" })).toHaveValue(
-      "TestRegister123"
+      "1234"
     );
 
     // Click login button
@@ -146,25 +146,26 @@ test.describe("Customer Login", () => {
   test("Form validation - empty fields", async ({ page }) => {
     await page.goto("http://localhost:3000/login");
 
-    // Try to click login with empty fields
-    await page.getByRole("button", { name: "Login" }).click();
+    const loginBtn = page.getByRole("button", { name: "Login" });
 
-    // Wait for and verify error notification header appears
-    // Header from responseHandler.js for MISSING_FIELDS error
-    await expect(page.getByText("Missing Information")).toBeVisible({
-      timeout: 5000,
-    });
+    // The app disables the button when fields are empty
+    await expect(loginBtn).toBeVisible();
+    await expect(loginBtn).toBeDisabled();
 
-    // Verify error notification content from auth.js
-    await expect(
-      page.getByText("Please enter both username and password")
-    ).toBeVisible();
-
-    // Verify we're still on the login page
+    // Still on login page, and no token stored
     await expect(page).toHaveURL("http://localhost:3000/login");
-
-    // Verify token is NOT stored
     const token = await page.evaluate(() => localStorage.getItem("token"));
     expect(token).toBeNull();
+
+    await page
+      .getByRole("textbox", { name: "Username (For Login)" })
+      .fill("Test1234");
+
+    await expect(loginBtn).toBeDisabled();
+
+    // Still on login page, and no token stored
+    await expect(page).toHaveURL("http://localhost:3000/login");
+    const token2 = await page.evaluate(() => localStorage.getItem("token"));
+    expect(token2).toBeNull();
   });
 });
