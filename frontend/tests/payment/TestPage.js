@@ -1,4 +1,4 @@
-import { formatDate } from "./Utils";
+import { formatDate } from ".././Utils";
 
 const frontendURL = "http://localhost:3000";
 
