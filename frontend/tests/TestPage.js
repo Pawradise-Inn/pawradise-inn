@@ -1,3 +1,4 @@
+import { mockSlipOK } from "./MockAPI";
 import { formatDate } from "./Utils";
 
 const frontendURL = "http://localhost:3000";
@@ -19,7 +20,6 @@ const frontendURL = "http://localhost:3000";
 //  always reset database if you test failed
 //  always reset database if you test failed
 //  always reset database if you test failed
-
 
 export class TestPage {
   /**
@@ -169,7 +169,6 @@ export class TestPage {
     await this.page.getByRole("button", { name: "BOOK" }).nth(3).click();
     await this.page.getByRole("button", { name: "Close" }).first().click();
     await this.page.getByRole("button", { name: "Close" }).click();
-    await this.page.locator(".bi.bi-x-lg").first().click();
 
     const name = this.page.getByTestId("name");
     const price = this.page.getByText(/฿/);
@@ -212,7 +211,6 @@ export class TestPage {
       .click();
     await this.page.getByRole("button", { name: "BOOK" }).click();
     await this.page.getByRole("button", { name: "Close" }).click();
-    await this.page.locator(".bi.bi-x-lg").first().click();
 
     const name = this.page.getByTestId("name");
     const price = this.page.getByText(/฿/);
@@ -233,7 +231,7 @@ export class TestPage {
     };
   }
 
-  async createPayment(imageUrl) {
+  async createPayment(imageUrl, fakeResponse, status) {
     await this.page.getByRole("link", { name: "room" }).click();
     await this.page.getByTestId("cart-icon").click();
     await this.page.getByTestId("check-all").click();
@@ -247,8 +245,7 @@ export class TestPage {
     const imagePath = imageUrl;
     await uploadInput.setInputFiles(imagePath);
 
-    const doneBtn = this.page.getByRole("button", { name: "Done" });
-    await doneBtn.click();
+    await mockSlipOK(page, fakeResponse, status);
   }
 }
 

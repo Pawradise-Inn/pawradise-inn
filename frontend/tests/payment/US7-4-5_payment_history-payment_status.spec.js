@@ -1,11 +1,29 @@
 import { test, expect } from "@playwright/test";
-import TestPage from "./TestPage";
+import TestPage from "../TestPage";
 
 let app; // Declare in outer scope
 let petData;
 
 let bookedRoom = [];
 let bookedService = [];
+
+// Global image paths for testing
+const slip =
+  "https://storage.googleapis.com/paw_image/slip/fail.jpg?fbclid=IwY2xjawN0aJJleHRuA2FlbQIxMABicmlkETFYc25qOXJIQUFmQ2VWbGFZAR4ojfiXMQsFChjXORJ-EPWDg75REhSYpRqvCTAtm32GERESrhiW-a5Fn9uY0Q_aem_8Q4wTev00gLEMmiugA2UEA";
+
+const invalid_mockingAPI_response = {
+  success: false,
+  data: {
+    success: false,
+  },
+};
+
+const valid_mockingAPI_response = {
+  success: true,
+  data: {
+    success: true,
+  },
+};
 
 const findStaffPaymentCard = async (
   page,
@@ -89,9 +107,7 @@ test.afterEach(async () => {
 });
 
 test("Staff got payment data with failed slip", async ({ page }) => {
-  app.createPayment(
-    "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg"
-  );
+  app.createPayment(slip, invalid_mockingAPI_response, 400);
   app.loginStaff();
 
   await page.getByRole("link", { name: "management" }).click();
@@ -124,9 +140,7 @@ test("Staff got payment data with failed slip", async ({ page }) => {
 });
 
 test("Staff got payment data with paid slip", async ({ page }) => {
-  app.createPayment(
-    "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg"
-  );
+  app.createPayment(slip, valid_mockingAPI_response, 200);
   app.loginStaff();
 
   await page.getByRole("link", { name: "management" }).click();

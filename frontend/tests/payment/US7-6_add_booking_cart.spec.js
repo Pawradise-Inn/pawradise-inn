@@ -3,7 +3,7 @@
 // it mean test data can't not be create
 
 import { test, expect } from "@playwright/test";
-import TestPage from "./TestPage";
+import TestPage from "../TestPage";
 
 let app; // Declare in outer scope
 let petData;
@@ -27,7 +27,7 @@ const findCard = async (
     .getByTestId("cart-card")
     .filter({ hasText: `${type} ${name}` })
     .filter({ hasText: `for ${pet_name}` })
-    .filter({ hasText: `price ${price.toFixed(2)} THB`  })
+    .filter({ hasText: `price ${price.toFixed(2)} THB` })
     .filter({
       hasText:
         type === "Service"

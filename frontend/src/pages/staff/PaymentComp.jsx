@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PaymentCard from "../../components/staff/PaymentCard";
+import { motion, AnimatePresence } from "framer-motion";
 
 const PaymentComp = () => {
   const [selectedStatuses, setSelectedStatuses] = useState([]);
@@ -14,7 +15,7 @@ const PaymentComp = () => {
         "Service: Spa Treatment - 01/11/2025 11:00 AM",
       ],
       totalPrice: 120,
-      status: "Success",
+      status: "SUCCESS",
     },
     {
       picture: "https://via.placeholder.com/150",
@@ -24,7 +25,7 @@ const PaymentComp = () => {
         "Service: Massage Therapy - 02/11/2025 3:00 PM",
       ],
       totalPrice: 150,
-      status: "Failed",
+      status: "FAILED",
     },
     {
       picture: "https://via.placeholder.com/150",
@@ -34,7 +35,7 @@ const PaymentComp = () => {
         "Service: Facial - 03/11/2025 10:00 AM",
       ],
       totalPrice: 200,
-      status: "Cancelled",
+      status: "PENDING",
     },
     {
       picture: "https://via.placeholder.com/150",
@@ -47,7 +48,7 @@ const PaymentComp = () => {
         "Service: Nutrition Consultation - 04/11/2025 12:00 PM",
       ],
       totalPrice: 300,
-      status: "Success",
+      status: "SUCCESS",
     },
   ]);
 
@@ -97,7 +98,7 @@ const PaymentComp = () => {
 
         {/* check box */}
         <div className="flex flex-wrap items-center gap-4 my-4">
-          {["Success", "Failed", "Cancelled"].map((status) => (
+          {["SUCCESS", "FAILED", "PENDING"].map((status) => (
             <label
               key={status}
               className="relative flex items-center space-x-2 cursor-pointer font-semibold"
@@ -127,19 +128,21 @@ const PaymentComp = () => {
             No matching results
           </div>
         ) : (
-          filteredPayments.map((payment) => (
-            <PaymentCard
-              key={payment.username}
-              picture={payment.picture}
-              username={payment.username}
-              bookingDetails={payment.bookingDetails}
-              totalPrice={payment.totalPrice}
-              status={payment.status}
-              onStatusChange={(newStatus) =>
-                updatePaymentStatus(payment.username, newStatus)
-              }
-            />
-          ))
+          <AnimatePresence>
+            {filteredPayments.map((payment) => (
+              <PaymentCard
+                key={payment.username} // The key is crucial for AnimatePresence
+                picture={payment.picture}
+                username={payment.username}
+                bookingDetails={payment.bookingDetails}
+                totalPrice={payment.totalPrice}
+                status={payment.status}
+                onStatusChange={(newStatus) =>
+                  updatePaymentStatus(payment.username, newStatus)
+                }
+              />
+            ))}
+          </AnimatePresence>
         )}
       </div>
     </div>

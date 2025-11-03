@@ -1,11 +1,30 @@
 import { test, expect } from "@playwright/test";
-import TestPage from "./TestPage";
+import TestPage from "../TestPage";
+import { mockSlipOK } from "../MockAPI";
 
 let app; // Declare in outer scope
 let petData;
 
 let bookedRoom = [];
 let bookedService = [];
+
+// Global image paths for testing
+const slip =
+  "https://storage.googleapis.com/paw_image/slip/fail.jpg?fbclid=IwY2xjawN0aJJleHRuA2FlbQIxMABicmlkETFYc25qOXJIQUFmQ2VWbGFZAR4ojfiXMQsFChjXORJ-EPWDg75REhSYpRqvCTAtm32GERESrhiW-a5Fn9uY0Q_aem_8Q4wTev00gLEMmiugA2UEA";
+
+const invalid_mockingAPI_response = {
+  success: false,
+  data: {
+    success: false,
+  },
+};
+
+const valid_mockingAPI_response = {
+  success: true,
+  data: {
+    success: true,
+  },
+};
 
 const findCartCard = async (
   page,
@@ -172,13 +191,10 @@ test.describe("Focus on payment behaviour", () => {
       .locator('input[type="file"]')
       .filter({ hasText: "Upload" });
 
-    // Upload first image
-    const imagePath =
-      "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
-    await uploadInput.setInputFiles(imagePath);
+    // Upload invalid slip
+    await uploadInput.setInputFiles(slip);
 
-    const doneBtn = page.getByRole("button", { name: "Done" });
-    await doneBtn.click();
+    await mockSlipOK(page, invalid_mockingAPI_response, 400);
 
     await expect(page).toHaveURL("http://localhost:3000/payment/failed  ");
     await expect(page.getByText("payment failed")).toBeVisible();
@@ -223,13 +239,10 @@ test.describe("Focus on payment behaviour", () => {
       .locator('input[type="file"]')
       .filter({ hasText: "Upload" });
 
-    // Upload first image
-    const imagePath =
-      "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
-    await uploadInput.setInputFiles(imagePath);
+    // Upload invalid slip
+    await uploadInput.setInputFiles(slip);
 
-    const doneBtn = page.getByRole("button", { name: "Done" });
-    await doneBtn.click();
+    await mockSlipOK(page, invalid_mockingAPI_response, 400);
 
     await expect(page).toHaveURL("http://localhost:3000/payment/failed");
 
@@ -249,13 +262,10 @@ test.describe("Focus on payment behaviour", () => {
       .locator('input[type="file"]')
       .filter({ hasText: "Upload" });
 
-    // Upload first image
-    const imagePath =
-      "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
-    await uploadInput.setInputFiles(imagePath);
+    // Upload valid slip
+    await uploadInput.setInputFiles(slip);
 
-    const doneBtn = page.getByRole("button", { name: "Done" });
-    await doneBtn.click();
+    await mockSlipOK(page, valid_mockingAPI_response, 200);
 
     await expect(page).toHaveURL("http://localhost:3000/payment/successful ");
     await expect(page.getByText("payment successful")).toBeVisible();
@@ -303,13 +313,10 @@ test.describe("Focus on payment behaviour", () => {
       .locator('input[type="file"]')
       .filter({ hasText: "Upload" });
 
-    // Upload first image
-    const imagePath =
-      "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
-    await uploadInput.setInputFiles(imagePath);
+    // Upload valid slip
+    await uploadInput.setInputFiles(slip);
 
-    const doneBtn = page.getByRole("button", { name: "Done" });
-    await doneBtn.click();
+    await mockSlipOK(page, valid_mockingAPI_response, 200);
 
     await expect(page).toHaveURL("http://localhost:3000/payment/successful ");
     await expect(page.getByText("payment successful")).toBeVisible();
@@ -342,9 +349,7 @@ test.describe("Focus on payment behaviour", () => {
     const imageDisplay = page.getByTestId("payment-upload");
 
     // Upload first image
-    const firstImagePath =
-      "https://storage.googleapis.com/paw_image/rooms/CatStandard.jpg";
-    await uploadInput.setInputFiles(firstImagePath);
+    await uploadInput.setInputFiles(slip);
 
     // Verify first image is displayed
     await expect(imageDisplay).toBeVisible();
@@ -352,9 +357,7 @@ test.describe("Focus on payment behaviour", () => {
     const firstImageSrc = await imageDisplay.getAttribute("src");
 
     // Use re-upload input to upload second image
-    const secondImagePath =
-      "https://storage.googleapis.com/paw_image/unnamed.jpg";
-    await uploadInput.setInputFiles(secondImagePath);
+    await uploadInput.setInputFiles(slip);
 
     // Verify image display is updated with new image
     await expect(imageDisplay).toBeVisible();
