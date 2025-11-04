@@ -66,18 +66,18 @@ const cart = require("./routes/cart");
 const qr = require('./routes/qr')
 
 app.use("/api/v1/auth", auth);
-app.use("/api/v1/booking", booking);
-app.use("/api/v1/bookedRoom", bookedRoom);
-app.use("/api/v1/bookedService", bookedService);
-app.use("/api/v1/room", room);
-app.use("/api/v1/service", service);
-app.use("/api/v1/pet", pet);
-app.use("/api/v1/staff", staff);
-app.use("/api/v1/chatlog", chatlog);
-app.use("/api/v1/customer", customer);
+app.use("/api/v1/bookings", booking);
+app.use("/api/v1/bookedRooms", bookedRoom);
+app.use("/api/v1/bookedServices", bookedService);
+app.use("/api/v1/rooms", room);
+app.use("/api/v1/services", service);
+app.use("/api/v1/pets", pet);
+app.use("/api/v1/staffs", staff);
+app.use("/api/v1/chatlogs", chatlog);
+app.use("/api/v1/customers", customer);
 app.use("/api/v1/cares", care);
-app.use("/api/v1/image", picture);
-app.use("/api/v1/cart", cart);
+app.use("/api/v1/images", picture);
+app.use("/api/v1/carts", cart);
 app.use('/api/v1/qr', qr)
 
 const PORT = process.env.PORT || 5000;

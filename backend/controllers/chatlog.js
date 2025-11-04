@@ -70,7 +70,7 @@ const getChatLogs = async (req, res) => {
       acc[field.trim()] = true;
       return acc;
     }, {});
-  }
+  }   
 
   //Sort
   if (req.query.sort) {
@@ -81,7 +81,7 @@ const getChatLogs = async (req, res) => {
       return { [field.trim()]: dir };
     });
   } else {
-    options.orderBy = { id: "asc" };
+    options.orderBy = { rating: "desc" };
   }
 
   //Pagination

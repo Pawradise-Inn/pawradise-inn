@@ -1,6 +1,6 @@
 import axiosInstance from "../api/axiosInstance";
 
-const API_URL = "/api/v1/bookedService";
+const API_URL = "/api/v1/bookedServices";
 
 export const getTodayService = async () => {
   const response = await axiosInstance.get(`${API_URL}/dashboard`);

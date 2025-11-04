@@ -1,6 +1,6 @@
 import axiosInstance from "../api/axiosInstance";
 
-const API_URL = "/api/v1/bookedRoom";
+const API_URL = "/api/v1/bookedRooms";
 
 export const getTodayRoom = async () => {
   const response = await axiosInstance.get(`${API_URL}/dashboard/checkins`);

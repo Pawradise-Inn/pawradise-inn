@@ -1,6 +1,6 @@
 import axiosInstance from "../api/axiosInstance";
 
-const API_URL = "/api/v1/room";
+const API_URL = "/api/v1/rooms";
 
 export const fetchAllRoomsAPI = async () => {
   const response = await axiosInstance.get(API_URL);

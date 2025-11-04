@@ -1,6 +1,6 @@
 import axiosInstance from "../api/axiosInstance";
 
-const API_URL = "/api/v1/chatlog";
+const API_URL = "/api/v1/chatlogs";
 
 // Get all chat logs with optional filters (customerId, serviceId, staffId)
 export const getChatLogsAPI = async (params = {}) => {

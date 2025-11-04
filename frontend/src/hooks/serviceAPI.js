@@ -1,7 +1,7 @@
 import axiosInstance from "../api/axiosInstance";
 
 // The base URL for all service-related API calls
-const API_URL = "/api/v1/service";
+const API_URL = "/api/v1/services";
 
 // --- Basic CRUD Operations ---
 

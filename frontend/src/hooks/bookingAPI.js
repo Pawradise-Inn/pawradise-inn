@@ -1,6 +1,6 @@
 import axiosInstance from "../api/axiosInstance";
 
-const API_URL = "/api/v1/booking";
+const API_URL = "/api/v1/bookings";
 
 export const fetchMyBookingAPI = async (id) => {
   const response = await axiosInstance.get(`${API_URL}/${id}`);
