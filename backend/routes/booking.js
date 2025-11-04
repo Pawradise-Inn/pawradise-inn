@@ -9,7 +9,7 @@ const {
     deleteBooking,
     getMyBookings,
     cancelBooking,
-    putBooking
+    updateBooking
 } = require('../controllers/booking');
 
 const {protect, authorize} = require('../middleware/auth');
@@ -28,7 +28,7 @@ router.route('/:id')
     .get(protect, authorize("STAFF", "CUSTOMER"),getBooking)
     .delete(protect, authorize("STAFF", "CUSTOMER"),deleteBooking)
     .patch(protect, authorize("STAFF", "CUSTOMER"),updateBookingStatus)
-    .put(protect, authorize("STAFF", "CUSTOMER"),putBooking);
+    .put(protect, authorize("STAFF", "CUSTOMER"),updateBooking);
 
 
 module.exports = router;

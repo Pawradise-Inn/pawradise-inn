@@ -74,6 +74,10 @@ const createErrorResponse = (
       header: "Review Not Found",
       content: userMessage || "Review could not be found",
     },
+    PAYMENT_NOT_FOUND: {
+      header: "Payment Not Found",
+      content: userMessage || "Payment cound not be found"
+    },
 
     // 409 - Conflict
     ALREADY_EXISTS: {

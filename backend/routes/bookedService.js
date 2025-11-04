@@ -7,12 +7,12 @@ const {
     createBookedService,
     updateBookedService,
     deleteBookedService,
-    getTodayService
+    getTodayServices
 } = require('../controllers/bookedService');
 const { authorize, protect } = require('../middleware/auth');
 
 router.route('/dashboard')
-    .get(protect, authorize("STAFF"), getTodayService);
+    .get(protect, authorize("STAFF"), getTodayServices);
 
 router.route('/')
     .get(getBookedServices)

@@ -213,7 +213,7 @@ const deleteBookedService = async (req, res) => {
   }
 };
 
-const getTodayService = async (req, res) => {
+const getTodayServices = async (req, res) => {
   try {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -264,5 +264,5 @@ module.exports = {
   createBookedService,
   updateBookedService,
   deleteBookedService,
-  getTodayService,
+  getTodayServices,
 };

@@ -152,6 +152,7 @@ const updateBookingStatus = async (req, res) => {
 const createBooking = async (req, res) => {
   try {
     const bookingDate = req.body.date;
+    const paymentId = req.body.paymentId;
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
     });
@@ -160,7 +161,7 @@ const createBooking = async (req, res) => {
         customerId: req.user.roleId,
         date: new Date(bookingDate),
         status: "PENDING",
-        // payment: 'PENDING',
+        paymentId: new Date(paymentId),
         customerName: user.firstname + " " + user.lastname,
         customerEmail: user.email,
         customerNumber: user.phone_number,
@@ -338,7 +339,7 @@ const cancelBooking = async (req, res) => {
   }
 };
 
-const putBooking = async (req, res) => {
+const updateBooking = async (req, res) => {
   try {
     const bookingId = Number(req.params.id);
     const {
@@ -439,5 +440,5 @@ module.exports = {
   deleteBooking,
   getMyBookings,
   cancelBooking,
-  putBooking,
+  updateBooking,
 };
