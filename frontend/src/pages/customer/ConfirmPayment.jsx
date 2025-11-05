@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion"; // Import motion
+
+// --- Animation Variants ---
+const startUpVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.3 },
+  }),
+  exit: { opacity: 0, x: -50, transition: { duration: 0.3 } },
+};
 
 // Using an inline SVG for the upload icon
 const UploadIcon = () => (
@@ -52,15 +64,27 @@ const ConfirmPayment = () => {
 
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center bg-white p-4 sm:p-8 font-['Inter',_sans-serif] text-gray-800">
+    <div className="w-full min-h-screen flex flex-col items-center justify-center bg-white p-4 sm:p-8 font-['Inter',_sans-serif] text-gray-800 overflow-x-hidden">
       <div className="w-full max-w-4xl mx-auto">
         {/* Main Title */}
-        <h1 className="text-3xl sm:text-4xl font-bold text-amber-800 text-center mb-8 sm:mb-12">
+        <motion.h1
+          variants={startUpVariants}
+          initial="hidden"
+          animate="visible"
+          custom={0}
+          className="text-3xl sm:text-4xl font-bold text-amber-800 text-center mb-8 sm:mb-12"
+        >
           Waiting for payment
-        </h1>
+        </motion.h1>
 
         {/* Content Area: QR Code and Upload */}
-        <div className="flex flex-col lg:flex-row gap-8 sm:gap-12 w-full">
+        <motion.div
+          variants={startUpVariants}
+          initial="hidden"
+          animate="visible"
+          custom={1}
+          className="flex flex-col lg:flex-row gap-8 sm:gap-12 w-full"
+        >
           {/* Left Side: QR Code */}
           <div className="flex-1 flex flex-col items-center justify-center bg-gray-200 rounded-lg p-6 min-h-[300px] sm:min-h-[400px]">
             <img
@@ -128,10 +152,16 @@ const ConfirmPayment = () => {
               />
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Footer Buttons */}
-        <div className="flex justify-between items-center mt-12 sm:mt-16">
+        <motion.div
+          variants={startUpVariants}
+          initial="hidden"
+          animate="visible"
+          custom={2}
+          className="flex justify-between items-center mt-12 sm:mt-16"
+        >
           <button
             type="button"
             onClick={() => navigate("/cart")}
@@ -141,11 +171,11 @@ const ConfirmPayment = () => {
           </button>
           <button
             type="button"
-            className="px-10 py-3 bg-amber-800 text-white font-semibold rounded-lg shadow-md hover:bg-amber-900 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-opacity-50"
+            className="px-10 py-3 bg-amber-800 text-white font-semibold rounded-lg shadow-md hover:bg-amber-900 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-opacity-50 !text-white hover:!text-white focus:!text-white"
           >
             Done
           </button>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
