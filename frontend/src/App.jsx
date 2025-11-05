@@ -30,6 +30,8 @@ import HistoryComp from "./components/review/history/HistoryComp";
 import StaffPayment from "./pages/staff/PaymentComp";
 import Cart from "./pages/customer/Cart";
 import PaymentHistory from "./components/Profile/PaymentHistory/paymenthistory";
+import ConfirmPayment from "./pages/customer/ConfirmPayment";
+
 const App = () => {
   const location = useLocation();
 
@@ -113,6 +115,15 @@ const App = () => {
           element={
             <RequireAuth roles={["CUSTOMER"]}>
               <Cart />
+            </RequireAuth>
+          }
+        />
+
+        <Route 
+          path="/payment"
+          element={
+            <RequireAuth roles={["CUSTOMER"]}>
+              <ConfirmPayment />
             </RequireAuth>
           }
         />

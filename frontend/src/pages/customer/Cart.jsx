@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion'; 
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom'; // ✅ Added import
 
 import CartItem from '../../components/Cart/CartItem';
 
@@ -23,17 +24,16 @@ const mockPendingBooking = {
                 name: 'Buddy'
             }
         },
-        // Example of an item that would have crashed the old code
         {
             id: 2,
-            scheduled: null, // Invalid date
+            scheduled: null,
             service: {
                 id: 11,
                 name: 'Basic Checkup',
                 price: 300.00,
                 picture: ''
             },
-            pet: null // No pet assigned
+            pet: null
         }
     ],
     booked_room: [
@@ -70,7 +70,6 @@ const deleteBookedRoomAPI = async (id) => {
     return new Promise(resolve => setTimeout(resolve, 300));
 };
 
-// --- Animation Variants ---
 const startUpVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: (i) => ({
@@ -85,6 +84,7 @@ const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
     const [total, setTotal] = useState(0.00);
+    const navigate = useNavigate(); // ✅ Added navigation hook
 
     const fetchBookingData = useCallback(async () => {
         const data = await fetchPendingBookingAPI();
@@ -102,19 +102,14 @@ const Cart = () => {
         }
 
         const transformedServices = booking.booked_service.map(bs => {
-            // FIX: Check for valid date string before formatting
             const scheduledDate = bs.scheduled ? new Date(bs.scheduled) : null;            
-            
             return {
                 id: bs.id,
-                // FIX: Typo 'uniqeId' -> 'uniqueId'
                 uniqueId: `service-${bs.id}`, 
                 type: 'service',
-                // FIX: Add optional chaining '?. ' to prevent crashes on null data
                 name: bs.service?.name || 'Service Not Found', 
                 picture: bs.service?.picture || '', 
                 petName: bs.pet?.name || 'No Pet Assigned', 
-                // FIX: Validate date object before formatting
                 details: scheduledDate && !isNaN(scheduledDate)
                     ? format(scheduledDate, 'MMM dd, yyyy / h:mm a')
                     : 'Date TBD',
@@ -132,15 +127,12 @@ const Cart = () => {
 
             return {
                 id: br.id,
-                // FIX: Typo 'uniqeId' -> 'uniqueId'
                 uniqueId: `room-${br.id}`, 
                 type: 'room',
-                // FIX: Add optional chaining '?. '
                 name: br.room?.name || 'Room Not Found',
                 picture: br.room?.picture || '',
                 petName: br.pet?.name || 'No Pet Assigned',
                 details: details,
-                // FIX: Critical bug! Was 'br.room.picture', now 'br.room.price'
                 price: br.room?.price || 0.00, 
             };
         });
@@ -201,28 +193,28 @@ const Cart = () => {
 
             {/* Cart Items List */}
             <div className="cart-list-container relative">
-                    <AnimatePresence mode="popLayout">
-                        {cartItems.length > 0 ? (
-                            cartItems.map((item) => (
-                                <CartItem
-                                    key={item.uniqueId}
-                                    item={item}
-                                    isSelected={selectedItems.includes(item.uniqueId)}
-                                    onSelect={handleSelectItem}
-                                    onDelete={handleDeleteItem}
-                                />
-                            ))
-                        ) : (
-                            <motion.p
-                                layout
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="text-center py-16"
-                            >
-                                Your cart is empty.
-                            </motion.p>
-                        )}
-                    </AnimatePresence>
+                <AnimatePresence mode="popLayout">
+                    {cartItems.length > 0 ? (
+                        cartItems.map((item) => (
+                            <CartItem
+                                key={item.uniqueId}
+                                item={item}
+                                isSelected={selectedItems.includes(item.uniqueId)}
+                                onSelect={handleSelectItem}
+                                onDelete={handleDeleteItem}
+                            />
+                        ))
+                    ) : (
+                        <motion.p
+                            layout
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="text-center py-16"
+                        >
+                            Your cart is empty.
+                        </motion.p>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Fixed Footer */}
@@ -253,14 +245,16 @@ const Cart = () => {
                                 {total.toFixed(2)} THB
                             </span>
                         </div>
-                        <button className="bg-[var(--brown-color)] !text-[var(--cream-color)] px-8 py-3 rounded-lg font-bold capitalize hover:bg-yellow-800 transition-colors text-lg">
+                        <button
+                            onClick={() => navigate('/payment')} // Added navigation
+                            className="bg-[var(--brown-color)] !text-[var(--cream-color)] px-8 py-3 rounded-lg font-bold capitalize hover:bg-yellow-800 transition-colors text-lg"
+                        >
                             payment
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Bottom padding */}
             <div className="h-32"></div>
         </div>
     )
