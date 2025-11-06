@@ -45,6 +45,37 @@ const isSuitable = async(roomId, petId)=>{
     return pet.type === room.petType;
 }
 
+const isReservableRoom = async(roomId, petId, checkIn, checkOut) => {
+    const count = await overlappingRoom(roomId, checkIn, checkOut);
+    const cap = await getRoomCap(roomId);
+
+    const isSuit = await isSuitable(roomId, petId);
+    if (!isSuit) {
+        const error = new Error('This pet is not eligible for the selected room.');
+        error.code = 'PET_NOT_SUIT';
+        throw error;
+    }
+
+    if (count >= cap) {
+        const error = new Error('This room has reached its maximum capacity for the selected dates.');
+        error.code = 'ROOM_FULL';
+        throw error;
+    }
+
+    const overlapping = await duplicatedRoom(petId, checkIn, checkOut);
+    if (overlapping.length > 0) {
+        const error = new Error('This pet already has a booking during the selected dates.');
+        error.duplicatedDates = overlapping.map(b => ({
+            checkIn: b.checkIn,
+            checkOut: b.checkOut
+        }));
+        error.code = 'BOOKING_DUPLICATE';
+        throw error;
+    }
+
+    return true;
+}
+
 const createBookedRoomWithCondition = async (roomId, petId, bookingId, checkIn, checkOut) => {
     const count = await overlappingRoom(roomId, checkIn, checkOut);
     const cap = await getRoomCap(roomId);
@@ -93,5 +124,6 @@ module.exports = {
     findBookedRoomById,
     overlappingRoom,
     duplicatedRoom,
-    createBookedRoomWithCondition
+    createBookedRoomWithCondition,
+    isReservableRoom
 };

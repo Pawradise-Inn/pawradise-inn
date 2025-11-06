@@ -7,8 +7,12 @@ const {
     getPayment,
     createPayment,
     updatePayment,
-    deletePayment
+    deletePayment,
+    getMyPayments
 } = require('../controllers/payments')
+
+router.route('/mine')
+    .get(protect, authorize("CUSTOMER"), getMyPayments)
 
 router.route('/')
     .get(protect, authorize("STAFF"), getPayments)

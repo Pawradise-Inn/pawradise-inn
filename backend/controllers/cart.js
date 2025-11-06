@@ -1,4 +1,6 @@
 const prisma = require("../prisma/prisma");
+const { isReservableRoom } = require("./logics/bookedRoom");
+const { isReservableService } = require("./logics/bookedService");
 const { sendErrorResponse, sendSuccessResponse } = require("../utils/responseHandler");
 
 // GET /cart - load or create current user's cart with items
@@ -146,6 +148,8 @@ const addRoomToCart = async (req, res) => {
       return existing ?? (await prisma.cart.create({ data: { customerId } }));
     });
 
+    await isReservableRoom(room.id, pet.id, checkIn, checkOut);
+
     const created = await prisma.cartRoom.create({
       data: {
         cartId: cart.id,
@@ -166,11 +170,36 @@ const addRoomToCart = async (req, res) => {
       created
     );
   } catch (err) {
+    if (err.code === "PET_NOT_SUIT") {
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "This room type is not suitable for your pet"
+      );
+    }
+    if (err.code === "BOOKING_DUPLICATE") {
+      return sendErrorResponse(
+        res,
+        409,
+        "DUPLICATE_BOOKING",
+        "Your pet already has a booking for these dates"
+      );
+    }
+    if (err.code === "ROOM_FULL") {
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "This room is fully booked for the selected dates"
+      );
+    }
+    console.log(err);
     return sendErrorResponse(
       res,
       500,
       "UNABLE_TO_SAVE",
-      "Unable to add room to cart. Please try again"
+      "Unable to add room booking. Please try again"
     );
   }
 };
@@ -209,6 +238,7 @@ const addServiceToCart = async (req, res) => {
     const cart = await prisma.cart.findFirst({ where: { customerId } })
       .then(async (c) => c ?? (await prisma.cart.create({ data: { customerId } })));
 
+    await isReservableService(serviceId, petId, scheduled);
     const created = await prisma.cartService.create({
       data: {
         cartId: cart.id,
@@ -228,11 +258,43 @@ const addServiceToCart = async (req, res) => {
       created
     );
   } catch (err) {
+    if (err.code === "PET_NOT_SUIT") {
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "This service is not suitable for your pet"
+      );
+    }
+    if (err.code === "SERVICE_FULL") {
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "This service is fully booked for the selected time"
+      );
+    }
+    if (err.code === "SERVICE_DUPLICATE") {
+      return sendErrorResponse(
+        res,
+        409,
+        "DUPLICATE_BOOKING",
+        "Your pet already has this service booked for this time"
+      );
+    }
+    if (err.code === "PET_NOT_FREE") {
+      return sendErrorResponse(
+        res,
+        409,
+        "OPERATION_NOT_ALLOWED",
+        "Your pet has another service scheduled at this time"
+      );
+    }
     return sendErrorResponse(
       res,
       500,
       "UNABLE_TO_SAVE",
-      "Unable to add service to cart. Please try again"
+      "Unable to add service booking. Please try again"
     );
   }
 };
