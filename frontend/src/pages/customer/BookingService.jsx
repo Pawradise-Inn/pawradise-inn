@@ -7,6 +7,7 @@ import { fetchAllServiceWithPaginationAPI } from "../../hooks/serviceAPI";
 import { overlay, popUP, startUpVariants } from "../../styles/animation";
 import { removeWindowScroll } from "../../utils/HandlePopup";
 import { filteredObjectByType } from "../../utils/HandleSearch";
+import CartButton from "../../components/Cart/CartButton";
 
 const BookingService = () => {
   const [mounted, setMounted] = useState(false);
@@ -51,6 +52,10 @@ const BookingService = () => {
   removeWindowScroll(popUpStatus);
 
   return (
+    <div className="w-full">
+      <div className="flex justify-end pr-8 mt-8">
+        <CartButton to="/cart" />
+      </div>
     <div className="w-full max-w-6xl mx-auto py-12">
       <b className="text-7xl text-center block m-8 mt-0">
         {"Service Reservation".split(" ").map((word, idx) => {
@@ -141,6 +146,7 @@ const BookingService = () => {
           </div>
         ) : null}
       </AnimatePresence>
+    </div>
     </div>
   );
 };
