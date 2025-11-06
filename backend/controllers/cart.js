@@ -1,19 +1,10 @@
 const prisma = require("../prisma/prisma");
 const { sendErrorResponse, sendSuccessResponse } = require("../utils/responseHandler");
 
-
-// Helper: get current customer's id from authenticated user
-const getCustomerIdFromReq = async (req) => {
-  const userId = req.user?.id;
-  if (!userId) return null;
-  const customer = await prisma.customer.findFirst({ where: { userId: Number(userId) } });
-  return customer?.id ?? null;
-};
-
 // GET /cart - load or create current user's cart with items
 const getCart = async (req, res) => {
   try {
-    const customerId = await getCustomerIdFromReq(req);
+    const customerId = req.user.roleId;
     if (!customerId) {
       return sendErrorResponse(res, 401, "UNAUTHORIZED", "Please log in to view your cart");
     }
@@ -67,7 +58,7 @@ const getCart = async (req, res) => {
 // PATCH /cart/rooms/:id/selected - toggle selection for room item
 const toggleCartRoomSelection = async (req, res) => {
   try {
-    const customerId = await getCustomerIdFromReq(req);
+    const customerId = req.user.roleId;
     if (!customerId) {
       return sendErrorResponse(res, 401, "UNAUTHORIZED", "Please log in to modify your cart");
     }
@@ -90,7 +81,7 @@ const toggleCartRoomSelection = async (req, res) => {
 // PATCH /cart/services/:id/selected - toggle selection for service item
 const toggleCartServiceSelection = async (req, res) => {
   try {
-    const customerId = await getCustomerIdFromReq(req);
+    const customerId = req.user.roleId;
     if (!customerId) {
       return sendErrorResponse(res, 401, "UNAUTHORIZED", "Please log in to modify your cart");
     }
@@ -113,7 +104,7 @@ const toggleCartServiceSelection = async (req, res) => {
 // POST /cart/rooms - add a room booking draft to cart
 const addRoomToCart = async (req, res) => {
   try {
-    const customerId = await getCustomerIdFromReq(req);
+    const customerId = req.user.roleId;
     if (!customerId) {
       return sendErrorResponse(res, 401, "UNAUTHORIZED", "Please log in to add to cart");
     }
@@ -187,7 +178,7 @@ const addRoomToCart = async (req, res) => {
 // POST /cart/services - add a service booking draft to cart
 const addServiceToCart = async (req, res) => {
   try {
-    const customerId = await getCustomerIdFromReq(req);
+    const customerId = req.user.roleId;
     if (!customerId) {
       return sendErrorResponse(res, 401, "UNAUTHORIZED", "Please log in to add to cart");
     }
@@ -249,7 +240,7 @@ const addServiceToCart = async (req, res) => {
 // DELETE /cart/rooms/:id - remove a room draft from cart
 const deleteCartRoom = async (req, res) => {
   try {
-    const customerId = await getCustomerIdFromReq(req);
+    const customerId = req.user.roleId;
     if (!customerId) {
       return sendErrorResponse(res, 401, "UNAUTHORIZED", "Please log in to modify your cart");
     }
@@ -276,7 +267,7 @@ const deleteCartRoom = async (req, res) => {
 // DELETE /cart/services/:id - remove a service draft from cart
 const deleteCartService = async (req, res) => {
   try {
-    const customerId = await getCustomerIdFromReq(req);
+    const customerId = req.user.roleId;
     if (!customerId) {
       return sendErrorResponse(res, 401, "UNAUTHORIZED", "Please log in to modify your cart");
     }

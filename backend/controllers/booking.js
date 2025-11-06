@@ -86,7 +86,7 @@ const updateBookingStatus = async (req, res) => {
   try {
     const bookingId = req.params.id;
     const status = req.body.status;
-    const allowedStatuses = ["BOOKED", "CANCELLED", "COMPLETED"];
+    const allowedStatuses = ["BOOKED", "CANCELLED", "PENDING"];
     if (!allowedStatuses.includes(status)) {
       return sendErrorResponse(
         res,
@@ -104,34 +104,6 @@ const updateBookingStatus = async (req, res) => {
       },
     });
 
-    if (status === "BOOKED") {
-      if (bookedRoomData?.length > 0) {
-        await Promise.all(
-          bookedRoomData.map((room) =>
-            createBookedRoomWithCondition({
-              roomId: room.roomId,
-              petId: room.petId,
-              bookingId: booking.id,
-              checkIn: room.checkIn,
-              checkOut: room.checkOut,
-            })
-          )
-        );
-      }
-
-      if (bookedServiceData?.length > 0) {
-        await Promise.all(
-          bookedServiceData.map((service) =>
-            createBookedServiceWithCondition({
-              serviceId: service.serviceId,
-              petId: service.petId,
-              bookingId: booking.id,
-              scheduled: service.scheduled,
-            })
-          )
-        );
-      }
-    }
     return sendSuccessResponse(
       res,
       200,
@@ -339,99 +311,6 @@ const cancelBooking = async (req, res) => {
   }
 };
 
-const updateBooking = async (req, res) => {
-  try {
-    const bookingId = Number(req.params.id);
-    const {
-      date,
-      status,
-      customerName,
-      customerEmail,
-      customerNumber,
-      ...otherData // Catch any other unexpected fields
-    } = req.body;
-
-    // Fetch the existing booking with its customer
-    const existingBooking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-      include: { customer: true },
-    });
-
-    if (!existingBooking) {
-      return sendErrorResponse(
-        res,
-        404,
-        "BOOKING_NOT_FOUND",
-        "Booking not found"
-      );
-    }
-
-    // Prepare the data to update the Booking model
-    const updateBookingData = {};
-    if (date) {
-      updateBookingData.date = new Date(date);
-    }
-    if (status) {
-      updateBookingData.status = status;
-    }
-    // Prepare the data to update the Customer model
-    const updateCustomerData = {};
-    if (customerName) {
-      updateCustomerData.name = customerName;
-    }
-    if (customerEmail) {
-      updateCustomerData.email = customerEmail;
-    }
-    if (customerNumber) {
-      updateCustomerData.number = customerNumber;
-    }
-
-    // Use a Prisma transaction to ensure both updates succeed or fail together
-    const [updatedBooking, updatedCustomer] = await prisma.$transaction([
-      // Update the Booking record with the new booking data
-      prisma.booking.update({
-        where: { id: bookingId },
-        data: updateBookingData,
-      }),
-      // Update the related Customer record if there's customer data to update
-      Object.keys(updateCustomerData).length > 0
-        ? prisma.customer.update({
-            where: { id: existingBooking.customerId },
-            data: updateCustomerData,
-          })
-        : prisma.customer.findUnique({
-            where: { id: existingBooking.customerId },
-          }), // A no-op to keep transaction consistent
-    ]);
-
-    // Reconstruct the response object in the desired format
-    const responseData = {
-      id: updatedBooking.id,
-      date: updatedBooking.date,
-      status: updatedBooking.status,
-      customerId: updatedBooking.customerId,
-      customerName: updatedCustomer.name,
-      customerEmail: updatedCustomer.email,
-      customerNumber: updatedCustomer.number,
-    };
-
-    return sendSuccessResponse(
-      res,
-      200,
-      "BOOKING_UPDATED",
-      "Booking updated successfully",
-      responseData
-    );
-  } catch (err) {
-    return sendErrorResponse(
-      res,
-      500,
-      "UNABLE_TO_UPDATE",
-      "Unable to update booking. Please try again"
-    );
-  }
-};
-
 module.exports = {
   getBookings,
   getBooking,
@@ -440,5 +319,4 @@ module.exports = {
   deleteBooking,
   getMyBookings,
   cancelBooking,
-  updateBooking,
 };

@@ -363,7 +363,7 @@ const getServiceStatus = async (req, res) => {
   //requirement: 6
   try {
     const name = req.query.name;
-    const schedule = new Date(req.query.entry_date_with_time);
+    const schedule = new Date();
     const service = await prisma.service.findFirst({
       where: { name: name },
     });

@@ -22,10 +22,6 @@ exports.register = async (req, res, next) => {
     const username = req.body.userName ?? req.body.user_name;
     const password = req.body.password;
     const role = (req.body.role ?? "CUSTOMER").toUpperCase();
-    let bankAccount;
-    if (role == "STAFF") {
-      bankAccount = req.body.account;
-    }
 
     if (!firstname || !lastname || !email || !phone || !username || !password) {
       return sendErrorResponse(
@@ -38,26 +34,35 @@ exports.register = async (req, res, next) => {
 
     const hashed = await hashPassword(password);
 
-    const user = await prisma.user.create({
-      data: {
-        firstname,
-        lastname,
-        email,
-        phone_number: phone,
-        user_name: username,
-        password: hashed,
-        role,
-      },
-    });
-
-    if (user.role === "CUSTOMER") {
-      await prisma.customer.create({ data: { userId: user.id } });
-    }
-    if (user.role === "STAFF") {
-      await prisma.staff.create({
-        data: { userId: user.id, wages: 0, bank_account: bankAccount },
+const user = await prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          firstname,
+          lastname,
+          email,
+          phone_number: phone,
+          user_name: username,
+          password: hashed,
+          role,
+        },
       });
-    }
+
+      if (newUser.role === "CUSTOMER") {
+        await tx.customer.create({ data: { userId: newUser.id } });
+      } 
+      else if (newUser.role === "STAFF") {
+        await tx.staff.create({
+          data: {
+            userId: newUser.id,
+            wages: req.body.wage,
+            bank_company: req.body.bankCompany,
+            bank_account: req.body.bankAccount,
+          },
+        });
+      }
+
+      return newUser;
+    });
 
     sendTokenResponse(user, 200, res, "REGISTERED_SUCCESSFULLY");
   } catch (error) {

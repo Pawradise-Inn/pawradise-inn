@@ -1,37 +1,6 @@
 const prisma = require("../prisma/prisma")
-const QRCode = require('qrcode')
-const generatePayload = required('promptpay-qr')
+const { createBookingTransaction } = require('./logics/booking.js');
 const { sendErrorResponse, sendSuccessResponse } = require("../utils/responseHandler");
-
-// const generateQR = async(req, res) =>{
-//     const amount = parseFloat(req.body.amount);
-//     const mobileNumber = process.env.PROMPTPAY_NUM;
-
-//     const payload = generatePayload(mobileNumber, {amount});
-//     const option = {
-//         dark: '#000',
-//         light: '#FFF'
-//     }
-
-//     try{
-//         const qrDataURL = QRCode.toDataURL(payload, option);
-            
-//         return sendSuccessResponse(
-//             res,
-//             201,
-//             "QR_GENERATED",
-//             "Generate QRcode successfully",
-//             {qrDataURL}
-//         )
-//     }catch(err){
-//         return sendErrorResponse(
-//             res,
-//             500,
-//             "FAIL_GENERATE_QRCODE",
-//             "Unable to generate QRCode"
-//         )
-//     }
-// }
 
 const getPayments = async (req, res) => {
    let options = {}
@@ -138,44 +107,32 @@ const getPayment = async (req, res) => {
 };
 
 const createPayment = async (req, res) => {
-    try{
-        const customerId = req.user.roleId;
-        const { amount, date, status, slip } = req.body;
-        const payment = await prisma.payment.create({
-            data: {
-                cost: amount,
-                date: date ? date : new Date(),
-                status: status,
-                slip: slip,
-                customerId: customerId
-            }
-        })
-        if (status == "SUCCESS"){
+    try {
+        const { payment, booking, status } = await createBookingTransaction(req.user, req.body);
+        
+        if (status === "SUCCESS") {
             return sendSuccessResponse(
-            res,
-            201,
-            "CREATED_SUCCESSFULLY",
-            "Payment has added to the history",
-            payment
-            )
-        }else{
+                res, 201, "BOOKING_CREATED", "Your booking has been created successfully",
+                { payment, booking } 
+            );
+        } else {
             return sendSuccessResponse(
-                res,
-                201,
-                "CREATED_SUCCESSFULLY",
-                "Payment has added to the history. Please re-upload slip or contact staff for help",
-                payment
-            )
+                res, 201, "PAYMENT_RECORDED_FAILED", "Payment has been recorded but failed. Please re-upload slip or contact staff.",
+                { payment, booking }
+            );
         }
-    }catch(err){
+
+    } catch (error) {
+
+        console.error("Booking transaction failed:", error);
         return sendErrorResponse(
             res,
             500,
-            "UNABLE_TO_SAVE",
-            "Unable to create peyment. Please try again"
-        )
+            "TRANSACTION_FAILED",
+            error.message || "Unable to create payment or booking."
+        );
     }
-}
+};
 
 const updatePayment = async (req, res) => {
     try{
@@ -261,7 +218,6 @@ const deletePayment = async (req, res) => {
 }
 
 module.exports ={
-    // generateQR,
     getPayments,
     getPayment,
     createPayment,
