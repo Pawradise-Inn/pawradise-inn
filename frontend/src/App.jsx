@@ -30,6 +30,10 @@ import HistoryComp from "./components/review/history/HistoryComp";
 import StaffPayment from "./pages/staff/PaymentComp";
 import Cart from "./pages/customer/Cart";
 import PaymentHistory from "./components/Profile/PaymentHistory/paymenthistory";
+import ConfirmPayment from "./pages/customer/ConfirmPayment";
+import PaymentSuccess from "./pages/customer/PaymentSuccess";
+import PaymentFailed from "./pages/customer/PaymentFailed";
+
 const App = () => {
   const location = useLocation();
 
@@ -116,6 +120,23 @@ const App = () => {
             </RequireAuth>
           }
         />
+
+        <Route
+          path="/payment"
+          element={<RequireAuth roles={["CUSTOMER"]}><ConfirmPayment /></RequireAuth>}
+        >
+        </Route>
+        <Route
+          path="/payment/success"
+          element={<RequireAuth roles={["CUSTOMER"]}><PaymentSuccess /></RequireAuth>}
+        >
+        </Route>
+        <Route
+          path="/payment/failed"
+          element={<RequireAuth roles={["CUSTOMER"]}><PaymentFailed /></RequireAuth>}
+        >
+        </Route>
+
 
         <Route path="/" element={<Navigate to="/login" replace />} />
         {/* <Route path="/staff" element={<Navigate to="/staff/login" replace />} /> */}
