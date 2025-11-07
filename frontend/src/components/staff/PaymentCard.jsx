@@ -16,7 +16,7 @@ const PaymentCard = ({
   const statusOptions = [
     { name: "Success", value: "SUCCESS" },
     { name: "Failed", value: "FAILED" },
-    { name: "Pending", value: "PENDING" },
+    { name: "Cancelled", value: "CANCELLED" },
   ];
 
   return (
@@ -35,9 +35,13 @@ const PaymentCard = ({
       <div className="flex justify-between items-center w-full mx-10">
         <div className="flex flex-col gap-2 justify-center items-start">
           <b>{username}</b>
-          {bookingDetails.map((detail, index) => (
-            <div key={index}>{detail}</div>
-          ))}
+          {Array.isArray(bookingDetails) && bookingDetails.length > 0 ? (
+            bookingDetails.map((detail, index) => (
+              <div key={index}>{detail}</div>
+            ))
+          ) : (
+            <div className="opacity-60">No booking details</div>
+          )}
         </div>
       </div>
 
