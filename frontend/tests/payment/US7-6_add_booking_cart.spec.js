@@ -48,31 +48,31 @@ test.beforeEach(async ({ page }) => {
   // Create 2 room bookings
   const bookedRoomData1 = await app.createBookingRoom(
     petData.data,
-    "Choose Wednesday, October 1st,",
-    "Choose Thursday, October 2nd,"
+    "Choose Saturday, November 1st,",
+    "Choose Sunday, November 2nd,"
   );
 
   const bookedRoomData2 = await app.createBookingRoom(
     petData.data,
-    "Choose Friday, October 3rd,",
-    "Choose Saturday, October 4th,"
+    "Choose Monday, November 3rd,",
+    "Choose Tuesday, November 4th,"
   );
 
   const bookedServiceData1 = await app.createBookingService(
     petData.data,
-    "Choose Wednesday, October 1st,",
+    "Choose Saturday, November 1st,",
     "10:00"
   );
 
   const bookedServiceData2 = await app.createBookingService(
     petData.data,
-    "Choose Thursday, October 2nd,",
+    "Choose Sunday, November 2nd,",
     "10:00"
   );
 
   const bookedServiceData3 = await app.createBookingService(
     petData.data,
-    "Choose Friday, October 3rd,",
+    "Choose Monday, November 3rd,",
     "12:00"
   );
 
@@ -138,12 +138,12 @@ test("Adding and Deleting cart card for Room and Service", async ({ page }) => {
 
   const bookedRoomData = await app.createBookingRoom(
     petData.data,
-    "Choose Sunday, October 5th,",
-    "Choose Monday, October 6th,"
+    "Choose Wednesday, November 5th,",
+    "Choose Thursday, November 6th,"
   );
   const bookedServiceData = await app.createBookingService(
     petData.data,
-    "Choose Tuesday, October 7th,",
+    "Choose Friday, November 7th,",
     "14:00"
   );
 

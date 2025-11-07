@@ -20,15 +20,9 @@ const register = async (req, res) => {
 
     const { name, sex, age, type, status, breed, disease, allergic, picture } =
       req.body;
-    const lastPet = await prisma.pet.findFirst({
-      orderBy: { id: "desc" }, // descending order, highest id first
-    });
-
-    const newId = lastPet ? lastPet.id + 1 : 1; // if no pets exist, start from 1
-
+    
     const pet = await prisma.pet.create({
       data: {
-        id: newId,
         name,
         sex,
         age: Number(age),

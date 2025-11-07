@@ -116,7 +116,7 @@ export class TestPage {
     };
 
     const response = await this.page.request.post(
-      "http://localhost:5000/api/v1/pet/register",
+      "http://localhost:5000/api/v1/pets/register",
       {
         data: petData,
         headers: {
@@ -137,7 +137,7 @@ export class TestPage {
 
   async deletePet(petId) {
     const response = await this.page.request.delete(
-      `http://localhost:5000/api/v1/pet/${petId}`,
+      `http://localhost:5000/api/v1/pets/${petId}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -158,17 +158,19 @@ export class TestPage {
     entryDate = "Choose Wednesday, October 1st,",
     exitDate = "Choose Thursday, October 2nd,"
   ) {
+    const bookingBar = this.page.getByTestId("booking-bar")
     await this.page.getByRole("link", { name: "room" }).click();
     await this.page.getByRole("button", { name: "BOOK" }).first().click();
-    await this.page.getByText("Pick pet").click();
-    await this.page.getByText(`${pet.name} (${pet.type})`).click();
-    await this.page.getByRole("button", { name: "mm/dd/yyyy" }).nth(2).click();
-    await this.page.getByRole("gridcell", { name: entryDate }).click();
-    await this.page.getByRole("button", { name: "mm/dd/yyyy" }).nth(2).click();
-    await this.page.getByRole("gridcell", { name: exitDate }).click();
-    await this.page.getByRole("button", { name: "BOOK" }).nth(3).click();
-    await this.page.getByRole("button", { name: "Close" }).first().click();
-    await this.page.getByRole("button", { name: "Close" }).click();
+    await bookingBar.getByText("Pick pet").click();
+    await bookingBar.getByText(`${pet.name} (${pet.type})`).last().click();
+    await bookingBar.getByRole("button", { name: "mm/dd/yyyy" }).first().click();
+    await bookingBar.getByRole("gridcell", { name: entryDate }).click();
+    await bookingBar.getByRole("button", { name: "mm/dd/yyyy" }).first().click();
+    await bookingBar.getByRole("gridcell", { name: exitDate }).click();
+    await bookingBar.getByRole("button", { name: "BOOK" }).click();
+    await bookingBar.getByRole("button", { name: "Close" }).first().click();
+    await bookingBar.getByRole("button", { name: "Close" }).click();
+    await this.page.locator('.bi.bi-x-lg').first().click();
 
     const name = this.page.getByTestId("name");
     const price = this.page.getByText(/฿/);
@@ -197,20 +199,23 @@ export class TestPage {
     entryDate = "Choose Wednesday, October 1st,",
     entryTime = "10:00"
   ) {
+
+    const bookingBar = this.page.getByTestId("booking-bar")
     await this.page.getByRole("link", { name: "service" }).click();
     await this.page.getByTestId("service-card").first().click();
-    await this.page.getByText("Pick pet").click();
-    await this.page.getByText(`${pet.name} (${pet.type})`).click();
-    await this.page.getByRole("button", { name: "mm/dd/yyyy" }).click();
-    await this.page.getByRole("gridcell", { name: entryDate }).click();
-    await this.page.getByTestId("pick-time").click();
-    await this.page
+    await bookingBar.getByText("Pick pet").click();
+    await bookingBar.getByText(`${pet.name} (${pet.type})`).last().click();
+    await bookingBar.getByRole("button", { name: "mm/dd/yyyy" }).click();
+    await bookingBar.getByRole("gridcell", { name: entryDate }).click();
+    await bookingBar.getByTestId("pick-time").click();
+    await bookingBar
       .locator("div")
       .filter({ hasText: entryTime })
       .last()
       .click();
-    await this.page.getByRole("button", { name: "BOOK" }).click();
-    await this.page.getByRole("button", { name: "Close" }).click();
+    await bookingBar.getByRole("button", { name: "BOOK" }).click();
+    await bookingBar.getByRole("button", { name: "Close" }).click();
+    await this.page.locator('.bi.bi-x-lg').first().click();
 
     const name = this.page.getByTestId("name");
     const price = this.page.getByText(/฿/);

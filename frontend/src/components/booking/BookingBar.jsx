@@ -272,7 +272,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   }, [data, commentStarSelect]);
 
   return (
-    <div className="w-1/2 bg-white rounded-3xl p-8 border-2 border-[var(--brown-color)] overflow-hidden">
+    <div data-testid="booking-bar" className="w-1/2 bg-white rounded-3xl p-8 border-2 border-[var(--brown-color)] overflow-hidden">
       {/* header dataial section */}
       <section className="my-5 flex justify-between">
         <div className="w-2/3">
