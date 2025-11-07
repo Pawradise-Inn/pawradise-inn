@@ -63,7 +63,8 @@ const customer = require("./routes/customer");
 const care = require("./routes/cares");
 const picture = require("./routes/picture");
 const cart = require("./routes/cart");
-const qr = require('./routes/qr')
+const payment = require('./routes/payment');
+const qr = require('./routes/qr');
 
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/bookings", booking);
@@ -78,7 +79,8 @@ app.use("/api/v1/customers", customer);
 app.use("/api/v1/cares", care);
 app.use("/api/v1/images", picture);
 app.use("/api/v1/carts", cart);
-app.use('/api/v1/qr', qr)
+app.use('/api/v1/payments', payment);
+app.use('/api/v1/qr', qr);
 
 const PORT = process.env.PORT || 5000;
 

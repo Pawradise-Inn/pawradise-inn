@@ -15,7 +15,7 @@ import DropDownList from "../../components/DropDownList";
 import "react-datepicker/dist/react-datepicker.css";
 import DateDropDown from "../../components/DateDropDown";
 import { fetchPetTypesAPI } from "../../hooks/petAPI";
-
+import CartButton from "../../components/Cart/CartButton";
 const BookingRoom = () => {
   const { createNotification } = useNotification();
   const [petTypes, setPetTypes] = useState([null]);
@@ -136,6 +136,10 @@ const BookingRoom = () => {
   removeWindowScroll(popUpStatus);
 
   return (
+    <div className="w-full">
+      <div className="flex justify-end pr-8 mt-8">
+        <CartButton to="/cart" />
+      </div>
     <div className="w-full max-w-6xl mx-auto py-12">
       <b className="text-7xl text-center block m-8 mt-0">
         {"Room Reservation".split(" ").map((word, idx) => {
@@ -265,6 +269,7 @@ const BookingRoom = () => {
           </div>
         ) : null}
       </AnimatePresence>
+    </div>
     </div>
   );
 };

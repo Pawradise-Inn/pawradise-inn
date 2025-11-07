@@ -65,6 +65,39 @@ const isSuitable = async(serviceId, petId)=>{
     return service.petType.includes(pet.type);
 }
 
+const isReservableService = async(serviceId, petId, scheduled) => {
+  const count = await overlappingService(serviceId, scheduled);
+
+  if (count >= 3) {
+    const error = new Error("This service is fully booked for the selected date and time.");
+    error.code = "SERVICE_FULL";
+    throw error;
+  }
+
+  const duplicated = await duplicatedService(serviceId, petId, scheduled);
+  if (duplicated) {
+    const error = new Error("This pet has already booked this service on the selected date.");
+    error.code = "SERVICE_DUPLICATE";
+    throw error;
+  }
+
+  const free = await isFreeThisTime(petId, scheduled);
+  if (!free) {
+    const error = new Error("This pet already has another service booked at the selected date and time.");
+    error.code = "PET_NOT_FREE";
+    throw error;
+  }
+
+  const isSuit = await isSuitable(serviceId, petId);
+  if (!isSuit) {
+    const error = new Error("This pet is not eligible for the selected service.");
+    error.code = "PET_NOT_SUIT";
+    throw error;
+  }
+
+  return true;
+}
+
 const createBookedServiceWithCondition = async (serviceId, petId, bookingId, scheduled) => {
   const count = await overlappingService(serviceId, scheduled);
 
@@ -112,4 +145,5 @@ module.exports = {
   overlappingService,
   duplicatedService,
   createBookedServiceWithCondition,
+  isReservableService
 };
