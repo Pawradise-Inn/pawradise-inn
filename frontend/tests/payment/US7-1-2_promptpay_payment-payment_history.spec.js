@@ -83,31 +83,31 @@ test.describe("Focus on payment behaviour", () => {
     // Create 2 room bookings
     const bookedRoomData1 = await app.createBookingRoom(
       petData.data,
-      "Choose Saturday, November 1st,",
-      "Choose Sunday, November 2nd,"
+      "Choose Thursday, November 27th,",
+      "Choose Friday, November 28th,"
     );
 
     const bookedRoomData2 = await app.createBookingRoom(
       petData.data,
-      "Choose Monday, November 3rd,",
-      "Choose Tuesday, November 4th,"
+      "Choose Saturday, November 29th,",
+      "Choose Sunday, November 30th,"
     );
 
     const bookedServiceData1 = await app.createBookingService(
       petData.data,
-      "Choose Saturday, November 1st,",
+      "Choose Thursday, November 27th,",
       "10:00"
     );
 
     const bookedServiceData2 = await app.createBookingService(
       petData.data,
-      "Choose Sunday, November 2nd,",
+      "Choose Friday, November 28th,",
       "10:00"
     );
 
     const bookedServiceData3 = await app.createBookingService(
       petData.data,
-      "Choose Monday, November 3rd,",
+      "Choose Saturday, November 29th,",
       "12:00"
     );
 
