@@ -25,10 +25,10 @@ const ItemRow = ({ item }) => (
 
 const PaymentHistoryCard = ({ items, status, totalPrice }) => {
   const getStatusDotColor = (status) => {
-    switch (String(status).toLowerCase()) {
-      case 'paid':
+    switch (status) {
+      case 'SUCCESS':
         return 'bg-[var(--success-color)]'; // Paid
-      case 'failed':
+      case 'FAILED':
         return 'bg-[var(--fail-color)]'; // Failed
       default:
         return 'bg-gray-400'; // Default
