@@ -106,27 +106,52 @@ test.afterEach(async () => {
   }
 });
 
-test("Staff got payment data with failed slip", async ({ page }) => {
+test("Staff got payment data with failed slip and change status", async ({
+  page,
+}) => {
   app.createPayment(slip, invalid_mockingAPI_response, 400);
+    await page.getByRole("link", { name: "profile" }).click();
+
+  const navigator = page.getByRole("link").filter({ hasText: /^$/ }).nth(2);
+  await navigator.click();
+
+  let totalPrice = 0;
+  let containerMyPaymentBefore = page.getByTestId("mypayment-container");
+  bookedRoom.forEach(async (item) => {
+    const card = findMypaymentCard(item, "Room");
+    await expect(card).toBeVisible();
+    containerMyPaymentBefore = containerMyPaymentBefore.filter({ has: card });
+    totalPrice += item.price;
+  });
+
+  bookedService.forEach(async (item) => {
+    const card = findMypaymentCard(item, "Service");
+    await expect(card).toBeVisible();
+    containerMyPaymentBefore = containerMyPaymentBefore.filter({ has: card });
+    totalPrice += item.price;
+  });
+
+  await expect(
+    containerMyPaymentBefore
+      .filter({ hasText: `Total Price: $${totalPrice.toFixed(2)}` })
+      .filter({ hasText: "Failed" })
+  ).toBeVisible();
   app.loginStaff();
 
   await page.getByRole("link", { name: "management" }).click();
   await page.getByRole("link").filter({ hasText: /^$/ }).nth(1).click();
 
-  let totalPrice = 0;
   const container = page.getByTestId("staff-payment-container");
   bookedRoom.forEach(async (item) => {
     const card = findStaffPaymentCard(item, "Room");
     await expect(card).toBeVisible();
     container = container.filter({ has: card });
-    totalPrice += item.price;
   });
 
   bookedService.forEach(async (item) => {
     const card = findStaffPaymentCard(item, "Service");
     await expect(card).toBeVisible();
     container = container.filter({ has: card });
-    totalPrice += item.price;
   });
 
   await expect(
@@ -137,6 +162,43 @@ test("Staff got payment data with failed slip", async ({ page }) => {
   ).toBeVisible();
 
   await expect(container.getByRole("img")).toBeVisible();
+
+  await container.getByText("FAILED").nth(1).click();
+  await container
+    .locator("div")
+    .filter({ hasText: /^Success$/ })
+    .last()
+    .click();
+
+  await expect(
+    container
+      .filter({ hasText: "test1234" })
+      .filter({ hasText: `Total Price: $${totalPrice.toFixed(2)}` })
+      .filter({ hasText: "Success" })
+  ).toBeVisible();
+
+  app.login();
+  await page.getByRole("link", { name: "profile" }).click();
+
+  await navigator.click();
+
+  // Re-query the container after logging back in
+  let containerMyPaymentAfter = page.getByTestId("mypayment-container");
+  bookedRoom.forEach(async (item) => {
+    const card = findMypaymentCard(item, "Room");
+    containerMyPaymentAfter = containerMyPaymentAfter.filter({ has: card });
+  });
+
+  bookedService.forEach(async (item) => {
+    const card = findMypaymentCard(item, "Service");
+    containerMyPaymentAfter = containerMyPaymentAfter.filter({ has: card });
+  });
+
+  await expect(
+    containerMyPaymentAfter
+      .filter({ hasText: `Total Price: $${totalPrice.toFixed(2)}` })
+      .filter({ hasText: "Success" })
+  ).toBeVisible();
 });
 
 test("Staff got payment data with paid slip", async ({ page }) => {

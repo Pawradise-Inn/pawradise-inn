@@ -184,7 +184,7 @@ test.describe("Focus on payment behaviour", () => {
     await expect(page.getByText(`Total 0.00 THB`)).toBeVisible();
   });
 
-  test("Done button with invalid slip, main-menu btn and check myPayment", async ({
+  test("Done button with invalid slip, main-menu btn, check myPayment and cart", async ({
     page,
   }) => {
     const uploadInput = page
@@ -230,6 +230,22 @@ test.describe("Focus on payment behaviour", () => {
         .filter({ hasText: `Total Price: $${totalPrice.toFixed(2)}` })
         .filter({ hasText: "Failed" })
     ).toBeVisible();
+
+    await page.getByRole("link", { name: "room" }).click();
+    await page.getByTestId("cart-icon").click();
+
+    bookedRoom.forEach(async (item) => {
+      const card = await findCartCard(item, "Room");
+      await expect(card).not.toBeVisible();
+    });
+
+    bookedService.forEach(async (item) => {
+      const card = await findCartCard(item, "Service");
+      await expect(card).not.toBeVisible();
+    });
+
+    bookedRoom = [];
+    bookedService = [];
   });
 
   test("Done button with invalid slip and re-upload btn", async ({ page }) => {
@@ -255,7 +271,7 @@ test.describe("Focus on payment behaviour", () => {
     await expect(page.getByText(totalPrice)).toBeVisible();
   });
 
-  test("Done button with valid slip and main-menu btn and check myPayment", async ({
+  test("Done button with valid slip and main-menu btn, check myPayment and cart", async ({
     page,
   }) => {
     const uploadInput = page
@@ -301,6 +317,19 @@ test.describe("Focus on payment behaviour", () => {
         .filter({ hasText: `Total Price: $${totalPrice.toFixed(2)}` })
         .filter({ hasText: "Paid" })
     ).toBeVisible();
+
+    await page.getByRole("link", { name: "room" }).click();
+    await page.getByTestId("cart-icon").click();
+
+    bookedRoom.forEach(async (item) => {
+      const card = await findCartCard(item, "Room");
+      await expect(card).not.toBeVisible();
+    });
+
+    bookedService.forEach(async (item) => {
+      const card = await findCartCard(item, "Service");
+      await expect(card).not.toBeVisible();
+    });
 
     bookedRoom = [];
     bookedService = [];
