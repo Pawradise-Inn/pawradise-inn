@@ -69,7 +69,7 @@ export const getPaymentStatusColor = (status) => {
       return "bg-[var(--service-complete-color)] !text-[var(--dark-brown-color)]";
     case "FAILED" :
       return "bg-[var(--fail-color)] !text-[var(--dark-brown-color)]";
-    case "PENDING" :
+    case "CANCELLED" :
       return "bg-[var(--room-reserved-color)] !text-[var(--dark-brown-color)]";
   }
 }

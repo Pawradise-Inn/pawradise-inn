@@ -108,7 +108,7 @@ const getPayments = async (req, res) => {
                 slip: payment.slip,
                 username: username,
                 bookingDetail: bookingDetail,
-                totalPrice: payment.cost,
+                totalPrice: payment.amount,
                 status: payment.status,
                 paymentDate: payment.date
             };

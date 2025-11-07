@@ -1,56 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PaymentCard from "../../components/staff/PaymentCard";
+import { fetchAllPaymentAPI, updatePaymentStatusAPI } from "../../hooks/paymentAPI";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PaymentComp = () => {
-  const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
 
-  const [payments, setPayments] = useState([
-    {
-      picture: "https://via.placeholder.com/150",
-      username: "John Doe",
-      bookingDetails: [
-        "Room A - 01/11/2025 10:00 AM",
-        "Service: Spa Treatment - 01/11/2025 11:00 AM",
-      ],
-      totalPrice: 120,
-      status: "SUCCESS",
-    },
-    {
-      picture: "https://via.placeholder.com/150",
-      username: "Jane Smith",
-      bookingDetails: [
-        "Room B - 02/11/2025 2:00 PM",
-        "Service: Massage Therapy - 02/11/2025 3:00 PM",
-      ],
-      totalPrice: 150,
-      status: "FAILED",
-    },
-    {
-      picture: "https://via.placeholder.com/150",
-      username: "David Brown",
-      bookingDetails: [
-        "Room C - 03/11/2025 9:00 AM",
-        "Service: Facial - 03/11/2025 10:00 AM",
-      ],
-      totalPrice: 200,
-      status: "PENDING",
-    },
-    {
-      picture: "https://via.placeholder.com/150",
-      username: "Emily White",
-      bookingDetails: [
-        "Room D - 04/11/2025 8:00 AM",
-        "Service: Yoga Class - 04/11/2025 9:00 AM",
-        "Service: Personal Training - 04/11/2025 10:00 AM",
-        "Room D - 04/11/2025 11:00 AM",
-        "Service: Nutrition Consultation - 04/11/2025 12:00 PM",
-      ],
-      totalPrice: 300,
-      status: "SUCCESS",
-    },
-  ]);
+  useEffect(() => {
+    const loadPayments = async () => {
+      try {
+        setLoading(true);
+        const response = await fetchAllPaymentAPI();
+        console.log("Full API response:", response);
+
+        const apiData = response?.data?.data ?? response?.data ?? [];
+        if (Array.isArray(apiData) && apiData.length > 0) {
+          setPayments(apiData);
+        } else {
+          setPayments([]);
+        }
+      } catch (error) {
+        console.error("❌ Failed to fetch payments:", error);
+        setPayments([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPayments();
+  }, []);
+
+  // ✅ handle status change (with API call)
+  const handleStatusChange = async (paymentId, newStatus) => {
+    try {
+      await updatePaymentStatusAPI(paymentId, newStatus);
+      // Update locally after successful API call
+      setPayments((prev) =>
+        prev.map((p) =>
+          p.paymentId === paymentId ? { ...p, status: newStatus } : p
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update payment status:", error);
+    }
+  };
 
   const handleCheckboxChange = (status) => {
     setSelectedStatuses((prev) =>
@@ -60,20 +56,10 @@ const PaymentComp = () => {
     );
   };
 
-  const updatePaymentStatus = (username, newStatus) => {
-    setPayments((prev) =>
-      prev.map((payment) =>
-        payment.username === username
-          ? { ...payment, status: newStatus }
-          : payment
-      )
-    );
-  };
-
-  // filter
   const filteredPayments = payments.filter(
     (payment) =>
-      (selectedStatuses.length === 0 || selectedStatuses.includes(payment.status)) &&
+      (selectedStatuses.length === 0 ||
+        selectedStatuses.includes(payment.status)) &&
       payment.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -98,7 +84,7 @@ const PaymentComp = () => {
 
         {/* check box */}
         <div className="flex flex-wrap items-center gap-4 my-4">
-          {["SUCCESS", "FAILED", "PENDING"].map((status) => (
+          {["SUCCESS", "FAILED", "CANCELLED"].map((status) => (
             <label
               key={status}
               className="relative flex items-center space-x-2 cursor-pointer font-semibold"
@@ -111,9 +97,9 @@ const PaymentComp = () => {
               />
               <div
                 className="relative w-8 h-8 border-2 border-[var(--brown-color)] rounded transition-all bg-[var(--cream-color)]
-                          before:absolute before:top-1/2 before:left-1/2 before:w-6 before:h-0.5 before:bg-[var(--dark-brown-color)]
-                          before:origin-center before:-translate-x-1/2 before:-translate-y-1/2 before:rotate-135 before:transform
-                          before:transition-all before:scale-0 peer-checked:before:scale-100"
+                  before:absolute before:top-1/2 before:left-1/2 before:w-6 before:h-0.5 before:bg-[var(--dark-brown-color)]
+                  before:origin-center before:-translate-x-1/2 before:-translate-y-1/2 before:rotate-135 before:transform
+                  before:transition-all before:scale-0 peer-checked:before:scale-100"
               ></div>
               <span>{status}</span>
             </label>
@@ -131,14 +117,14 @@ const PaymentComp = () => {
           <AnimatePresence>
             {filteredPayments.map((payment) => (
               <PaymentCard
-                key={payment.username} // The key is crucial for AnimatePresence
-                picture={payment.picture}
+                key={payment.paymentId}
+                picture={payment.slip}
                 username={payment.username}
-                bookingDetails={payment.bookingDetails}
+                bookingDetails={payment.bookingDetail}
                 totalPrice={payment.totalPrice}
                 status={payment.status}
                 onStatusChange={(newStatus) =>
-                  updatePaymentStatus(payment.username, newStatus)
+                  handleStatusChange(payment.paymentId, newStatus)
                 }
               />
             ))}
