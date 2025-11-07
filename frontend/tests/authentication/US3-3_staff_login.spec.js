@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Customer Login", () => {
+test.describe("Staff Login", () => {
   test("Initial login page elements", async ({ page }) => {
     await page.goto("http://localhost:3000/login");
 
@@ -29,15 +29,15 @@ test.describe("Customer Login", () => {
     // Fill in incorrect username
     await page
       .getByRole("textbox", { name: "Username (For Login)" })
-      .fill("testja1234");
-    await page.getByRole("textbox", { name: "Password" }).fill("1234");
+      .fill("poroja");
+    await page.getByRole("textbox", { name: "Password" }).fill("poro");
 
     // Verify fields are filled correctly
     await expect(
       page.getByRole("textbox", { name: "Username (For Login)" })
-    ).toHaveValue("testja1234");
+    ).toHaveValue("poroja");
     await expect(page.getByRole("textbox", { name: "Password" })).toHaveValue(
-      "1234"
+      "poro"
     );
 
     // Click login button
@@ -68,7 +68,7 @@ test.describe("Customer Login", () => {
     // Fill in correct username but wrong password
     await page
       .getByRole("textbox", { name: "Username (For Login)" })
-      .fill("test1234");
+      .fill("poro");
     await page.getByRole("textbox", { name: "Password" }).fill("WrongPassword123");
 
     // Click login button
@@ -101,15 +101,15 @@ test.describe("Customer Login", () => {
     // Fill in correct credentials
     await page
       .getByRole("textbox", { name: "Username (For Login)" })
-      .fill("test1234");
-    await page.getByRole("textbox", { name: "Password" }).fill("1234");
+      .fill("poro");
+    await page.getByRole("textbox", { name: "Password" }).fill("poro");
 
     // Verify fields are filled correctly
     await expect(
       page.getByRole("textbox", { name: "Username (For Login)" })
-    ).toHaveValue("test1234");
+    ).toHaveValue("poro");
     await expect(page.getByRole("textbox", { name: "Password" })).toHaveValue(
-      "1234"
+      "poro"
     );
 
     // Click login button
@@ -125,7 +125,7 @@ test.describe("Customer Login", () => {
     ).toBeVisible();
 
     // Wait for navigation after successful login
-    await page.waitForURL(/\/room|\/service|\/review|\/profile/, {
+    await page.waitForURL(/\/dashboard|\/pet-status|\/review|\/management/, {
       timeout: 10000,
     });
 
@@ -159,7 +159,7 @@ test.describe("Customer Login", () => {
 
     await page
       .getByRole("textbox", { name: "Username (For Login)" })
-      .fill("test1234");
+      .fill("poro");
 
     await expect(loginBtn).toBeDisabled();
 

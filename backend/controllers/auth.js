@@ -201,17 +201,59 @@ exports.updateMe = async (req, res) => {
 
 exports.deleteMe = async (req, res) => {
   try {
-    const idParam = req.user.id;
+    console.log(req.body);
+    const userId = Number(req.user.id);
+    const { password } = req.body || {};
 
-    const user = await prisma.user.delete({
-      where: { id: Number(idParam) },
+    // 1) Validate input
+    if (!password) {
+      return sendErrorResponse(
+        res,
+        400,
+        "MISSING_FIELDS",
+        "Please enter your password to confirm deletion"
+      );
+    }
+
+    // 2) Load current user (need the hashed password to verify)
+    const existing = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, password: true },
     });
+
+    if (!existing) {
+      return sendErrorResponse(
+        res,
+        404,
+        "NOT_FOUND",
+        "Your profile could not be found"
+      );
+    }
+
+    // 3) Check password
+    const isMatch = await matchPassword(password, existing.password);
+    if (!isMatch) {
+      return sendErrorResponse(
+        res,
+        401,
+        "UNAUTHORIZED",
+        "Incorrect password"
+      );
+    }
+
+    // 4) Delete the user
+    // If your Prisma schema does NOT have ON DELETE CASCADE for related rows,
+    // do this in a transaction and delete dependents first.
+    await prisma.user.delete({ where: { id: userId } });
+
+    // 5) Clear cookie + respond
     res.cookie("token", "", {
       httpOnly: true,
       expires: new Date(0),
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
     });
+
     return sendSuccessResponse(
       res,
       200,
@@ -219,6 +261,7 @@ exports.deleteMe = async (req, res) => {
       "Account deleted and logged out successfully"
     );
   } catch (err) {
+    console.error(err);
     return sendErrorResponse(
       res,
       500,
@@ -227,6 +270,7 @@ exports.deleteMe = async (req, res) => {
     );
   }
 };
+
 
 exports.login = async (req, res, next) => {
   try {
