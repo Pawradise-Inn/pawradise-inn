@@ -135,7 +135,7 @@ const ProfileComp = () => {
 
     setShowDeleteModal(false);
     setUser?.(null);
-    deleteMeAPI()
+    deleteMeAPI(password)
       .then(() => {
         localStorage.removeItem("token");
         sessionStorage.removeItem("token");

@@ -73,9 +73,24 @@ export const setUpInterceptors = (logout) => {
         const { header, content } = errorData.error;
         createNotification("fail", header, content);
 
+        const isDeleteMe = /\/api\/v1\/auth\/me\/?$/.test(url) && method === "delete";
+        const isLogin    = /\/api\/v1\/auth\/login\/?$/.test(url) && method === "post";
+
         // Special handling for 401 errors
         if (status === 401) {
-          logout();
+          // Wrong password on delete-me → let caller handle; DO NOT logout.
+          if (isDeleteMe && errType === "UNAUTHORIZED") {
+            return Promise.reject(error);
+          }
+          // Bad credentials on login → let caller handle; DO NOT logout.
+          if (isLogin) {
+            return Promise.reject(error);
+          }
+
+          // All other 401s: token invalid/expired → global logout.
+          if (typeof logout === "function") {
+            logout();
+          }
         }
       }
 

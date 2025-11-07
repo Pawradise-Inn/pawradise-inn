@@ -78,6 +78,7 @@ test.describe("Customer Delete Account", () => {
     await page.getByRole("button", { name: /confirm/i }).click();
 
     // Expect some error to appear; adapt selector/text to your UI if needed
+    await expect(page.getByText('Access Denied')).toBeVisible();
     await expect(page.getByText("Incorrect password")).toBeVisible({ timeout: 5000 });
     
     // Still authenticated and on profile

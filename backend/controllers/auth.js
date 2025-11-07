@@ -242,8 +242,6 @@ exports.deleteMe = async (req, res) => {
     }
 
     // 4) Delete the user
-    // If your Prisma schema does NOT have ON DELETE CASCADE for related rows,
-    // do this in a transaction and delete dependents first.
     await prisma.user.delete({ where: { id: userId } });
 
     // 5) Clear cookie + respond
