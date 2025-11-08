@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { generateQrAPI } from "../../hooks/paymentAPI"; 
 import { uploadImageAPI } from "../../hooks/imageAPI";
+import { checkSlipAPI } from "../../hooks/slipOkAPI";
 
 const startUpVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -76,7 +77,11 @@ const ConfirmPayment = () => {
 
     try {
       const result = await uploadImageAPI(uploadedImage);
-      console.log("✅ Uploaded image result:", result);
+      const imageUrl = result.message.details.imageUrl;
+      console.log("✅ Uploaded image url:", imageUrl);
+
+      const slipResult = await checkSlipAPI(imageUrl);
+      console.log("✅ OK Slip API result:", slipResult);
     } catch (error) {
       console.error("❌ Error uploading image:", error);
     }
