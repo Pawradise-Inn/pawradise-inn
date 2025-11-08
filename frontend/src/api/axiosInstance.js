@@ -27,8 +27,11 @@ export const setUpInterceptors = (logout) => {
       const responseData = response.data;
       const method = response.config.method?.toLowerCase();
       
-      const display = [responseData.message.type, responseData.message.content];
-      console.log(display.join('\n'), responseData);
+      // const display = [responseData.message.type, responseData.message.content];
+      // console.log(display.join('\n'), responseData);
+      const typeForLog = responseData?.message?.type || "";
+      const contentForLog = responseData?.message?.content || "";
+      console.log([typeForLog, contentForLog].join('\n'), responseData);
 
       // Only show success notifications for actions that modify data
       const shouldShowNotification =
@@ -59,6 +62,9 @@ export const setUpInterceptors = (logout) => {
 
       const status = error.response.status;
       const errorData = error.response.data;
+      const method = error.config?.method?.toLowerCase?.() || "";
+      const url = error.config?.url || "";
+      const errType = errorData?.error?.type || "";
 
       const display = [errorData.error.type, errorData.error.content];
       console.log(display.join('\n'), errorData);
