@@ -53,7 +53,7 @@ const BookingService = () => {
 
   return (
     <div className="w-full">
-      <div className="flex justify-end pr-8 mt-8">
+      <div className="fixed top-25 right-15 z-50">
         <CartButton to="/cart" />
       </div>
     <div className="w-full max-w-6xl mx-auto py-12">
