@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { generateQrAPI } from "../../hooks/paymentAPI";
+import { generateQrAPI, createPaymentAPI } from "../../hooks/paymentAPI";
 import { uploadImageAPI } from "../../hooks/imageAPI";
 import { checkSlipAPI } from "../../hooks/slipOkAPI";
 
@@ -83,8 +83,19 @@ const ConfirmPayment = () => {
 
       const slipResult = await checkSlipAPI(imageUrl);
       const slipStatus = slipResult.success;
-
       console.log("✅ OK Slip API status:", slipStatus);
+
+      const paymentStatus = slipStatus ? "SUCCESS" : "FAILED";
+      try {
+        const paymentResponse = await createPaymentAPI({
+          status: paymentStatus,
+          amount: total,
+          slip: imageUrl,
+        });
+        console.log(`💰 Payment creation ${paymentStatus}:`, paymentResponse);
+      } catch (createError) {
+        console.error("❌ Payment creation failed:", createError);
+      }
 
       if (slipStatus) {
         navigate("/payment/success");
@@ -92,9 +103,10 @@ const ConfirmPayment = () => {
         navigate("/payment/failed");
       }
     } catch (error) {
-      console.error("❌ Error uploading image:", error);
+      console.error("❌ Error uploading image or processing payment:", error);
     }
   };
+
 
   useEffect(() => {
     return () => {
