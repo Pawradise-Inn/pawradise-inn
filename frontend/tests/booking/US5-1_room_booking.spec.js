@@ -26,11 +26,11 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
       .click();
 
     // Ensure popup visible
-    await expect(page.getByText(/Room/)).toBeVisible();
+    await expect(page.getByTestId("booking-bar")).toBeVisible();
 
     // Select DOG pet created in setup
     await page.getByText("Pick pet").click();
-    await page.getByText(`${petData.data.name} (${petData.data.type})`).click();
+    await page.getByText(`${petData.data.name} (${petData.data.type})`).last().click();
 
     // Pick a valid future-ish date range
     await page.getByRole("button", { name: "mm/dd/yyyy" }).nth(2).click();
@@ -43,7 +43,7 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
       .click();
 
     // Attempt booking - expect suitability error
-    await page.getByRole("button", { name: "BOOK" }).nth(3).click();
+    await page.locator('form').getByRole("button", { name: "BOOK" }).click();
     await expect(
       page.getByText("This room type is not suitable for your pet")
     ).toBeVisible();
@@ -56,24 +56,24 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
     await page.goto("http://localhost:3000/room");
     await page.getByRole("button", { name: "BOOK" }).first().click();
 
-    await expect(page.getByText(/Room/)).toBeVisible();
+    await expect(page.getByTestId("booking-bar")).toBeVisible();
 
     await page.getByText("Pick pet").click();
-    await page.getByText(`${petData.data.name} (${petData.data.type})`).click();
+    await page.getByText(`${petData.data.name} (${petData.data.type})`).last().click();
 
     // Select past dates (relative to other tests in this suite)
     await page.getByRole("button", { name: "mm/dd/yyyy" }).nth(2).click();
     await page
-      .getByRole("gridcell", { name: "Choose Wednesday, October 1st," })
+      .getByRole("gridcell", { name: "Choose Friday, October 31st," })
       .click();
     await page.getByRole("button", { name: "mm/dd/yyyy" }).nth(2).click();
     await page
-      .getByRole("gridcell", { name: "Choose Thursday, October 2nd," })
+      .getByRole("gridcell", { name: "Choose Saturday, November 1st," })
       .click();
 
     // Submit and expect date validation
-    await page.getByRole("button", { name: "BOOK" }).nth(3).click();
-    await expect(page.getByText("Date is invalid")).toBeVisible();
+    await page.locator('form').getByRole("button", { name: "BOOK" }).click();
+    await expect(page.locator('b').getByText("Date is invalid")).toBeVisible();
 
     await page.locator(".bi.bi-x-lg").first().click();
   });
@@ -82,23 +82,23 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
     await page.goto("http://localhost:3000/room");
     await page.getByRole("button", { name: "BOOK" }).first().click();
 
-    await expect(page.getByText(/Room/)).toBeVisible();
+    await expect(page.getByTestId("booking-bar")).toBeVisible();
 
     await page.getByText("Pick pet").click();
-    await page.getByText(`${petData.data.name} (${petData.data.type})`).click();
+    await page.getByText(`${petData.data.name} (${petData.data.type})`).last().click();
 
-    // Entry: Oct 2, Exit: Oct 1 (invalid order)
+    // Entry: Nov 30, Exit: Nov 29 (invalid order)
     await page.getByRole("button", { name: "mm/dd/yyyy" }).nth(2).click();
     await page
-      .getByRole("gridcell", { name: "Choose Thursday, October 2nd," })
+      .getByRole("gridcell", { name: "Choose Sunday, November 30th," })
       .click();
     await page.getByRole("button", { name: "mm/dd/yyyy" }).nth(2).click();
     await page
-      .getByRole("gridcell", { name: "Choose Wednesday, October 1st," })
+      .getByRole("gridcell", { name: "Choose Saturday, November 29th," })
       .click();
 
-    await page.getByRole("button", { name: "BOOK" }).nth(3).click();
-    await expect(page.getByText("Date is invalid")).toBeVisible();
+    await page.locator('form').getByRole("button", { name: "BOOK" }).click();
+    await expect(page.locator('b').getByText("Date is invalid")).toBeVisible();
 
     await page.locator(".bi.bi-x-lg").first().click();
   });
@@ -119,11 +119,11 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
     await page.getByRole("button", { name: "BOOK" }).first().click();
 
     // Wait for booking popup to be visible
-    await expect(page.getByText(/Room/)).toBeVisible();
+    await expect(page.getByTestId("booking-bar")).toBeVisible();
 
     // Select pet
     await page.getByText("Pick pet").click();
-    await page.getByText(`${petData.data.name} (${petData.data.type})`).click();
+    await page.getByText(`${petData.data.name} (${petData.data.type})`).last().click();
 
     // Select check-in date (November 29th)
     await page.getByRole("button", { name: "mm/dd/yyyy" }).nth(2).click();
@@ -137,13 +137,19 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
       .getByRole("gridcell", { name: "Choose Sunday, November 30th," })
       .click();
 
+    // Wait for booking status to update (room available)
+    await expect(
+      page.getByText("room available")
+    ).toBeVisible({ timeout: 10000 });
+
     // Confirm booking
-    await page.getByRole("button", { name: "BOOK" }).nth(3).click();
+    await page.locator('form').getByRole("button", { name: "BOOK" }).click();
 
     // Wait for and verify success notification appears
+    // The notification content "Room added to cart" appears in the notification card
     await expect(
-      page.getByText("Room booking created successfully")
-    ).toBeVisible();
+      page.getByText("Room added to cart")
+    ).toBeVisible({ timeout: 10000 });
 
     // Close popup (X icon)
     await page.locator(".bi.bi-x-lg").first().click();
@@ -176,10 +182,10 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
       // Book the room with this pet
       await page.getByRole("button", { name: "BOOK" }).first().click();
 
-      await expect(page.getByText(/Room/)).toBeVisible();
+      await expect(page.getByTestId("booking-bar")).toBeVisible();
 
       await page.getByText("Pick pet").click();
-      await page.getByText(`${pet.data.name} (${pet.data.type})`).click();
+      await page.getByText(`${pet.data.name} (${pet.data.type})`).last().click();
 
       await page.getByRole("button", { name: "mm/dd/yyyy" }).nth(2).click();
       await page
@@ -199,7 +205,7 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
 
       if (statusText && statusText.includes("not available")) {
         // Room is now full, attempt booking should fail
-        await page.getByRole("button", { name: "BOOK" }).nth(3).click();
+        await page.locator('form').getByRole("button", { name: "BOOK" }).click();
 
         // Wait for and verify error notification appears
         await expect(
@@ -211,7 +217,7 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
         break; // Room is full, exit loop
       } else {
         // Room is still available, book it
-        await page.getByRole("button", { name: "BOOK" }).nth(3).click();
+        await page.locator('form').getByRole("button", { name: "BOOK" }).click();
 
         // Wait for booking confirmation
 
@@ -228,19 +234,19 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
     await page.goto("http://localhost:3000/room");
     await page.getByRole("button", { name: "BOOK" }).first().click();
 
-    await expect(page.getByText(/Room/)).toBeVisible();
+    await expect(page.getByTestId("booking-bar")).toBeVisible();
 
     await page.getByText("Pick pet").click();
-    await page.getByText(`${petData.data.name} (${petData.data.type})`).click();
+    await page.getByText(`${petData.data.name} (${petData.data.type})`).last().click();
 
     await page.getByRole("button", { name: "mm/dd/yyyy" }).nth(2).click();
     await page
-      .getByRole("gridcell", { name: "Choose Wednesday, October 1st," })
+      .getByRole("gridcell", { name: "Choose Saturday, November 29th," })
       .click();
 
     await page.getByRole("button", { name: "mm/dd/yyyy" }).nth(2).click();
     await page
-      .getByRole("gridcell", { name: "Choose Thursday, October 2nd," })
+      .getByRole("gridcell", { name: "Choose Sunday, November 30th," })
       .click();
 
     // Check status again
@@ -251,7 +257,7 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
 
     if (finalStatusText && finalStatusText.includes("not available")) {
       // Attempt booking - should fail
-      await page.getByRole("button", { name: "BOOK" }).nth(3).click();
+      await page.locator('form').getByRole("button", { name: "BOOK" }).click();
 
       // Wait for and verify error notification appears
       await expect(
@@ -260,7 +266,7 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
     } else {
       // Room might still have capacity, but we've tested the booking flow
       // Attempt booking - may succeed or fail depending on capacity
-      await page.getByRole("button", { name: "BOOK" }).nth(3).click();
+      await page.locator('form').getByRole("button", { name: "BOOK" }).click();
 
       // Check for either success or failure
       try {
