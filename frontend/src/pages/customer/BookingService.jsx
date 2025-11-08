@@ -24,7 +24,7 @@ const BookingService = () => {
       data.data.forEach((service) => {
         service.headerType = "Service";
       });
-
+      
       setService(data.data);
     });
   }, []);

@@ -130,7 +130,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     let body;
     if (data.headerType === "Service") {
       body = {
-        service_name: data.name,
+        serviceId: data.id,
         petId: currentPetId,
         scheduled: changeDateTime(formData.entryDate, formData.entryTime),
       };
@@ -297,7 +297,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
                 backgroundColor:
                   status == "date is invalid"
                     ? "var(--warning-color)"
-                    : status == "room available"
+                    : (status == "room available" || status == "service available")
                     ? "var(--success-color)"
                     : "var(--fail-color)",
               }}

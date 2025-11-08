@@ -331,6 +331,7 @@ const getServicesWithPagination = async (req, res) => {
           : 0;
 
         return {
+          id: s.id,
           image: s.picture,
           name: s.name,
           reviewStar: avgRating.toFixed(2),
