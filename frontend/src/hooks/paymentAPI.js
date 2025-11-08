@@ -29,3 +29,13 @@ export const updatePaymentStatusAPI = async (paymentId, newStatus) => {
     throw error;
   }
 };
+
+export const generateQrAPI = async () => {
+  try {
+    const response = await axiosInstance.post("/api/v1/qr/generateQr");
+    return response.data;
+  } catch (error) {
+    console.error("Error generating QR code:", error);
+    throw error;
+  }
+};

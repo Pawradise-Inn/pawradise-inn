@@ -15,10 +15,10 @@ const genQR = async (req, res) => {
     QRCode.toDataURL(payload, option, (err, url) => {
         if(err){
             console.log('generate fail');
-            return sendErrorResponse(res, 400, 'Generate fail', 'Unable to generate qr code');
+            return sendErrorResponse(res, 400, 'Generate fail', 'Unable to generate QR code');
         }
         else{
-            return sendSuccessResponse(res, 200, "Generate successfully", "generate qr code", url); 
+            return sendSuccessResponse(res, 200, "Generate successfully", "QR code generated", url); 
         }
     })
 }

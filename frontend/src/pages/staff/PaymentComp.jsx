@@ -33,7 +33,7 @@ const PaymentComp = () => {
     loadPayments();
   }, []);
 
-  // ✅ handle status change (with API call)
+  // handle status change
   const handleStatusChange = async (paymentId, newStatus) => {
     try {
       await updatePaymentStatusAPI(paymentId, newStatus);

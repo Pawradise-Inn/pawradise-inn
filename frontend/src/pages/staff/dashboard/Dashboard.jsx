@@ -45,6 +45,7 @@ const Dashboard = () => {
           checkOut: allData.checkOut.length,
           services: allData.serviceBookings.length,
         });
+        console.log(allData)
 
       } catch (error) {
         console.error("Failed to load dashboard data:", error);

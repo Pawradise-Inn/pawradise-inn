@@ -13,3 +13,20 @@ export const uploadImageAPI = async (file) => {
     
     return response.data;
 }
+
+
+// export const uploadImageAPI = async (file) => {
+//     const formData = new FormData();
+//     formData.append('image', file);
+
+//     try {
+//         const response = await axiosInstance.post(`${API_URL}/upload`, formData);
+
+//         console.log("Raw image upload response:", response);
+
+//         return response;
+//     } catch (error) {
+//         console.error("Upload failed:", error.response?.data || error);
+//         throw error;
+//     }
+// }
