@@ -131,6 +131,13 @@ const BookingRoom = () => {
   const handlePopUpData = useCallback((data, status) => {
     setPopUpStatus(status);
     setPopUpData(data);
+    if (status) {
+      // status is TRUE (popup is opening)
+      window.dispatchEvent(new Event('hideCartButton'));
+    } else {
+      // status is FALSE (popup is closing)
+      window.dispatchEvent(new Event('showCartButton'));
+    }
   }, []);
 
   removeWindowScroll(popUpStatus);

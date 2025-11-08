@@ -139,6 +139,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         .then(() => {
           changeBookingBarStatus();
           onClick(data, false);
+          window.dispatchEvent(new Event('cartUpdated'));
+          window.dispatchEvent(new Event('showCartButton'));
         })
         .catch((error) => {
           console.error("Adding service to cart error:", error);
@@ -155,6 +157,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         .then(() => {
           changeBookingBarStatus();
           onClick(data, false);
+          window.dispatchEvent(new Event('cartUpdated'));
+          window.dispatchEvent(new Event('showCartButton'));
         })
         .catch((error) => {
           console.error("Adding room to cart error:", error);
