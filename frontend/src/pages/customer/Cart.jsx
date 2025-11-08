@@ -2,73 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion'; 
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom'; // ✅ Added import
+import { getCart, toggleCartRoomSelection, toggleCartServiceSelection } from '../../hooks/cartAPI';
 
 import CartItem from '../../components/Cart/CartItem';
-
-const mockPendingBooking = {
-    id: 1,
-    status: 'PENDING',
-    customerName: 'Test Customer',
-    booked_service: [
-        {
-            id: 1,
-            scheduled: '2025-11-10T10:00:00Z',
-            service: {
-                id: 10,
-                name: 'Deluxe Pet Grooming',
-                price: 850.00,
-                picture: 'https://storage.googleapis.com/paw_image/service_grooming.jpg'
-            },
-            pet: {
-                id: 3,
-                name: 'Buddy'
-            }
-        },
-        {
-            id: 2,
-            scheduled: null,
-            service: {
-                id: 11,
-                name: 'Basic Checkup',
-                price: 300.00,
-                picture: ''
-            },
-            pet: null
-        }
-    ],
-    booked_room: [
-        {
-            id: 1,
-            checkIn: '2025-11-05T14:00:00Z',
-            checkOut: '2025-11-07T12:00:00Z',
-            room: {
-                id: 20,
-                name: 'Standard Room',
-                price: 2400.00,
-                picture: 'https://storage.googleapis.com/paw_image/room_standard.jpg'
-            },
-            pet: {
-                id: 4,
-                name: 'Luna'
-            }
-        }
-    ]
-};
-
-const fetchPendingBookingAPI = async () => {
-    console.log("API: Fetching pending booking...");
-    return new Promise(resolve => setTimeout(() => resolve(mockPendingBooking), 500));
-};
-
-const deleteBookedServiceAPI = async (id) => {
-    console.log(`API: Deleting BookedService with id: ${id}`);
-    return new Promise(resolve => setTimeout(resolve, 300));
-};
-
-const deleteBookedRoomAPI = async (id) => {
-    console.log(`API: Deleting BookedRoom with id: ${id}`);
-    return new Promise(resolve => setTimeout(resolve, 300));
-};
 
 const startUpVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -80,64 +16,80 @@ const startUpVariants = {
 };
 
 const Cart = () => {
-    const [booking, setBooking] = useState(null);
+    const [cart, setCart] = useState(null);
     const [cartItems, setCartItems] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
     const [total, setTotal] = useState(0.00);
     const navigate = useNavigate(); // ✅ Added navigation hook
 
-    const fetchBookingData = useCallback(async () => {
-        const data = await fetchPendingBookingAPI();
-        setBooking(data);
+    const fetchCartData = useCallback(async () => {
+        try {
+            const response = await getCart();
+            setCart(response.data);
+        } catch(err) {
+            console.error("Failed to fetch cart:", err);
+        }
     }, []);
 
     useEffect(() => {
-        fetchBookingData();
-    }, [fetchBookingData]);
+        fetchCartData();
+    }, [fetchCartData]);
 
     useEffect(() => {
-        if (!booking) {
+        if (!cart) {
             setCartItems([]);
+            setSelectedItems([]);
             return;
         }
 
-        const transformedServices = booking.booked_service.map(bs => {
-            const scheduledDate = bs.scheduled ? new Date(bs.scheduled) : null;            
+        const transformedServices = (cart.cartServices || []).map(cs => {
+            const scheduledDate = cs.scheduled ? new Date(cs.scheduled) : null;            
             return {
-                id: bs.id,
-                uniqueId: `service-${bs.id}`, 
+                id: cs.id,
+                uniqueId: `service-${cs.id}`, 
                 type: 'service',
-                name: bs.service?.name || 'Service Not Found', 
-                picture: bs.service?.picture || '', 
-                petName: bs.pet?.name || 'No Pet Assigned', 
+                name: cs.service?.name || 'Service Not Found', 
+                picture: cs.service?.picture || '', 
+                petName: cs.pet?.name || 'No Pet Assigned', 
                 details: scheduledDate && !isNaN(scheduledDate)
                     ? format(scheduledDate, 'MMM dd, yyyy / h:mm a')
                     : 'Date TBD',
-                price: bs.service?.price || 0.00,
+                price: cs.service?.price || 0.00,
+                selected: cs.selected,
             };
         });
 
-        const transformedRooms = booking.booked_room.map(br => {
-            const checkInDate = br.checkIn ? new Date(br.checkIn) : null;
-            const checkOutDate = br.checkOut ? new Date(br.checkOut) : null;
+        const transformedRooms = (cart.cartRooms || []).map(cr => {
+            const checkInDate = cr.checkIn ? new Date(cr.checkIn) : null;
+            const checkOutDate = cr.checkOut ? new Date(cr.checkOut) : null;
             
             const details = checkInDate && !isNaN(checkInDate) && checkOutDate && !isNaN(checkOutDate)
                 ? `${format(checkInDate, 'MMM dd, yyyy')} - ${format(checkOutDate, 'MMM dd, yyyy')}`
                 : 'Invalid Dates';
 
             return {
-                id: br.id,
-                uniqueId: `room-${br.id}`, 
+                id: cr.id,
+                uniqueId: `room-${cr.id}`, 
                 type: 'room',
-                name: br.room?.name || 'Room Not Found',
-                picture: br.room?.picture || '',
-                petName: br.pet?.name || 'No Pet Assigned',
+                name: cr.room?.name || 'Room Not Found',
+                picture: cr.room?.picture || '',
+                petName: cr.pet?.name || 'No Pet Assigned',
                 details: details,
-                price: br.room?.price || 0.00, 
+                price: cr.room?.price || 0.00, 
+                selected: cr.selected,
             };
         });
-        setCartItems([...transformedServices, ...transformedRooms]);
-    }, [booking]);
+
+        const allItems = [...transformedServices, ...transformedRooms];
+        setCartItems(allItems);
+
+        const initiallySelected = allItems
+            .filter(item => item.selected === true)
+            .map(item => item.uniqueId);
+
+        setSelectedItems(initiallySelected);
+
+    }, [cart]);
 
     useEffect(() => {
         const newTotal = cartItems
@@ -147,28 +99,54 @@ const Cart = () => {
     }, [selectedItems, cartItems]);
 
     const handleSelectItem = (uniqueId) => {
-        setSelectedItems(prev => 
-            prev.includes(uniqueId)
-                ? prev.filter(id => id !== uniqueId)
-                : [...prev, uniqueId]
+        const item = cartItems.find(i => i.uniqueId === uniqueId);
+        if (!item) return;
+
+        const newSelectedState = !selectedItems.includes(uniqueId);
+
+        setSelectedItems(prev =>
+            newSelectedState
+                ? [...prev, uniqueId]
+                : prev.filter(id => id !== uniqueId)
         );
+
+        try {
+            if (item.type === 'room') {
+                toggleCartRoomSelection(item.id, newSelectedState);
+            } else if (item.type === 'service') {
+                toggleCartServiceSelection(item.id, newSelectedState);
+            }
+        } catch(err) {
+            console.error("Failed to update selection in database:", err);
+        }
     };
 
     const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            setSelectedItems(cartItems.map(item => item.uniqueId));
-        } else {
-            setSelectedItems([]);
+        const newSelectedState = e.target.checked;
+
+        setSelectedItems(newSelectedState ? cartItems.map(item => item.uniqueId) : []);
+
+        try {
+            const updatePromises = cartItems.map(item => {
+                if (item.type === 'room') {
+                    return toggleCartRoomSelection(item.id, newSelectedState);
+                } else {
+                    return toggleCartServiceSelection(item.id, newSelectedState);
+                }
+            });
+            Promise.all(updatePromises);
+        } catch(err) {
+            console.error("Failed to update all selections:", err);
         }
     };
 
     const handleDeleteItem = async (id, type) => {
         try {
-            if (type === 'service') {
-                await deleteBookedServiceAPI(id);
-            } else if (type === 'room') {
-                await deleteBookedRoomAPI(id);
-            }
+            // if (type === 'service') {
+            //     await deleteBookedServiceAPI(id);
+            // } else if (type === 'room') {
+            //     await deleteBookedRoomAPI(id);
+            // }
             fetchBookingData();
         } catch(err) {
             console.error("Failed to delete item:", err);
