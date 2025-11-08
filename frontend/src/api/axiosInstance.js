@@ -73,8 +73,11 @@ export const setUpInterceptors = (logout) => {
         const { header, content } = errorData.error;
         createNotification("fail", header, content);
 
-        const isDeleteMe = /\/api\/v1\/auth\/me\/?$/.test(url) && method === "delete";
-        const isLogin    = /\/api\/v1\/auth\/login\/?$/.test(url) && method === "post";
+        const requestUrl = error.config?.url;
+        const requestMethod = error.config?.method?.toLowerCase();
+
+        const isDeleteMe = /\/api\/v1\/auth\/me\/?$/.test(requestUrl) && requestMethod === "delete";
+        const isLogin = /\/api\/v1\/auth\/login\/?$/.test(requestUrl) && requestMethod === "post";
 
         // Special handling for 401 errors
         if (status === 401) {

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion"; // Import motion
+import { motion } from "framer-motion";
+import { generateQrAPI } from "../../hooks/paymentAPI"; 
+import { uploadImageAPI } from "../../hooks/imageAPI";
 
-// --- Animation Variants ---
 const startUpVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: (i) => ({
@@ -13,7 +14,6 @@ const startUpVariants = {
   exit: { opacity: 0, x: -50, transition: { duration: 0.3 } },
 };
 
-// Using an inline SVG for the upload icon
 const UploadIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -36,37 +36,57 @@ const UploadIcon = () => (
 const ConfirmPayment = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const [qrImage, setQrImage] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchQr = async () => {
+      try {
+        const response = await generateQrAPI();
+        const qrUrl = response?.data?.qrUrl || response?.data || "";
+        setQrImage(qrUrl);
+      } catch (error) {
+        console.error("Failed to fetch QR:", error);
+      }
+    };
+
+    fetchQr();
+  }, []);
 
   const handleImageChange = (e) => {
     e.preventDefault();
-
-    // Get the selected file
     let file = e.target.files[0];
-
     if (file) {
-      // Create a preview URL
       const previewUrl = URL.createObjectURL(file);
       setImagePreviewUrl(previewUrl);
       setUploadedImage(file);
     }
   };
 
-  // Clean up the object URL to avoid memory leaks
+  const handleDone = async () => {
+    if (!uploadedImage) {
+      console.log("No image uploaded yet");
+      return;
+    }
+
+    try {
+      const result = await uploadImageAPI(uploadedImage);
+      console.log("✅ Uploaded image result:", result);
+    } catch (error) {
+      console.error("❌ Error uploading image:", error);
+    }
+  };
+
+
   useEffect(() => {
-    // This is the cleanup function
     return () => {
-      if (imagePreviewUrl) {
-        URL.revokeObjectURL(imagePreviewUrl);
-      }
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
     };
   }, [imagePreviewUrl]);
-
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-center bg-white p-4 sm:p-8 font-['Inter',_sans-serif] text-gray-800 overflow-x-hidden">
       <div className="w-full max-w-4xl mx-auto">
-        {/* Main Title */}
         <motion.h1
           variants={startUpVariants}
           initial="hidden"
@@ -77,7 +97,6 @@ const ConfirmPayment = () => {
           Waiting for payment
         </motion.h1>
 
-        {/* Content Area: QR Code and Upload */}
         <motion.div
           variants={startUpVariants}
           initial="hidden"
@@ -85,18 +104,23 @@ const ConfirmPayment = () => {
           custom={1}
           className="flex flex-col lg:flex-row gap-8 sm:gap-12 w-full"
         >
-          {/* Left Side: QR Code */}
+          {/* generate qr code */}
           <div className="flex-1 flex flex-col items-center justify-center bg-gray-200 rounded-lg p-6 min-h-[300px] sm:min-h-[400px]">
-            <img
-              id="payment-qr"
-              src="https://placehold.co/300x300/e2e8f0/64748b?text=QR+code"
-              alt="Payment QR Code"
-              className="w-full max-w-[300px] h-auto rounded-md shadow-sm"
-              onError={(e) => {
-                e.target.onerror = null; 
-                e.target.src="https://placehold.co/300x300/e2e8f0/64748b?text=QR+Code+Placeholder";
-              }}
-            />
+            {qrImage ? (
+              <img
+                id="payment-qr"
+                src={qrImage}
+                alt="Payment QR Code"
+                className="w-full max-w-[300px] h-auto rounded-md shadow-sm"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src =
+                    "https://placehold.co/300x300/e2e8f0/64748b?text=QR+Code+Unavailable";
+                }}
+              />
+            ) : (
+              <div className="text-gray-600 font-medium">Loading QR...</div>
+            )}
             <span className="mt-4 text-gray-600 font-medium">QR code</span>
           </div>
 
@@ -109,22 +133,18 @@ const ConfirmPayment = () => {
               Please upload your evidence
             </h3>
 
-            {/* Upload Box */}
             <label
               htmlFor="file-upload"
               className="flex-1 flex flex-col items-center justify-center bg-amber-50 rounded-lg p-6 min-h-[250px] sm:min-h-[300px] border-2 border-dashed border-amber-200 cursor-pointer hover:bg-amber-100 transition-colors"
             >
-              <img
-                id="payment-upload"
-                src={imagePreviewUrl || "https://placehold.co/300x150/fdf8e7/92400e?text=Upload+Evidence+Here"}
-                alt="Upload evidence placeholder"
-                className={`w-full max-w-[300px] h-auto object-contain rounded-md mb-4 ${imagePreviewUrl ? '' : 'hidden'}`} // Show if preview URL exists
-                onError={(e) => {
-                  e.target.onerror = null; 
-                  e.target.src="https://placehold.co/300x150/fdf8e7/92400e?text=Upload+Evidence+Here";
-                }}
-              />
-              {!imagePreviewUrl && (
+              {imagePreviewUrl ? (
+                <img
+                  id="payment-upload"
+                  src={imagePreviewUrl}
+                  alt="Uploaded Evidence"
+                  className="w-full max-w-[300px] h-auto object-contain rounded-md mb-4"
+                />
+              ) : (
                 <div className="flex flex-col items-center justify-center text-center">
                   <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
                     <UploadIcon />
@@ -134,7 +154,6 @@ const ConfirmPayment = () => {
               )}
             </label>
 
-            {/* Re-upload Button */}
             <div className="text-right mt-4">
               <label
                 htmlFor="file-upload"
@@ -142,11 +161,11 @@ const ConfirmPayment = () => {
               >
                 Re-upload
               </label>
-              <input 
-                id="file-upload" 
-                name="file-upload" 
-                type="file" 
-                className="sr-only" 
+              <input
+                id="file-upload"
+                name="file-upload"
+                type="file"
+                className="sr-only"
                 accept=".png, .jpg, .jpeg"
                 onChange={handleImageChange}
               />
@@ -165,13 +184,14 @@ const ConfirmPayment = () => {
           <button
             type="button"
             onClick={() => navigate("/cart")}
-            className="px-8 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
+            className="px-8 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-300 transition-colors"
           >
             Cancel
           </button>
           <button
             type="button"
-            className="px-10 py-3 bg-amber-800 text-white font-semibold rounded-lg shadow-md hover:bg-amber-900 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-opacity-50 !text-white hover:!text-white focus:!text-white"
+            className="px-10 py-3 bg-amber-800 text-white font-semibold rounded-lg shadow-md hover:bg-amber-900 transition-colors"
+            onClick={handleDone}
           >
             Done
           </button>
