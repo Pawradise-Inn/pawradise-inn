@@ -22,13 +22,9 @@ const DropDownList = ({
 
   const selectedOption = options.find(option => option.value === value);
 
-  // ถ้ามี option ที่ถูกเลือก, ให้แสดง name. ถ้าไม่, ให้แสดง startText
   const displayText = selectedOption ? selectedOption.name : (value || startText);
   
-  // ถ้ามี option ที่ถูกเลือก, ใช้ value ของมัน. ถ้าไม่, ใช้ 'default'
-  // นี่จะสร้างคลาส 'success', 'failed', หรือ 'default'
-  const statusClass = selectedOption ? selectedOption.value.toLowerCase() : 'default';
-  // --- END FIX ---
+  const statusClass = selectedOption ? selectedOption.value : 'default';
 
   const handleDropDown = () => {
     setDropDownStatus(!dropDownStatus);

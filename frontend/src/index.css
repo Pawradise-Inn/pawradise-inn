@@ -127,15 +127,15 @@ body {
   vertical-align: middle;
 }
 
-.status-circle.success::before {
+.status-circle.SUCCESS::before {
   background-color:rgb(117, 158, 60) ;
 }
 
-.status-circle.failed::before {
+.status-circle.FAILED::before {
   background-color: rgb(186, 30, 7);
 }
 
-.status-circle.cancelled::before {
+.status-circle.CANCELLED::before {
   background-color: rgb(245, 194, 54);
 }
 /* ---------------------------------- font ---------------------------------- */
