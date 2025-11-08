@@ -1,5 +1,5 @@
 const prisma = require('../prisma/prisma');
-const { sendErrorResponse } = require("../utils/responseHandler");
+const { sendErrorResponse, sendSuccessResponse } = require("../utils/responseHandler");
 
 const getCustomerProfile = async(req, res)=>{ //requirement: 2
     try{
