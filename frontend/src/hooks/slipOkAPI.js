@@ -1,14 +1,28 @@
-import axios from "axios";
-
-const API_URL =  "https://api.slipok.com/api/check-slip"
+import axiosInstance from "../api/axiosInstance";
 
 export const checkSlipAPI = async (pic_url) => {
-    const response = await axios.post(`${API_URL}}`,
-        {
-            url: pic_url,
-            log: true
-        }
-    )
-    return response.data
-}
+  try {
+    const res = await axiosInstance.post("/api/v1/slip/check", {
+      url: pic_url,
+      log: true,
+    });
 
+    console.log("SlipOK API response:", res.data);
+    return res.data;
+
+  } catch (error) {
+    // Get the error data from response
+    const err = error.response?.data;
+    console.error("Slip check failed - Full error:", error);
+    console.error("Slip check failed - Error data:", err);
+
+    // Return the error object with all available information
+    return {
+      success: false,
+      code: err?.code || "SLIP_CHECK_ERROR",
+      message: err?.message || "Failed to verify slip",
+      data: err?.data || null,
+      rawError: err, // Include the full error for debugging
+    };
+  }
+};

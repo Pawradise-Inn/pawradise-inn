@@ -5,7 +5,7 @@ const {
     checkSlip
 } = require('../controllers/slipOk')
 
-router.route('/api/check-slip')
+router.route('/check')
     .post(checkSlip)
 
 module.exports = router;

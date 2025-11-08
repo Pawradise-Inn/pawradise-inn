@@ -82,7 +82,7 @@ app.use("/api/v1/images", picture);
 app.use("/api/v1/carts", cart);
 app.use('/api/v1/payments', payment);
 app.use('/api/v1/qr', qr);
-app.use('/api/check-slip', slipOk)
+app.use('/api/v1/slip', slipOk)
 
 const PORT = process.env.PORT || 5000;
 
