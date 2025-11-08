@@ -4,7 +4,7 @@ const { sendErrorResponse, sendSuccessResponse } = require('../utils/responseHan
 
 const genQR = async (req, res) => {
     const {amount} = Number(req.body);
-    const mobileNumber = '0123456789';
+    const mobileNumber = '1209000167848';
     const payload = generatePayload(mobileNumber, {amount})
     const option = {
         color: {
