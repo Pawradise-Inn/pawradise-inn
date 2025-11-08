@@ -7,10 +7,7 @@ import {getStatusText, getRoomStatusColor} from "../../components/staff/StatusUt
 import PetCard from "../../components/staff/PetUpdateCard";
 import ServiceCard from "../../components/staff/ServiceCard";
 import DropDownList from "../../components/DropDownList";
-import { updateBookedRoom } from "../../hooks/bookedRoomAPI";
-import { updateBookedService } from "../../hooks/bookedServiceAPI";
-import { createChatLogAPI } from "../../hooks/chatlogAPI";
-const PetUpdate = (type, receivedId) => {
+const PetUpdate = () => {
   const { createNotification } = useNotification();
   const { id } = useParams();
   const [pet, setPet] = useState({});
@@ -37,20 +34,7 @@ const PetUpdate = (type, receivedId) => {
       try {
         const { scheduled, stayed, ...updatePet } = pet;
         updatePet.status = status;
-        if(type == "room"){
-          updateBookedRoom(id, {status: status})
-          createChatLogAPI({
-                    roomId: receivedId,
-                  });
-        }
-        else if(type == "service"){
-          updateBookedService(id, {status: status})
-          createChatLogAPI({
-                      serviceId: receivedId,
-                    })
-        }
         updatePetAPI(id, updatePet);
-        
         setPet(updatePet);
         navigate("/staff/pet-status");
       } catch (error) {

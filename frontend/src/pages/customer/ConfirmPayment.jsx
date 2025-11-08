@@ -57,8 +57,13 @@ const ConfirmPayment = () => {
     e.preventDefault();
     let file = e.target.files[0];
     if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreviewUrl(previewUrl);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const previewUrl = reader.result;
+        setImagePreviewUrl(previewUrl);
+      }
+      reader.readAsDataURL(file)
+      //setImagePreviewUrl(previewUrl);
       setUploadedImage(file);
     }
   };
