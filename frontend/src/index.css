@@ -111,6 +111,33 @@ body {
   --complete-color: rgb(177, 129, 211);
 }
 
+.status-circle {
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+}
+
+.status-circle::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.status-circle.success::before {
+  background-color:rgb(117, 158, 60) ;
+}
+
+.status-circle.failed::before {
+  background-color: rgb(186, 30, 7);
+}
+
+.status-circle.cancelled::before {
+  background-color: rgb(245, 194, 54);
+}
 /* ---------------------------------- font ---------------------------------- */
 
 @font-face {

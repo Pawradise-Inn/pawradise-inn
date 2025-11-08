@@ -56,10 +56,11 @@ const PaymentCard = ({
           value={status} 
           onChange={onStatusChange} 
           element={`status-dropdown-${username}`}
-          inputSyle={`py-1 pl-3 pr-10 rounded-full ${statusColor} text-sm font-semibold tracking-wide cursor-pointer`}
-          dropDownStyle="border-2 border-[var(--brown-color)] bg-[var(--light-brown-color)] origin-top translate-y-1 top-full right-0" // Aligns dropdown to the right
+          inputSyle={"py-1 pl-3 pr-10 rounded-full bg-[var(--dark-brown-color)] !text-[var(--cream-color)] text-sm tracking-wide cursor-pointer"}
+          dropDownStyle="border-2 border-[var(--brown-color)] bg-[var(--light-brown-color)] origin-top translate-y-1 top-full right-0 " // Aligns dropdown to the right
           activeColor="var(--cream-color)"
           // arrowColor="white" 
+          
         />
       </div>
     </motion.div>
