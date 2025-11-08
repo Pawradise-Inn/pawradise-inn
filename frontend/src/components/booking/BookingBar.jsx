@@ -2,8 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
-import { createBookedRoom } from "../../hooks/bookedRoomAPI";
-import { createBookedService } from "../../hooks/bookedServiceAPI";
+import { addRoomToCart, addServiceToCart } from "../../hooks/cartAPI";
 import { fetchCustomerPets, fetchAvailablePetAPI } from "../../hooks/petAPI";
 import { fetchRoomStatusAPI, fetchRoomReviewsAPI } from "../../hooks/roomAPI";
 import {
@@ -33,7 +32,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   const [comments, setComments] = useState([]);
   const [commentStatus, setCommentStatus] = useState(false);
   const [status, setStatus] = useState("date is invalid");
-  const [currentPet, setCurrentPet] = useState(null);
+  const [currentPetId, setCurrentPetId] = useState(null);
+  const [currentPetName, setCurrentPetName] = useState(null);
   const [petData, setPetData] = useState([]);
   const [size, setSize] = useState(0);
   const [formData, setFormData] = useState({
@@ -122,7 +122,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       return;
     }
 
-    if (!currentPet) {
+    if (!currentPetId) {
       createNotification("fail", "Pet is missing", "Please select your pet.");
       return;
     }
@@ -131,29 +131,33 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     if (data.headerType === "Service") {
       body = {
         service_name: data.name,
-        pet_name: currentPet,
-        bookingId: 1,
+        petId: currentPetId,
         scheduled: changeDateTime(formData.entryDate, formData.entryTime),
       };
 
-      createBookedService(body)
-        .then(() => changeBookingBarStatus())
+      addServiceToCart(body)
+        .then(() => {
+          changeBookingBarStatus();
+          onClick(data, false);
+        })
         .catch((error) => {
-          console.error("Booking service error:", error);
+          console.error("Adding service to cart error:", error);
         });
     } else {
       body = {
         roomId: data.id,
-        pet_name: currentPet,
-        bookingId: 1,
+        petId: currentPetId,
         checkIn: formData.entryDate,
         checkOut: formData.exitDate,
       };
 
-      createBookedRoom(body)
-        .then(() => changeBookingBarStatus())
+      addRoomToCart(body)
+        .then(() => {
+          changeBookingBarStatus();
+          onClick(data, false);
+        })
         .catch((error) => {
-          console.error("Booking error:", error);
+          console.error("Adding room to cart error:", error);
         });
     }
   };
@@ -214,6 +218,7 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         let response;
         if (data.headerType === "Service") {
           response = await fetchCustomerPets(user.customer.id, [
+            "id",
             "name",
             "type",
           ]);
@@ -353,10 +358,18 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
             startText="Pick pet"
             options={petData.map((pet) => ({
               name: `${pet.name} (${pet.type})`,
-              value: pet.name,
+              value: pet.id,
             }))}
-            onChange={(pet) => setCurrentPet(pet)}
-            value={currentPet}
+            onChange={(petId) => {
+              const selectedPet = petData.find(pet => pet.id === petId);
+            
+              if (selectedPet) {
+                // Set both states
+                setCurrentPetId(selectedPet.id);
+                setCurrentPetName(`${selectedPet.name} (${selectedPet.type})`);
+              }
+            }}
+            value={currentPetName}
             mainStyle="mt-2 mb-4"
             element="bookingPickPet"
           />

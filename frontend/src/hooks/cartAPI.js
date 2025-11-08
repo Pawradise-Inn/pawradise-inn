@@ -18,11 +18,11 @@ export const toggleCartServiceSelection = async (id, selected) => {
 };
 
 export const addRoomToCart = async (cartItem) => {
-    const response = await axiosInstance.post(`${API_URL}/rooms`, { cartItem });
+    const response = await axiosInstance.post(`${API_URL}/rooms`, cartItem);
     return response.data;
 };
 
 export const addServiceToCart = async (cartItem) => {
-    const response = await axiosInstance.post(`${API_URL}/services`, { cartItem });
+    const response = await axiosInstance.post(`${API_URL}/services`, cartItem);
     return response.data
 }

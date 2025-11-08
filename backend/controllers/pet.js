@@ -224,6 +224,7 @@ const getCustomerPets = async (req, res) => {
     const fields = req.query.fields
       ? req.query.fields.split(",")
       : [
+          "id",
           "name",
           "breed",
           "sex",
@@ -272,6 +273,7 @@ const getCustomerPetNamesWithAvailable = async (req, res) => {
         },
       },
       select: {
+        id: true,
         name: true,
         type: true,
       },
