@@ -25,4 +25,14 @@ export const addRoomToCart = async (cartItem) => {
 export const addServiceToCart = async (cartItem) => {
     const response = await axiosInstance.post(`${API_URL}/services`, cartItem);
     return response.data
-}
+};
+
+export const deleteCartRoom = async (id) => {
+    const response = await axiosInstance.delete(`${API_URL}/rooms/${id}`);
+    return response.data
+};
+
+export const deleteCartService = async (id) => {
+    const response = await axiosInstance.delete(`${API_URL}/services/${id}`);
+    return response.data
+};

@@ -20,6 +20,7 @@ const CartItem = ({ item, onSelect, isSelected, onDelete }) => {
             exit="exit"
             custom={1} // You can pass a custom index 'i' from the map function if needed
             className="flex items-center w-full bg-[var(--cream-color)] border border-[var(--brown-color)] rounded-2xl p-6 md:p-8 mb-4 "
+            data-testid="cart-card"
         >
             {/* Checkbox */}
             <input
@@ -49,7 +50,7 @@ const CartItem = ({ item, onSelect, isSelected, onDelete }) => {
                 <span className="text-xl font-bold mb-2">{item.price.toFixed(2)} THB</span>
 
                 <button
-                    onClick={() => onDelete(item.id, item.type)} // Pass id and type up
+                    onClick={() => onDelete(item.uniqueId)} // Pass id and type up
                     className="bg-[var(--brown-color)] !text-[var(--cream-color)] px-6 py-2.5 rounded-md font-semibold text-base capitalize hover:bg-yellow-800 transition-colors"
                 >
                     delete

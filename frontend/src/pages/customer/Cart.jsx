@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion'; 
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom'; // ✅ Added import
-import { getCart, toggleCartRoomSelection, toggleCartServiceSelection } from '../../hooks/cartAPI';
+import { getCart, toggleCartRoomSelection, toggleCartServiceSelection, deleteCartRoom, deleteCartService } from '../../hooks/cartAPI';
 
 import CartItem from '../../components/Cart/CartItem';
 
@@ -140,14 +140,17 @@ const Cart = () => {
         }
     };
 
-    const handleDeleteItem = async (id, type) => {
+    const handleDeleteItem = async (id) => {
+        const item = cartItems.find(i => i.uniqueId === id);
+        if (!item) return;
+
         try {
-            // if (type === 'service') {
-            //     await deleteBookedServiceAPI(id);
-            // } else if (type === 'room') {
-            //     await deleteBookedRoomAPI(id);
-            // }
-            fetchBookingData();
+            if (item.type === 'room') {
+                await deleteCartRoom(item.id);
+            } else if (item.type === 'service') {
+                await deleteCartService(item.id);   
+            }
+            fetchCartData();
         } catch(err) {
             console.error("Failed to delete item:", err);
         }
@@ -206,6 +209,7 @@ const Cart = () => {
                             checked={isAllSelected}
                             onChange={handleSelectAll}
                             className="h-6 w-6 rounded border-gray-300 accent-[var(--brown-color)] !focus:ring-[var(--light-brown-color)] mr-3 flex-shrink-0"
+                            data-testid="check-all"
                         />
                         <label
                             htmlFor="select-all"
