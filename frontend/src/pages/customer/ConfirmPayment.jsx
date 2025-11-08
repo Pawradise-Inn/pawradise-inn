@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { generateQrAPI } from "../../hooks/paymentAPI";
 import { uploadImageAPI } from "../../hooks/imageAPI";
@@ -39,6 +39,10 @@ const ConfirmPayment = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [qrImage, setQrImage] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Read total from Cart state
+  const total = location.state?.total || 0.0;
 
   useEffect(() => {
     const fetchQr = async () => {
@@ -50,7 +54,6 @@ const ConfirmPayment = () => {
         console.error("Failed to fetch QR:", error);
       }
     };
-
     fetchQr();
   }, []);
 
@@ -60,11 +63,9 @@ const ConfirmPayment = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const previewUrl = reader.result;
-        setImagePreviewUrl(previewUrl);
-      }
-      reader.readAsDataURL(file)
-      //setImagePreviewUrl(previewUrl);
+        setImagePreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
       setUploadedImage(file);
     }
   };
@@ -81,12 +82,19 @@ const ConfirmPayment = () => {
       console.log("✅ Uploaded image url:", imageUrl);
 
       const slipResult = await checkSlipAPI(imageUrl);
-      console.log("✅ OK Slip API result:", slipResult);
+      const slipStatus = slipResult.success;
+
+      console.log("✅ OK Slip API status:", slipStatus);
+
+      if (slipStatus) {
+        navigate("/payment/success");
+      } else {
+        navigate("/payment/failed");
+      }
     } catch (error) {
       console.error("❌ Error uploading image:", error);
     }
   };
-
 
   useEffect(() => {
     return () => {
@@ -137,7 +145,7 @@ const ConfirmPayment = () => {
           {/* Right Side: Upload Evidence */}
           <div className="flex-1 flex flex-col">
             <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">
-              Total Price: xx.xx THB
+              Total Price: {total.toFixed(2)} THB
             </h2>
             <h3 className="text-lg sm:text-xl font-medium text-gray-700 mt-4 mb-4">
               Please upload your evidence
