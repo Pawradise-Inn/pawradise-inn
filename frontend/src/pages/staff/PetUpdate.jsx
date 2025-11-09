@@ -1,60 +1,81 @@
-import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useNotification } from "../../context/notification/NotificationProvider";
-import { fetchPetAPI, updatePetAPI } from "../../hooks/petAPI";
-import {getStatusText, getRoomStatusColor} from "../../components/staff/StatusUtils"
+import { fetchPetAPI, fetchPetBookingsAPI, updatePetAPI } from "../../hooks/petAPI";
+import { getStatusText, getRoomStatusColor } from "../../components/staff/StatusUtils"
 import PetCard from "../../components/staff/PetUpdateCard";
 import ServiceCard from "../../components/staff/ServiceCard";
 import DropDownList from "../../components/DropDownList";
-import { updateBookedRoom } from "../../hooks/bookedRoomAPI";
-import { updateBookedService } from "../../hooks/bookedServiceAPI";
-import { createChatLogAPI } from "../../hooks/chatlogAPI";
-const PetUpdate = (type, receivedId) => {
+
+import { createCareAPI } from "../../hooks/careAPI";
+const PetUpdate = () => {
   const { createNotification } = useNotification();
   const { id } = useParams();
   const [pet, setPet] = useState({});
   const [status, setStatus] = useState("");
   const [scheduled, setScheduled] = useState([]);
+  const [bookingType, setBookingType] = useState("service");
+  const [booking, setBooking] = useState()
   const fetchPet = async () => {
     const response = await fetchPetAPI(id);
     setPet(response.data);
     setStatus(response.data.status);
     setScheduled(response.data.scheduled);
 
-    //setServiceData(response.data.scheduled.service)
   };
+  const fetchBooking = async () => {
+    const response = await fetchPetBookingsAPI(id);
+    setBooking(response.data);
+    console.log("res:", response)
+  }
 
   useEffect(() => {
     fetchPet();
-    console.log(pet);
+    fetchBooking();
+
   }, []);
 
   const navigate = useNavigate();
 
-  const handleSave = () => {
+  const handleSave = (selectedBookingId) => {
+    if (!selectedBookingId) {
+      createNotification("fail", "Error", "Please select a booking");
+      return;
+    }
+
     createNotification("warning", "Confirmation", "Are you sure?", async () => {
       try {
         const { scheduled, stayed, ...updatePet } = pet;
         updatePet.status = status;
-        if(type == "room"){
-          updateBookedRoom(id, {status: status})
-          createChatLogAPI({
-                    roomId: receivedId,
-                  });
+
+        // Create Care record based on booking type
+        if (bookingType === "room") {
+          // Create Care record for room
+          await createCareAPI({
+            bookedRoomId: selectedBookingId,
+            petId: parseInt(id),
+            status: status,
+          });
         }
-        else if(type == "service"){
-          updateBookedService(id, {status: status})
-          createChatLogAPI({
-                      serviceId: receivedId,
-                    })
+        else if (bookingType === "service") {
+          // Create Care record for service
+          await createCareAPI({
+            bookedServiceId: selectedBookingId,
+            petId: parseInt(id),
+            status: status,
+          });
         }
-        updatePetAPI(id, updatePet);
-        
+
+        // Update pet status
+        await updatePetAPI(id, updatePet);
         setPet(updatePet);
+
+        createNotification("success", "Success", "Care record created and pet status updated successfully");
         navigate("/staff/pet-status");
       } catch (error) {
-        console.error("Interceptor handled the update error:", error);
+        console.error("Error updating status:", error);
+        createNotification("fail", "Error", "Failed to update status. Please try again.");
       }
     });
   };
@@ -105,6 +126,9 @@ const PetUpdate = (type, receivedId) => {
                 handleCancel={handleCancel}
                 status={status}
                 setStatus={setStatus}
+                bookingType={bookingType}
+                setBookingType={setBookingType}
+                booking={booking}
               />
             </div>
           </div>
@@ -136,15 +160,54 @@ const PetUpdate = (type, receivedId) => {
   );
 };
 
-const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
-  const OPERATE_STATUS = [
+const StatusUpdate = ({ handleSave, handleCancel, status, setStatus, bookingType, setBookingType, booking }) => {
+  const [selectedBookingId, setSelectedBookingId] = useState("");
+
+  // Define status options for service
+  const SERVICE_STATUS = [
     "IDLE",
-    "CHECKED_IN",
-    "CHECKED_OUT",
     "QUEUE",
     "IN_PROGRESS",
     "COMPLETED",
   ];
+
+  // Define status options for booking (room)
+  const BOOKING_STATUS = [
+    "IDLE",
+    "CHECKED_IN",
+    "CHECKED_OUT",
+  ];
+
+  // Get the appropriate status options based on booking type
+  const OPERATE_STATUS = bookingType === "service" ? SERVICE_STATUS : BOOKING_STATUS;
+
+  // Get booking options based on type
+  const getBookingOptions = () => {
+    if (!booking) return [];
+
+    if (bookingType === "service") {
+      return booking.services?.map(service => ({
+        name: service.service.name,
+        value: service.id
+      })) || [];
+    } else {
+      return booking.rooms?.map(room => ({
+        name: `Room ${room.room.number}`,
+        value: room.id
+      })) || [];
+    }
+  };
+
+  const bookingOptions = getBookingOptions();
+
+  // Reset status to IDLE when booking type changes if current status is not in the new list
+  useEffect(() => {
+    if (!OPERATE_STATUS.includes(status)) {
+      setStatus("IDLE");
+    }
+    // Reset selected booking when type changes
+    setSelectedBookingId("");
+  }, [bookingType]);
 
   return (
     <div className="bg-[var(--cream-color)] rounded-lg p-6 shadow-lg">
@@ -157,7 +220,42 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
 
       {/* Form */}
       <div className="flex flex-col gap-4">
-        {/* Status Dropdown */}
+        {/* Type Radio Buttons - First Line */}
+        <div className="flex flex-row justify-start items-center">
+          <label className="font-semibold mr-4">Type:</label>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="radio"
+                id="service"
+                name="bookingType"
+                value="service"
+                checked={bookingType === "service"}
+                onChange={(e) => setBookingType(e.target.value)}
+                className="w-4 h-4 cursor-pointer accent-[var(--dark-brown-color)]"
+              />
+              <label htmlFor="service" className="cursor-pointer">
+                Service
+              </label>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="radio"
+                id="room"
+                name="bookingType"
+                value="room"
+                checked={bookingType === "room"}
+                onChange={(e) => setBookingType(e.target.value)}
+                className="w-4 h-4 cursor-pointer accent-[var(--dark-brown-color)]"
+              />
+              <label htmlFor="room" className="cursor-pointer">
+                Room
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Status Dropdown - Second Line */}
         <div className="flex flex-row justify-start items-center">
           <label className="font-semibold mb-1 mr-4">Status:</label>
           <DropDownList
@@ -169,6 +267,25 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
             element="changeStatus"
             inputSyle="py-1 px-1 text-center p-2 border rounded-lg"
             dropDownStyle="border-2 border-[var(--brown-color)] bg-[var(--light-brown-color)]  origin-bottom -translate-y-full top-0 left-0 mb-1"
+            focusStyle="outline-none ring-[var(--dark-brown-color)] ring-2"
+            arrowColor="var(--dark-brown-color)"
+          />
+        </div>
+
+        {/* Booking Selection Dropdown - Third Line - Always show */}
+        <div className="flex flex-row justify-start items-center">
+          <label className="font-semibold mb-1 mr-4">
+            Booked name:
+          </label>
+          <DropDownList
+            value={selectedBookingId && bookingOptions.length > 0 ? bookingOptions.find(opt => opt.value === selectedBookingId)?.name || "Select" : "Select"}
+            options={bookingOptions.length > 0 ? bookingOptions : [{ name: "Select", value: "" }]}
+            onChange={(value) => {
+              setSelectedBookingId(value);
+            }}
+            element="selectBooking"
+            inputSyle="py-1 px-1 text-center p-2 border rounded-lg min-w-[200px]"
+            dropDownStyle="border-2 border-[var(--brown-color)] bg-[var(--light-brown-color)] origin-bottom -translate-y-full top-0 left-0 mb-1"
             focusStyle="outline-none ring-[var(--dark-brown-color)] ring-2"
             arrowColor="var(--dark-brown-color)"
           />
@@ -188,7 +305,7 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus }) => {
         <div className="flex-1">
           <motion.button
             className="bg-[var(--dark-brown-color)] !text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition cursor-pointer"
-            onClick={() => handleSave()}
+            onClick={() => handleSave(selectedBookingId)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >

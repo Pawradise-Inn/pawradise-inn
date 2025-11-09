@@ -20,7 +20,7 @@ const register = async (req, res) => {
 
     const { name, sex, age, type, status, breed, disease, allergic, picture } =
       req.body;
-    
+
     const pet = await prisma.pet.create({
       data: {
         name,
@@ -224,18 +224,18 @@ const getCustomerPets = async (req, res) => {
     const fields = req.query.fields
       ? req.query.fields.split(",")
       : [
-          "id",
-          "name",
-          "breed",
-          "sex",
-          "age",
-          "type",
-          "status",
-          "breed",
-          "disease",
-          "allergic",
-          "picture",
-        ];
+        "id",
+        "name",
+        "breed",
+        "sex",
+        "age",
+        "type",
+        "status",
+        "breed",
+        "disease",
+        "allergic",
+        "picture",
+      ];
 
     const select = {};
     fields.forEach((f) => (select[f] = true));
@@ -316,6 +316,71 @@ const getPetTypes = async (req, res) => {
   }
 };
 
+const getPetBookings = async (req, res) => {
+  try {
+    const petId = Number(req.params.id);
+
+    // Verify pet exists
+    const pet = await prisma.pet.findUnique({
+      where: { id: petId },
+    });
+
+    if (!pet) {
+      return sendErrorResponse(
+        res,
+        404,
+        "NOT_FOUND",
+        "Pet not found"
+      );
+    }
+
+    // Get all booked services for this pet
+    const bookedServices = await prisma.bookedService.findMany({
+      where: { petId: petId },
+      include: {
+        service: true,
+        pet: true,
+      },
+      orderBy: {
+        id: 'desc',
+      },
+    });
+
+    // Get all booked rooms for this pet
+    const bookedRooms = await prisma.bookedRoom.findMany({
+      where: { petId: petId },
+      include: {
+        room: true,
+        pet: true,
+      },
+      orderBy: {
+        id: 'desc',
+      },
+    });
+
+    return sendSuccessResponse(
+      res,
+      200,
+      "BOOKINGS_RETRIEVED",
+      "Pet bookings retrieved successfully",
+      {
+        petId: petId,
+        petName: pet.name,
+        services: bookedServices,
+        rooms: bookedRooms,
+      }
+    );
+  } catch (err) {
+    console.error("pet.getPetBookings:", err);
+    return sendErrorResponse(
+      res,
+      500,
+      "SERVER_ERROR",
+      "Unable to retrieve pet bookings"
+    );
+  }
+};
+
 module.exports = {
   register,
   getPet,
@@ -326,4 +391,5 @@ module.exports = {
   getCustomerPetNamesWithAvailable,
   getAllPets,
   getPetTypes,
+  getPetBookings,
 };

@@ -9,6 +9,7 @@ const {
   getCustomerPets,
   getCustomerPetNamesWithAvailable,
   getPetTypes,
+  getPetBookings,
 } = require("../controllers/pet");
 const { protect, authorize } = require("../middleware/auth");
 
@@ -40,5 +41,9 @@ router
 router
   .route("/:id/available")
   .get(protect, authorize("CUSTOMER", "STAFF"), getCustomerPets);
+
+router
+  .route("/:id/bookings")
+  .get(protect, authorize("CUSTOMER", "STAFF"), getPetBookings);
 
 module.exports = router;
