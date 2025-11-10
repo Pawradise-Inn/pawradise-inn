@@ -9,6 +9,7 @@ const PaymentCard = ({
   totalPrice,
   status,
   onStatusChange,
+  onPictureClick,
 }) => {
 
   const statusColor = getPaymentStatusColor(status) || "bg-green-500";
@@ -31,6 +32,7 @@ const PaymentCard = ({
         src={picture}
         className="w-40 h-40 object-cover object-center rounded-lg"
         alt={username}
+        onClick={onPictureClick}
       />
       <div className="flex justify-between items-center w-full mx-10">
         <div className="flex flex-col gap-2 justify-center items-start">
