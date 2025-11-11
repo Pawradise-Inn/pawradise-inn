@@ -16,7 +16,7 @@ test.describe("US5-4: Staff Room Status Dashboard", () => {
     await page.goto("http://localhost:3000/staff/dashboard");
 
     // Verify dashboard is visible
-    await expect(page.getByText("Dashboard")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 
     // Verify Room Bookings tab is visible (first tab)
     await expect(page.getByText("Room Bookings")).toBeVisible();

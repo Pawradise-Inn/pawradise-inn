@@ -24,7 +24,7 @@ test.describe("US5-2: Service Booking - Available and Unavailable Cases", () => 
 
     // Select pet
     await page.getByText("Pick pet").click();
-    await page.getByText(`${petData.data.name} (${petData.data.type})`).click();
+    await page.getByText(`${petData.data.name} (${petData.data.type})`).last().click();
 
     // Pick a past date
     await page.getByRole("button", { name: "mm/dd/yyyy" }).click();
@@ -38,7 +38,7 @@ test.describe("US5-2: Service Booking - Available and Unavailable Cases", () => 
 
     // Submit and expect date validation
     await page.getByRole("button", { name: "BOOK" }).click();
-    await expect(page.getByText("Date is invalid")).toBeVisible();
+    await expect(page.locator('b').getByText("Date is invalid")).toBeVisible();
 
     // Close
     await page.locator(".bi.bi-x-lg").first().click();
@@ -76,7 +76,7 @@ test.describe("US5-2: Service Booking - Available and Unavailable Cases", () => 
 
     // Select RABBIT pet (newly created)
     await page.getByText("Pick pet").click();
-    await page.getByText(`${rabbitPet.data.name} (${rabbitPet.data.type})`).click();
+    await page.getByText(`${rabbitPet.data.name} (${rabbitPet.data.type})`).last().click();
 
     // Select valid future date (2025-11-30) and time
     await page.getByRole("button", { name: "mm/dd/yyyy" }).click();
@@ -120,7 +120,7 @@ test.describe("US5-2: Service Booking - Available and Unavailable Cases", () => 
     
     // Select pet
     await page.getByText("Pick pet").click();
-    await page.getByText(`${petData.data.name} (${petData.data.type})`).click();
+    await page.getByText(`${petData.data.name} (${petData.data.type})`).last().click();
     
     // Select date (November 30th)
     await page.getByRole("button", { name: "mm/dd/yyyy" }).click();
@@ -141,7 +141,7 @@ test.describe("US5-2: Service Booking - Available and Unavailable Cases", () => 
     
     // Wait for and verify success notification appears
     await expect(
-      page.getByText("Service booking created successfully")
+      page.getByText("Service added to cart")
     ).toBeVisible();
     
     // Close popup (X icon)
@@ -178,7 +178,7 @@ test.describe("US5-2: Service Booking - Available and Unavailable Cases", () => 
       await expect(page.getByText(/Service/)).toBeVisible();
       
       await page.getByText("Pick pet").click();
-      await page.getByText(`${pets[i].data.name} (${pets[i].data.type})`).click();
+      await page.getByText(`${pets[i].data.name} (${pets[i].data.type})`).last().click();
       
       await page.getByRole("button", { name: "mm/dd/yyyy" }).click();
       await page
@@ -231,7 +231,7 @@ test.describe("US5-2: Service Booking - Available and Unavailable Cases", () => 
     await expect(page.getByText(/Service/)).toBeVisible();
     
     await page.getByText("Pick pet").click();
-    await page.getByText(`${petData.data.name} (${petData.data.type})`).click();
+    await page.getByText(`${petData.data.name} (${petData.data.type})`).last().click();
     
     await page.getByRole("button", { name: "mm/dd/yyyy" }).click();
     await page
