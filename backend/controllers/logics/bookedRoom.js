@@ -58,7 +58,9 @@ const isReservableRoom = async(roomId, petId, checkIn, checkOut) => {
     // Include items currently in carts for the same room and overlapping dates
     const cartCount = await prisma.cartRoom.count({
         where: {
-            roomId: Number(roomId)
+            roomId: Number(roomId),
+            checkIn: { lt: new Date(checkOut) },
+            checkOut: { gt: new Date(checkIn) },
         }
     });
 
