@@ -22,7 +22,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /customer/{id}:
+ * /customers/{id}:
  *   get:
  *     summary: Get customer profile by ID
  *     tags: [Customers]

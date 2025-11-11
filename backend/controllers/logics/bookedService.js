@@ -77,17 +77,12 @@ const isReservableService = async(serviceId, petId, scheduled) => {
   // Include items currently in carts for the same service and schedule
   const cartCount = await prisma.cartService.count({
     where: {
-      serviceId: Number(serviceId)
+      serviceId: Number(serviceId),
+      scheduled: new Date(scheduled),
     },
   });
 
   const totalCount = count + cartCount;
-
-  if (totalCount >= 3) {
-    const error = new Error("This service is fully booked for the selected date and time.");
-    error.code = "SERVICE_FULL";
-    throw error;
-  }
 
   const duplicated = await duplicatedService(serviceId, petId, scheduled);
   if (duplicated) {
@@ -107,6 +102,12 @@ const isReservableService = async(serviceId, petId, scheduled) => {
   if (!isSuit) {
     const error = new Error("This pet is not eligible for the selected service.");
     error.code = "PET_NOT_SUIT";
+    throw error;
+  }
+
+  if (totalCount >= 3) {
+    const error = new Error("This service is fully booked for the selected date and time.");
+    error.code = "SERVICE_FULL";
     throw error;
   }
 

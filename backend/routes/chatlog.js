@@ -41,7 +41,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /chatlog/mine/waiting:
+ * /chatlogs/mine/waiting:
  *   get:
  *     summary: Get reviews waiting to be written by current user
  *     tags: [ChatLogs]
@@ -58,7 +58,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /chatlog/mine:
+ * /chatlogs/mine:
  *   get:
  *     summary: Get current user's reviews
  *     tags: [ChatLogs]
@@ -75,7 +75,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /chatlog:
+ * /chatlogs:
  *   get:
  *     summary: Get all chat logs
  *     tags: [ChatLogs]
@@ -106,7 +106,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /chatlog/{id}:
+ * /chatlogs/{id}:
  *   get:
  *     summary: Get chat log by ID
  *     tags: [ChatLogs]

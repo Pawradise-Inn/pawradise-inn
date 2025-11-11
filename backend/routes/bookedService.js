@@ -34,7 +34,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /bookedService/dashboard:
+ * /bookedServices/dashboard:
  *   get:
  *     summary: Get today's booked services
  *     tags: [BookedServices]
@@ -51,7 +51,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /bookedService:
+ * /bookedServices:
  *   get:
  *     summary: Get all booked services
  *     tags: [BookedServices]
@@ -82,7 +82,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /bookedService/{id}:
+ * /bookedServices/{id}:
  *   get:
  *     summary: Get booked service by ID
  *     tags: [BookedServices]

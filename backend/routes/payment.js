@@ -34,7 +34,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /payment/mine:
+ * /payments/mine:
  *   get:
  *     summary: Get current user's payments
  *     tags: [Payments]
@@ -51,7 +51,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /payment:
+ * /payments:
  *   get:
  *     summary: Get all payments
  *     tags: [Payments]
@@ -86,7 +86,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /payment/{id}:
+ * /payments/{id}:
  *   get:
  *     summary: Get payment by ID
  *     tags: [Payments]

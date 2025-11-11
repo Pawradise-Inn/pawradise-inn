@@ -40,7 +40,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /booking/mine:
+ * /bookings/mine:
  *   get:
  *     summary: Get current user's bookings
  *     tags: [Bookings]
@@ -57,7 +57,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /booking/cancel/{id}:
+ * /bookings/cancel/{id}:
  *   patch:
  *     summary: Cancel a booking
  *     tags: [Bookings]
@@ -83,7 +83,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /booking:
+ * /bookings:
  *   get:
  *     summary: Get all bookings
  *     tags: [Bookings]
@@ -118,7 +118,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /booking/{id}:
+ * /bookings/{id}:
  *   get:
  *     summary: Get booking by ID
  *     tags: [Bookings]

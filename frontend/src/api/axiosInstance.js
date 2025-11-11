@@ -23,20 +23,22 @@ export const setUpInterceptors = (logout) => {
   axiosInstance.interceptors.response.use(
     (response) => {
       // Handle success notifications only for meaningful user actions
+      const uncatchMethod = ["get"];
+      const uncatchAPI = [
+        new RegExp("^/api/v1/carts/services/[^/]+/selected$"),
+      ]; // "RegExp type only"
       const { createNotification } = window.notificationprovider;
       const responseData = response.data;
       const method = response.config.method?.toLowerCase();
-      
-      // const display = [responseData.message.type, responseData.message.content];
-      // console.log(display.join('\n'), responseData);
-      const typeForLog = responseData?.message?.type || "";
-      const contentForLog = responseData?.message?.content || "";
-      console.log([typeForLog, contentForLog].join('\n'), responseData);
+      const API = response.config.url?.toLowerCase();
 
       // Only show success notifications for actions that modify data
-      const shouldShowNotification =
-        method && ["post", "put", "patch", "delete"].includes(method);
+      const isUncatchAPI = uncatchAPI.some((pattern) => pattern.test(API));
 
+      const shouldShowNotification =
+        method && !uncatchMethod.includes(method) && API && !isUncatchAPI;
+
+      console.log(shouldShowNotification);
       // Check if response has success message format and should show notification
       if (
         shouldShowNotification &&
@@ -62,12 +64,10 @@ export const setUpInterceptors = (logout) => {
 
       const status = error.response.status;
       const errorData = error.response.data;
-      const method = error.config?.method?.toLowerCase?.() || "";
-      const url = error.config?.url || "";
       const errType = errorData?.error?.type || "";
 
       const display = [errorData.error.type, errorData.error.content];
-      console.log(display.join('\n'), errorData);
+      console.log(display.join("\n"), errorData);
 
       // Handle new standardized error format
       if (
@@ -82,8 +82,12 @@ export const setUpInterceptors = (logout) => {
         const requestUrl = error.config?.url;
         const requestMethod = error.config?.method?.toLowerCase();
 
-        const isDeleteMe = /\/api\/v1\/auth\/me\/?$/.test(requestUrl) && requestMethod === "delete";
-        const isLogin = /\/api\/v1\/auth\/login\/?$/.test(requestUrl) && requestMethod === "post";
+        const isDeleteMe =
+          /\/api\/v1\/auth\/me\/?$/.test(requestUrl) &&
+          requestMethod === "delete";
+        const isLogin =
+          /\/api\/v1\/auth\/login\/?$/.test(requestUrl) &&
+          requestMethod === "post";
 
         // Special handling for 401 errors
         if (status === 401) {

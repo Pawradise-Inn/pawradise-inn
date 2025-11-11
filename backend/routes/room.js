@@ -56,7 +56,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /room/available:
+ * /rooms/available:
  *   get:
  *     summary: Get available rooms
  *     tags: [Rooms]
@@ -69,7 +69,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /room/reviews:
+ * /rooms/reviews:
  *   get:
  *     summary: Get rooms with pagination and reviews
  *     tags: [Rooms]
@@ -82,7 +82,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /room:
+ * /rooms:
  *   get:
  *     summary: Get all rooms
  *     tags: [Rooms]
@@ -113,7 +113,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /room/{id}:
+ * /rooms/{id}:
  *   get:
  *     summary: Get room by ID
  *     tags: [Rooms]
@@ -183,7 +183,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /room/{id}/pictures:
+ * /rooms/{id}/pictures:
  *   post:
  *     summary: Add pictures to room
  *     tags: [Rooms]
@@ -242,7 +242,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /room/{id}/status:
+ * /rooms/{id}/status:
  *   get:
  *     summary: Get room status
  *     tags: [Rooms]
@@ -264,7 +264,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /room/{id}/reviews:
+ * /rooms/{id}/reviews:
  *   get:
  *     summary: Get room reviews
  *     tags: [Rooms]
