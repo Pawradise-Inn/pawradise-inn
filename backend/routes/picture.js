@@ -15,7 +15,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /picture/upload:
+ * /pictures/upload:
  *   post:
  *     summary: Upload an image
  *     tags: [Pictures]

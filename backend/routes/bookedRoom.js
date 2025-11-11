@@ -36,7 +36,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /bookedRoom/dashboard/checkins:
+ * /bookedRooms/dashboard/checkins:
  *   get:
  *     summary: Get today's room check-ins
  *     tags: [BookedRooms]
@@ -49,7 +49,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /bookedRoom/dashboard/checkouts:
+ * /bookedRooms/dashboard/checkouts:
  *   get:
  *     summary: Get today's room check-outs
  *     tags: [BookedRooms]
@@ -62,7 +62,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /bookedRoom:
+ * /bookedRooms:
  *   get:
  *     summary: Get all booked rooms
  *     tags: [BookedRooms]
@@ -97,7 +97,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /bookedRoom/{id}:
+ * /bookedRooms/{id}:
  *   get:
  *     summary: Get booked room by ID
  *     tags: [BookedRooms]

@@ -36,13 +36,22 @@ const swaggerOptions={
     swaggerDefinition:{
         openapi: '3.0.0',
         info: {
-            title: 'Library API',
+            title: 'PawradiseInn API',
             version: '1.0.0',
-            description: 'A simple Express PawradiseInn API'
+            description: `
+# PawradiseInn Pet Hotel & Services API
+
+Welcome to the PawradiseInn API documentation!
+
+## Authentication Methods
+- **Bearer Token**: Include in Authorization header as \`Bearer <token>\`
+- **Cookie**: Automatically set after login (for browser clients)
+`
         },
         servers: [
             {
-                url: 'http://localhost:5000/api/v1'
+                url: 'http://localhost:5000/api/v1',
+                description: 'Development server'
             }
         ]
     },

@@ -2,6 +2,23 @@
  * Swagger Components Module
  * This module exports reusable components for Swagger API documentation.
  * 
+ * Security Schemes Definition
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *       description: Enter your JWT token in the format **Bearer &lt;token&gt;**
+ *     cookieAuth:
+ *       type: apiKey
+ *       in: cookie
+ *       name: token
+ *       description: Authentication token stored in cookie
+ */
+ 
+/** 
  * USER Schema Definition
  * @swagger
  * components:
