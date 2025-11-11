@@ -17,13 +17,17 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
     // Navigate to rooms page
     await page.goto("http://localhost:3000/room");
 
-    // Open a room that is not suitable for DOG (look for CAT)
-    await page
+    // Find a room that is not suitable for DOG (look for CAT)
+    const catRoomCard = page
       .getByTestId("room-card")
       .filter({ hasText: "Suitable for CAT" })
-      .first()
-      .getByRole("button", { name: "BOOK" })
-      .click();
+      .first();
+    
+    // Verify CAT room exists
+    await expect(catRoomCard).toBeVisible({ timeout: 5000 });
+    
+    // Open the CAT room booking popup
+    await catRoomCard.getByRole("button", { name: "BOOK" }).click();
 
     // Ensure popup visible
     await expect(page.getByTestId("booking-bar")).toBeVisible();
@@ -44,9 +48,12 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
 
     // Attempt booking - expect suitability error
     await page.locator('form').getByRole("button", { name: "BOOK" }).click();
+    
+    // Wait for error notification to appear
+    // The notification shows the error message in a <b> tag within the notification card
     await expect(
-      page.getByText("This room type is not suitable for your pet")
-    ).toBeVisible();
+      page.locator('b').getByText("This room type is not suitable for your pet")
+    ).toBeVisible({ timeout: 10000 });
 
     // Close popup
     await page.locator(".bi.bi-x-lg").first().click();
@@ -155,12 +162,23 @@ test.describe("US5-1: Room Booking - Available and Unavailable Cases", () => {
     await page.locator(".bi.bi-x-lg").first().click();
 
     // Verify booking is in cart (filter specific pet)
+    // The cart icon navigates to /cart page
     await page.getByTestId("cart-icon").click();
-    await expect(
-      page
-        .getByTestId("cart-card")
-        .filter({ hasText: `for ${petData.data.name}` })
-    ).toBeVisible();
+    
+    // Wait for navigation to cart page
+    await expect(page).toHaveURL(/\/cart/);
+    
+    // Wait for cart to load and verify booking is in cart
+    // The cart card shows "For: {petName}" (capital F with colon) in a <p> tag
+    // Find the exact text "For: TestPet" (not "For: TestPet1", etc.) using regex
+    // Then locate the parent cart-card element by going up the DOM tree
+    // Structure: cart-card > div.flex-grow > p (For: TestPet)
+    const exactPetText = page.getByText(new RegExp(`^For: ${petData.data.name}$`, "i"));
+    // Navigate up: p -> div.flex-grow -> cart-card
+    const cartCard = exactPetText.locator("..").locator("..");
+    
+    // Verify it's the cart-card by checking it has the testid
+    await expect(cartCard).toHaveAttribute("data-testid", "cart-card", { timeout: 10000 });
   });
 
   test("Given I have selected an unavailable room, When I try to book, Then the system should reject booking", async ({
