@@ -18,7 +18,10 @@ const overlappingRoom = async(id, checkIn, checkOut)=>{
         where: {
             roomId: Number(id),
             checkIn: {lt: new Date(checkOut)},
-            checkOut: {gt: new Date(checkIn)}
+            checkOut: {gt: new Date(checkIn)},
+            status: {
+                not : "CANCELLED"
+            }
         }
     });
     return count;
@@ -29,7 +32,10 @@ const duplicatedRoom = async(petId, checkIn, checkOut)=>{
         where: {
             petId: petId,
             checkIn: { lt: new Date(checkOut) },
-            checkOut: { gt: new Date(checkIn) }
+            checkOut: { gt: new Date(checkIn) },
+            status: {
+                not : "CANCELLED"
+            }
         }
     });
     return duplicated;
