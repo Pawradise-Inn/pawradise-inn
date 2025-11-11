@@ -18,7 +18,7 @@ const ItemRow = ({ item }) => (
       <div className="text-base !text-[var(--dark-brown-color)] mt-1">for {item.petName}</div> {/* ✅ Changed pet_name to petName */}
     </div>
     <div>
-      <div className="text-base !text-[var(--dark-brown-color)] mt-1 ml-4 flex-shrink-0">${item.price.toFixed(2)}</div>
+      <div className="text-base !text-[var(--dark-brown-color)] mt-1 ml-4 flex-shrink-0">{item.price.toFixed(2)} THB</div>
     </div>
   </div>
 );
@@ -30,6 +30,8 @@ const PaymentHistoryCard = ({ items, status, totalPrice }) => {
         return 'bg-[var(--success-color)]'; // Paid
       case 'FAILED':
         return 'bg-[var(--fail-color)]'; // Failed
+      case 'CANCELLED':
+        return 'bg-[var(--warning-color)]'
       default:
         return 'bg-gray-400'; // Default
     }
@@ -61,7 +63,7 @@ const PaymentHistoryCard = ({ items, status, totalPrice }) => {
 
       <div className="flex justify-end mt-5">
         <span className="text-xl font-semibold text-[var(--dark-brown-color)]">
-          Total Price: ${totalPrice.toFixed(2)}
+          Total Price: {totalPrice.toFixed(2)} THB
         </span>
       </div>
     </div>

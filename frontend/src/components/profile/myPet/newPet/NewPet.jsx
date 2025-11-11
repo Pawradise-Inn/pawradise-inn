@@ -185,7 +185,7 @@ const NewPet = () => {
             onClick={handleImageClick}
           >
             <img
-              src={petImagePreview || testImage}
+              src="https://storage.googleapis.com/paw_image/unnamed.jpg"
               className="w-full h-full rounded-full object-cover"
             />
           </div>

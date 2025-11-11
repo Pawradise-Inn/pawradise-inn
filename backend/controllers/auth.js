@@ -71,6 +71,36 @@ const user = await prisma.$transaction(async (tx) => {
     // Handle unique constraint violations
     if (error.code === "P2002") {
       const field = error.meta?.target[0];
+      
+      // Handle specific field messages
+      if (field === "phone_number") {
+        return sendErrorResponse(
+          res,
+          409,
+          "ALREADY_EXISTS",
+          "This phone number is already taken. Please choose a different one"
+        );
+      }
+      
+      if (field === "email") {
+        return sendErrorResponse(
+          res,
+          409,
+          "ALREADY_EXISTS",
+          "This email is already taken. Please choose a different one"
+        );
+      }
+      
+      if (field === "user_name") {
+        return sendErrorResponse(
+          res,
+          409,
+          "ALREADY_EXISTS",
+          "This username is already taken. Please choose a different one"
+        );
+      }
+      
+      // Default message for other fields
       return sendErrorResponse(
         res,
         409,

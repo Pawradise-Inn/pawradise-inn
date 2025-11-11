@@ -39,10 +39,46 @@ exports.updateMyProfile = async (req, res) => {
     return sendSuccessResponse(res, 200, "PROFILE_UPDATED", "Your profile has been updated successfully", result);
   } catch (err) {
     if (err.code === 'P2025') {
-      return sendErrorResponse(res, 404, "NOT_FOUND", "Staff profile not found. Please contact an administrator");
+      return sendErrorResponse(res, 404, "NOT_FOUND", "Your profile could not be found");
     }
     if (err.code === 'P2002') {
-      return sendErrorResponse(res, 409, "ALREADY_EXISTS", "This email or username is already in use");
+      const field = err.meta?.target[0];
+      
+      // Handle specific field messages
+      if (field === "phone_number") {
+        return sendErrorResponse(
+          res,
+          409,
+          "ALREADY_EXISTS",
+          "This phone number is already taken. Please choose a different one"
+        );
+      }
+      
+      if (field === "email") {
+        return sendErrorResponse(
+          res,
+          409,
+          "ALREADY_EXISTS",
+          "This email is already taken. Please choose a different one"
+        );
+      }
+      
+      if (field === "user_name") {
+        return sendErrorResponse(
+          res,
+          409,
+          "ALREADY_EXISTS",
+          "This username is already taken. Please choose a different one"
+        );
+      }
+      
+      // Default message for other fields
+      return sendErrorResponse(
+        res,
+        409,
+        "ALREADY_EXISTS",
+        `This ${field} is already taken. Please choose a different one`
+      );
     }
     return sendErrorResponse(res, 500, "SERVER_ERROR", "Unable to update your profile. Please try again");
   }
@@ -68,10 +104,10 @@ exports.getStaffProfile = async(req, res)=>{ //requirement: 17
             }
         });
         if(!staffWithInformation) {
-            return sendErrorResponse(res, 404, "PROFILE_NOT_FOUND", "Staff profile not found");
+            return sendErrorResponse(res, 404, "NOT_FOUND", "Your profile could not be found");
         }
-        return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Staff profile loaded", staffWithInformation);
+        return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Profile loaded", staffWithInformation);
     }catch(err){
-        return sendErrorResponse(res, 500, "UNABLE_TO_LOAD", "Unable to load staff profile. Please refresh and try again");
+        return sendErrorResponse(res, 500, "UNABLE_TO_LOAD", "Unable to load your profile. Please refresh and try again");
     }
 };

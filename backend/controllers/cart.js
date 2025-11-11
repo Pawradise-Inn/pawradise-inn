@@ -74,7 +74,7 @@ const toggleCartRoomSelection = async (req, res) => {
       return sendErrorResponse(res, 404, "NOT_FOUND", "Cart item not found");
     }
     const updated = await prisma.cartRoom.update({ where: { id: item.id }, data: { selected } });
-    return sendSuccessResponse(res, 200, "UPDATED_SUCCESSFULLY", "Selection updated", updated);
+    //return sendSuccessResponse(res, 200, "UPDATED_SUCCESSFULLY", "Selection updated", updated);
   } catch (err) {
     return sendErrorResponse(res, 500, "UNABLE_TO_UPDATE", "Unable to update selection. Please try again");
   }
