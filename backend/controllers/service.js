@@ -315,6 +315,7 @@ const getServicesWithPagination = async (req, res) => {
       include: {
         reviews: true,
       },
+      orderBy: { name: "asc" },
     });
 
     const formattedService = await Promise.all(

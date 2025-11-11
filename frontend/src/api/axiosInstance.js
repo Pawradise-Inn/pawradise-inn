@@ -31,7 +31,7 @@ export const setUpInterceptors = (logout) => {
       // console.log(display.join('\n'), responseData);
       const typeForLog = responseData?.message?.type || "";
       const contentForLog = responseData?.message?.content || "";
-      console.log([typeForLog, contentForLog].join('\n'), responseData);
+      //console.log([typeForLog, contentForLog].join('\n'), responseData);
 
       // Only show success notifications for actions that modify data
       const shouldShowNotification =
