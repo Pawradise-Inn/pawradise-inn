@@ -26,7 +26,7 @@ const BookingCard = ({ room, getRoomStatusColor, pet, checkIn, checkOut }) => {
       <div className="flex items-start space-x-6">
         <div className="w-64 h-64 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
           <img
-            src={room.img || testImage}
+            src={room.picture || testImage}
             alt="Room"
             className="w-full h-full object-cover"
           />

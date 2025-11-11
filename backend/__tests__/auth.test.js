@@ -206,7 +206,7 @@ describe('User Registration Tests', () => {
       expect(response.body.error.type).toBe('ALREADY_EXISTS');
       expect(response.body.error.header).toBe('Already Exists');
       expect(response.body.error.content).toBe(
-        'This user_name is already taken. Please choose a different one'
+        'This username is already taken. Please choose a different one'
       );
     });
 

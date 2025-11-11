@@ -55,6 +55,15 @@ const isReservableRoom = async(roomId, petId, checkIn, checkOut) => {
     const count = await overlappingRoom(roomId, checkIn, checkOut);
     const cap = await getRoomCap(roomId);
 
+    // Include items currently in carts for the same room and overlapping dates
+    const cartCount = await prisma.cartRoom.count({
+        where: {
+            roomId: Number(roomId)
+        }
+    });
+
+    const totalCount = count + cartCount;
+
     const isSuit = await isSuitable(roomId, petId);
     if (!isSuit) {
         const error = new Error('This pet is not eligible for the selected room.');
@@ -62,7 +71,7 @@ const isReservableRoom = async(roomId, petId, checkIn, checkOut) => {
         throw error;
     }
 
-    if (count >= cap) {
+    if (totalCount >= cap) {
         const error = new Error('This room has reached its maximum capacity for the selected dates.');
         error.code = 'ROOM_FULL';
         throw error;

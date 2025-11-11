@@ -74,7 +74,16 @@ const isSuitable = async(serviceId, petId)=>{
 const isReservableService = async(serviceId, petId, scheduled) => {
   const count = await overlappingService(serviceId, scheduled);
 
-  if (count >= 3) {
+  // Include items currently in carts for the same service and schedule
+  const cartCount = await prisma.cartService.count({
+    where: {
+      serviceId: Number(serviceId)
+    },
+  });
+
+  const totalCount = count + cartCount;
+
+  if (totalCount >= 3) {
     const error = new Error("This service is fully booked for the selected date and time.");
     error.code = "SERVICE_FULL";
     throw error;
