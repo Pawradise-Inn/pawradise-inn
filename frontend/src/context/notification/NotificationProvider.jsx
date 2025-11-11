@@ -10,6 +10,7 @@ const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [isBlock, setIsBlock] = useState(false);
   const [useAnimation, setUseAnimation] = useState(false);
+  const [notificationCounter, setNotificationCounter] = useState(0);
 
   const overflowNumber = 4;
 
@@ -22,7 +23,9 @@ const NotificationProvider = ({ children }) => {
 
   const createNotification = ( status, header, text, onClick, duration=5000 ) => {
 
-    const id = Date.now();
+    // Use combination of timestamp and counter to ensure uniqueness
+    const id = `${Date.now()}-${notificationCounter}`;
+    setNotificationCounter(prev => prev + 1);
     if (status === 'warning') {
       setIsBlock(true);
       setNotifications((prev) => [
