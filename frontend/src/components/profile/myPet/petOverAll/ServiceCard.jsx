@@ -1,7 +1,7 @@
 import testImage from "../../../../assets/test.png";
 
 const ServiceCard = ({ service, getStatusText, getStatusColor, pet }) => {
-  console.log(pet)
+  console.log(service)
   return (
     <div className="bg-[var(--light-brown-color)] rounded-lg p-6 shadow-lg flex items-center justify-between">
       <div className="flex items-center space-x-6 flex-1">
