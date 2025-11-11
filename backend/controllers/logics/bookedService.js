@@ -17,6 +17,9 @@ const overlappingService = async (serviceId, scheduled) => {
     where: {
       serviceId: serviceId,
       scheduled: new Date(scheduled),
+      status: {
+        not : "CANCELLED"
+      }
     }
   });
 
@@ -38,6 +41,9 @@ const duplicatedService = async (serviceId, petId, scheduled) => {
         gte: startOfDay,
         lte: endOfDay,
       },
+      status: {
+        not : "CANCELLED"
+      }
     },
   });
 

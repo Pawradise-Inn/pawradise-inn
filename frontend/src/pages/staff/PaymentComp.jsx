@@ -8,6 +8,7 @@ const PaymentComp = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [previewImage, setPreviewImage] = useState(null); // ✅ for enlarged image
 
   useEffect(() => {
     const loadPayments = async () => {
@@ -37,7 +38,6 @@ const PaymentComp = () => {
   const handleStatusChange = async (paymentId, newStatus) => {
     try {
       await updatePaymentStatusAPI(paymentId, newStatus);
-      // Update locally after successful API call
       setPayments((prev) =>
         prev.map((p) =>
           p.paymentId === paymentId ? { ...p, status: newStatus } : p
@@ -126,11 +126,35 @@ const PaymentComp = () => {
                 onStatusChange={(newStatus) =>
                   handleStatusChange(payment.paymentId, newStatus)
                 }
+                onPictureClick={() => setPreviewImage(payment.slip)} // ✅ added
               />
             ))}
           </AnimatePresence>
         )}
       </div>
+
+      {/* ✅ Image Preview Modal */}
+      <AnimatePresence>
+        {previewImage && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-[9999]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setPreviewImage(null)} // close when clicking background
+          >
+            <motion.img
+              src={previewImage}
+              alt="Preview"
+              className="max-w-[90vw] max-h-[90vh] rounded-lg shadow-lg"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()} // prevent closing when clicking image
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
