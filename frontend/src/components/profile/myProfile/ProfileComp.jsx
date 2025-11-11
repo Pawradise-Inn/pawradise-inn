@@ -8,6 +8,7 @@ import { useNotification } from "../../../context/notification/NotificationProvi
 import { deleteMeAPI } from "../../../hooks/authAPI";
 import Overlay from "../../Overlay";
 import { updateStaffProfileAPI } from "../../../hooks/staffAPI";
+import { validateFormTel } from "../../../utils/HandleForm";
 
 const ProfileComp = () => {
   const { createNotification } = useNotification();
@@ -53,7 +54,7 @@ const ProfileComp = () => {
       type: "tel",
       autoComplete: "true",
     },
-    { label: "Email", name: "email", type: "email", autoComplete: "true" },
+    { label: "Email", name: "email", type: "text", autoComplete: "true" },
   ];
 
   useEffect(() => {
@@ -76,6 +77,36 @@ const ProfileComp = () => {
   const handleConfirm = async (e) => {
     e.preventDefault();
     if (!newUser.id) return;
+
+    // Validate all required fields are filled
+    const requiredFields = ['firstname', 'lastname', 'user_name', 'phone_number', 'email'];
+    const emptyFields = requiredFields.filter(field => !newUser[field]?.trim());
+    
+    if (emptyFields.length > 0) {
+      createNotification(
+        "fail",
+        "Missing Information",
+        "Please fill in all required fields"
+      );
+      return;
+    }
+
+    // Validate phone number format
+    if (!validateFormTel({ phoneNumber: newUser.phone_number }, createNotification)) {
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newUser.email)) {
+      createNotification(
+        "fail",
+        "Invalid Email",
+        "Please enter a valid email address"
+      );
+      return;
+    }
+
     createNotification(
       "warning",
       "Confirmation.",
@@ -189,7 +220,9 @@ const ProfileComp = () => {
                   }
                   className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
                   border-[var(--brown-color)] bg-[var(--cream-color)] 
-                  focus:border-[var(--dark-brown-color)] focus:outline-none"
+                  focus:border-[var(--dark-brown-color)] focus:outline-none
+                  hover:shadow-md"
+                  placeholder={data.label}
                 />
               </motion.div>
             ))}
