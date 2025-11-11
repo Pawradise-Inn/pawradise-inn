@@ -18,6 +18,20 @@ export const fetchAllPaymentAPI = async () => {
   return response.data;
 };
 
+export const createPaymentAPI = async ({ status, amount, slip }) => {
+  try {
+    const response = await axiosInstance.post("/api/v1/payments", {
+      status,
+      amount, // required by backend
+      slip,   // can be undefined if no slip uploaded yet
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating payment:", error);
+    throw error;
+  }
+};
+
 export const updatePaymentStatusAPI = async (paymentId, newStatus) => {
   try {
     const response = await axiosInstance.put(`${API_URL}/${paymentId}`, {

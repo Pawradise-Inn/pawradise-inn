@@ -23,12 +23,12 @@ export const deletePetAPI = async (id) => {
 };
 
 export const updatePetStatusAPI = async (id, status) => {
-  const response = await axiosInstance.patch(`${API_URL}/${id}`, {status});
+  const response = await axiosInstance.patch(`${API_URL}/${id}`, { status });
   return response.data;
 };
 
 export const registerPetAPI = async (customerId, pet) => {
-  const response = await axiosInstance.post(`${API_URL}/register`, {...pet, customerId});
+  const response = await axiosInstance.post(`${API_URL}/register`, { ...pet, customerId });
   return response.data;
 };
 
@@ -50,5 +50,25 @@ export const fetchCustomerPets = async (customerId, fields) => {
 
 export const fetchPetTypesAPI = async () => {
   const response = await axiosInstance.get(`${API_URL}/pet-types`);
+  return response.data;
+};
+
+/**
+ * Fetch all bookings (services and rooms) for a specific pet
+ * @param {number} petId - The ID of the pet
+ * @returns {Promise} Response containing pet bookings data
+ * Response structure:
+ * {
+ *   success: true,
+ *   data: {
+ *     petId: number,
+ *     petName: string,
+ *     services: Array<BookedService>,
+ *     rooms: Array<BookedRoom>
+ *   }
+ * }
+ */
+export const fetchPetBookingsAPI = async (petId) => {
+  const response = await axiosInstance.get(`${API_URL}/${petId}/bookings`);
   return response.data;
 };

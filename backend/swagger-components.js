@@ -52,7 +52,6 @@
  *         - phone_number
  *         - user_name
  *         - password
- *         - role
  *       example:
  *         id: 3
  *         firstname: bung
@@ -82,8 +81,6 @@
  *         bank_company:
  *           type: string
  *           description: The bank company of this staff.
- *           default: KASIKORN
- *           enum: [KASIKORN, SCB, KRUNGTHAI]
  *         bank_account:
  *           type: string
  *           description: The unique bank account number of this staff.
@@ -142,6 +139,7 @@
  *         sex:
  *           type: string
  *           description: The sex of the pet
+ *           default: MALE
  *           enum: [MALE, FEMALE]
  *         age:
  *           type: Integer
@@ -186,6 +184,7 @@
  *         - breed
  *         - disease
  *         - allergic
+ *         - customerId
  *       example:
  *         id: 2
  *         name: Meow
@@ -208,8 +207,6 @@
  *   schemas:
  *     ChatLog:
  *       type: object
- *       required:
- *         - customerId
  *       properties:
  *         id:
  *           type: integer
@@ -225,6 +222,7 @@
  *         rating:
  *           type: integer
  *           nullable: true
+ *           default: 5
  *           description: The rating given by the customer (1-5).
  *         review_date:
  *           type: string
@@ -259,6 +257,11 @@
  *               type: integer
  *               nullable: false
  *               description: The room ID associated with this chat log.
+ *       required:
+ *         - review
+ *         - rating
+ *         - review_date
+ *         - customerId
  *       example:
  *         id: 4
  *         review: "I love this room"
@@ -305,6 +308,7 @@
  *         picture:
  *           type: string
  *           description: The picture URL of the room.
+ *           default: "https://storage.googleapis.com/paw_image/unnamed.jpg"
  *         petType:
  *           type: string
  *           description: The type of pet suitable for the room.
@@ -313,6 +317,14 @@
  *       required:
  *         - name
  *         - number
+ *       example:
+ *         id: 1
+ *         name: "Large Standard Room"
+ *         number: 101
+ *         capacity: 20
+ *         price: 200
+ *         picture: "https://storage.googleapis.com/paw_image/unnamed.jpg"
+ *         petType: "MOUSE"
  */
 
 /**
@@ -337,7 +349,7 @@
  *         status:
  *           type: string
  *           description: The status of the booked room.
- *           enum: [RESERVED, CHECKED_IN, CHECKED_OUT, CANCELLED]
+ *           enum: [PENDING, RESERVED, CHECKED_IN, CHECKED_OUT, CANCELLED]
  *           default: RESERVED
  *         roomId:
  *           type: integer
@@ -423,7 +435,7 @@
  *         status:
  *           type: string
  *           description: The status of the booked service
- *           enum: [RESERVED, IN_PROCESS, COMPLETED, CANCELLED]
+ *           enum: [PENDING, RESERVED, QUEUE, IN_PROCESS, COMPLETED, CANCELLED]
  *           default: RESERVED
  *         serviceId:
  *           type: integer
@@ -487,6 +499,15 @@
  *         - date
  *         - customerId
  *         - paymentId
+ *       example:
+ *         id: 2
+ *         date: "2025-11-06-T15:24:24.000Z"
+ *         status: PENDING
+ *         customerId: 1
+ *         paymentId: 2
+ *         customerName: "Bung Sell"
+ *         customerEmail: "bungsell@gmail.com"
+ *         customerNumber: "0987654321"
  */
 
 /**
@@ -515,7 +536,6 @@
  *         slip:
  *           type: string
  *           description: The picture URL of the payment receipt.
- *           default: "https://storage.googleapis.com/paw_image/slip/slipExample.jpg"
  *         customerId:
  *           type: integer
  *           description: The customer ID associated with this payment.
@@ -533,6 +553,112 @@
  *         slip: "https://storage.googleapis.com/paw_image/slip/slipExample.jpg"
  *         customerId: 2
  */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CartRoom:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The auto-generated id of the cart record.
+ *         cartId:
+ *           type: integer
+ *           description: The cart ID which store this room.
+ *         roomId:
+ *           type: integer
+ *           description: The room ID which wanted by customer.
+ *         petId:
+ *           type: integer
+ *           description: The pet ID which reserve to this room.
+ *         checkIn:
+ *           type: string
+ *           format: date
+ *           description: The check-in date for the room. 
+ *         checkOut:
+ *           type: string
+ *           format: date
+ *           description: The check-out date for this room.
+ *         selected:
+ *           type: boolean
+ *           description: The status for checking if this item is selected.
+ *           default: false
+ *       required:
+ *         - roomId
+ *         - petId
+ *         - checkIn
+ *         - checkOut
+ *       example:
+ *         id: 4
+ *         cartId: 1
+ *         roomId: 2
+ *         petId: 5
+ *         checkIn: "2025-11-06T00:00:00.000Z"
+ *         checkOut: "2025-11-08T00:00:00.000Z"
+ *         selected: true
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CartService:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The auto-generated id of the cart record.
+ *         cartId:
+ *           type: integer
+ *           description: The cart ID which store this service.
+ *         serviceId:
+ *           type: integer
+ *           description: The service ID which wanted by customer.
+ *         petId:
+ *           type: integer
+ *           description: The pet ID which reserve to this service.
+ *         scheduled:
+ *           type: string
+ *           format: date-time
+ *           description: The check-in date-time for the service. 
+ *         selected:
+ *           type: boolean
+ *           description: The status for checking if this item is selected.
+ *           default: false
+ *       required:
+ *         - serviceId
+ *         - petId
+ *         - scheduled
+ *       example:
+ *         id: 4
+ *         cartId: 1
+ *         serviceId: 1
+ *         petId: 2
+ *         scheduled: "2025-11-12T10:00:00.000Z"
+ *         selected: false
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Cart:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The auto-generated id of the cart record.
+ *         customerId:
+ *           type: integer
+ *           description: The customer ID who provided the care.
+ *       required:
+ *         - customerId
+ *       example:
+ *         id: 4
+ *         customerId: 1
+ */        
 
 /**
  * @swagger
@@ -566,6 +692,7 @@
  *         - date
  *         - staff_id
  *         - pet_id
+ *         - anyOf
  *       example:
  *         id: 1
  *         date: "2025-10-20T08:00:00Z"

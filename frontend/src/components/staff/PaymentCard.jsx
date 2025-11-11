@@ -9,6 +9,7 @@ const PaymentCard = ({
   totalPrice,
   status,
   onStatusChange,
+  onPictureClick,
 }) => {
 
   const statusColor = getPaymentStatusColor(status) || "bg-green-500";
@@ -31,13 +32,14 @@ const PaymentCard = ({
         src={picture}
         className="w-40 h-40 object-cover object-center rounded-lg"
         alt={username}
+        onClick={onPictureClick}
       />
       <div className="flex justify-between items-center w-full mx-10">
         <div className="flex flex-col gap-2 justify-center items-start">
           <b>{username}</b>
           {Array.isArray(bookingDetails) && bookingDetails.length > 0 ? (
             bookingDetails.map((detail, index) => (
-              <div key={index}>{detail}</div>
+              <div key={index}>{detail.petName} ({detail.name})</div>
             ))
           ) : (
             <div className="opacity-60">No booking details</div>
@@ -56,10 +58,11 @@ const PaymentCard = ({
           value={status} 
           onChange={onStatusChange} 
           element={`status-dropdown-${username}`}
-          inputSyle={`py-1 pl-3 pr-10 rounded-full ${statusColor} text-sm font-semibold tracking-wide cursor-pointer`}
-          dropDownStyle="border-2 border-[var(--brown-color)] bg-[var(--light-brown-color)] origin-top translate-y-1 top-full right-0" // Aligns dropdown to the right
+          inputSyle={"py-1 pl-3 pr-10 rounded-full bg-[var(--dark-brown-color)] !text-[var(--cream-color)] text-sm font-semibold tracking-wide cursor-pointer"}
+          dropDownStyle="border-2 border-[var(--brown-color)] bg-[var(--light-brown-color)] origin-top translate-y-1 top-full right-0 " // Aligns dropdown to the right
           activeColor="var(--cream-color)"
           // arrowColor="white" 
+          
         />
       </div>
     </motion.div>

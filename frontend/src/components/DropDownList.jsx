@@ -20,6 +20,12 @@ const DropDownList = ({
   const [dropDownStatus, setDropDownStatus] = useState(false);
   const ref = useRef(null);
 
+  const selectedOption = options.find(option => option.value === value);
+
+  const displayText = selectedOption ? selectedOption.name : (value || startText);
+  
+  const statusClass = selectedOption ? selectedOption.value : 'default';
+
   const handleDropDown = () => {
     setDropDownStatus(!dropDownStatus);
   };
@@ -44,7 +50,12 @@ const DropDownList = ({
           dropDownStatus && focusStyle
         }`}
       >
-        {value || startText}
+        <span className={`status-circle ${statusClass}`}>
+          {displayText}
+        </span>
+
+        {/* {value || startText} */}
+
         <i
           style={{ color: arrowColor }}
           className={`bi bi-caret-down-fill absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center text-2xl cursor-pointer pointer-events-none transition-all duration-200 ${
@@ -79,7 +90,11 @@ const DropDownList = ({
                       className="w-full px-4 py-2 text-xl cursor-pointer absolute top-0 left-0 pointer-events-none h-full z-20"
                     />
                   ) : null}
-                  <span className="z-30 relative">{option.name}</span>
+                  <span className="z-30 relative text-[18px]">{option.name}</span>
+                  {/* <span className={`status-circle z-30 relative ${option.value.toLowerCase()}`}>
+                    {option.name}
+                  </span> */}
+
                 </div>
               </div>
             ))}

@@ -151,8 +151,11 @@ const getPayments = async (req, res) => {
 
 const getPayment = async (req, res) => {
     try{
-        const paymentId = req.params.id;
-        const payment = await prisma.payment.findUnique(paymentId);
+        const paymentId = Number(req.params.id);
+        const payment = await prisma.payment.findUnique({
+            where: { id : paymentId},
+        });
+        console.log(payment);
         if (!payment)
             return sendErrorResponse(res, 404, "PAYMENT_NOT_FOUND", "Payment not found")
         return sendSuccessResponse(
@@ -202,20 +205,14 @@ const createPayment = async (req, res) => {
 const updatePayment = async (req, res) => {
     try{
         let dataToUpdate = {};
-        let paymentId;
 
+        const paymentId = req.params.id;
         if (req.user.role == "CUSTOMER"){
-            paymentId = req.body.paymentId;
             if (req.body.slip) dataToUpdate.slip = req.body.slip;
-            if (req.body.date) dataToUpdate.date = new Date(req.body.date);
             if (req.body.status) dataToUpdate.status = req.body.status;
         }else if (req.user.role == "STAFF"){
-            paymentId = req.params.id;
             if (req.body.status) dataToUpdate.status = req.body.status;
-            if (req.body.date) dataToUpdate.date = new Date(req.body.date);
         }
-
-        const newStatus = dataToUpdate.status;
 
         if (Object.keys(dataToUpdate).length === 0) {
             return sendErrorResponse(
@@ -225,6 +222,8 @@ const updatePayment = async (req, res) => {
                 "Please provide details to update"
             );
         }
+        dataToUpdate.date = req.body.date ? new Date(req.body.date) : new Date();
+        const newStatus = dataToUpdate.status;
 
         const payment = await prisma.$transaction(async (tx) => {
             const updatedPayment = await tx.payment.update({
@@ -232,31 +231,38 @@ const updatePayment = async (req, res) => {
                 data: dataToUpdate,
             });
 
+            let newBookingStatus;
+            let newBookedStatus;
+
             if (newStatus === "SUCCESS") {
-
-                const booking = await tx.booking.findUnique({
-                    where: { paymentId: updatedPayment.id },
-                    select: { id: true }
-                });
-
-                if (booking) {
-                    await tx.booking.update({
-                        where: { id: booking.id },
-                        data: { status: "BOOKED" },
-                    });
-
-                    await tx.bookedRoom.updateMany({
-                        where: { bookingId: booking.id },
-                        data: { status: "RESERVED" },
-                    });
-
-                    await tx.bookedService.updateMany({
-                        where: { booking_id: booking.id },
-                        data: { status: "RESERVED" },
-                    });
-                }
+                newBookingStatus = "BOOKED";
+                newBookedStatus = "RESERVED";
+            }else if (newStatus === "CANCELLED") {
+                newBookingStatus = "CANCELLED";
+                newBookedStatus = "CANCELLED";
             }
 
+            const booking = await tx.booking.findUnique({
+                where: { paymentId: updatedPayment.id },
+                select: { id: true }
+            });
+
+            if (booking) {
+                await tx.booking.update({
+                    where: { id: booking.id },
+                    data: { status: newBookingStatus },
+                });
+
+                await tx.bookedRoom.updateMany({
+                    where: { bookingId: booking.id },
+                    data: { status: newBookedStatus },
+                });
+
+                await tx.bookedService.updateMany({
+                    where: { booking_id: booking.id },
+                    data: { status: newBookedStatus },
+                });
+            }
             return updatedPayment;
         });
 

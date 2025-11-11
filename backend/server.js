@@ -65,6 +65,7 @@ const picture = require("./routes/picture");
 const cart = require("./routes/cart");
 const payment = require('./routes/payment');
 const qr = require('./routes/qr');
+const slipOk = require('./routes/slipOk')
 
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/bookings", booking);
@@ -81,6 +82,7 @@ app.use("/api/v1/images", picture);
 app.use("/api/v1/carts", cart);
 app.use('/api/v1/payments', payment);
 app.use('/api/v1/qr', qr);
+app.use('/api/v1/slip', slipOk)
 
 const PORT = process.env.PORT || 5000;
 

@@ -262,7 +262,7 @@ enum BookingStatus {
   CANCELLED
 }
 
-enum BookedRoomStatus {
+enum BookedServiceStatus {
   PENDING
   RESERVED
   QUEUE
@@ -271,7 +271,7 @@ enum BookedRoomStatus {
   CANCELLED
 }
 
-enum BookedServiceStatus {
+enum BookedRoomStatus {
   PENDING
   RESERVED
   CHECKED_IN

@@ -228,7 +228,7 @@ const Cart = () => {
                             </span>
                         </div>
                         <button
-                            onClick={() => navigate('/payment')} // Added navigation
+                            onClick={() => navigate('/payment', { state: { total } })} // Added navigation
                             className="bg-[var(--brown-color)] !text-[var(--cream-color)] px-8 py-3 rounded-lg font-bold capitalize hover:bg-yellow-800 transition-colors text-lg"
                         >
                             payment
