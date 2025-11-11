@@ -74,7 +74,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   //  calculate date is valid or not
   //  @return: validDateStatus which contain 1)status, 2)warningText
   const validDateStatus = useMemo(() => {
-    if (!formData.entryDate || !formData.exitDate) return { status: true };
+    if (data.headerType === "Room" && (!formData.entryDate || !formData.exitDate)) return { status: true };
+    if (data.headerType === "Service" && (!formData.entryDate)) return { status: true };
     return getDateValidation(formData.entryDate, formData.exitDate);
   }, [formData]);
 

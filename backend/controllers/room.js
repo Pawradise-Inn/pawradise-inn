@@ -424,6 +424,7 @@ const getRoomsWithPagination = async (req, res) => {
           },
         },
       },
+      orderBy: [{ petType: "asc" }, { id: "asc" }],
     });
 
     if (!rooms || rooms.length === 0) {
