@@ -93,6 +93,7 @@ temp/
 *.sln
 *.sw?
 
+<<<<<<< HEAD
 # Backend specific
 backend/config/
 backend/generated/
@@ -144,3 +145,64 @@ frontend/playwright/.auth/
 backend/***REMOVED***
 *.env
 backend/*.env*
+||||||| merged common ancestors
+#  About folder
+**/about_this_folder.md
+||||||||| merged common ancestors
+=========
+node_modules/*
+config/config.env
+config/config.env.local
+/generated/
+/out/
+>>>>>>>>> Temporary merge branch 2
+=======
+# Backend specific
+backend/config/
+backend/generated/
+backend/out/
+backend/testcase.sql
+backend/swagger
+
+# Frontend specific
+frontend/dist/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+
+# Package manager lock files (uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Prisma
+/generated/prisma
+prisma/schema.prisma
+prisma.config.ts
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+frontend/playwright/.cache/
+frontend/playwright/.auth/
+>>>>>>> da5e18fa8eb86272f9b3c30522abe2afb5a68667
