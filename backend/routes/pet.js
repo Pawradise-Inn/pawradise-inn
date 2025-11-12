@@ -57,7 +57,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /pet:
+ * /pets:
  *   get:
  *     summary: Get all pets
  *     tags: [Pets]
@@ -70,7 +70,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /pet/register:
+ * /pets/register:
  *   post:
  *     summary: Register a new pet
  *     tags: [Pets]
@@ -93,7 +93,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /pet/available:
+ * /pets/available:
  *   get:
  *     summary: Get customer's available pet names
  *     tags: [Pets]
@@ -110,7 +110,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /pet/pet-types:
+ * /pets/pet-types:
  *   get:
  *     summary: Get all pet types
  *     tags: [Pets]
@@ -123,7 +123,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /pet/{id}:
+ * /pets/{id}:
  *   get:
  *     summary: Get pet by ID
  *     tags: [Pets]
@@ -224,7 +224,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /pet/{id}/available:
+ * /pets/{id}/available:
  *   get:
  *     summary: Get customer's pets by customer ID
  *     tags: [Pets]
@@ -248,7 +248,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /pet/{id}/bookings:
+ * /pets/{id}/bookings:
  *   get:
  *     summary: Get all bookings for a pet
  *     tags: [Pets]

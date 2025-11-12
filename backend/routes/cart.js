@@ -45,7 +45,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /cart:
+ * /carts:
  *   get:
  *     summary: Get current user's cart with all items
  *     tags: [Cart]
@@ -62,7 +62,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /cart/rooms:
+ * /carts/rooms:
  *   post:
  *     summary: Add a room booking to cart
  *     tags: [Cart]
@@ -111,7 +111,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /cart/services:
+ * /carts/services:
  *   post:
  *     summary: Add a service booking to cart
  *     tags: [Cart]
@@ -155,7 +155,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /cart/rooms/{id}:
+ * /carts/rooms/{id}:
  *   delete:
  *     summary: Remove a room booking from cart
  *     tags: [Cart]
@@ -181,7 +181,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /cart/services/{id}:
+ * /carts/services/{id}:
  *   delete:
  *     summary: Remove a service booking from cart
  *     tags: [Cart]
@@ -207,7 +207,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /cart/rooms/{id}/selected:
+ * /carts/rooms/{id}/selected:
  *   patch:
  *     summary: Toggle room selection status in cart (for checkout)
  *     tags: [Cart]
@@ -247,7 +247,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /cart/services/{id}/selected:
+ * /carts/services/{id}/selected:
  *   patch:
  *     summary: Toggle service selection status in cart (for checkout)
  *     tags: [Cart]

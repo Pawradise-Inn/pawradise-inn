@@ -22,10 +22,12 @@ module.exports = router;
 
 /** 
  * @swagger
- * /staff/login:
+ * /staffs/login:
  *   post:
- *     summary: Staff login
+ *     summary: Staff login (alternative endpoint - use /auth/login instead)
  *     tags: [Staff]
+ *     deprecated: true
+ *     description: This endpoint uses the same login controller as /auth/login. Please use /auth/login for consistency.
  *     requestBody:
  *       required: true
  *       content:
@@ -33,16 +35,60 @@ module.exports = router;
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - userName
  *               - password
  *             properties:
- *               email:
+ *               userName:
  *                 type: string
+ *                 example: staffuser123
  *               password:
  *                 type: string
+ *                 format: password
+ *                 example: SecurePass123
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Login successful, returns user data and JWT token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 type:
+ *                   type: string
+ *                   example: LOGIN_SUCCESSFUL
+ *                 message:
+ *                   type: string
+ *                   nullable: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         firstname:
+ *                           type: string
+ *                         lastname:
+ *                           type: string
+ *                         email:
+ *                           type: string
+ *                         phone_number:
+ *                           type: string
+ *                         user_name:
+ *                           type: string
+ *                         role:
+ *                           type: string
+ *                           enum: [CUSTOMER, STAFF]
+ *                     token:
+ *                       type: string
+ *                       description: JWT token to use for authentication. Copy this token and click "Authorize" button to use it.
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       400:
+ *         description: Missing username or password
  *       401:
  *         description: Invalid credentials
  *       500:
@@ -51,7 +97,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /staff/logout:
+ * /staffs/logout:
  *   post:
  *     summary: Staff logout
  *     tags: [Staff]
@@ -68,7 +114,7 @@ module.exports = router;
 
 /** 
  * @swagger
- * /staff/{id}:
+ * /staffs/{id}:
  *   get:
  *     summary: Get staff profile by ID
  *     tags: [Staff]

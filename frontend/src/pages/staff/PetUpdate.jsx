@@ -114,7 +114,7 @@ const PetUpdate = () => {
           {/* My Pets */}
           <div>
             <div className="space-y-4 max-h-[300px] pr-2 scrollbar-sleek">
-              {<PetCard pet={pet} />}
+              {<PetCard key={pet.id} pet={pet} />}
             </div>
           </div>
 
@@ -143,8 +143,8 @@ const PetUpdate = () => {
           <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
             <h2 className="text-2xl font-bold mb-6">History</h2>
             <div className="space-y-6 pr-2 scrollbar-sleek">
-              {scheduled.map((sch, index) => (
-                <div key={sch.id}>
+              {scheduled.map((sch) => (
+                <div key={`scheduled-${sch.id}`}>
                   <ServiceCard
                     service={sch.service}
                     getStatusText={getStatusText}

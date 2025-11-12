@@ -20,7 +20,7 @@ const RoomCard = ({
       data-testid="room-card"
     >
       <img
-        src={data.image || testImage}
+        src={data.picture || testImage}
         alt={`Room ${data.id}`}
         className="object-center rounded-2xl w-[180px] h-[180px]"
       />

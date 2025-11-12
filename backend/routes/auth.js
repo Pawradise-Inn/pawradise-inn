@@ -77,7 +77,46 @@ module.exports = router;
  *                 description: Required if role is STAFF
  *     responses:
  *       200:
- *         description: User registered successfully
+ *         description: User registered successfully, returns user data and JWT token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 type:
+ *                   type: string
+ *                   example: REGISTERED_SUCCESSFULLY
+ *                 message:
+ *                   type: string
+ *                   nullable: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         firstname:
+ *                           type: string
+ *                         lastname:
+ *                           type: string
+ *                         email:
+ *                           type: string
+ *                         phone_number:
+ *                           type: string
+ *                         user_name:
+ *                           type: string
+ *                         role:
+ *                           type: string
+ *                           enum: [CUSTOMER, STAFF]
+ *                     token:
+ *                       type: string
+ *                       description: JWT token to use for authentication. Copy this token and click "Authorize" button to use it.
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
  *         description: Missing required fields
  *       409:
@@ -111,7 +150,46 @@ module.exports = router;
  *                 example: SecurePass123
  *     responses:
  *       200:
- *         description: Login successful, returns user data and sets auth cookie
+ *         description: Login successful, returns user data and JWT token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 type:
+ *                   type: string
+ *                   example: LOGIN_SUCCESSFUL
+ *                 message:
+ *                   type: string
+ *                   nullable: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         firstname:
+ *                           type: string
+ *                         lastname:
+ *                           type: string
+ *                         email:
+ *                           type: string
+ *                         phone_number:
+ *                           type: string
+ *                         user_name:
+ *                           type: string
+ *                         role:
+ *                           type: string
+ *                           enum: [CUSTOMER, STAFF]
+ *                     token:
+ *                       type: string
+ *                       description: JWT token to use for authentication. Copy this token and click "Authorize" button to use it.
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
  *         description: Missing username or password
  *       401:
@@ -126,8 +204,6 @@ module.exports = router;
  *   post:
  *     summary: Logout current user
  *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Logout successful, auth cookie cleared
@@ -148,8 +224,50 @@ module.exports = router;
  *     responses:
  *       200:
  *         description: User profile retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 type:
+ *                   type: string
+ *                   example: LOADED_SUCCESSFULLY
+ *                 message:
+ *                   type: string
+ *                   example: Profile loaded
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     firstname:
+ *                       type: string
+ *                     lastname:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     phone_number:
+ *                       type: string
+ *                     user_name:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                       enum: [CUSTOMER, STAFF]
+ *                     customer:
+ *                       type: object
+ *                       nullable: true
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         pets:
+ *                           type: array
+ *                           items:
+ *                             type: object
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized - No token provided or invalid token
  *       404:
  *         description: User not found
  *       500:
@@ -157,8 +275,6 @@ module.exports = router;
  *   put:
  *     summary: Update current user profile
  *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -192,8 +308,6 @@ module.exports = router;
  *   delete:
  *     summary: Delete current user account (requires password confirmation)
  *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
