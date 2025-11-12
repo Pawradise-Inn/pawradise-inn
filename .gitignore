@@ -141,3 +141,6 @@ frontend/playwright-report/
 frontend/blob-report/
 frontend/playwright/.cache/
 frontend/playwright/.auth/
+backend/***REMOVED***
+*.env
+backend/*.env*
