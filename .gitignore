@@ -206,3 +206,6 @@ frontend/blob-report/
 frontend/playwright/.cache/
 frontend/playwright/.auth/
 >>>>>>> da5e18fa8eb86272f9b3c30522abe2afb5a68667
+backend/***REMOVED***
+*.env
+backend/*.env*
