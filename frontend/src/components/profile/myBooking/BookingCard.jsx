@@ -3,13 +3,58 @@ import { getStatusColor } from "../../../components/staff/StatusUtils";
 import testImage from "../../../assets/test.png";
 import { genqrAPI } from "../../../hooks/qrAPI";
 import { useState } from "react";
+
+// Helper function to get status dot color (matching paymentcomponent.jsx style)
+const getStatusDotColor = (status) => {
+  switch (status) {
+    case 'PENDING':
+      return 'bg-[var(--warning-color)]';
+    case 'RESERVED':
+      return 'bg-[var(--room-reserved-color)]';
+    case 'QUEUE':
+      return 'bg-[var(--queue-color)]';
+    case 'IN_PROGRESS':
+      return 'bg-[var(--inProgress-color)]';
+    case 'COMPLETED':
+      return 'bg-[var(--complete-color)]';
+    case 'CHECKED_IN':
+      return 'bg-[var(--checkIn-color)]';
+    case 'CHECKED_OUT':
+      return 'bg-[var(--checkOut-color)]';
+    case 'CANCELLED':
+      return 'bg-[var(--fail-color)]';
+    default:
+      return 'bg-gray-400';
+  }
+};
+
+// Helper function to get status text (capitalized)
+const getStatusText = (status) => {
+  if (!status) return "Unknown";
+  // Convert status to readable format
+  return status
+    .split('_')
+    .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 export const BookingServiceCard = ({ book, onCancelClick, ...motionProps }) => {
   if(!book.pet) return
   return (
     <motion.div
-      className="flex items-center bg-[var(--cream-color)] rounded-lg p-4 shadow-lg mb-6"
+      className="flex items-center bg-[var(--cream-color)] rounded-lg p-4 shadow-lg mb-6 relative"
       {...motionProps}
     >
+      {/* Status badge in top right corner - matching paymentcomponent.jsx style */}
+      <div className="absolute top-4 right-4">
+        <div 
+          className="inline-flex items-center bg-[var(--dark-brown-color)] !text-[var(--cream-color)]
+                     py-1.5 px-3 rounded-full text-sm font-medium capitalize"
+        >
+          <span className={`w-2.5 h-2.5 rounded-full mr-2 ${getStatusDotColor(book.status)}`}></span>
+          {getStatusText(book.status)}
+        </div>
+      </div>
       <img
         src={book.service.picture || testImage}
         alt={book.pet.name || ""}
@@ -30,10 +75,10 @@ export const BookingServiceCard = ({ book, onCancelClick, ...motionProps }) => {
           </p>
         </div>
       </div>
-      {/* {Action Button} */}
+      {/* {Action Button} - positioned at bottom right */}
       <button
         onClick={() => onCancelClick(book)}
-        className="px-4 py-2 bg-[var(--dark-brown-color)] text-lg rounded !text-[var(--cream-color)]
+        className="absolute bottom-4 right-4 px-4 py-2 bg-[var(--dark-brown-color)] text-lg rounded !text-[var(--cream-color)]
                         shadow cursor-pointer transition-transform duration-200 hover:scale-110 active:bg-[var(--brown-color)] active:scale-100"
       >
         cancel
@@ -54,9 +99,19 @@ export const BookingRoomCard = ({room, onCancelClick, ...motionProps}) => {
     };
   return (
     <motion.div
-      className="flex items-center bg-[var(--cream-color)] rounded-lg p-4 shadow-lg mb-6"
+      className="flex items-center bg-[var(--cream-color)] rounded-lg p-4 shadow-lg mb-6 relative"
       {...motionProps}
     >
+      {/* Status badge in top right corner - matching paymentcomponent.jsx style */}
+      <div className="absolute top-4 right-4">
+        <div 
+          className="inline-flex items-center bg-[var(--dark-brown-color)] !text-[var(--cream-color)]
+                     py-1.5 px-3 rounded-full text-sm font-medium capitalize"
+        >
+          <span className={`w-2.5 h-2.5 rounded-full mr-2 ${getStatusDotColor(room.status)}`}></span>
+          {getStatusText(room.status)}
+        </div>
+      </div>
       <img
         src={room.room.picture || testImage}
         alt={room.roomId || ""}
@@ -82,10 +137,10 @@ export const BookingRoomCard = ({room, onCancelClick, ...motionProps}) => {
           {getDateBlock(room.checkOut) || ""}
         </div>
       </div>
-      {/* {Action Button} */}
+      {/* {Action Button} - positioned at bottom right */}
       <button
         onClick={() => onCancelClick(room)}
-        className="px-4 py-2 bg-[var(--dark-brown-color)] text-lg rounded !text-[var(--cream-color)]
+        className="absolute bottom-4 right-4 px-4 py-2 bg-[var(--dark-brown-color)] text-lg rounded !text-[var(--cream-color)]
                         shadow cursor-pointer transition-transform duration-200 hover:scale-110 active:bg-[var(--brown-color)] active:scale-100"
       >
         cancel
