@@ -116,7 +116,7 @@ export class TestPage {
     };
 
     const response = await this.page.request.post(
-      "http://localhost:5000/api/v1/pets/register",
+      "http://localhost:5001/api/v1/pets/register",
       {
         data: petData,
         headers: {
@@ -137,7 +137,7 @@ export class TestPage {
 
   async deletePet(petId) {
     const response = await this.page.request.delete(
-      `http://localhost:5000/api/v1/pets/${petId}`,
+      `http://localhost:5001/api/v1/pets/${petId}`,
       {
         headers: {
           "Content-Type": "application/json",

@@ -119,6 +119,7 @@ const getPet = async (req, res) => {
     }
     return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Pet details loaded", pet);
   } catch (err) {
+    console.error("pet.getPet:", err);
     return sendErrorResponse(
       res,
       500,

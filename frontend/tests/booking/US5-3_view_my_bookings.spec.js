@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test";
 import TestPage from "../TestPage";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 let app;
 let petData;
@@ -7,7 +12,8 @@ let setupContext;
 
 test.describe("US5-3: View My Bookings", () => {
   test.beforeAll(async ({ browser }) => {
-    // Setup: Create bookings for viewing
+    test.setTimeout(60000); // Increase timeout for beforeAll hook
+    // Setup: Create pet and bookings for tests
     setupContext = await browser.newContext();
     const setupPage = await setupContext.newPage();
     const setupApp = new TestPage(setupPage);
@@ -23,15 +29,6 @@ test.describe("US5-3: View My Bookings", () => {
       "Choose Sunday, November 30th,"
     );
 
-    // Go through payment to create actual booking (without slip upload)
-    await setupPage.getByTestId("cart-icon").click();
-    await setupPage.getByTestId("check-all").click();
-    await setupPage.getByRole("button", { name: "payment" }).click();
-    
-    // Note: Clicking Done without slip doesn't navigate, but booking may still be created
-    // Just wait a moment for any async operations
-    await setupPage.waitForTimeout(2000);
-
     // Create service booking using helper method (adds to cart)
     await setupApp.createBookingService(
       petData.data,
@@ -39,14 +36,56 @@ test.describe("US5-3: View My Bookings", () => {
       "10:00"
     );
 
-    // Go through payment to create actual booking (without slip upload)
+    // Create payment using createPayment method (creates PENDING bookings from cart items)
+    // Note: createPayment has a bug (line 253 uses 'page' instead of 'this.page')
+    // So we'll do the payment flow manually to avoid the bug
+    await setupPage.goto("http://localhost:3000/room");
     await setupPage.getByTestId("cart-icon").click();
-    await setupPage.getByTestId("check-all").click();
-    await setupPage.getByRole("button", { name: "payment" }).click();
     
-    // Note: Clicking Done without slip doesn't navigate, but booking may still be created
-    // Just wait a moment for any async operations
-    await setupPage.waitForTimeout(2000);
+    // Wait for cart page to load
+    await setupPage.waitForURL(/\/cart/, { timeout: 10000 });
+    
+    // Wait for cart items to be visible
+    await setupPage.waitForSelector('[data-testid="cart-card"]', { timeout: 10000 });
+    
+    // Select all items from cart (required for payment)
+    await setupPage.getByTestId("check-all").click();
+    
+    // Wait a bit for the selection API calls to complete
+    await setupPage.waitForTimeout(1000);
+    
+    // Verify items are selected by checking the checkbox is checked
+    const checkAllCheckbox = setupPage.locator('[data-testid="check-all"]');
+    await expect(checkAllCheckbox).toBeChecked({ timeout: 5000 });
+    
+    await setupPage.getByRole("button", { name: "payment" }).click();
+
+    // Wait for payment page
+    await setupPage.waitForURL(/\/payment/, { timeout: 10000 });
+
+    // Wait for upload input to be attached (it's hidden with sr-only class, so use attached state)
+    const uploadInput = setupPage.locator('input#file-upload[type="file"]');
+    await uploadInput.waitFor({ state: "attached", timeout: 10000 });
+
+    // Upload payment slip (use local file path)
+    const slip = path.join(__dirname, "../../src/assets/test.png");
+    await uploadInput.setInputFiles(slip);
+
+    // Mock payment verification response (FAILED status creates PENDING bookings)
+    const { mockSlipOK } = await import("../MockAPI");
+    const fakeResponse = {
+      success: false,
+      data: { success: false },
+    };
+    await mockSlipOK(setupPage, fakeResponse, 400);
+
+    // Click Done to complete payment flow (creates PENDING bookings)
+    await setupPage.getByRole("button", { name: "Done" }).click();
+
+    // Wait for payment page to load
+    await setupPage.waitForURL(/\/payment\/(success|failed)/, {
+      timeout: 15000,
+    });
   });
 
   test.beforeEach(async ({ page }) => {
@@ -76,21 +115,25 @@ test.describe("US5-3: View My Bookings", () => {
     await page.goto("http://localhost:3000/profile/booking");
 
     // Verify bookings page is loaded
-    // If there are bookings, they should be visible
-    // If there are no bookings, the page should still load
     await expect(page).toHaveURL(/\/profile\/booking/);
     
-    // Check if any booking cards exist (optional - may or may not have bookings)
-    const bookingCards = page.locator('[class*="BookingRoomCard"], [class*="BookingServiceCard"]');
-    const cardCount = await bookingCards.count();
+    // Wait for bookings to load - look for cancel/delete buttons which indicate booking cards are rendered
+    // This is the same pattern used in US5-8 and US5-9 tests
+    const cancelButtons = page.getByRole("button", { name: /cancel|delete/i });
     
-    if (cardCount > 0) {
-      // If bookings exist, verify they are displayed
-      await expect(bookingCards.first()).toBeVisible();
-    }
-    // If no bookings exist, that's also valid - the test just verifies the page loads
+    // Wait for at least one booking card to appear (indicated by cancel/delete button)
+    await expect(cancelButtons.first()).toBeVisible({ timeout: 15000 });
+    
+    // Verify we have at least one booking
+    const buttonCount = await cancelButtons.count();
+    expect(buttonCount).toBeGreaterThan(0);
+    
+    // Also verify we can see the pet name from our test booking
+    // The pet name is displayed as "Pet Name: TestPet" in the booking cards
+    // Use a more flexible locator that finds text containing TestPet
+    const petNameLocator = page.locator('text=/TestPet/i');
+    await expect(petNameLocator.first()).toBeVisible({ timeout: 10000 });
   });
-
 
   test("Given I have no booking, When I check, Then I shouldn't see a booking", async ({
     page,

@@ -88,6 +88,8 @@ export const BookingServiceCard = ({ book, onCancelClick, ...motionProps }) => {
 };
 
 export const BookingRoomCard = ({room, onCancelClick, ...motionProps}) => {
+  if(!room.pet) return null;
+  
   const getDateBlock = (dateWithTime) => {
       const [date, time] = dateWithTime.replace(".000Z", "").split("T");
       return (
@@ -122,10 +124,10 @@ export const BookingRoomCard = ({room, onCancelClick, ...motionProps}) => {
         <div className="text-xl font-bold">Room {room.roomId || ""}</div>
         <div className="text-base mt-2 space-y-1">
           <p>
-            <span className="text-lg">Pet Type: {room.pet.type || ""}</span>
+            <span className="text-lg">Pet Type: {room.pet?.type || ""}</span>
           </p>
           <p>
-            <span className="text-lg">Pet Name: {room.pet.name || ""}</span>
+            <span className="text-lg">Pet Name: {room.pet?.name || ""}</span>
           </p>
           <p>
             <span className="text-lg">Check In</span>

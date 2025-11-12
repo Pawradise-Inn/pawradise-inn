@@ -42,7 +42,7 @@ const swaggerOptions={
         },
         servers: [
             {
-                url: 'http://localhost:5000/api/v1'
+                url: 'http://localhost:5001/api/v1'
             }
         ]
     },
@@ -84,7 +84,7 @@ app.use('/api/v1/payments', payment);
 app.use('/api/v1/qr', qr);
 app.use('/api/v1/slip', slipOk)
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 const server = app.listen(PORT, () => {
   console.log(
