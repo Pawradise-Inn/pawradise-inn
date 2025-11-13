@@ -6,7 +6,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production  # Requires approval if configured in GitHub settings
 
     steps:
       - name: Setup SSH
