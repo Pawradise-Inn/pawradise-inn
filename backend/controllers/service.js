@@ -365,7 +365,8 @@ const getServiceStatus = async (req, res) => {
   //requirement: 6
   try {
     const name = req.query.name;
-    const schedule = new Date();
+    const schedule = new Date(req.query.entry_date_with_time);
+    
     const service = await prisma.service.findFirst({
       where: { name: name },
     });
@@ -378,7 +379,20 @@ const getServiceStatus = async (req, res) => {
       );
     }
 
-    const count = await overlappingService(service.id, schedule);
+    const total = await overlappingService(service.id, schedule);
+    let cartCount = 0;
+    if (req.user && req.user.roleId) {
+      cartCount = await prisma.cartService.count({
+        where: {
+          cart: {customerId: req.user.roleId},
+          serviceId: Number(service.id),
+          scheduled: new Date(schedule)
+        }
+      });
+    }
+
+    const count = total + cartCount;
+
     return sendSuccessResponse(
       res,
       200,

@@ -47,18 +47,43 @@ const duplicatedService = async (serviceId, petId, scheduled) => {
     },
   });
 
-  return overlapping;
+  const items = await prisma.cartService.findFirst({
+    where: {
+      serviceId: serviceId,
+      petId: petId,
+      scheduled: {
+        gte: startOfDay,
+        lte: endOfDay,
+      }
+    }
+  });
+
+  return overlapping || items;
 };
 
 const isFreeThisTime = async (petId, scheduled) => {
-  const pet = await prisma.bookedService.findFirst({
+  const petIsBusy = await prisma.pet.findFirst({
     where: {
-      petId: petId,
-      scheduled: new Date(scheduled),
-    },
+      id: petId,
+      OR: [
+        {
+          scheduled: {
+            some: {
+              scheduled: new Date(scheduled)
+            }
+          }
+        },
+        {
+          CartService: {
+            some: {
+              scheduled: new Date(scheduled)
+            }
+          }
+        }
+      ]
+    }
   });
-
-  return !pet;
+  return !petIsBusy;
 };
 
 const isSuitable = async(serviceId, petId)=>{
@@ -71,12 +96,35 @@ const isSuitable = async(serviceId, petId)=>{
     return service.petType.includes(pet.type);
 }
 
-const isReservableService = async(serviceId, petId, scheduled) => {
-  const count = await overlappingService(serviceId, scheduled);
+const checkServiceBeforePaid = async(customerId, serviceId, schedule) => {
+    const count = await overlappingService(serviceId, schedule);
 
+    if (count >= 3){
+        return "THIS_SERVICE_IS_FULL";
+    }
+
+    const cartCount = await prisma.cartService.count({
+      where: {
+        cart: {customerId: customerId},
+        serviceId: Number(serviceId),
+        scheduled: new Date(schedule),
+        selected: true
+      }
+    });
+
+    if (cartCount + count > 3){
+        return "ITEM_EXCEED";
+    }
+
+    return "VALID";
+}
+
+const isReservableService = async(serviceId, petId, scheduled, customerId) => {
+  const count = await overlappingService(serviceId, scheduled);
   // Include items currently in carts for the same service and schedule
   const cartCount = await prisma.cartService.count({
     where: {
+      cart: {customerId: customerId},
       serviceId: Number(serviceId),
       scheduled: new Date(scheduled),
     },
@@ -110,7 +158,6 @@ const isReservableService = async(serviceId, petId, scheduled) => {
     error.code = "SERVICE_FULL";
     throw error;
   }
-
   return true;
 }
 
@@ -161,5 +208,6 @@ module.exports = {
   overlappingService,
   duplicatedService,
   createBookedServiceWithCondition,
-  isReservableService
+  isReservableService,
+  checkServiceBeforePaid
 };

@@ -9,6 +9,7 @@ const {
   deleteCartService,
   toggleCartRoomSelection,
   toggleCartServiceSelection,
+  checkItem
 } = require('../controllers/cart');
 
 const { protect, authorize } = require('../middleware/auth');
@@ -16,6 +17,9 @@ const { protect, authorize } = require('../middleware/auth');
 router.route('/')
   .get(protect, getCart);
 
+router.route('/checks')
+  .get(protect, authorize('CUSTOMER'), checkItem);
+  
 router.route('/rooms')
   .post(protect, authorize('CUSTOMER'), addRoomToCart);
 

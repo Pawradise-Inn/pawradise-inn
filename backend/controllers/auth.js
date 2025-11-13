@@ -122,7 +122,6 @@ const user = await prisma.$transaction(async (tx) => {
 exports.getMe = async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log("Yeah!!");
 
     const user = await prisma.user.findUnique({
       where: { id: Number(userId) },

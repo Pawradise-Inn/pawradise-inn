@@ -1,6 +1,7 @@
 const prisma = require("../prisma/prisma");
 const { isReservableRoom } = require("./logics/bookedRoom");
 const { isReservableService } = require("./logics/bookedService");
+const { isValidToCreate } = require("./logics/booking");
 const { sendErrorResponse, sendSuccessResponse } = require("../utils/responseHandler");
 
 // GET /cart - load or create current user's cart with items
@@ -148,7 +149,7 @@ const addRoomToCart = async (req, res) => {
       return existing ?? (await prisma.cart.create({ data: { customerId } }));
     });
 
-    await isReservableRoom(room.id, pet.id, checkIn, checkOut);
+    await isReservableRoom(room.id, pet.id, checkIn, checkOut, customerId);
 
     const created = await prisma.cartRoom.create({
       data: {
@@ -238,7 +239,8 @@ const addServiceToCart = async (req, res) => {
     const cart = await prisma.cart.findFirst({ where: { customerId } })
       .then(async (c) => c ?? (await prisma.cart.create({ data: { customerId } })));
 
-    await isReservableService(serviceId, petId, scheduled);
+    await isReservableService(serviceId, petId, scheduled, customerId);
+    
     const created = await prisma.cartService.create({
       data: {
         cartId: cart.id,
@@ -353,6 +355,27 @@ const deleteCartService = async (req, res) => {
   }
 };
 
+const checkItem = async (req, res) => {
+    const customerId = req.user.roleId;
+    try {
+      const cart = await isValidToCreate(customerId);
+      return sendSuccessResponse(
+        res,
+        200,
+        "CHECK_SUCCESSFULLY",
+        "Check items successfully",
+        cart
+      );
+    }catch (err){
+      return sendErrorResponse(
+        res,
+        500,
+        "UNABLE_TO_CHECK",
+        "Unable to check items from cart. Please try again"
+      );
+    }
+}
+
 module.exports = {
   getCart,
   addRoomToCart,
@@ -361,4 +384,5 @@ module.exports = {
   deleteCartService,
   toggleCartRoomSelection,
   toggleCartServiceSelection,
+  checkItem
 };

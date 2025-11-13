@@ -118,6 +118,10 @@ const createErrorResponse = (
       header: "Update Failed",
       content: userMessage || "Unable to update this item. Please try again",
     },
+    UNABLE_TO_CHECK: {
+      header: "Check Failed",
+      content: userMessage || "Unable to check items from cart. Please try again",
+    },
 
     // Business logic errors
     NO_DATA_FOUND: {
@@ -263,6 +267,10 @@ const createSuccessResponse = (
       header: "Saved",
       content: userMessage || "Your changes have been saved",
     },
+    CHECK_SUCCESSFULLY: {
+      header: "Checked",
+      content: userMessage || "Check items successfully",
+    }
   };
 
   const successInfo = successResponses[successType] || successResponses.OPERATION_SUCCESSFUL;

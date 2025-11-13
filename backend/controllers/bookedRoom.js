@@ -151,7 +151,7 @@ const updateBookedRoom = async (req, res) => {
     }
 
     const check = await duplicatedRoom(bookedRoom.petId, checkIn, checkOut);
-    if (check.length > 0) {
+    if (check > 0) {
       return sendErrorResponse(
         res,
         409,

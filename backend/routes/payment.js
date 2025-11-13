@@ -22,6 +22,8 @@ router.route('/:id')
     .get(protect, authorize("STAFF", "CUSTOMER"), getPayment)
     .put(protect, authorize("STAFF", "CUSTOMER"), updatePayment)
     .delete(protect, authorize("STAFF", "CUSTOMER"), deletePayment)
+
+
     
 module.exports = router;
 

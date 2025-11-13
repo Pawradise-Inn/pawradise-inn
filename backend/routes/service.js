@@ -21,19 +21,19 @@ const chatlogs = require('./chatlog');
 router.use('/:serviceName/comments', chatlogs);
 
 router.route('/status')
-    .get(getServiceStatus);
+    .get(protect, getServiceStatus);
 
 router.route('/reviews')
-    .get(getServicesWithPagination);
+    .get(protect, getServicesWithPagination);
 
 // router.get('/pet-types', getPetTypes);
 
 router.route('/')
-    .get(getServices)      
+    .get(protect, getServices)      
     .post(protect, authorize("STAFF"), createService);  
 
 router.route('/:id')
-    .get(getService)        
+    .get(protect, getService)        
     .patch(protect, authorize("STAFF"), updateService)  
     .delete(protect, authorize("STAFF"), deleteService);
 
@@ -42,7 +42,7 @@ router.route('/:id/pictures')
     .delete(protect, authorize("STAFF"), deletePicturesFromService); 
 
 router.route('/:id/reviews')
-    .get(getServiceReviews);
+    .get(protect, getServiceReviews);
 
 
 module.exports = router;

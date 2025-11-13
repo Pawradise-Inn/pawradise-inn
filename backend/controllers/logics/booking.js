@@ -1,4 +1,6 @@
 const prisma = require("../../prisma/prisma");
+const { checkServiceBeforePaid } = require("./bookedService");
+const { checkRoomBeforePaid } = require("./bookedRoom");
 
 const createBookingTransaction = async (user, body) => {
     const userId = user.id;       
@@ -100,6 +102,69 @@ const createBookingTransaction = async (user, body) => {
     return { payment, booking, status };
 };
 
+const isValidToCreate = async(customerId) =>{
+    const cart = await prisma.cart.findMany({
+        where: {
+            customerId: customerId,
+        },
+        include: {
+            cartRooms: {
+                where: {
+                    selected: true
+                }
+            },
+            cartServices: {
+                where: {
+                    selected: true
+                }
+            }
+        }
+    })
+
+    let exceededRooms = [];
+    let fullRooms = [];
+
+    let exceededServices = [];
+    let fullServices = [];
+
+    for (const r of cart[0].cartRooms) {
+        console.log(r);
+        const result_room = await checkRoomBeforePaid(customerId, r.roomId, r.checkIn, r.checkOut);
+        console.log(result_room);
+        switch (result_room) {
+            case "THIS_ROOM_IS_FULL":
+                fullRooms.push([r.roomId, r.checkIn, r.checkOut]);
+                await prisma.cartRoom.delete({ where: { id: r.id } }); 
+                break;
+            case "ITEM_EXCEED":
+                exceededRooms.push([r.roomId, r.checkIn, r.checkOut]);
+                break;
+        }
+    }
+
+    for (const s of cart[0].cartServices) {
+        console.log(s);
+        const result_service = await checkServiceBeforePaid(customerId, s.serviceId, s.scheduled);
+        switch (result_service) {
+            case "THIS_SERVICE_IS_FULL":
+                fullServices.push([s.serviceId, s.scheduled]);
+                await prisma.cartService.delete({ where: { id: s.id } }); 
+                break;
+            case "ITEM_EXCEED":
+                exceededServices.push([s.serviceId, s.scheduled]);
+                break;
+        }
+    }
+
+    return {
+        fullRooms,
+        fullServices,
+        exceededRooms,
+        exceededServices
+    };
+}
+
 module.exports = {
-    createBookingTransaction
+    createBookingTransaction,
+    isValidToCreate
 };

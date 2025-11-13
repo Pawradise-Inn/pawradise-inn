@@ -27,8 +27,33 @@ const overlappingRoom = async(id, checkIn, checkOut)=>{
     return count;
 };
 
+const checkRoomBeforePaid = async(customerId, roomId, checkIn, checkOut) => {
+    const cap = await getRoomCap(roomId);
+    const count = await overlappingRoom(roomId, checkIn, checkOut);
+
+    if (count >= cap){
+        return "THIS_ROOM_IS_FULL";
+    }
+
+    const cartCount = await prisma.cartRoom.count({
+        where: {
+            cart: {customerId: customerId},
+            roomId: Number(roomId),
+            checkIn: { lt: new Date(checkOut) },
+            checkOut: { gt: new Date(checkIn) },
+            selected: true
+        }
+    });
+
+    if ((cartCount + count) > cap){
+        return "ITEM_EXCEED";
+    }
+
+    return "VALID";
+}
+
 const duplicatedRoom = async(petId, checkIn, checkOut)=>{
-    const duplicated = await prisma.bookedRoom.findMany({
+    const duplicated = await prisma.bookedRoom.count({
         where: {
             petId: petId,
             checkIn: { lt: new Date(checkOut) },
@@ -38,7 +63,15 @@ const duplicatedRoom = async(petId, checkIn, checkOut)=>{
             }
         }
     });
-    return duplicated;
+
+    const countCart = await prisma.cartRoom.count({
+        where: {
+            petId: petId,
+            checkIn: { lt: new Date(checkOut) },
+            checkOut: { gt: new Date(checkIn) },
+        }
+    })
+    return duplicated + countCart;
 }
 
 const isSuitable = async(roomId, petId)=>{
@@ -51,20 +84,19 @@ const isSuitable = async(roomId, petId)=>{
     return pet.type === room.petType;
 }
 
-const isReservableRoom = async(roomId, petId, checkIn, checkOut) => {
+const isReservableRoom = async(roomId, petId, checkIn, checkOut, customerId) => {
     const count = await overlappingRoom(roomId, checkIn, checkOut);
     const cap = await getRoomCap(roomId);
 
     // Include items currently in carts for the same room and overlapping dates
     const cartCount = await prisma.cartRoom.count({
         where: {
+            cart: {customerId: customerId},
             roomId: Number(roomId),
             checkIn: { lt: new Date(checkOut) },
             checkOut: { gt: new Date(checkIn) },
         }
     });
-
-    const totalCount = count + cartCount;
 
     const isSuit = await isSuitable(roomId, petId);
     if (!isSuit) {
@@ -73,19 +105,15 @@ const isReservableRoom = async(roomId, petId, checkIn, checkOut) => {
         throw error;
     }
 
-    if (totalCount >= cap) {
+    if (count + cartCount >= cap) {
         const error = new Error('This room has reached its maximum capacity for the selected dates.');
         error.code = 'ROOM_FULL';
         throw error;
     }
 
     const overlapping = await duplicatedRoom(petId, checkIn, checkOut);
-    if (overlapping.length > 0) {
+    if (overlapping > 0) {
         const error = new Error('This pet already has a booking during the selected dates.');
-        error.duplicatedDates = overlapping.map(b => ({
-            checkIn: b.checkIn,
-            checkOut: b.checkOut
-        }));
         error.code = 'BOOKING_DUPLICATE';
         throw error;
     }
@@ -108,10 +136,6 @@ const createBookedRoomWithCondition = async (roomId, petId, bookingId, checkIn, 
     const overlapping = await duplicatedRoom(petId, checkIn, checkOut);
     if (overlapping.length > 0) {
         const error = new Error('This pet already has a booking during the selected dates.');
-        error.duplicatedDates = overlapping.map(b => ({
-            checkIn: b.checkIn,
-            checkOut: b.checkOut
-        }));
         error.code = 'BOOKING_DUPLICATE';
         throw error;
     }
@@ -142,5 +166,6 @@ module.exports = {
     overlappingRoom,
     duplicatedRoom,
     createBookedRoomWithCondition,
-    isReservableRoom
+    isReservableRoom,
+    checkRoomBeforePaid
 };

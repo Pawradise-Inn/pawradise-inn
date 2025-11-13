@@ -24,14 +24,14 @@ router.route('/available')
     .get(getAvailableRooms);
 
 router.route('/reviews')
-    .get(getRoomsWithPagination);
+    .get(protect, getRoomsWithPagination);
 
 router.route('/')
-    .get(getRooms)
+    .get(protect, getRooms)
     .post(protect, authorize("STAFF"),createRoom);
 
 router.route('/:id')
-    .get(getRoom)
+    .get(protect, getRoom)
     .patch(protect, authorize("STAFF"),updateRoom)
     .delete(protect, authorize("STAFF"),deleteRoom);
 
@@ -40,10 +40,10 @@ router.route('/:id/pictures')
     .delete(protect, authorize("STAFF"), deletePicturesFromRoom);
 
 router.route('/:id/status')
-    .get(getRoomStatus);
+    .get(protect, getRoomStatus);
 
 router.route('/:id/reviews')
-    .get(getRoomReviews);
+    .get(protect, getRoomReviews);
 
 module.exports = router;
 

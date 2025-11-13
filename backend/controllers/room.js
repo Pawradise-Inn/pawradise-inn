@@ -298,7 +298,21 @@ const getRoomStatus = async (req, res) => {
         "This room could not be found"
       );
 
-    const count = await overlappingRoom(id, checkIn, checkOut);
+    const total = await overlappingRoom(id, checkIn, checkOut);
+    let cartCount = 0; 
+    if (req.user && req.user.roleId) {
+      cartCount = await prisma.cartRoom.count({
+        where: {
+          cart: { customerId: req.user.roleId },
+          roomId: Number(id),
+          checkIn: { lt: checkOut },
+          checkOut: { gt: checkIn },
+        },
+      });
+    }
+
+    const count = total + cartCount;
+
     return sendSuccessResponse(
       res,
       200,
@@ -370,7 +384,20 @@ const getAvailableRooms = async (req, res) => {
           : 0;
 
         const count = await overlappingRoom(r.id, entryDate, exitDate);
-        const status = count >= r.capacity ? "full" : "available";
+        let cartCount = 0; 
+        if (req.user && req.user.roleId) {
+          cartCount = await prisma.cartRoom.count({
+            where: {
+              cart: { customerId: req.user.roleId },
+              roomId: Number(r.id),
+              checkIn: { lt: exitDate },
+              checkOut: { gt: entryDate },
+            },
+          });
+        }
+
+        const total = count + cartCount;
+        const status = total >= r.capacity ? "full" : "available";
 
         return {
           image: r.picture,
@@ -378,7 +405,7 @@ const getAvailableRooms = async (req, res) => {
           reviewStar: avgRating.toFixed(2),
           forWhich: r.petType,
           price: r.price,
-          size: count,
+          size: total,
           maxsize: r.capacity,
           commentPages: totalReviews,
           status: status,
@@ -449,15 +476,28 @@ const getRoomsWithPagination = async (req, res) => {
         exitDate.setDate(exitDate.getDate() + 1);
 
         const count = await overlappingRoom(r.id, entryDate, exitDate);
+        let cartCount = 0; 
+        if (req.user && req.user.roleId) {
+          cartCount = await prisma.cartRoom.count({
+            where: {
+              cart: { customerId: req.user.roleId },
+              roomId: Number(r.id),
+              checkIn: { lt: exitDate },
+              checkOut: { gt: entryDate },
+            },
+          });
+        }
 
-        const status = count >= r.capacity ? "full" : "available";
+        const total = count + cartCount;
+
+        const status = total >= r.capacity ? "full" : "available";
         return {
           image: r.picture,
           id: r.id,
           reviewStar: avgRating.toFixed(2),
           forWhich: r.petType,
           price: r.price,
-          size: count,
+          size: total,
           maxsize: r.capacity,
           commentPages: totalReviews,
           status: status,
