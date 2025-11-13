@@ -3,14 +3,22 @@ ARG NODE_VERSION=22.18.0
 FROM node:${NODE_VERSION}-alpine
 
 WORKDIR /usr/src/app/backend
+
+# Copy package files
 COPY package*.json ./
-RUN npm ci --omit=dev
 
+# Install dependencies
+RUN npm ci
+
+# Copy prisma schema
 COPY prisma ./prisma
-RUN rm -rf ./generated/prisma && npx prisma generate
 
+# Copy all source code
 COPY . .
+
+# Generate Prisma Client (after all files are copied)
+RUN npx prisma generate
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "npx prisma db push && node server.js"]
+CMD ["npm", "run", "dev"]

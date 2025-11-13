@@ -8,7 +8,7 @@
     "test:coverage": "jest --coverage",
     "db:push:local": "dotenv -e config/config.env.local -- npx prisma db push",
     "db:push:cloud": "dotenv -e config/config.env -- npx prisma db push",
-    "dev": "dotenv -e config/config.env.local nodemon server.js",
+    "dev": "nodemon server.js",
     "dev:cloud": "dotenv -e config/config.env nodemon server.js",
     "start": "node server.js"
   },

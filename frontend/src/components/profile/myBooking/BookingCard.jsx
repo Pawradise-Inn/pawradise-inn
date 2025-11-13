@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { getStatusColor } from "../../../components/staff/StatusUtils";
+import { getStatusColor } from "../../staff/StatusUtils";
 import testImage from "../../../assets/test.png";
 import { genqrAPI } from "../../../hooks/qrAPI";
 import { useState } from "react";

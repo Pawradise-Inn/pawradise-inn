@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import { fetchPetAPI } from "../../../../hooks/petAPI";
 import { startUpVariants } from "../../../../styles/animation";
-import ServiceCard from "../../myPet/petOverAll/ServiceCard";
+import ServiceCard from "./ServiceCard";
 import BookingCard from "./BookingCard";
 import PetCard from "./PetCard";
 import { useAuth } from "../../../../context/AuthProvider";
