@@ -121,50 +121,80 @@ const createBookedService = async (req, res) => {
 const updateBookedService = async (req, res) => {
   try {
     const bookedId = Number(req.params.id);
-    const scheduled = req.body.scheduled;
-    if (!scheduled)
+    const { scheduled, status } = req.body;
+    
+    // Build update data object
+    const dataToUpdate = {};
+    
+    // If scheduled time is provided, validate and add it
+    if (scheduled) {
+      const updateScheduled = new Date(scheduled);
+      const bookedService = await findBookedServiceById(bookedId);
+      
+      const count = await overlappingService(
+        bookedService.serviceId,
+        updateScheduled
+      );
+      if (count >= 3) {
+        return sendErrorResponse(
+          res,
+          409,
+          "OPERATION_NOT_ALLOWED",
+          "This time slot is fully booked. Please choose another time"
+        );
+      }
+      
+      const check = await duplicatedService(
+        bookedService.serviceId,
+        bookedService.petId,
+        updateScheduled
+      );
+      if (check)
+        return sendErrorResponse(
+          res,
+          409,
+          "DUPLICATE_BOOKING",
+          "Your pet already has a service scheduled for this day"
+        );
+      
+      dataToUpdate.scheduled = updateScheduled;
+    }
+    
+    // If status is provided, add it to update
+    if (status) {
+      const validStatuses = ["PENDING", "CONFIRMED", "IN_PROGRESS", "COMPLETED", "CANCELLED"];
+      if (!validStatuses.includes(status)) {
+        return sendErrorResponse(
+          res,
+          400,
+          "INVALID_STATUS",
+          "Invalid status. Must be one of: PENDING, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED"
+        );
+      }
+      dataToUpdate.status = status;
+    }
+    
+    // Check if there's anything to update
+    if (Object.keys(dataToUpdate).length === 0) {
       return sendErrorResponse(
         res,
         400,
         "MISSING_FIELDS",
-        "Please select a new appointment time"
-      );
-    const updateScheduled = new Date(scheduled);
-    const bookedService = await findBookedServiceById(bookedId);
-    const count = await overlappingService(
-      bookedService.serviceId,
-      updateScheduled
-    );
-    if (count >= 3) {
-      return sendErrorResponse(
-        res,
-        409,
-        "OPERATION_NOT_ALLOWED",
-        "This time slot is fully booked. Please choose another time"
+        "Please provide fields to update (scheduled or status)"
       );
     }
-    const check = await duplicatedService(
-      bookedService.serviceId,
-      bookedService.petId,
-      updateScheduled
-    );
-    if (check)
-      return sendErrorResponse(
-        res,
-        409,
-        "DUPLICATE_BOOKING",
-        "Your pet already has a service scheduled for this day"
-      );
-    const updateBookedService = await prisma.bookedService.update({
+    
+    const updatedBookedService = await prisma.bookedService.update({
       where: { id: bookedId },
-      data: { scheduled: updateScheduled },
+      data: dataToUpdate,
     });
+    
     return sendSuccessResponse(
       res,
       200,
       "BOOKING_UPDATED",
       "Service booking updated successfully",
-      updateBookedService
+      updatedBookedService
     );
   } catch (err) {
     if (err.code === "P2025")
@@ -182,7 +212,6 @@ const updateBookedService = async (req, res) => {
     );
   }
 };
-
 const deleteBookedService = async (req, res) => {
   try {
     const bookedServiceId = Number(req.params.id);

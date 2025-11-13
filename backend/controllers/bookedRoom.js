@@ -128,51 +128,83 @@ const createBookedRoom = async (req, res) => {
 const updateBookedRoom = async (req, res) => {
   try {
     const bookedId = Number(req.params.id);
-    const { checkIn, checkOut } = req.body;
-    if ((!checkIn, !checkOut)) {
+    const { checkIn, checkOut, status } = req.body;
+    
+    // Build update data object
+    const dataToUpdate = {};
+    
+    // If dates are provided, validate and add them
+    if (checkIn || checkOut) {
+      if (!checkIn || !checkOut) {
+        return sendErrorResponse(
+          res,
+          400,
+          "MISSING_FIELDS",
+          "Please provide both check-in and check-out dates"
+        );
+      }
+
+      const bookedRoom = await findBookedRoomById(bookedId);
+      const count = await overlappingRoom(bookedRoom.roomId, checkIn, checkOut);
+      const cap = await getRoomCap(bookedRoom.roomId);
+      if (count >= cap) {
+        return sendErrorResponse(
+          res,
+          409,
+          "OPERATION_NOT_ALLOWED",
+          "This room is not available for the selected dates"
+        );
+      }
+
+      const check = await duplicatedRoom(bookedRoom.petId, checkIn, checkOut);
+      if (check.length > 0) {
+        return sendErrorResponse(
+          res,
+          409,
+          "DUPLICATE_BOOKING",
+          "Your pet already has a booking during these dates"
+        );
+      }
+
+      dataToUpdate.checkIn = new Date(checkIn);
+      dataToUpdate.checkOut = new Date(checkOut);
+    }
+    
+    // If status is provided, add it to update
+    if (status) {
+      const validStatuses = ["PENDING", "CONFIRMED", "CHECKED_IN", "CHECKED_OUT", "CANCELLED"];
+      if (!validStatuses.includes(status)) {
+        return sendErrorResponse(
+          res,
+          400,
+          "INVALID_STATUS",
+          "Invalid status. Must be one of: PENDING, CONFIRMED, CHECKED_IN, CHECKED_OUT, CANCELLED"
+        );
+      }
+      dataToUpdate.status = status;
+    }
+    
+    // Check if there's anything to update
+    if (Object.keys(dataToUpdate).length === 0) {
       return sendErrorResponse(
         res,
         400,
         "MISSING_FIELDS",
-        "Please provide check-in and check-out dates"
+        "Please provide fields to update (checkIn, checkOut, or status)"
       );
     }
 
-    const bookedRoom = await findBookedRoomById(bookedId);
-    const count = await overlappingRoom(bookedRoom.roomId, checkIn, checkOut);
-    const cap = await getRoomCap(roomId);
-    if (count >= cap) {
-      return sendErrorResponse(
-        res,
-        409,
-        "OPERATION_NOT_ALLOWED",
-        "This room is not available for the selected dates"
-      );
-    }
-
-    const check = await duplicatedRoom(bookedRoom.petId, checkIn, checkOut);
-    if (check > 0) {
-      return sendErrorResponse(
-        res,
-        409,
-        "DUPLICATE_BOOKING",
-        "Your pet already has a booking during these dates"
-      );
-    }
-
-    const updateBookedRoom = await prisma.bookedRoom.update({
+    const updatedBookedRoom = await prisma.bookedRoom.update({
       where: { id: bookedId },
-      data: {
-        checkIn: new Date(checkIn),
-        checkOut: new Date(checkOut),
-      },
+      data: dataToUpdate,
     });
+    
     return sendSuccessResponse(
       res,
       200,
       "BOOKING_UPDATED",
       "Room booking updated successfully",
-      updateBookedRoom
+      updatedBookedRoom
     );
   } catch (err) {
     if (err.code === "P2025")
