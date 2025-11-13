@@ -13,6 +13,7 @@ const RoomCard = ({
   actionLabel,
   ...motionProps
 }) => {
+  console.log(data)
   return (
     <motion.div
       className="bg-[var(--cream-color)] border border-[var(--brown-color)] rounded-2xl p-4 flex justify-start gap-4"

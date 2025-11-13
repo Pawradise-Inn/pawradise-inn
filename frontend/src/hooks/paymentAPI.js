@@ -32,6 +32,26 @@ export const createPaymentAPI = async ({ status, amount, slip }) => {
   }
 };
 
+export const updatePaymentAPI = async (paymentId, { status, slip, date }) => {
+  try {
+    // Only include defined fields (avoid sending undefined)
+    const dataToSend = {};
+    if (status) dataToSend.status = status;
+    if (slip) dataToSend.slip = slip;
+    if (date) dataToSend.date = date;
+
+    if (Object.keys(dataToSend).length === 0) {
+      throw new Error("No data provided to update payment");
+    }
+
+    const response = await axiosInstance.put(`${API_URL}/${paymentId}`, dataToSend);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating payment ID ${paymentId}:`, error.response?.data || error);
+    throw error;
+  }
+};
+
 export const updatePaymentStatusAPI = async (paymentId, newStatus) => {
   try {
     const response = await axiosInstance.put(`${API_URL}/${paymentId}`, {
