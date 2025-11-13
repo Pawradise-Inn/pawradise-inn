@@ -96,7 +96,22 @@ const BookingRoom = () => {
               filter.entryDate,
               filter.exitDate
             );
-            setFilterRoom(filterWithPet(availableRooms.data));
+            const filteredByPet = filterWithPet(availableRooms.data);
+            
+            // Preserve original room order by creating a map of room IDs to their original index
+            const originalOrderMap = new Map();
+            room.forEach((r, index) => {
+              originalOrderMap.set(r.id, index);
+            });
+            
+            // Sort filtered rooms to match original order
+            const sortedFilteredRooms = filteredByPet.sort((a, b) => {
+              const indexA = originalOrderMap.get(a.id) ?? Infinity;
+              const indexB = originalOrderMap.get(b.id) ?? Infinity;
+              return indexA - indexB;
+            });
+            
+            setFilterRoom(sortedFilteredRooms);
           } catch (error) {
             console.error("Failed to fetch available rooms:", error);
             setFilterRoom([]);
