@@ -48,7 +48,7 @@ const PaymentCard = ({
       </div>
 
       <div className="absolute bottom-4 right-4 text-lg font-bold">
-        Total Price: ${totalPrice}
+        Total Price: ฿{totalPrice}
       </div>
 
       {/* payment status */}
