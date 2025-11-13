@@ -13,6 +13,7 @@ const RoomCard = ({
   actionLabel,
   ...motionProps
 }) => {
+  console.log(data)
   return (
     <motion.div
       className="bg-[var(--cream-color)] border border-[var(--brown-color)] rounded-2xl p-4 flex justify-start gap-4"
@@ -20,7 +21,7 @@ const RoomCard = ({
       data-testid="room-card"
     >
       <img
-        src={data.picture || testImage}
+        src={data.image || testImage}
         alt={`Room ${data.id}`}
         className="object-center rounded-2xl w-[180px] h-[180px]"
       />
