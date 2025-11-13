@@ -81,6 +81,15 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     return getDateValidation(formData.entryDate, formData.exitDate);
   }, [formData]);
 
+  const totalPrice = useMemo(() => {
+    if (data.headerType === 'Room' && formData.entryDate && formData.exitDate) {
+      const oneDay = 24 * 60 * 60 * 1000;
+      const nights = Math.round(Math.abs((formData.exitDate - formData.entryDate) / oneDay));
+      return { nights: nights, total: nights * data.price}
+    }
+    return { nights: 0, total: data.price};
+  }, [formData.entryDate, formData.exitDate, data.price, data.headerType]);
+
   //  handle form submit and check availability and validation
   //  @params: e -> form itself
   //  @constraint: if this is room and EntryDate and ExitDate is not fully filled Notify fail
@@ -337,7 +346,42 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
           ) : (
             <div />
           )}
-          <p className="text-2xl font-bold">{data.price} ฿</p>
+
+          {data.headerType === "Room" && totalPrice.nights > 0 ? (
+            <motion.div 
+              className="text-right"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              key={`${totalPrice.nights}-${totalPrice.total}`}
+            >
+              <motion.p 
+                className="text-lg text-gray-600"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+              >
+                {totalPrice.nights} night{totalPrice.nights > 1 ? 's' : ''} × {data.price} ฿
+              </motion.p>
+              <motion.p 
+                className="text-2xl font-bold"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.2, type: "spring", stiffness: 200 }}
+              >
+                {totalPrice.total.toLocaleString()} ฿
+              </motion.p>
+            </motion.div>
+          ) : (
+            <motion.p 
+              className="text-2xl font-bold"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              {data.price} ฿
+            </motion.p>
+          )}
         </div>
       </section>
       <hr />

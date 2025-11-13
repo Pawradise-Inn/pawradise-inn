@@ -47,6 +47,12 @@ const CartItem = ({ item, onSelect, isSelected, onDelete }) => {
             
             {/* Price & Delete Button */}
             <div className="flex flex-col items-end ml-4 flex-shrink-0">
+                {item.type === 'room' && item.nights > 0 && (
+                    <p className="text-sm text-gray-600 mb-1">
+                        {item.nights} night{item.nights !== 1 ? 's' : ''} × {item.pricePerNight} ฿
+                    </p>
+                )}
+                
                 <span className="text-xl font-bold mb-2">{item.price.toFixed(2)} THB</span>
 
                 <button

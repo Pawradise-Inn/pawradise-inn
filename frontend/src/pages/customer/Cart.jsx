@@ -63,8 +63,18 @@ const Cart = () => {
             const checkInDate = cr.checkIn ? new Date(cr.checkIn) : null;
             const checkOutDate = cr.checkOut ? new Date(cr.checkOut) : null;
             
+            let nights = 0;
+            let totalPrice = cr.room?.price || 0;
+            let pricePerNight = cr.room?.price || 0;
+
+            if (checkInDate && !isNaN(checkInDate) && checkOutDate && !isNaN(checkOutDate)) {
+                const oneDay = 24 * 60 * 60 * 1000;
+                nights = Math.round(Math.abs((checkOutDate - checkInDate) / oneDay));
+                totalPrice = nights * (cr.room?.price || 0);
+            }
+
             const details = checkInDate && !isNaN(checkInDate) && checkOutDate && !isNaN(checkOutDate)
-                ? `${format(checkInDate, 'MMM dd, yyyy')} - ${format(checkOutDate, 'MMM dd, yyyy')}`
+                ? `${format(checkInDate, 'MMM dd, yyyy')} - ${format(checkOutDate, 'MMM dd, yyyy')} (${nights} night${nights !== 1 ? 's' : ''})`
                 : 'Invalid Dates';
 
             return {
@@ -75,7 +85,9 @@ const Cart = () => {
                 picture: cr.room?.picture || '',
                 petName: cr.pet?.name || 'No Pet Assigned',
                 details: details,
-                price: cr.room?.price || 0.00, 
+                price: totalPrice, 
+                pricePerNight: pricePerNight,
+                nights: nights,
                 selected: cr.selected,
             };
         });
