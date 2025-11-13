@@ -9,6 +9,12 @@ const createCareWithCheck = async (bookedId, type, petId, staffId, date, status)
             error.code = "INVALID_ROOM_STATUS";
             throw error;
         }
+        const updatedBookedRoom = await prisma.bookedRoom.update({
+            where: { id: bookedId },
+            data: {
+                status: status
+            },
+        });
     }else if (type === "service"){
         data.bs_id = bookedId;
         if (!["IDLE", "QUEUE", "IN_PROGESS", "COMPLETED"].includes(status)){
@@ -16,6 +22,12 @@ const createCareWithCheck = async (bookedId, type, petId, staffId, date, status)
             error.code = "INVALID_SERVICE_STATUS";
             throw error;
         }
+        const updatedBookedService = await prisma.bookedService.update({
+            where: { id: bookedId },
+            data: {
+                status: status
+            },
+        });
     }else{
         const error = new Error("Invalid booked type (only service or room)");
         error.code = "INVALID_TYPE";

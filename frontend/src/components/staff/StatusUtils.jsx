@@ -26,7 +26,7 @@ export const getStatusText = (status) => {
     case "CHECKED_IN":
       return "Checked in";
     case "CHECKED_OUT":
-      return "Chceked out";
+      return "Checked out";
     default:
       return status;
   }
