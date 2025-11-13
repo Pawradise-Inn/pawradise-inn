@@ -6,6 +6,10 @@ export const getStatusColor = (status) => {
       return "bg-[var(--warning-color)] text-[var(--dark-brown-color)]";
     case "IN_PROGRESS":
       return "bg-[var(--service-inprogress-color)] text-[var(--dark-brown-color)]";
+    case "CHECKED_IN":
+      return "bg-[var(--checkIn-color)]";
+    case "CHECKED_OUT":
+      return "bg-[var(--checkOut-color)]";
     case "COMPLETE":
       return "bg-[var(--service-complete-color)] text-white";
     default:

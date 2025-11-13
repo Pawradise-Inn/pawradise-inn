@@ -6,6 +6,7 @@ import { fetchPetAPI, fetchPetBookingsAPI, updatePetAPI } from "../../hooks/petA
 import { getStatusText, getRoomStatusColor } from "../../components/staff/StatusUtils"
 import PetCard from "../../components/staff/PetUpdateCard";
 import ServiceCard from "../../components/staff/ServiceCard";
+import RoomCard from "../../components/staff/RoomCard";
 import DropDownList from "../../components/DropDownList";
 
 import { createCareAPI } from "../../hooks/careAPI";
@@ -21,8 +22,7 @@ const PetUpdate = () => {
     const response = await fetchPetAPI(id);
     setPet(response.data);
     setStatus(response.data.status);
-    setScheduled(response.data.scheduled);
-
+    setScheduled(response.data.scheduled || []);
   };
   const fetchBooking = async () => {
     const response = await fetchPetBookingsAPI(id);
@@ -142,16 +142,43 @@ const PetUpdate = () => {
         >
           <div className="bg-[var(--cream-color)] p-10 rounded-lg shadow-md flex-1 flex flex-col">
             <h2 className="text-2xl font-bold mb-6">History</h2>
-            <div className="space-y-6 pr-2 scrollbar-sleek">
-              {scheduled.map((sch) => (
-                <div key={`scheduled-${sch.id}`}>
-                  <ServiceCard
-                    service={sch.service}
-                    getStatusText={getStatusText}
-                    getStatusColor={getRoomStatusColor}
-                  />
-                </div>
-              ))}
+            <div className="space-y-6 pr-2 scrollbar-sleek overflow-y-auto max-h-[600px]">
+              {/* Services History */}
+              {scheduled && scheduled.length > 0 && (
+                <>
+                  <h3 className="text-lg font-semibold text-[var(--dark-brown-color)]">Services</h3>
+                  {scheduled.map((sch) => (
+                    <div key={`scheduled-${sch.id}`}>
+                      <ServiceCard
+                        service={sch.service}
+                        getStatusText={getStatusText}
+                        getStatusColor={getRoomStatusColor}
+                      />
+                    </div>
+                  ))}
+                </>
+              )}
+              
+              {/* Rooms History - Only show CHECKED_OUT rooms */}
+              {pet.stayed && pet.stayed.filter(stay => stay.status === 'CHECKED_OUT').length > 0 && (
+                <>
+                  <h3 className="text-lg font-semibold text-[var(--dark-brown-color)] mt-4">Rooms</h3>
+                  {pet.stayed.filter(stay => stay.status === 'CHECKED_OUT').map((stay) => (
+                    <div key={`stayed-${stay.id}`}>
+                      <RoomCard
+                        room={stay.room}
+                        checkIn={stay.checkIn}
+                        checkOut={stay.checkOut}
+                        status={stay.status}
+                      />
+                    </div>
+                  ))}
+                </>
+              )}
+              
+              {(!scheduled || scheduled.length === 0) && (!pet.stayed || pet.stayed.filter(stay => stay.status === 'CHECKED_OUT').length === 0) && (
+                <p className="text-gray-500 text-center">No history available</p>
+              )}
             </div>
           </div>
         </motion.div>
@@ -191,7 +218,8 @@ const StatusUpdate = ({ handleSave, handleCancel, status, setStatus, bookingType
         value: service.id
       })) || [];
     } else {
-      return booking.rooms?.map(room => ({
+      // Filter out CHECKED_OUT rooms from dropdown
+      return booking.rooms?.filter(room => room.status !== 'CHECKED_OUT').map(room => ({
         name: `Room ${room.room.number}`,
         value: room.id
       })) || [];
