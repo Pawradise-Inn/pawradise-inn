@@ -186,9 +186,48 @@ const updateBookedService = async (req, res) => {
 const deleteBookedService = async (req, res) => {
   try {
     const bookedServiceId = Number(req.params.id);
-    const bookedService = await prisma.bookedService.delete({
+    
+    // First, fetch the booked service to check cancellation deadline
+    const bookedService = await prisma.bookedService.findUnique({
       where: { id: bookedServiceId },
     });
+
+    if (!bookedService) {
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "Service booking not found or already deleted"
+      );
+    }
+
+    // Check if cancellation deadline has passed
+    // Users can cancel if today is before the next day after scheduled date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of today
+    
+    const scheduledDate = new Date(bookedService.scheduled);
+    scheduledDate.setHours(0, 0, 0, 0); // Set to start of scheduled day
+    
+    // Calculate cancellation deadline: scheduled date + 1 day
+    const cancellationDeadline = new Date(scheduledDate);
+    cancellationDeadline.setDate(cancellationDeadline.getDate() - 1);
+    
+    // If today is on or after the cancellation deadline, reject cancellation
+    if (today >= cancellationDeadline) {
+      return sendErrorResponse(
+        res,
+        403,
+        "CANCELLATION_DEADLINE_PASSED",
+        "Cannot cancel booking. The cancellation deadline has passed. You can only cancel bookings before the next day after the scheduled date."
+      );
+    }
+
+    // If deadline hasn't passed, proceed with deletion
+    await prisma.bookedService.delete({
+      where: { id: bookedServiceId },
+    });
+    
     return sendSuccessResponse(
       res,
       200,

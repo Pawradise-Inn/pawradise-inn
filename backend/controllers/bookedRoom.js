@@ -193,10 +193,49 @@ const updateBookedRoom = async (req, res) => {
 
 const deleteBookedRoom = async (req, res) => {
   try {
-    const bookedRoomId = req.params.id;
-    const bookedRoom = await prisma.bookedRoom.delete({
-      where: { id: Number(bookedRoomId) },
+    const bookedRoomId = Number(req.params.id);
+    
+    // First, fetch the booked room to check cancellation deadline
+    const bookedRoom = await prisma.bookedRoom.findUnique({
+      where: { id: bookedRoomId },
     });
+
+    if (!bookedRoom) {
+      return sendErrorResponse(
+        res,
+        404,
+        "BOOKING_NOT_FOUND",
+        "Room booking not found or already deleted"
+      );
+    }
+
+    // Check if cancellation deadline has passed
+    // Users can cancel if today is before the next day after check-in
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of today
+    
+    const checkInDate = new Date(bookedRoom.checkIn);
+    checkInDate.setHours(0, 0, 0, 0); // Set to start of check-in day
+    
+    // Calculate cancellation deadline: check-in date + 1 day
+    const cancellationDeadline = new Date(checkInDate);
+    cancellationDeadline.setDate(cancellationDeadline.getDate() - 1);
+    
+    // If today is on or after the cancellation deadline, reject cancellation
+    if (today >= cancellationDeadline) {
+      return sendErrorResponse(
+        res,
+        403,
+        "CANCELLATION_DEADLINE_PASSED",
+        "Cannot cancel booking. The cancellation deadline has passed. You can only cancel bookings before the next day after the check-in date."
+      );
+    }
+
+    // If deadline hasn't passed, proceed with deletion
+    await prisma.bookedRoom.delete({
+      where: { id: bookedRoomId },
+    });
+    
     return sendSuccessResponse(
       res,
       200,

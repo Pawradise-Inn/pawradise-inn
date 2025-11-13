@@ -93,7 +93,7 @@ temp/
 *.sln
 *.sw?
 
-<<<<<<< HEAD
+
 # Backend specific
 backend/config/
 backend/generated/
