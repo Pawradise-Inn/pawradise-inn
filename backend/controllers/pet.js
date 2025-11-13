@@ -176,7 +176,7 @@ const updatePetStatus = async (req, res) => {
       where: { id: petId },
       data: { status },
     });
-    console.log(pet);
+
     const log = await createCareWithCheck(
       bookedId,
       type,
