@@ -8,9 +8,9 @@ import { useState } from "react";
 const getStatusDotColor = (status) => {
   switch (status) {
     case 'PENDING':
-      return 'bg-[var(--warning-color)]';
+      return 'bg-gray-400'; 
     case 'RESERVED':
-      return 'bg-[var(--room-reserved-color)]';
+      return 'bg-[var(--room-reserved-color)]'; 
     case 'QUEUE':
       return 'bg-[var(--queue-color)]';
     case 'IN_PROGRESS':

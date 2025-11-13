@@ -90,7 +90,7 @@ body {
   --service-unavailable-color: rgb(46, 25, 22);
 
   --room-available-color: rgb(117, 158, 60);
-  --room-reserved-color: rgb(245, 194, 54);
+  --room-reserved-color: rgb(253, 156, 88);
   --room-full-color-color: rgb(186, 30, 7);
 
   --success-color: rgb(117, 158, 60);
@@ -105,10 +105,10 @@ body {
 
   --idle-color: rgb(192, 192, 192);
   --queue-color: rgb(255, 215, 0);
-  --checkIn-color: rgb(60, 179, 113);
-  --checkOut-color: rgb(219, 112, 147);
+  --checkIn-color: rgb(100, 149, 237);
+  --checkOut-color: rgb(117, 158, 60);
   --inProgress-color: rgb(100, 149, 237);
-  --complete-color: rgb(177, 129, 211);
+  --complete-color: rgb(117, 158, 60);
 }
 
 .status-circle {
