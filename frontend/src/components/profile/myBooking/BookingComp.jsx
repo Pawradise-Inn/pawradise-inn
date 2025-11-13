@@ -1,8 +1,8 @@
 // BookingComp.js
 import {  useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthProvider";
-import { deleteBookedService } from "../../../hooks/bookedServiceAPI";
-import { deleteBookedRoom } from "../../../hooks/bookedRoomAPI";
+import { deleteBookedService, updateBookedService } from "../../../hooks/bookedServiceAPI";
+import { deleteBookedRoom, updateBookedRoom } from "../../../hooks/bookedRoomAPI";
 import { fetchMyBookings } from "../../../hooks/bookingAPI"; // Import cancelBooking
 import { startUpVariants } from "../../../styles/animation";
 import {BookingRoomCard, BookingServiceCard }from "./BookingCard";
@@ -22,9 +22,15 @@ const BookingComp = () => {
         console.log(data)
         // Flatten all booked_service into one array
         const allServices = data.data.flatMap((book) => book.booked_service);
-        setAllBookedService(allServices);
+        const filterBookingService = allServices.filter(
+              (ab) => ab.status != "CANCELLED"
+            );
+        setAllBookedService(filterBookingService);
         const allRooms = data.data.flatMap((book) => book.booked_room);
-        setAllBookedRoom(allRooms);
+        const filterBookingRoom = allRooms.filter(
+              (ab) => ab.status != "CANCELLED"
+            );
+        setAllBookedRoom(filterBookingRoom);
       } catch (error) {
         console.error("Failed to fetch bookings:", error);
       }
@@ -42,13 +48,13 @@ const BookingComp = () => {
       async () => {
         try {
           if (type === 'service') {
-            await deleteBookedService(obj.id);
+            await updateBookedService(obj.id, {status: "CANCELLED"});
             const filterBookingService = allBookedService.filter(
               (ab) => ab.id !== obj.id
             );
             setAllBookedService(filterBookingService);
           } else if (type === 'room') {
-            await deleteBookedRoom(obj.id);
+            await updateBookedRoom(obj.id, {status: "CANCELLED"});
             const filterBookingRoom = allBookedRoom.filter(
               (ar) => ar.id !== obj.id
             );
