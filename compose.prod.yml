@@ -4,8 +4,8 @@ services:
       context: ./backend
     ports:
       - "5000:5000"
-    env_file:
-      - ./backend/config/config.env
+    volumes:
+      - ./backend/config:/usr/src/app/backend/config
 
   frontend:
     build:
@@ -15,3 +15,5 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    volumes:
+      - ./frontend/config:/usr/src/app/frontend/config

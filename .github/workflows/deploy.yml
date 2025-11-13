@@ -6,6 +6,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production  # Requires approval if configured in GitHub settings
 
     steps:
       - name: Setup SSH
@@ -17,7 +18,9 @@ jobs:
 
       - name: Deploy via SSH
         run: |
-          ssh ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'ENDSSH'
+            set -e
+            
             cd /root/pawradise-inn
 
             echo "🔹 Pulling latest code..."
@@ -25,29 +28,67 @@ jobs:
             git checkout main
             git reset --hard origin/main
 
-            echo "🔹 Writing .env at backend"
-            cat > ./backend/config/config.env << EENV
+            echo "🔹 Creating config directories..."
+            mkdir -p ./backend/config
+            mkdir -p ./frontend/config
+
+            echo "🔹 Writing backend config..."
+            cat > ./backend/config/config.env << 'ENDBACKEND'
 PORT=${{ secrets.PORT }}
 NODE_ENV=${{ secrets.NODE_ENV }}
 DATABASE_URL=${{ secrets.DATABASE_URL }}
 JWT_SECRET=${{ secrets.JWT_SECRET }}
 JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}
 JWT_COOKIE_EXPIRE=${{ secrets.JWT_COOKIE_EXPIRE }}
-EENV
+ENDBACKEND
 
-            echo "🔹 Writing .env at frontend"
-            cat > ./frontend/config/config.env << EENV
+            echo "🔹 Writing frontend config..."
+            cat > ./frontend/config/config.env << 'ENDFRONTEND'
 VITE_BRANCH_ID=${{ secrets.VITE_BRANCH_ID }}
 VITE_API_KEY=${{ secrets.VITE_API_KEY }}
-EENV
+ENDFRONTEND
 
             echo "🔹 Writing keyfile.json..."
-            cat > ./backend/config/keyfile.json << EJSON
+            cat > ./backend/config/keyfile.json << 'ENDKEYFILE'
 ${{ secrets.GOOGLE_KEYFILE_JSON }}
-EJSON
+ENDKEYFILE
 
-            echo "🔹 Building and running containers..."
+            echo "🔹 Setting proper permissions..."
+            chmod 600 ./backend/config/config.env
+            chmod 600 ./frontend/config/config.env
+            chmod 600 ./backend/config/keyfile.json
+
+            echo "🔹 Stopping old containers..."
+            npm run prod:down || true
+
+            echo "🔹 Cleaning up old images..."
+            docker image prune -f || true
+
+            echo "🔹 Building and starting containers..."
             npm run prod:up
 
-            echo "✅ Deployment complete."
-          EOF
+            echo "🔹 Waiting for services to start..."
+            sleep 10
+
+            echo "🔹 Checking container status..."
+            docker ps
+
+            echo "🔹 Checking backend health..."
+            if curl -f http://localhost:5000/health > /dev/null 2>&1; then
+              echo "✅ Backend is healthy"
+            else
+              echo "⚠️ Backend health check failed (might be normal if no /health endpoint)"
+            fi
+
+            echo "✅ Deployment complete!"
+          ENDSSH
+
+      - name: Notify on Success
+        if: success()
+        run: echo "🎉 Deployment to production succeeded!"
+
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed!"
+          exit 1
