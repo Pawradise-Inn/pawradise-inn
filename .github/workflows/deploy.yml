@@ -1,0 +1,53 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+ 
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        run: |
+          ssh ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
+            cd /root/pawradise-inn
+
+            echo "🔹 Pulling latest code..."
+            git fetch origin main
+            git checkout main
+            git reset --hard origin/main
+
+            echo "🔹 Writing .env at backend"
+            cat > ./backend/config/config.env << EENV
+PORT=${{ secrets.PORT }}
+NODE_ENV=${{ secrets.NODE_ENV }}
+DATABASE_URL=${{ secrets.DATABASE_URL }}
+JWT_SECRET=${{ secrets.JWT_SECRET }}
+JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}
+JWT_COOKIE_EXPIRE=${{ secrets.JWT_COOKIE_EXPIRE }}
+EENV
+
+            echo "🔹 Writing .env at frontend"
+            cat > ./frontend/config/config.env << EENV
+VITE_BRANCH_ID=${{ secrets.VITE_BRANCH_ID }}
+VITE_API_KEY=${{ secrets.VITE_API_KEY }}
+EENV
+
+            echo "🔹 Writing keyfile.json..."
+            cat > ./backend/config/keyfile.json << EJSON
+${{ secrets.GOOGLE_KEYFILE_JSON }}
+EJSON
+
+            echo "🔹 Building and running containers..."
+            npm run prod:up
+
+            echo "✅ Deployment complete."
+          EOF
