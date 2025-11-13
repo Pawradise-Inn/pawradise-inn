@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { deleteChatLogAPI, updateChatLogAPI } from "../../hooks/chatlogAPI";
 import { getChatLogByIdAPI } from "../../hooks/chatlogAPI";
 import { replyToChatLogAPI } from "../../hooks/chatlogAPI";
@@ -97,11 +98,13 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
       data-probe="REVIEW-CARD-ACTIVE"
-      className={`mb-6 bg-white border border-[var(--brown-color)] rounded-2xl ${
-         "p-6"
-      }`}
+      className={`mb-6 bg-white border border-[var(--brown-color)] rounded-2xl p-6`}
       role="article"
       aria-label={`Review card for ${review?.serviceName ?? "service"}`}
     >
@@ -139,7 +142,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
             </div>
 
             <p className="mb-4 mt-2 italic text-gray-700 break-words">
-              “{review?.commenter_detail ?? review?.review ?? ""}”
+              "{review?.commenter_detail ?? review?.review ?? ""}"
             </p>
 
             {/* staff reply editor */}
@@ -159,9 +162,13 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
                   </span>
                   <div className="flex items-center gap-3">
                     {justSavedReply && (
-                      <span className="text-xs font-semibold !text-green-700">
+                      <motion.span 
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="text-xs font-semibold !text-green-700"
+                      >
                         Saved
-                      </span>
+                      </motion.span>
                     )}
                     <button
                       type="button"
@@ -202,7 +209,7 @@ const ReviewCard = ({ review, onDelete, onAfterReplySave, onAfterHideChange }) =
             </div>
           </div>
         </div>
-    </div>
+    </motion.div>
   );
 };
 
