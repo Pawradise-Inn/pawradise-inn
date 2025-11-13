@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion'; 
 import { format } from 'date-fns';
-import { useNavigate } from 'react-router-dom'; // ✅ Added import
-import { getCart, toggleCartRoomSelection, toggleCartServiceSelection, deleteCartRoom, deleteCartService } from '../../hooks/cartAPI';
+import { useNavigate } from 'react-router-dom';
+import { getCart, toggleCartRoomSelection, toggleCartServiceSelection, deleteCartRoom, deleteCartService, checkCart } from '../../hooks/cartAPI';
+import { useNotification } from '../../context/notification/NotificationProvider';
 
 import CartItem from '../../components/Cart/CartItem';
 
@@ -20,7 +21,8 @@ const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
     const [total, setTotal] = useState(0.00);
-    const navigate = useNavigate(); // ✅ Added navigation hook
+    const navigate = useNavigate();
+    const { createNotification } = useNotification();
 
     const fetchCartData = useCallback(async () => {
         try {
@@ -31,9 +33,88 @@ const Cart = () => {
         }
     }, []);
 
+    // Silent check on page load - removes full items without notifications
+    const checkCartAvailabilitySilent = useCallback(async () => {
+        try {
+            const response = await checkCart();
+            const { fullRooms, fullServices } = response.data;
+
+            // Refresh cart if any items were removed (silently)
+            if ((fullRooms && fullRooms.length > 0) || (fullServices && fullServices.length > 0)) {
+                await fetchCartData();
+            }
+        } catch(err) {
+            console.error("Failed to check cart availability:", err);
+        }
+    }, [fetchCartData]);
+
+    // Check with notifications - used when clicking payment button
+    const checkCartAvailability = useCallback(async () => {
+        try {
+            const response = await checkCart();
+            const { fullRooms, fullServices, exceededRooms, exceededServices } = response.data;
+            console.log(response.data)
+
+            // Show notifications for full rooms
+            if (fullRooms && fullRooms.length > 0) {
+                createNotification(
+                    "fail",
+                    "Room No Longer Available",
+                    `Selected room is now full. It has been removed from your cart.`,
+                    null,
+                    7000
+                );
+            }
+
+            // Show notifications for full services
+            if (fullServices && fullServices.length > 0) {
+                createNotification(
+                    "fail",
+                    "Service No Longer Available",
+                    `Selected service is now full. It has been removed from your cart.`,
+                    null,
+                    7000
+                );
+            }
+
+            if (exceededRooms && exceededRooms.length > 0) {
+                createNotification(
+                    "fail",
+                    "Room Capacity Exceeded",
+                    `Selected room has exceeded its capacity. Cannot book additional rooms.`,
+                    null,
+                    7000
+                );
+            }
+
+            if (exceededServices && exceededServices.length > 0) {
+                createNotification(
+                    "fail",
+                    "Service Capacity Exceeded",
+                    `Selected service has exceeded its capacity. Cannot book additional services.`,
+                    null,
+                    7000
+                );
+        }
+
+            // Refresh cart if any items were removed
+            if ((fullRooms && fullRooms.length > 0) || (fullServices && fullServices.length > 0)) {
+                await fetchCartData();
+            }
+
+            // Return true if there are any issues
+            return (fullRooms?.length > 0 || fullServices?.length > 0 || 
+                    exceededRooms?.length > 0 || exceededServices?.length > 0);
+        } catch(err) {
+            console.error("Failed to check cart availability:", err);
+            return false;
+        }
+    }, [createNotification, fetchCartData]);
+
     useEffect(() => {
         fetchCartData();
-    }, [fetchCartData]);
+        checkCartAvailabilitySilent(); // Silent check on page load
+    }, [fetchCartData, checkCartAvailabilitySilent]);
 
     useEffect(() => {
         if (!cart) {
@@ -240,7 +321,15 @@ const Cart = () => {
                             </span>
                         </div>
                         <button
-                            onClick={() => navigate('/payment', { state: { total } })}
+                            onClick={async () => {
+                                const hasIssues = await checkCartAvailability();
+                                // Only navigate if there are no issues and total > 0
+                                if (!hasIssues && total > 0) {
+                                    setTimeout(() => {
+                                        navigate('/payment', { state: { total } });
+                                    }, 500);
+                                }
+                            }}
                             disabled = {total === 0}
                             className="bg-[var(--brown-color)] !text-[var(--cream-color)] px-8 py-3 rounded-lg font-bold capitalize hover:bg-yellow-800 transition-colors text-lg"
                         >

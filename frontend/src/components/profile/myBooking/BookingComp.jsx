@@ -22,9 +22,15 @@ const BookingComp = () => {
         console.log(data)
         // Flatten all booked_service into one array
         const allServices = data.data.flatMap((book) => book.booked_service);
-        setAllBookedService(allServices);
+        const filterBookingService = allServices.filter(
+              (ab) => ab.status != "CANCELLED"
+            );
+        setAllBookedService(filterBookingService);
         const allRooms = data.data.flatMap((book) => book.booked_room);
-        setAllBookedRoom(allRooms);
+        const filterBookingRoom = allRooms.filter(
+              (ab) => ab.status != "CANCELLED"
+            );
+        setAllBookedRoom(filterBookingRoom);
       } catch (error) {
         console.error("Failed to fetch bookings:", error);
       }

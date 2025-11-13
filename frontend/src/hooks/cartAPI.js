@@ -36,3 +36,8 @@ export const deleteCartService = async (id) => {
     const response = await axiosInstance.delete(`${API_URL}/services/${id}`);
     return response.data
 };
+
+export const checkCart = async () => {
+    const response = await axiosInstance.get(`${API_URL}/checks`);
+    return response.data;
+};
