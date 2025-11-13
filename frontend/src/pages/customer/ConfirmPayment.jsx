@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { generateQrAPI, createPaymentAPI } from "../../hooks/paymentAPI";
+import { generateQrAPI, createPaymentAPI, updatePaymentAPI } from "../../hooks/paymentAPI";
 import { uploadImageAPI } from "../../hooks/imageAPI";
 import { checkSlipAPI } from "../../hooks/slipOkAPI";
 
@@ -38,13 +38,18 @@ const ConfirmPayment = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [qrImage, setQrImage] = useState("");
+  const [isCooldown, setIsCooldown] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Read total from Cart state
+  // --- MODIFIED CODE ---
   const total = location.state?.total || 0.0;
+  const isReupload = location.state?.from === "failed";
+  const paymentId = location.state?.paymentId || null;
+  // --- END MODIFIED CODE ---
 
   useEffect(() => {
+    console.log("isreupload:", isReupload)
     const fetchQr = async () => {
       try {
         const response = await generateQrAPI();
@@ -59,51 +64,92 @@ const ConfirmPayment = () => {
 
   const handleImageChange = (e) => {
     e.preventDefault();
-    let file = e.target.files[0];
+    const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviewUrl(reader.result);
-      };
+      reader.onloadend = () => setImagePreviewUrl(reader.result);
       reader.readAsDataURL(file);
       setUploadedImage(file);
     }
   };
 
   const handleDone = async () => {
+    if (isCooldown) return;
     if (!uploadedImage) {
       console.log("No image uploaded yet");
       return;
     }
 
+    setIsCooldown(true);
+    setTimeout(() => setIsCooldown(false), 5000);
+
     try {
+      // 1️⃣ Upload image
       const result = await uploadImageAPI(uploadedImage);
       const imageUrl = result.message.details.imageUrl;
       console.log("✅ Uploaded image url:", imageUrl);
 
+      // 2️⃣ Check slip validity
       const slipResult = await checkSlipAPI(imageUrl);
       const slipStatus = slipResult.success;
-      console.log("✅ OK Slip API status:", slipStatus);
+      console.log("✅ Slip check result:", slipStatus);
 
       const paymentStatus = slipStatus ? "SUCCESS" : "FAILED";
-      try {
-        const paymentResponse = await createPaymentAPI({
-          status: paymentStatus,
-          amount: total,
-          slip: imageUrl,
-        });
-        console.log(`💰 Payment creation ${paymentStatus}:`, paymentResponse);
-      } catch (createError) {
-        console.error("❌ Payment creation failed:", createError);
+
+      let currentPaymentId = paymentId;
+
+      // 3️⃣ Re-upload logic
+      if (isReupload && currentPaymentId) {
+        console.log("🔄 Re-upload detected. Updating existing payment...");
+
+        try {
+          const paymentResponse = await updatePaymentAPI(currentPaymentId, {
+            status: paymentStatus,
+            slip: imageUrl,
+          });
+          console.log(`🔄 Payment updated (${paymentStatus}):`, paymentResponse);
+
+          if (slipStatus) {
+            navigate("/payment/success");
+          } else {
+            navigate("/payment/failed", {
+              state: { total, paymentId: currentPaymentId, from: "failed" },
+            });
+          }
+        } catch (updateError) {
+          console.error("❌ Update failed:", updateError);
+          navigate("/payment/failed", {
+            state: { total, paymentId: currentPaymentId, from: "failed" },
+          });
+        }
+        return;
       }
+
+      // 4️⃣ Normal new payment flow
+      console.log("💰 Creating new payment...");
+      const paymentResponse = await createPaymentAPI({
+        status: paymentStatus,
+        amount: total,
+        slip: imageUrl,
+      });
+      console.log(`💰 Payment creation response:`, paymentResponse);
+
+      // ✅ Correctly extract paymentId
+      currentPaymentId = paymentResponse?.data?.payment.id;
+      console.log("💳 Payment ID after creation:", currentPaymentId);
 
       if (slipStatus) {
         navigate("/payment/success");
       } else {
-        navigate("/payment/failed");
+        navigate("/payment/failed", {
+          state: { total, paymentId: currentPaymentId, from: "failed" },
+        });
       }
     } catch (error) {
-      console.error("❌ Error uploading image or processing payment:", error);
+      console.error("❌ Error uploading or processing payment:", error);
+      navigate("/payment/failed", {
+        state: { total, paymentId, from: "failed" },
+      });
     }
   };
 
@@ -124,7 +170,7 @@ const ConfirmPayment = () => {
           custom={0}
           className="text-3xl sm:text-4xl font-bold text-amber-800 text-center mb-8 sm:mb-12"
         >
-          Waiting for payment
+          {isReupload ? "Re-upload Payment" : "Waiting for payment"}
         </motion.h1>
 
         <motion.div
@@ -134,7 +180,6 @@ const ConfirmPayment = () => {
           custom={1}
           className="flex flex-col lg:flex-row gap-8 sm:gap-12 w-full"
         >
-          {/* generate qr code */}
           <div className="flex-1 flex flex-col items-center justify-center bg-gray-200 rounded-lg p-6 min-h-[300px] sm:min-h-[400px]">
             {qrImage ? (
               <img
@@ -154,7 +199,6 @@ const ConfirmPayment = () => {
             <span className="mt-4 text-gray-600 font-medium">QR code</span>
           </div>
 
-          {/* Right Side: Upload Evidence */}
           <div className="flex-1 flex flex-col">
             <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">
               Total Price: {total.toFixed(2)} THB
@@ -179,7 +223,9 @@ const ConfirmPayment = () => {
                   <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
                     <UploadIcon />
                   </div>
-                  <p className="text-amber-800">Drag & drop or click to upload</p>
+                  <p className="text-amber-800">
+                    Drag & drop or click to upload
+                  </p>
                 </div>
               )}
             </label>
@@ -203,7 +249,6 @@ const ConfirmPayment = () => {
           </div>
         </motion.div>
 
-        {/* Footer Buttons */}
         <motion.div
           variants={startUpVariants}
           initial="hidden"
@@ -220,10 +265,15 @@ const ConfirmPayment = () => {
           </button>
           <button
             type="button"
-            className="px-10 py-3 bg-amber-800 text-white font-semibold rounded-lg shadow-md hover:bg-amber-900 transition-colors"
+            disabled={isCooldown}
             onClick={handleDone}
+            className={`px-10 py-3 font-semibold rounded-lg shadow-md transition-colors ${
+              isCooldown
+                ? "bg-gray-400 cursor-not-allowed text-white"
+                : "bg-amber-800 hover:bg-amber-900 text-white"
+            }`}
           >
-            Done
+            {isCooldown ? "Please wait..." : "Done"}
           </button>
         </motion.div>
       </div>

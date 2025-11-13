@@ -1,6 +1,6 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion"; // Import motion
+import { useNavigate, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 
 // --- Animation Variants ---
 const startUpVariants = {
@@ -13,7 +13,7 @@ const startUpVariants = {
   exit: { opacity: 0, x: -50, transition: { duration: 0.3 } },
 };
 
-// Inline SVG for the failure cross icon
+// Inline SVG for failure icon
 const FailureCrossIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -33,11 +33,14 @@ const FailureCrossIcon = () => (
 
 const PaymentFailed = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const total = location.state?.total || 0.0;
+  const paymentId = location.state?.paymentId || null; // ✅ grab paymentId
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-center bg-white p-4 sm:p-8 font-['Inter',_sans-serif] text-gray-800 overflow-x-hidden">
       <div className="flex flex-col items-center text-center">
-        {/* Failure Icon (Animated) */}
         <motion.div
           variants={startUpVariants}
           initial="hidden"
@@ -48,7 +51,6 @@ const PaymentFailed = () => {
           <FailureCrossIcon />
         </motion.div>
 
-        {/* Failure Message (Animated) */}
         <motion.h1
           variants={startUpVariants}
           initial="hidden"
@@ -58,7 +60,7 @@ const PaymentFailed = () => {
         >
           payment failed
         </motion.h1>
-        
+
         <motion.p
           variants={startUpVariants}
           initial="hidden"
@@ -69,7 +71,6 @@ const PaymentFailed = () => {
           Tel: 000-000-0000
         </motion.p>
 
-        {/* Action Buttons (Animated) */}
         <motion.div
           variants={startUpVariants}
           initial="hidden"
@@ -84,9 +85,18 @@ const PaymentFailed = () => {
           >
             main menu
           </button>
+
           <button
             type="button"
-            onClick={() => navigate("/payment")}
+            onClick={() =>
+              navigate("/payment", {
+                state: {
+                  total,
+                  from: "failed",
+                  paymentId, // ✅ pass paymentId for re-upload
+                },
+              })
+            }
             className="px-10 py-3 bg-amber-800 text-white font-semibold rounded-lg shadow-md hover:bg-amber-900 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-opacity-50 !text-white hover:!text-white focus:!text-white"
           >
             re-upload

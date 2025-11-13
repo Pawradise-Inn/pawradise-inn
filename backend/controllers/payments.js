@@ -181,7 +181,7 @@ const createPayment = async (req, res) => {
         if (status === "SUCCESS") {
             return sendSuccessResponse(
                 res, 201, "BOOKING_CREATED", "Your booking has been created successfully",
-                { payment, booking } 
+                { paymentId: payment.id, payment, booking } 
             );
         } else {
             return sendSuccessResponse(
