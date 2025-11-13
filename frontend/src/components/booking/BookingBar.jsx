@@ -42,6 +42,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
     entryTime: null,
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const CheckInRef = forwardRef(({ value, onClick, className }, ref) => (
     <div ref={ref}>
       <button type="button" onClick={onClick} className={className}>
@@ -87,8 +89,10 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
   //  @constraint: if pet is not selected Notify faile
   //  @constraint: if this is room and all constraint pass call CreateRoomAPI and Notify according to status
   //  @constraint: if this is service and all constraint pass call CreateServiceAPI and Notify according to status
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    if (isSubmitting) return;
 
     if (
       data.headerType === "Room" &&
@@ -127,44 +131,43 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
       createNotification("fail", "Pet is missing", "Please select your pet.");
       return;
     }
+    
+    setIsSubmitting(true);
 
-    let body;
-    if (data.headerType === "Service") {
-      body = {
-        serviceId: data.id,
-        petId: currentPetId,
-        scheduled: changeDateTime(formData.entryDate, formData.entryTime),
-      };
-
-      addServiceToCart(body)
-        .then(() => {
-          changeBookingBarStatus();
-          onClick(data, false);
-          window.dispatchEvent(new Event('cartUpdated'));
-          window.dispatchEvent(new Event('showCartButton'));
-        })
-        .catch((error) => {
-          console.error("Adding service to cart error:", error);
-        });
-    } else {
-      body = {
-        roomId: data.id,
-        petId: currentPetId,
-        checkIn: formData.entryDate,
-        checkOut: formData.exitDate,
-      };
-
-      addRoomToCart(body)
-        .then(() => {
-          changeBookingBarStatus();
-          onClick(data, false);
-          window.dispatchEvent(new Event('cartUpdated'));
-          window.dispatchEvent(new Event('showCartButton'));
-        })
-        .catch((error) => {
-          console.error("Adding room to cart error:", error);
-        });
+    try {
+      let body;
+      if (data.headerType === "Service") {
+        body = {
+          serviceId: data.id,
+          petId: currentPetId,
+          scheduled: changeDateTime(formData.entryDate, formData.entryTime),
+        };
+  
+        await addServiceToCart(body);
+        changeBookingBarStatus();
+        onClick(data, false);
+        window.dispatchEvent(new Event('cartUpdated'));
+        window.dispatchEvent(new Event('showCartButton'));
+      } else {
+        body = {
+          roomId: data.id,
+          petId: currentPetId,
+          checkIn: formData.entryDate,
+          checkOut: formData.exitDate,
+        };
+  
+        await addRoomToCart(body);
+        changeBookingBarStatus();
+        onClick(data, false);
+        window.dispatchEvent(new Event('cartUpdated'));
+        window.dispatchEvent(new Event('showCartButton'));
+      }
+    } catch(err) {
+        console.error("Adding to cart error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
+
   };
   //  change BookingStatus when formData and currentPet is changed
   //  @constraint: if data is not fully filled Notify warning
@@ -438,11 +441,14 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
 
           <button
             type="submit"
-            className={
-              "mt-2 block w-full bg-[var(--dark-brown-color)] rounded !text-white text-center py-1 text-3xl mb-4 cursor-pointer hover:scale-105 transition-all duration-200"
-            }
+            disabled={isSubmitting}
+            className={`mt-2 block w-full bg-[var(--dark-brown-color)] rounded !text-white text-center py-1 text-3xl mb-4 transition-all duration-200 ${
+              isSubmitting 
+                ? "opacity-50 cursor-not-allowed" 
+                : "cursor-pointer hover:scale-105"
+            }`}
           >
-            BOOK
+            {isSubmitting ? "BOOKING..." : "BOOK"}
           </button>
         </form>
       </section>
