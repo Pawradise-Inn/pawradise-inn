@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("US2-1: Customer Registration", () => {
+test.describe.serial("US2-1: Customer Registration", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("http://localhost:3000/register");
   });
@@ -8,11 +8,11 @@ test.describe("US2-1: Customer Registration", () => {
   test("TC1-1: Valid Registration", async ({ page }) => {
     await page.getByLabel(/first.*name/i).fill("bungsell");
     await page.getByLabel(/last.*name/i).fill("roti");
-    await page.getByLabel(/email/i).fill("matiba01@gmail.com");
-    await page.getByLabel(/username/i).fill("bungRakRoti01");
+    await page.getByLabel(/email/i).fill("matiba@gmail.com");
+    await page.getByLabel(/username/i).fill("bungRakRoti");
     await page.getByLabel(/^password$/i).fill("roti12345678");
     await page.getByLabel(/confirm.*password/i).fill("roti12345678");
-    await page.getByLabel(/phone/i).fill("0649488957");
+    await page.getByLabel(/phone/i).fill("5555555555");
     await page.getByLabel(/consent|agree/i).check();
 
     await page
@@ -321,5 +321,38 @@ test.describe("US2-1: Customer Registration", () => {
       name: /submit|register|sign up|done/i,
     });
     await expect(submitButton).toBeDisabled();
+  });
+});
+
+// Separate describe block for cleanup - runs after all registration tests
+test.describe("US2-1: Cleanup", () => {
+  test("Delete Registered Account", async ({ page }) => {
+    // Login with registered credentials
+    await page.goto("http://localhost:3000/login");
+    await page.fill('input[name="Username"]', "bungRakRoti");
+    await page.fill('input[name="Password"]', "roti12345678");
+    await page.getByRole("button", { name: /login/i }).click();
+    await page.waitForURL(/\/room/);
+
+    // Navigate to profile
+    await page.goto("http://localhost:3000/profile/");
+    await page.waitForLoadState("networkidle");
+
+    // Click Delete Account button
+    await page.locator('button:has-text("Delete account")').click();
+
+    // Wait for popup to appear and fill in password
+    await page.waitForSelector(
+      'input[placeholder="Password"][type="password"]'
+    );
+    await page
+      .locator('input[placeholder="Password"][type="password"]')
+      .fill("roti12345678");
+
+    // Click confirm button to delete
+    await page.locator('button:has-text("confirm")').click();
+
+    // Optionally verify deletion was successful (e.g., redirect to login or show confirmation)
+    await page.waitForTimeout(2000); // Wait for deletion to process
   });
 });
