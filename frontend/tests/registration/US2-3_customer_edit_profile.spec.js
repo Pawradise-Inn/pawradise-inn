@@ -181,3 +181,41 @@ test.describe.serial("US2-3: Customer Edit Profile", () => {
     ).toBeVisible();
   });
 });
+
+// Separate describe block for cleanup - runs outside the serial block
+test.describe("US2-3: Cleanup", () => {
+  test("Reset Customer Profile to Original", async ({ page }) => {
+    // Login with new credentials (don't use beforeEach)
+    await page.goto("http://localhost:3000/login");
+    await page.fill('input[name="Username"]', "bungRakRoti02");
+    await page.fill('input[name="Password"]', "testcustomer02");
+    await page.getByRole("button", { name: /login/i }).click();
+    await page.waitForURL(/\/room/);
+
+    // Navigate to profile
+    await page.goto("http://localhost:3000/profile/");
+    await page.waitForLoadState("networkidle");
+
+    // Reset to original values
+    await page.locator('input[placeholder="Firstname"]').fill("testcustomer02");
+    await page.locator('input[placeholder="Lastname"]').fill("testcustomer02");
+    await page
+      .locator('input[placeholder*="mail" i]')
+      .fill("testcustomer02@gmail.com");
+    await page.locator('input[placeholder="Username"]').fill("testcustomer02");
+    await page.locator('input[placeholder*="phone" i]').fill("0749798665");
+
+    await page.getByRole("button", { name: /done/i }).click();
+
+    // Handle confirmation dialog
+    await expect(
+      page.locator("text=/Are you sure to update the data/i")
+    ).toBeVisible();
+    await page.getByRole("button", { name: /confirm/i }).click();
+
+    // Check success notification
+    await expect(
+      page.locator("text=/Your profile has been updated successfully/i")
+    ).toBeVisible();
+  });
+});
