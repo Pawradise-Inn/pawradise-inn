@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
-// Helper function to login as staff
-async function loginAsStaff(page) {
+// Helper function to login as teststaff01
+async function loginAsTestStaff01(page) {
   await page.goto("http://localhost:3000/login");
   await page.fill('input[name="Username"]', "teststaff01");
   await page.fill('input[name="Password"]', "teststaff01");
@@ -9,17 +9,58 @@ async function loginAsStaff(page) {
   await page.waitForURL(/\/staff\/dashboard/);
 }
 
-test.describe.serial("US2-4: Staff Edit Profile", () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAsStaff(page);
-    await page.goto("http://localhost:3000/staff/management/profile");
+// Helper function to login as teststaff02
+async function loginAsTestStaff02(page) {
+  await page.goto("http://localhost:3000/login");
+  await page.fill('input[name="Username"]', "teststaff02");
+  await page.fill('input[name="Password"]', "teststaff02");
+  await page.getByRole("button", { name: /login/i }).click();
+  await page.waitForURL(/\/staff\/dashboard/);
+}
 
-    // Wait for page to load and data to be fetched
+// Separate describe block for TC1-41 - runs first with teststaff01
+test.describe("US2-4: Staff Edit Profile - Valid Update", () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAsTestStaff01(page);
+    await page.goto("http://localhost:3000/staff/management/profile");
+    await page.waitForLoadState("networkidle");
+  });
+
+  test("TC1-41: Valid Profile Edit", async ({ page }) => {
+    await page
+      .locator('input[placeholder="Firstname"]')
+      .waitFor({ state: "visible" });
+
+    await page.locator('input[placeholder="Firstname"]').fill("bungsell");
+    await page.locator('input[placeholder="Lastname"]').fill("roti");
+    await page.locator('input[placeholder*="mail" i]').fill("matiba@gmail.com");
+    await page.locator('input[placeholder="Username"]').fill("bungRakRoti");
+    await page.locator('input[placeholder*="phone" i]').fill("5555555555");
+
+    await page.getByRole("button", { name: /done/i }).click();
+
+    // Handle confirmation dialog
+    await expect(
+      page.locator("text=/Are you sure to update the data/i")
+    ).toBeVisible();
+    await page.getByRole("button", { name: /confirm/i }).click();
+
+    // Check success notification
+    await expect(
+      page.locator("text=/Your profile has been updated successfully/i")
+    ).toBeVisible();
+  });
+});
+
+// Main validation tests - use teststaff02
+test.describe("US2-4: Staff Edit Profile - Validation Tests", () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAsTestStaff02(page);
+    await page.goto("http://localhost:3000/staff/management/profile");
     await page.waitForLoadState("networkidle");
   });
 
   test("TC1-42: Empty Firstname", async ({ page }) => {
-    // Wait for input to be visible and populated
     await page
       .locator('input[placeholder="Firstname"]')
       .waitFor({ state: "visible" });
@@ -206,46 +247,14 @@ test.describe.serial("US2-4: Staff Edit Profile", () => {
       )
     ).toBeVisible();
   });
-
-  // TC1-41 runs last to avoid affecting other tests
-  test("TC1-41: Valid Profile Edit", async ({ page }) => {
-    await page
-      .locator('input[placeholder="Firstname"]')
-      .waitFor({ state: "visible" });
-
-    await page.locator('input[placeholder="Firstname"]').fill("bungsell");
-
-    await page.locator('input[placeholder="Lastname"]').fill("roti");
-
-    await page
-      .locator('input[placeholder*="mail" i]')
-      .fill("matiba03@gmail.com");
-
-    await page.locator('input[placeholder="Username"]').fill("bungRakRoti03");
-
-    await page.locator('input[placeholder*="phone" i]').fill("0703830878");
-
-    await page.getByRole("button", { name: /done/i }).click();
-
-    // Handle confirmation dialog
-    await expect(
-      page.locator("text=/Are you sure to update the data/i")
-    ).toBeVisible();
-    await page.getByRole("button", { name: /confirm/i }).click();
-
-    // Check success notification
-    await expect(
-      page.locator("text=/Your profile has been updated successfully/i")
-    ).toBeVisible();
-  });
 });
 
-// Separate describe block for cleanup - runs outside the serial block
+// Separate describe block for cleanup - resets teststaff01 profile
 test.describe("US2-4: Cleanup", () => {
   test("Reset Staff Profile to Original", async ({ page }) => {
-    // Login with new credentials (don't use beforeEach)
+    // Login with updated credentials
     await page.goto("http://localhost:3000/login");
-    await page.fill('input[name="Username"]', "bungRakRoti03");
+    await page.fill('input[name="Username"]', "bungRakRoti");
     await page.fill('input[name="Password"]', "teststaff01");
     await page.getByRole("button", { name: /login/i }).click();
     await page.waitForURL(/\/staff\/dashboard/);
