@@ -1,19 +1,39 @@
 import { test, expect } from "@playwright/test";
 
+// Helper function to login as customer
+async function loginAsCustomer(page) {
+  await page.goto("http://localhost:3000/login");
+  await page.fill('input[name="Username"]', "testcustomer01");
+  await page.fill('input[name="Password"]', "testcustomer01");
+  await page.getByRole("button", { name: /login/i }).click();
+  await page.waitForURL(/\/room/);
+}
+
 test.describe("US4-4: Customer Browse Service", () => {
   test.beforeEach(async ({ page }) => {
-    // Login as customer
-    await page.goto("http://localhost:3000/login");
-    // Add login steps here
+    await loginAsCustomer(page);
+    await page.goto("http://localhost:3000/service/");
   });
 
-  test("TC: Browse Services", async ({ page }) => {
-    await page.click('a[href*="service"]'); // Click service menu item
+  test("TC2-20: Browse Services", async ({ page }) => {
+    // Wait for service cards to load
+    await page.waitForSelector('[data-testid="service-card"]');
 
-    await expect(page.locator("text=Service1")).toBeVisible();
-    await expect(page.locator("text=Service2")).toBeVisible();
-    await expect(page.locator("text=Service3")).toBeVisible();
-    await expect(page.locator("text=Service4")).toBeVisible();
-    await expect(page.locator("text=Service5")).toBeVisible();
+    // Verify each specific service is visible by checking service names
+    await expect(
+      page.locator('[data-testid="service-card"]:has-text("Bathing")')
+    ).toBeVisible();
+    await expect(
+      page.locator('[data-testid="service-card"]:has-text("Fighting")')
+    ).toBeVisible();
+    await expect(
+      page.locator('[data-testid="service-card"]:has-text("Grooming")')
+    ).toBeVisible();
+    await expect(
+      page.locator('[data-testid="service-card"]:has-text("Swimming")')
+    ).toBeVisible();
+    await expect(
+      page.locator('[data-testid="service-card"]:has-text("Training")')
+    ).toBeVisible();
   });
 });
