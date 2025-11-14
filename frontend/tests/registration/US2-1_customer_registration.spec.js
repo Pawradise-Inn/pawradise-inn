@@ -8,22 +8,24 @@ test.describe("US2-1: Customer Registration", () => {
   test("TC1-1: Valid Registration", async ({ page }) => {
     await page.getByLabel(/first.*name/i).fill("bungsell");
     await page.getByLabel(/last.*name/i).fill("roti");
-    await page.getByLabel(/email/i).fill("matiba@gmail.com");
-    await page.getByLabel(/username/i).fill("bungRakRoti");
+    await page.getByLabel(/email/i).fill("matiba01@gmail.com");
+    await page.getByLabel(/username/i).fill("bungRakRoti01");
     await page.getByLabel(/^password$/i).fill("roti12345678");
     await page.getByLabel(/confirm.*password/i).fill("roti12345678");
-    await page.getByLabel(/phone/i).fill("5555555555");
+    await page.getByLabel(/phone/i).fill("0649488957");
     await page.getByLabel(/consent|agree/i).check();
 
     await page
       .getByRole("button", { name: /submit|register|sign up|done/i })
       .click();
 
-    // Check for success notification
-    await expect(page.locator("text=/Registration Complete/i")).toBeVisible();
-
-    // Check navigation
+    // Check navigation to room page
     await expect(page).toHaveURL("http://localhost:3000/room");
+
+    // Check for success notification on the room page
+    await expect(
+      page.locator("text=/Registration completed successfully/i")
+    ).toBeVisible();
   });
 
   test("TC1-2: Empty Firstname", async ({ page }) => {
@@ -150,7 +152,7 @@ test.describe("US2-1: Customer Registration", () => {
     await page.getByLabel(/username/i).fill("bungRakRoti");
     await page.getByLabel(/^password$/i).fill("roti12345678");
     await page.getByLabel(/confirm.*password/i).fill("roti12345678");
-    await page.getByLabel(/phone/i).fill("5555555555");
+    await page.getByLabel(/phone/i).fill("0961562155");
     await page.getByLabel(/consent|agree/i).check();
 
     await page
