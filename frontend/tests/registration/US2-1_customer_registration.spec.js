@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("US2-1: Customer Registration", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("http://localhost:3000/register"); // Adjust URL as needed
+    await page.goto("http://localhost:3000/register");
   });
 
   test("TC1-1: Valid Registration", async ({ page }) => {
@@ -19,6 +19,10 @@ test.describe("US2-1: Customer Registration", () => {
       .getByRole("button", { name: /submit|register|sign up|done/i })
       .click();
 
+    // Check for success notification
+    await expect(page.locator("text=/Registration Complete/i")).toBeVisible();
+
+    // Check navigation
     await expect(page).toHaveURL("http://localhost:3000/room");
   });
 
@@ -32,11 +36,11 @@ test.describe("US2-1: Customer Registration", () => {
     await page.getByLabel(/phone/i).fill("5555555555");
     await page.getByLabel(/consent|agree/i).check();
 
-    await page
-      .getByRole("button", { name: /submit|register|sign up|done/i })
-      .click();
-
-    await expect(page.locator("text=/firstname.*required/i")).toBeVisible();
+    // Check that submit button is disabled
+    const submitButton = page.getByRole("button", {
+      name: /submit|register|sign up|done/i,
+    });
+    await expect(submitButton).toBeDisabled();
   });
 
   test("TC1-3: Empty Lastname", async ({ page }) => {
@@ -49,11 +53,11 @@ test.describe("US2-1: Customer Registration", () => {
     await page.getByLabel(/phone/i).fill("5555555555");
     await page.getByLabel(/consent|agree/i).check();
 
-    await page
-      .getByRole("button", { name: /submit|register|sign up|done/i })
-      .click();
-
-    await expect(page.locator("text=/lastname.*required/i")).toBeVisible();
+    // Check that submit button is disabled
+    const submitButton = page.getByRole("button", {
+      name: /submit|register|sign up|done/i,
+    });
+    await expect(submitButton).toBeDisabled();
   });
 
   test("TC1-4: Invalid Email Format", async ({ page }) => {
@@ -66,11 +70,22 @@ test.describe("US2-1: Customer Registration", () => {
     await page.getByLabel(/phone/i).fill("5555555555");
     await page.getByLabel(/consent|agree/i).check();
 
+    // Listen for validation message
+    page.on("dialog", async (dialog) => {
+      expect(dialog.message()).toContain("Please include an '@' in");
+      await dialog.accept();
+    });
+
     await page
       .getByRole("button", { name: /submit|register|sign up|done/i })
       .click();
 
-    await expect(page.locator("text=/invalid.*email/i")).toBeVisible();
+    // Check for HTML5 validation message (browser native)
+    const emailInput = page.getByLabel(/email/i);
+    const validationMessage = await emailInput.evaluate(
+      (el) => el.validationMessage
+    );
+    expect(validationMessage).toContain("@");
   });
 
   test("TC1-5: Empty Email", async ({ page }) => {
@@ -83,11 +98,11 @@ test.describe("US2-1: Customer Registration", () => {
     await page.getByLabel(/phone/i).fill("5555555555");
     await page.getByLabel(/consent|agree/i).check();
 
-    await page
-      .getByRole("button", { name: /submit|register|sign up|done/i })
-      .click();
-
-    await expect(page.locator("text=/email.*required/i")).toBeVisible();
+    // Check that submit button is disabled
+    const submitButton = page.getByRole("button", {
+      name: /submit|register|sign up|done/i,
+    });
+    await expect(submitButton).toBeDisabled();
   });
 
   test("TC1-6: Duplicate Email", async ({ page }) => {
@@ -104,7 +119,11 @@ test.describe("US2-1: Customer Registration", () => {
       .getByRole("button", { name: /submit|register|sign up|done/i })
       .click();
 
-    await expect(page.locator("text=/email.*already.*use/i")).toBeVisible();
+    await expect(
+      page.locator(
+        "text=/This email is already taken.*Please choose a different one/i"
+      )
+    ).toBeVisible();
   });
 
   test("TC1-7: Empty Username", async ({ page }) => {
@@ -117,11 +136,11 @@ test.describe("US2-1: Customer Registration", () => {
     await page.getByLabel(/phone/i).fill("5555555555");
     await page.getByLabel(/consent|agree/i).check();
 
-    await page
-      .getByRole("button", { name: /submit|register|sign up|done/i })
-      .click();
-
-    await expect(page.locator("text=/username.*required/i")).toBeVisible();
+    // Check that submit button is disabled
+    const submitButton = page.getByRole("button", {
+      name: /submit|register|sign up|done/i,
+    });
+    await expect(submitButton).toBeDisabled();
   });
 
   test("TC1-8: Duplicate Username", async ({ page }) => {
@@ -139,7 +158,9 @@ test.describe("US2-1: Customer Registration", () => {
       .click();
 
     await expect(
-      page.locator("text=/username.*already.*taken/i")
+      page.locator(
+        "text=/This username is already taken.*Please choose a different one/i"
+      )
     ).toBeVisible();
   });
 
@@ -153,11 +174,11 @@ test.describe("US2-1: Customer Registration", () => {
     await page.getByLabel(/phone/i).fill("5555555555");
     await page.getByLabel(/consent|agree/i).check();
 
-    await page
-      .getByRole("button", { name: /submit|register|sign up|done/i })
-      .click();
-
-    await expect(page.locator("text=/password.*required/i")).toBeVisible();
+    // Check that submit button is disabled
+    const submitButton = page.getByRole("button", {
+      name: /submit|register|sign up|done/i,
+    });
+    await expect(submitButton).toBeDisabled();
   });
 
   test("TC1-10: Password Mismatch", async ({ page }) => {
@@ -174,7 +195,7 @@ test.describe("US2-1: Customer Registration", () => {
       .getByRole("button", { name: /submit|register|sign up|done/i })
       .click();
 
-    await expect(page.locator("text=/password.*do not match/i")).toBeVisible();
+    await expect(page.locator("text=/Password do not match/i")).toBeVisible();
   });
 
   test("TC1-11: Empty Confirm Password", async ({ page }) => {
@@ -187,13 +208,11 @@ test.describe("US2-1: Customer Registration", () => {
     await page.getByLabel(/phone/i).fill("5555555555");
     await page.getByLabel(/consent|agree/i).check();
 
-    await page
-      .getByRole("button", { name: /submit|register|sign up|done/i })
-      .click();
-
-    await expect(
-      page.locator("text=/confirm.*password.*required/i")
-    ).toBeVisible();
+    // Check that submit button is disabled
+    const submitButton = page.getByRole("button", {
+      name: /submit|register|sign up|done/i,
+    });
+    await expect(submitButton).toBeDisabled();
   });
 
   test("TC1-12: Short Phone Number", async ({ page }) => {
@@ -210,7 +229,7 @@ test.describe("US2-1: Customer Registration", () => {
       .getByRole("button", { name: /submit|register|sign up|done/i })
       .click();
 
-    await expect(page.locator("text=/phone.*10.*digit/i")).toBeVisible();
+    await expect(page.locator("text=/Phone number is invalid/i")).toBeVisible();
   });
 
   test("TC1-13: Long Phone Number", async ({ page }) => {
@@ -227,7 +246,7 @@ test.describe("US2-1: Customer Registration", () => {
       .getByRole("button", { name: /submit|register|sign up|done/i })
       .click();
 
-    await expect(page.locator("text=/phone.*10.*digit/i")).toBeVisible();
+    await expect(page.locator("text=/Phone number is invalid/i")).toBeVisible();
   });
 
   test("TC1-14: Invalid Phone Number", async ({ page }) => {
@@ -244,7 +263,7 @@ test.describe("US2-1: Customer Registration", () => {
       .getByRole("button", { name: /submit|register|sign up|done/i })
       .click();
 
-    await expect(page.locator("text=/phone.*number/i")).toBeVisible();
+    await expect(page.locator("text=/Phone number is invalid/i")).toBeVisible();
   });
 
   test("TC1-15: Empty Phone Number", async ({ page }) => {
@@ -257,11 +276,11 @@ test.describe("US2-1: Customer Registration", () => {
     await page.getByLabel(/phone/i).fill("");
     await page.getByLabel(/consent|agree/i).check();
 
-    await page
-      .getByRole("button", { name: /submit|register|sign up|done/i })
-      .click();
-
-    await expect(page.locator("text=/phone.*required/i")).toBeVisible();
+    // Check that submit button is disabled
+    const submitButton = page.getByRole("button", {
+      name: /submit|register|sign up|done/i,
+    });
+    await expect(submitButton).toBeDisabled();
   });
 
   test("TC1-16: Duplicate Phone Number", async ({ page }) => {
@@ -278,7 +297,11 @@ test.describe("US2-1: Customer Registration", () => {
       .getByRole("button", { name: /submit|register|sign up|done/i })
       .click();
 
-    await expect(page.locator("text=/phone.*already.*use/i")).toBeVisible();
+    await expect(
+      page.locator(
+        "text=/This phone number is already taken.*Please choose a different one/i"
+      )
+    ).toBeVisible();
   });
 
   test("TC1-17: Consent Not Checked", async ({ page }) => {
@@ -291,12 +314,10 @@ test.describe("US2-1: Customer Registration", () => {
     await page.getByLabel(/phone/i).fill("5555555555");
     // Consent not checked
 
-    await page
-      .getByRole("button", { name: /submit|register|sign up|done/i })
-      .click();
-
-    await expect(
-      page.locator("text=/consent.*required|agree.*terms/i")
-    ).toBeVisible();
+    // Check that submit button is disabled
+    const submitButton = page.getByRole("button", {
+      name: /submit|register|sign up|done/i,
+    });
+    await expect(submitButton).toBeDisabled();
   });
 });
