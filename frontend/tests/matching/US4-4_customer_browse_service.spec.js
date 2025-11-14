@@ -15,6 +15,7 @@ test.describe("US4-4: Customer Browse Service", () => {
     await page.goto("http://localhost:3000/service/");
   });
 
+  //TODO: PLEASE COMMENT THIS ENTIRE TEST ON PRODUCTION TESTING
   test("TC2-20: Browse Services", async ({ page }) => {
     // Wait for service cards to load
     await page.waitForSelector('[data-testid="service-card"]');
@@ -36,4 +37,25 @@ test.describe("US4-4: Customer Browse Service", () => {
       page.locator('[data-testid="service-card"]:has-text("Training")')
     ).toBeVisible();
   });
+
+  //TODO: PLEASE UNCOMMENT THIS ENTIRE TEST ON PRODUCTION TESTING
+  // test("TC2-20: Browse Services (ACTUAL TEST PLAN)", async ({ page }) => {
+  //   await page.waitForSelector('[data-testid="service-card"]');
+
+  //   await expect(
+  //     page.locator('[data-testid="service-card"]:has-text("Service1")')
+  //   ).toBeVisible();
+  //   await expect(
+  //     page.locator('[data-testid="service-card"]:has-text("Service2")')
+  //   ).toBeVisible();
+  //   await expect(
+  //     page.locator('[data-testid="service-card"]:has-text("Service3")')
+  //   ).toBeVisible();
+  //   await expect(
+  //     page.locator('[data-testid="service-card"]:has-text("Service4")')
+  //   ).toBeVisible();
+  //   await expect(
+  //     page.locator('[data-testid="service-card"]:has-text("Service5")')
+  //   ).toBeVisible();
+  // });
 });
