@@ -13,7 +13,14 @@ const { getRoomCap } = require("./logics/room");
 
 const getBookedRooms = async (req, res) => {
   try {
-    const bookedRooms = await prisma.bookedRoom.findMany();
+    const bookedRooms = await prisma.bookedRoom.findMany({
+      include: {
+        room: true,
+        pet: true,
+        booking: true,
+      }
+    });
+
     if (bookedRooms.length === 0)
       return sendErrorResponse(
         res,
@@ -21,12 +28,24 @@ const getBookedRooms = async (req, res) => {
         "NO_DATA_FOUND",
         "No room bookings found"
       );
+
+    const formattedRooms = bookedRooms.map((br) => ({
+      bookingId: br.bookingId,
+      roomId: br.roomId,
+      roomImage: br.room.picture ?? null,
+      petId: br.petId,
+      petName: br.pet?.name ?? null,
+      checkIn: br.checkIn,
+      checkOut: br.checkOut,
+      petStatus: br.pet?.status ?? null,
+      roomName: br.room.name,
+    }));
     return sendSuccessResponse(
       res,
       200,
       "LOADED_SUCCESSFULLY",
       "Room bookings loaded",
-      bookedRooms
+      formattedRooms
     );
   } catch (err) {
     return sendErrorResponse(

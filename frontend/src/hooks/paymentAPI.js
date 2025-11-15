@@ -2,9 +2,14 @@ import axiosInstance from "../api/axiosInstance"
 
 const API_URL = "/api/v1/payments"
 
-export const fetchMyPayments = async() =>{
+export const fetchMyPayments = async(page=1,limit =10) =>{
     try{
-        const response = await axiosInstance.get(`${API_URL}/mine`)
+        const response = await axiosInstance.get(`${API_URL}/mine`,{
+          params:{
+            page,
+            limit
+          }
+        })
         return response.data
     }
     catch(error){

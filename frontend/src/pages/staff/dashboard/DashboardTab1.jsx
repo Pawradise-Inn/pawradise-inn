@@ -4,7 +4,7 @@ import DashboardCard from "../../../components/dashboard/DashboardCard";
 // --- API Functions (adjust path as needed) ---
 // Now using the new bookedRoomAPI functions
 import {
-  getTodayRoom,
+  fetchAllBookedRoomsAPI,
 } from "../../../hooks/bookedRoomAPI";
 import Overlay from "../../../components/Overlay";
 import { overlay, popUP } from "../../../styles/animation";
@@ -20,9 +20,18 @@ const DashboardTab1 = () => {
     const loadRooms = async () => {
       try {
         setLoading(true);
-        const response = await getTodayRoom();
+        const response = await fetchAllBookedRoomsAPI();
+        //console.log(response.data);
         // Ensure we're setting an array, even if empty
-        setItems(Array.isArray(response?.data) ? response.data : []);
+        const useData = [];
+        const today = new Date()
+        const filtered = response?.data.filter(item => {
+            const checkOut = new Date(item.checkOut);
+            const checkIn = new Date(item.checkIn)
+            return checkOut > today && checkIn < today;
+        });
+        console.log(filtered)
+        setItems(filtered);
       } catch (error) {
         console.error("Failed to fetch rooms:", error);
         setItems([]); // Set empty array on error
