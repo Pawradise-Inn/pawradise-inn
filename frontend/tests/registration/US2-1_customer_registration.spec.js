@@ -326,7 +326,7 @@ test.describe.serial("US2-1: Customer Registration", () => {
 
 // Separate describe block for cleanup - runs after all registration tests
 test.describe("US2-1: Cleanup", () => {
-  test("Delete Registered Account", async ({ page }) => {
+  test("US2-1: Cleanup - Delete Registered Account", async ({ page }) => {
     // Login with registered credentials
     await page.goto("http://localhost:3000/login");
     await page.fill('input[name="Username"]', "bungRakRoti");

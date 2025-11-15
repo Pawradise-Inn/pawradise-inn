@@ -62,7 +62,7 @@ test.describe("US4-1: Customer Search Room by Date", () => {
     ).toBeVisible();
   });
 
-  test("TC2-2: Checkout in Past", async ({ page }) => {
+  test("TC2-2: Check-out Date in Past", async ({ page }) => {
     // Select check-in: November 20, 2025
     await selectDate(page, 0, 20);
 
@@ -74,7 +74,7 @@ test.describe("US4-1: Customer Search Room by Date", () => {
     ).toBeVisible();
   });
 
-  test("TC2-3: Checkout Before Checkin", async ({ page }) => {
+  test("TC2-3: Check-out Date Before Check-in Date", async ({ page }) => {
     // Select check-in: November 20, 2025
     await selectDate(page, 0, 20);
 
@@ -86,7 +86,7 @@ test.describe("US4-1: Customer Search Room by Date", () => {
     ).toBeVisible();
   });
 
-  test("TC2-4: Checkin in Past", async ({ page }) => {
+  test("TC2-4: Check-in Date in Past", async ({ page }) => {
     // Select check-in: November 4, 2025
     await selectDate(page, 0, 4);
 
@@ -98,7 +98,7 @@ test.describe("US4-1: Customer Search Room by Date", () => {
     ).toBeVisible();
   });
 
-  test("TC2-5: Checkin and Checkout in Past", async ({ page }) => {
+  test("TC2-5: Check-in Date and Check-out Date in Past", async ({ page }) => {
     // Select check-in: November 4, 2025
     await selectDate(page, 0, 4);
 
@@ -110,7 +110,9 @@ test.describe("US4-1: Customer Search Room by Date", () => {
     ).toBeVisible();
   });
 
-  test("TC2-6: Checkin and Checkout in Past, Same Day", async ({ page }) => {
+  test("TC2-6: Check-in Date and Check-out Date are Same Day - Past [1]", async ({
+    page,
+  }) => {
     // Select check-in: November 4, 2025
     await selectDate(page, 0, 4);
 
@@ -122,7 +124,9 @@ test.describe("US4-1: Customer Search Room by Date", () => {
     ).toBeVisible();
   });
 
-  test("TC2-7: Checkin and Checkout Same Day - Future", async ({ page }) => {
+  test("TC2-7: Check-in Date and Check-out Date are Same Day - Future [1]", async ({
+    page,
+  }) => {
     // Select check-in: November 21, 2025
     await selectDate(page, 0, 21);
 
@@ -134,7 +138,9 @@ test.describe("US4-1: Customer Search Room by Date", () => {
     ).toBeVisible();
   });
 
-  test("TC2-8: Checkin and Checkout Same Day - Past", async ({ page }) => {
+  test("TC2-8: Check-in Date and Check-out Date are Same Day - Past [2]", async ({
+    page,
+  }) => {
     // Select check-in: November 6, 2025
     await selectDate(page, 0, 6);
 
@@ -146,7 +152,7 @@ test.describe("US4-1: Customer Search Room by Date", () => {
     ).toBeVisible();
   });
 
-  test("TC2-9: Checkin and Checkout Same Day - Future (Duplicate)", async ({
+  test("TC2-9: Check-in Date and Check-out Date are Same Day - Future [2]", async ({
     page,
   }) => {
     // Select check-in: November 22, 2025
@@ -160,7 +166,9 @@ test.describe("US4-1: Customer Search Room by Date", () => {
     ).toBeVisible();
   });
 
-  test("TC2-10: Checkin After Checkout", async ({ page }) => {
+  test("TC2-10: Check-in Date After Check-out Date - Future", async ({
+    page,
+  }) => {
     // Select check-in: November 29, 2025
     await selectDate(page, 0, 29);
 
@@ -172,7 +180,9 @@ test.describe("US4-1: Customer Search Room by Date", () => {
     ).toBeVisible();
   });
 
-  test("TC2-11: Checkin After Checkout - Past", async ({ page }) => {
+  test("TC2-11: Check-in Date After Check-out Date - Past", async ({
+    page,
+  }) => {
     // Select check-in: November 22, 2025
     await selectDate(page, 0, 22);
 

@@ -199,7 +199,9 @@ test.describe("US2-3: Customer Edit Profile - Validation Tests", () => {
 
 // Separate describe block for cleanup - resets testcustomer01 profile
 test.describe("US2-3: Cleanup", () => {
-  test("Reset Customer Profile to Original", async ({ page }) => {
+  test("US2-3: Cleanup - Reset Customer Profile to Original", async ({
+    page,
+  }) => {
     // Login with updated credentials
     await page.goto("http://localhost:3000/login");
     await page.fill('input[name="Username"]', "bungRakRoti");
