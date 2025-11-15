@@ -1,24 +1,40 @@
 import { test, expect } from "@playwright/test";
 
+// Helper function to login as customer
+async function loginAsCustomer(page) {
+  await page.goto("http://localhost:3000/login");
+  await page.fill('input[name="Username"]', "testcustomer01");
+  await page.fill('input[name="Password"]', "testcustomer01");
+  await page.getByRole("button", { name: /login/i }).click();
+  await page.waitForURL(/\/room/);
+}
+
 test.describe("US4-2: Customer Search Service", () => {
   test.beforeEach(async ({ page }) => {
-    // Login as customer
-    await page.goto("http://localhost:3000/login");
-    // Add login steps here
-    await page.goto("http://localhost:3000/service"); // Adjust URL as needed
+    await loginAsCustomer(page);
+    await page.goto("http://localhost:3000/service/");
   });
 
   test("TC2-17: Search Existing Service", async ({ page }) => {
-    await page.fill('input[name="serviceName"]', "Grooming");
-    await page.click('button[type="submit"]');
+    // Fill in the search input
+    await page.locator('input[placeholder="search"]').fill("Grooming");
 
-    await expect(page.locator("text=Grooming")).toBeVisible();
+    // Verify Grooming service card is visible
+    await expect(
+      page.locator('[data-testid="service-card"]:has-text("Grooming")')
+    ).toBeVisible();
   });
 
   test("TC2-18: Search Non-Existing Service", async ({ page }) => {
-    await page.fill('input[name="serviceName"]', "Walking");
-    await page.click('button[type="submit"]');
+    // Fill in the search input
+    await page.locator('input[placeholder="search"]').fill("NonExistService");
 
+    // Verify no service cards are visible
+    await expect(
+      page.locator('[data-testid="service-card"]')
+    ).not.toBeVisible();
+
+    // Verify error message appears
     await expect(
       page.locator(
         "text=/Sorry.*your desired services is not on operation now/i"
@@ -27,16 +43,29 @@ test.describe("US4-2: Customer Search Service", () => {
   });
 
   test("TC2-19: Search Lowercase", async ({ page }) => {
-    await page.fill('input[name="serviceName"]', "grooming");
-    await page.click('button[type="submit"]');
+    // Fill in the search input with lowercase
+    await page.locator('input[placeholder="search"]').fill("grooming");
 
-    await expect(page.locator("text=Grooming")).toBeVisible();
+    // Verify Grooming service card is visible
+    await expect(
+      page.locator('[data-testid="service-card"]:has-text("Grooming")')
+    ).toBeVisible();
   });
 
   test("TC2-20: Search with Trailing Space", async ({ page }) => {
-    await page.fill('input[name="serviceName"]', " Grooming ");
-    await page.click('button[type="submit"]');
+    // Fill in the search input with trailing spaces
+    await page.locator('input[placeholder="search"]').fill("Grooming  ");
 
-    await expect(page.locator("text=Grooming")).toBeVisible();
+    // Verify no service cards are visible
+    await expect(
+      page.locator('[data-testid="service-card"]')
+    ).not.toBeVisible();
+
+    // Verify error message appears
+    await expect(
+      page.locator(
+        "text=/Sorry.*your desired services is not on operation now/i"
+      )
+    ).toBeVisible();
   });
 });
