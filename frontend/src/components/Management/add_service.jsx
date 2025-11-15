@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import DropDownList from "../DropDownList";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "motion/react";
 import { useNotification } from "../../context/notification/NotificationProvider";
 import { fetchPetTypesAPI } from "../../hooks/petAPI";
@@ -16,17 +15,34 @@ const AddServicePopup = ({
   const { createNotification } = useNotification();
 
   const [name, setName] = useState(initialData?.name || "");
-  const [petType, setPetType] = useState(initialData?.petType?.[0] || "");
+  const [petTypes, setPetTypes] = useState(initialData?.petType || []);
   const [price, setPrice] = useState(initialData?.price ?? "");
   const [image, setImage] = useState(initialData?.image || "");
   const [petTypeOptions, setPetTypeOptions] = useState([]);
+  const [showPetTypeDropdown, setShowPetTypeDropdown] = useState(false);
+  const petTypeDropdownRef = useRef(null);
 
   useEffect(() => {
     setName(initialData?.name || "");
-    setPetType(initialData?.petType?.[0] || "");
+    setPetTypes(initialData?.petType || []);
     setPrice(initialData?.price ?? "");
     setImage(initialData?.image || "");
   }, [initialData]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (petTypeDropdownRef.current && !petTypeDropdownRef.current.contains(event.target)) {
+        setShowPetTypeDropdown(false);
+      }
+    }
+    if (showPetTypeDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showPetTypeDropdown]);
 
   useEffect(() => {
 
@@ -46,9 +62,25 @@ const AddServicePopup = ({
     if (file) setImage(URL.createObjectURL(file));
   };
 
+  const handlePetTypeToggle = (type) => {
+    setPetTypes(prev => {
+      if (prev.includes(type)) {
+        // Remove if already selected
+        return prev.filter(t => t !== type);
+      } else {
+        // Add if not selected
+        return [...prev, type];
+      }
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault?.();
-    const payload = { name, petType:[petType], price: Number(price), image };
+    if (petTypes.length === 0) {
+      createNotification("fail", "Pet Type Required", "Please select at least one pet type.");
+      return;
+    }
+    const payload = { name, petType: petTypes, price: Number(price), image };
     onSave && onSave(payload);
   };
 
@@ -99,24 +131,64 @@ const AddServicePopup = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Pet type
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Pet type {petTypes.length > 0 && `(${petTypes.length} selected)`}
             </label>
-            <DropDownList
-              startText="Select..."
-              options={petTypeOptions.map((type) => ({
-                name: type,
-                value: type,
-              }))}
-              value={petType}
-              onChange={(value) => setPetType(value)}
-              inputSyle="mt-1 border rounded-md px-3 py-2"
-              dropDownStyle="bg-white border border-$var(--brown-color) origin-top translate-y-1"
-              arrowColor="var(--light-brown-color)"
-              activeColor="var(--service-available-color)"
-              focusStyle="outline-none ring border-blue-400"
-              element="addServiceType"
-            />
+            <div className="relative" ref={petTypeDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setShowPetTypeDropdown(!showPetTypeDropdown)}
+                className="mt-1 w-full border rounded-md px-3 py-2 text-left bg-white hover:bg-gray-50 focus:outline-none focus:ring focus:border-blue-400 flex items-center justify-between"
+              >
+                <span className={petTypes.length === 0 ? "text-gray-500" : ""}>
+                  {petTypes.length === 0 
+                    ? "Select pet types..." 
+                    : petTypes.join(", ")}
+                </span>
+                <i className={`bi bi-caret-${showPetTypeDropdown ? 'up' : 'down'}-fill text-gray-500`}></i>
+              </button>
+              
+              {showPetTypeDropdown && (
+                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {petTypeOptions.map((type) => {
+                    const isSelected = petTypes.includes(type);
+                    return (
+                      <label
+                        key={type}
+                        className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handlePetTypeToggle(type)}
+                          className="mr-3 h-4 w-4 text-[var(--brown-color)] focus:ring-[var(--brown-color)] border-gray-300 rounded"
+                        />
+                        <span className="text-sm">{type}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            {petTypes.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {petTypes.map((type) => (
+                  <span
+                    key={type}
+                    className="inline-flex items-center px-2 py-1 rounded-md bg-[var(--light-brown-color)] text-sm"
+                  >
+                    {type}
+                    <button
+                      type="button"
+                      onClick={() => handlePetTypeToggle(type)}
+                      className="ml-2 text-gray-600 hover:text-gray-800"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
