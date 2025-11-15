@@ -1,230 +1,363 @@
-// src/pages/room/RoomEdit.jsx
-import { useEffect, useMemo, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNotification } from "../../context/notification/NotificationProvider";
-import RoomCard from "../room/RoomCard";
-import AddRoomPopup from "./add_room";
+import DropDownList from "../DropDownList";
+import { motion } from "motion/react";
+import testImage from "../../assets/test.png";
+import { fetchPetTypesAPI } from "../../hooks/petAPI";
 
-import {
-  deleteRoomAPI,
-  fetchAllRoomsAPI,
-  fetchAllRoomsWithPaginationAPI,
-  updateRoomAPI,
-} from "../../hooks/roomAPI";
-import Overlay from "../Overlay";
-import { overlay, popUP } from "../../styles/animation";
-import { AnimatePresence } from "motion/react";
-
-const RoomEdit = () => {
+const AddRoomPopup = ({
+  title = "Add room",
+  initialData = null,
+  onClose,
+  onSave,
+  onDelete,
+  ...motionProps
+}) => {
   const { createNotification } = useNotification();
-  const [rooms, setRooms] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [timeoutReached, setTimeoutReached] = useState(false);
 
-  const [search, setSearch] = useState("");
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selected, setSelected] = useState(null);
+  const [status, setStatus] = useState(initialData?.status ?? "available");
+  const [forwhich, setForwhich] = useState(initialData?.forwhich ?? "DOG"); // pet type
+  const [price, setPrice] = useState(
+    initialData?.price !== undefined ? String(initialData.price) : ""
+  );
+  const [size, setSize] = useState(
+    initialData?.size !== undefined ? String(initialData.size) : ""
+  );
+  const [maxsize, setMaxsize] = useState(
+    initialData?.maxsize !== undefined ? String(initialData.maxsize) : ""
+  );
+  const [image, setImage] = useState(initialData?.image || null);
 
+  const [petTypeOptions, setPetTypeOptions] = useState([]);
+  const createdObjectUrl = useRef(null);
+  const isEdit = useMemo(() => Boolean(initialData?.roomId), [initialData]);
+
+  // Sync when editing existing room
   useEffect(() => {
-    let mounted = true;
-    const loadRooms = async () => {
-      setLoading(true);
-      setTimeoutReached(false);
-      setError(null);
+    setStatus(initialData?.status ?? "available");
+    setForwhich(initialData?.forwhich ?? "DOG");
+    setPrice(initialData?.price !== undefined ? String(initialData.price) : "");
+    setSize(initialData?.size !== undefined ? String(initialData.size) : "");
+    setMaxsize(
+      initialData?.maxsize !== undefined ? String(initialData.maxsize) : ""
+    );
+    setImage(initialData?.image || null);
+  }, [initialData]);
 
-      // Set timeout to show timeout message after 10 seconds
-      const timeoutId = setTimeout(() => {
-        if (mounted) setTimeoutReached(true);
-      }, 10000);
-
-      try {
-        const response = await fetchAllRoomsWithPaginationAPI();
-        console.log(response.data);
-        if (mounted) {
-          setRooms(Array.isArray(response) ? response : response.data || []);
-        }
-      } catch (err) {
-        console.error("Failed to fetch rooms:", err);
-        if (mounted) {
-          setError("Could not load rooms. Please try again later.");
-        }
-      } finally {
-        clearTimeout(timeoutId);
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadRooms();
-
+  // Lock scroll + cleanup image URL
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     return () => {
-      mounted = false;
+      document.body.style.overflow = prev;
+      if (createdObjectUrl.current) {
+        URL.revokeObjectURL(createdObjectUrl.current);
+        createdObjectUrl.current = null;
+      }
     };
   }, []);
 
-  const filtered = useMemo(() => {
-    if (rooms.length === 0) return rooms;
-    if (!search) return rooms;
-    const q = search.toLowerCase();
-    return rooms.filter(
-      (r) =>
-        String(r.roomId).includes(q) ||
-        (r.status ?? "").toLowerCase().includes(q) ||
-        (r.forwhich ?? "").toLowerCase().includes(q)
-    );
-  }, [rooms, search]);
+  // Close on ESC
+  useEffect(() => {
+    const onEsc = (ev) => ev.key === "Escape" && onClose?.();
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, [onClose]);
 
-  const openAdd = () => {
-    setSelected(null);
-    setIsPopupOpen(true);
-  };
-  const openEdit = (room) => {
-    setSelected(room);
-    setIsPopupOpen(true);
-  };
-  const closePopup = () => {
-    setIsPopupOpen(false);
-    setSelected(null);
-  };
+  // Load pet types from API (DOG, CAT, MOUSE, RABBIT, BIRD, etc.)
+  useEffect(() => {
+    const loadPetTypes = async () => {
+      try {
+        const response = await fetchPetTypesAPI();
+        // Expecting response.data to be an array like ["DOG", "CAT", ...]
+        const types = Array.isArray(response.data) ? response.data : [];
+        // Ensure uppercase as you requested
+        const upperTypes = types.map((t) => String(t).toUpperCase());
+        setPetTypeOptions(upperTypes);
 
-  // Map popup payload -> backend fields
-  const mapPayloadToBackend = (p) => ({
-    // UI fields: { forwhich, price, maxsize, image }
-    // createRoom requires: { capacity, price, petType, picture }
-    capacity: p.maxsize ?? p.size, // UI uses maxsize = capacity
-    price: p.price,
-    petType: p.forwhich, // "small"/"big"
-    picture: p.image, // URL or string per your backend
-  });
-
-  const handleSaveRoom = async (payload) => {
-    try {
-      if (selected) {
-        // EDIT MODE
-        const response = await updateRoomAPI(selected.roomId, payload);
-        const updatedRoom = response.data;
-        setRooms((prev) =>
-          prev.map((item) =>
-            item.roomId === updatedRoom.roomId ? updatedRoom : item
-          )
+        // If current forwhich is not in the list, default to the first option
+        if (upperTypes.length > 0 && !upperTypes.includes(forwhich)) {
+          setForwhich(upperTypes[0]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch pet types: ", err);
+        createNotification(
+          "fail",
+          "Failed to load pet types",
+          "Could not load pet type options. Please try again later."
         );
-      } else {
-        // ADD MODE - Note: You need to import addRoomAPI
-        // const response = await addRoomAPI(payload);
-        // const newRoom = response.data;
-        // setRooms((prev) => [newRoom, ...prev]);
+        // Optional fallback
+        const fallbackTypes = ["DOG", "CAT", "MOUSE", "RABBIT", "BIRD"];
+        setPetTypeOptions(fallbackTypes);
       }
-      closePopup();
-    } catch (err) {
-      console.error("Failed to save room:", err);
+    };
+
+    loadPetTypes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (createdObjectUrl.current) {
+      URL.revokeObjectURL(createdObjectUrl.current);
+      createdObjectUrl.current = null;
     }
+
+    const url = URL.createObjectURL(file);
+    createdObjectUrl.current = url;
+    setImage(url);
   };
 
-  const handleDeleteRoom = async (roomId) => {
-    try {
-      await deleteRoomAPI(roomId);
-      setRooms((prev) => prev.filter((r) => r.roomId !== roomId));
-      closePopup();
-    } catch (err) {
-      console.error("Failed to delete room:", err);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const nPrice = Number(price);
+    const nSize = Number(size);
+    const nMax = Number(maxsize);
+
+    if (!Number.isFinite(nPrice) || nPrice < 0) {
+      return createNotification(
+        "fail",
+        "Invalid price",
+        "Price must be a non-negative number."
+      );
     }
+
+    if (!Number.isFinite(nSize) || nSize < 0) {
+      return createNotification(
+        "fail",
+        "Invalid current size",
+        "Current size must be a non-negative number."
+      );
+    }
+
+    if (!Number.isFinite(nMax) || nMax < 0) {
+      return createNotification(
+        "fail",
+        "Invalid max size",
+        "Max size must be a non-negative number."
+      );
+    }
+
+    if (nSize > nMax) {
+      return createNotification(
+        "fail",
+        "Invalid current size",
+        "Current size cannot exceed max size."
+      );
+    }
+
+    if (!forwhich) {
+      return createNotification(
+        "fail",
+        "Pet type required",
+        "Please select a pet type for this room."
+      );
+    }
+
+    const payload = {
+      status,
+      forwhich, // pet type from API
+      price: nPrice,
+      size: nSize,
+      maxsize: nMax,
+      image, // preview URL; replace with uploaded URL when integrating storage
+      // review & pageAmount stay unchanged in parent on edit
+    };
+
+    onSave?.(payload);
   };
 
-  if (loading) {
-    return (
-      <p className="text-2xl w-full text-center mt-32">Loading services...</p>
+  const handleDelete = () => {
+    if (!isEdit) return;
+    const ok = window.confirm(
+      `Delete Room #${initialData.roomId}? This cannot be undone.`
     );
-  }
-
-  if (error) {
-    return (
-      <p className="text-2xl w-full text-center mt-32 text-red-500">{error}</p>
-    );
-  }
+    if (ok) onDelete?.(initialData.roomId);
+  };
 
   return (
-    <main className="flex-1">
-      {/* Top bar */}
-      <div className="max-w-7xl mx-auto w-full px-4 md:px-8">
-        <div className="flex items-center my-8 w-full">
-          <div className="flex flex-1 border-2 rounded-4xl px-6 py-4 text-3xl">
-            <i className="bi bi-search opacity-50 pr-2 flex justify-center items-center -bottom-1 relative"></i>
-            <input
-              className="w-full outline-0 placeholder:opacity-75 text-2xl"
-              placeholder="search"
-              onChange={(e) => setSearch(e.target.value)}
-              value={search}
-            />
-          </div>
-
-          <div className="flex gap-6 ml-8">
-            <button
-              onClick={openAdd}
-              className="px-12 py-4 font-semibold bg-[var(--light-brown-color)] rounded transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 text-xl w-40 cursor-pointer"
-            >
-              add
-            </button>
-          </div>
-        </div>
+    <motion.div
+      className="bg-white rounded-3xl p-8 w-[680px] max-w-full flex flex-col gap-6 shadow-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
+      {...motionProps}
+    >
+      <div className="flex items-start justify-between">
+        <h2 className="text-3xl font-bold text-[var(--dark-brown-color)]">
+          {title}
+        </h2>
+        <button
+          className="text-2xl px-3 py-1 rounded hover:bg-gray-100 cursor-pointer transition-all duration-150"
+          aria-label="Close"
+          onClick={onClose}
+        >
+          ×
+        </button>
       </div>
 
-      {/* Grid / states */}
-      {loading ? (
-        timeoutReached ? (
-          <p className="text-2xl w-full text-center mt-32 italic text-red-600">
-            Server not responding. Please try again later.
-          </p>
-        ) : (
-          <p className="text-2xl w-full text-center mt-32 italic">Loading…</p>
-        )
-      ) : filtered.length === 0 ? (
-        <p className="text-2xl w-full text-center mt-32 italic">No result.</p>
-      ) : (
-        <div className="px-4 md:px-8">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {filtered.map((r) => (
-              <RoomCard
-                key={r.roomId}
-                data={r}
-                actionLabel="EDIT"
-                onClick={() => openEdit(r)}
+      <form id="room-form" onSubmit={handleSubmit} className="flex gap-6">
+        <div className="flex flex-col flex-1 space-y-4">
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Status
+            </label>
+            <DropDownList
+              startText="Select..."
+              options={["available", "full", "maintenance"].map((type) => ({
+                name: type,
+                value: type,
+              }))}
+              value={status}
+              onChange={(value) => setStatus(value)}
+              inputSyle="mt-1 border rounded-md px-3 py-2"
+              dropDownStyle="bg-white border border-$var(--brown-color) origin-top translate-y-1"
+              arrowColor="var(--light-brown-color)"
+              activeColor="var(--service-available-color)"
+              focusStyle="outline-none ring border-blue-400"
+              element="addRoomStatus"
+            />
+          </div>
+
+          {/* Pet type from API */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Pet type
+            </label>
+            <DropDownList
+              startText="Select..."
+              options={petTypeOptions.map((type) => ({
+                name: type,
+                value: type,
+              }))}
+              value={forwhich}
+              onChange={(value) => setForwhich(value)}
+              inputSyle="mt-1 border rounded-md px-3 py-2"
+              dropDownStyle="bg-white border border-$var(--brown-color) origin-top translate-y-1"
+              arrowColor="var(--light-brown-color)"
+              activeColor="var(--service-available-color)"
+              focusStyle="outline-none ring border-blue-400"
+              element="addRoomType"
+            />
+          </div>
+
+          {/* Price */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Price
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+              required
+            />
+          </div>
+
+          {/* Size / Max size */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Current size
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={size}
+                onChange={(e) => setSize(e.target.value)}
+                className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+                required
               />
-            ))}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Max size
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={maxsize}
+                onChange={(e) => setMaxsize(e.target.value)}
+                className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+                required
+              />
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Popup */}
-      <AnimatePresence mode="popLayout">
-        {isPopupOpen && (
-          <div>
-            <Overlay
-              bgColor="black"
-              variants={overlay}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-            />
-            <AddRoomPopup
-              variants={popUP}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              title={selected ? `Edit Room #${selected.roomId}` : "Add room"}
-              initialData={selected}
-              onClose={closePopup}
-              onSave={handleSaveRoom}
-              onDelete={(id) => handleDeleteRoom(id)}
-            />
-          </div>
+        {/* Image */}
+        <div className="flex flex-col items-center justify-center">
+          <label className="cursor-pointer">
+            <div className="w-40 h-40 flex items-center justify-center border-2 border-dashed rounded-md bg-gray-100 relative overflow-hidden">
+              {image ? (
+                <img
+                  src={image || testImage}
+                  alt="preview"
+                  className="w-full h-full object-cover rounded-md"
+                />
+              ) : (
+                <span className="text-4xl text-gray-500">+</span>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </div>
+            <p className="text-xs text-center mt-1 text-gray-500">
+              click to change pic
+            </p>
+          </label>
+
+          {isEdit && (
+            <p className="text-xs text-gray-500 mt-3">
+              Editing:{" "}
+              <span className="font-mono">Room #{initialData.roomId}</span>
+            </p>
+          )}
+        </div>
+      </form>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between">
+        {isEdit ? (
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700"
+          >
+            Delete
+          </button>
+        ) : (
+          <span />
         )}
-      </AnimatePresence>
 
-      <Outlet className="overflow-y-hidden" />
-    </main>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 rounded-md border border-gray-300"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="room-form"
+            className="px-4 py-2 rounded-md bg-[var(--light-brown-color)]"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 
-export default RoomEdit;
+export default AddRoomPopup;
