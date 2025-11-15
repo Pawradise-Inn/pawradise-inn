@@ -1,7 +1,7 @@
 const getDateValidation = (entryDate, exitDate) => {
   let data = { status: true, warningText: "" };
+  if (!entryDate && !exitDate) return null;
   if (!exitDate) {
-    console.log("hi")
     if (entryDate.getTime() < new Date()) {
       data.status = false;
       data.warningText = "Entry date must be later than today.";
