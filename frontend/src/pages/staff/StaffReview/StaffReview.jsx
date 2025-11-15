@@ -5,6 +5,7 @@ import StarFilter from "../../../components/staffReview/StarFilter";
 import Pagination from "../../../components/Pagination";
 import DateDropDown from "../../../components/DateDropDown";
 import { getChatLogsAPI } from "../../../hooks/chatlogAPI";
+import { formatDateForAPI } from "../../../utils/dateUtils";
 
 // --- Main Component ---
 const StaffReviewPage = () => {
@@ -54,7 +55,8 @@ const StaffReviewPage = () => {
           filters.rating = starFilter;
         }
         if (dateFilter) {
-          filters.review_date = dateFilter;
+          // Format date to YYYY-MM-DD to avoid timezone issues
+          filters.review_date = formatDateForAPI(dateFilter);
         }
         if (search) {
           filters.search = search;

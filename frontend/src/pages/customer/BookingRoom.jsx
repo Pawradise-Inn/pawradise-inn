@@ -16,6 +16,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import DateDropDown from "../../components/DateDropDown";
 import { fetchPetTypesAPI } from "../../hooks/petAPI";
 import CartButton from "../../components/Cart/CartButton";
+import { formatDateForAPI } from "../../utils/dateUtils";
 const BookingRoom = () => {
   const { createNotification } = useNotification();
   const [petTypes, setPetTypes] = useState([null]);
@@ -92,9 +93,13 @@ const BookingRoom = () => {
         );
         if (validatedDate.status) {
           try {
+            // Format dates to avoid timezone issues
+            const formattedEntryDate = formatDateForAPI(filter.entryDate);
+            const formattedExitDate = formatDateForAPI(filter.exitDate);
+            
             const availableRooms = await fetchAvailableRoomsAPI(
-              filter.entryDate,
-              filter.exitDate
+              formattedEntryDate,
+              formattedExitDate
             );
             const filteredByPet = filterWithPet(availableRooms.data);
             

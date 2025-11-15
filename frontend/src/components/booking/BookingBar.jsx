@@ -5,6 +5,7 @@ import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import { addRoomToCart, addServiceToCart } from "../../hooks/cartAPI";
 import { fetchCustomerPets, fetchAvailablePetAPI } from "../../hooks/petAPI";
 import { fetchRoomStatusAPI, fetchRoomReviewsAPI } from "../../hooks/roomAPI";
+import { formatDateForAPI } from "../../utils/dateUtils";
 import {
   fetchServiceReviewsAPI,
   getServiceStatusAPI,
@@ -161,8 +162,8 @@ const BookingBar = ({ data, popupStatus, onClick }) => {
         body = {
           roomId: data.id,
           petId: currentPetId,
-          checkIn: formData.entryDate,
-          checkOut: formData.exitDate,
+          checkIn: formatDateForAPI(formData.entryDate),
+          checkOut: formatDateForAPI(formData.exitDate),
         };
   
         await addRoomToCart(body);
