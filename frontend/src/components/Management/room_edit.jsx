@@ -39,7 +39,8 @@ const RoomEdit = () => {
       }, 10000);
 
       try {
-        const response = await fetchAllRoomsAPI();
+        const response = await fetchAllRoomsWithPaginationAPI();
+        console.log(response.data);
         if (mounted) {
           setRooms(Array.isArray(response) ? response : response.data || []);
         }
@@ -187,7 +188,6 @@ const RoomEdit = () => {
               <RoomCard
                 key={r.roomId}
                 data={r}
-                compact
                 actionLabel="EDIT"
                 onClick={() => openEdit(r)}
               />
