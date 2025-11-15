@@ -27,7 +27,7 @@ const CartItem = ({ item, onSelect, isSelected, onDelete }) => {
                 type="checkbox"
                 checked={isSelected}
                 onChange={() => onSelect(item.uniqueId)} // Pass the uniqueId up
-                className="h-6 w-6 rounded border-gray-300 accent-[var(--brown-color)] !focus:ring-[var(--light-brown-color)] mr-6 md:mr-8 flex-shrink-0"            
+                className="h-6 w-6 rounded border-gray-300 accent-[var(--brown-color)] !focus:ring-[var(--light-brown-color)] mr-6 md:mr-8 flex-shrink-0 cursor-pointer"            
             />
             {/* Image */}
             <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center text-sm flex-shrink-0 mr-6 md:mr-8">
@@ -57,7 +57,7 @@ const CartItem = ({ item, onSelect, isSelected, onDelete }) => {
 
                 <button
                     onClick={() => onDelete(item.uniqueId)} // Pass id and type up
-                    className="bg-[var(--brown-color)] !text-[var(--cream-color)] px-6 py-2.5 rounded-md font-semibold text-base capitalize hover:bg-yellow-800 transition-colors"
+                    className="bg-[var(--brown-color)] !text-[var(--cream-color)] px-6 py-2.5 rounded-md font-semibold text-base capitalize hover:bg-yellow-800 transition-colors cursor-pointer"
                 >
                     delete
                 </button>

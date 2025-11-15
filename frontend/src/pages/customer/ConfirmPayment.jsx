@@ -259,7 +259,7 @@ const ConfirmPayment = () => {
           <button
             type="button"
             onClick={() => navigate("/cart")}
-            className="px-8 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-300 transition-colors"
+            className="px-8 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-300 transition-colors cursor-pointer"
           >
             Cancel
           </button>
@@ -267,7 +267,7 @@ const ConfirmPayment = () => {
             type="button"
             disabled={isCooldown}
             onClick={handleDone}
-            className={`px-10 py-3 font-semibold rounded-lg shadow-md transition-colors ${
+            className={`px-10 py-3 font-semibold rounded-lg shadow-md transition-colors cursor-pointer ${
               isCooldown
                 ? "bg-gray-400 cursor-not-allowed text-white"
                 : "bg-amber-800 hover:bg-amber-900 text-white"

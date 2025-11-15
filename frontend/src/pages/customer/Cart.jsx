@@ -301,7 +301,7 @@ const Cart = () => {
                             id="select-all"
                             checked={isAllSelected}
                             onChange={handleSelectAll}
-                            className="h-6 w-6 rounded border-gray-300 accent-[var(--brown-color)] !focus:ring-[var(--light-brown-color)] mr-3 flex-shrink-0"
+                            className="h-6 w-6 rounded border-gray-300 accent-[var(--brown-color)] !focus:ring-[var(--light-brown-color)] mr-3 flex-shrink-0 cursor-pointer"
                             data-testid="check-all"
                         />
                         <label
@@ -331,7 +331,7 @@ const Cart = () => {
                                 }
                             }}
                             disabled = {total === 0}
-                            className="bg-[var(--brown-color)] !text-[var(--cream-color)] px-8 py-3 rounded-lg font-bold capitalize hover:bg-yellow-800 transition-colors text-lg"
+                            className="bg-[var(--brown-color)] !text-[var(--cream-color)] px-8 py-3 rounded-lg font-bold capitalize hover:bg-yellow-800 transition-colors text-lg cursor-pointer"
                         >
                             payment
                         </button>
