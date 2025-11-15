@@ -198,7 +198,7 @@ test.describe("US2-3: Customer Edit Profile - Validation Tests", () => {
 });
 
 // Separate describe block for cleanup - resets testcustomer01 profile
-test.describe("US2-3: Cleanup", () => {
+test.describe("US2-3: Cleanup - Reset Customer Profile to Original", () => {
   test("US2-3: Cleanup - Reset Customer Profile to Original", async ({
     page,
   }) => {

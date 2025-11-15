@@ -250,7 +250,7 @@ test.describe("US2-4: Staff Edit Profile - Validation Tests", () => {
 });
 
 // Separate describe block for cleanup - resets teststaff01 profile
-test.describe("US2-4: Cleanup", () => {
+test.describe("US2-4: Cleanup - Reset Staff Profile to Original", () => {
   test("US2-4: Cleanup - Reset Staff Profile to Original", async ({ page }) => {
     // Login with updated credentials
     await page.goto("http://localhost:3000/login");
