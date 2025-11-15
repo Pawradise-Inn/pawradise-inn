@@ -116,14 +116,29 @@ const ProfileComp = () => {
           console.log(user.role)
           if(user.role === 'CUSTOMER'){
             const { id, ...userObjected } = newUser;
-            const data = await updateCustomerAPI(user.customer.id, userObjected);
-            setUser?.(data.data);
+            // Check if customer object exists, if not use the id from newUser
+            const customerId = user.customer?.id || user.id;
+            const data = await updateCustomerAPI(customerId, userObjected);
+            // Preserve the original user structure
+            const updatedUser = {
+              ...user,
+              ...data.data,
+              id: id,
+              customer: user.customer // Preserve customer object
+            };
+            setUser?.(updatedUser);
           }
           else if(user.role === 'STAFF'){
             const { id, customer, ...userObjected } = newUser;
             const data = await updateStaffProfileAPI(user.id, userObjected);
             console.log(data)
-            setUser?.(data.data.updatedUser);
+            // Preserve the original user structure
+            const updatedUser = {
+              ...user,
+              ...data.data.updatedUser,
+              id: id
+            };
+            setUser?.(updatedUser);
           }
         } catch (err) {
           console.error("Update failed:", err);

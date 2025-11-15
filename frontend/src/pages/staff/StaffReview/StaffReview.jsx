@@ -24,7 +24,7 @@ const StaffReviewPage = () => {
 
   const DateFilterRef = forwardRef(({ value, onClick, className }, ref) => (
     <button type="button" onClick={onClick} className={className} ref={ref}>
-      {value || "mm/dd/yyyy"}
+      {value || "dd/mm/yyyy"}
     </button>
   ));
 
