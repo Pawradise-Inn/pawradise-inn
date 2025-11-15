@@ -41,7 +41,7 @@ const DashboardCard = ({ data, onClick}) => {
   const statusCircleStyle = {
     width: "12px",
     height: "12px",
-    backgroundColor: getStatusColor(data.petStatus),
+    backgroundColor: getStatusColor(data.roomStatus),
     borderRadius: "50%",
 
   };
@@ -54,9 +54,9 @@ const DashboardCard = ({ data, onClick}) => {
   };
   return (
     <div style={cardStyle} onClick={onClick}>
-      <img src={data.serviceImage ||data.roomImage || testImage} className="object-center rounded-2xl w-[140px] h-[140px]"></img>
+      <img src={data.roomImage || testImage} className="object-center rounded-2xl w-[140px] h-[140px]"></img>
       <div style={textContainerStyle}>
-        <p style={nameStyle}>{data.serviceName || data.roomName}</p>
+        <p style={nameStyle}>{data.roomName}</p>
         <p style={detailStyle}>{data.petName}</p>
         <div style={detailStyle}>
         {data.timeBooked ? (
@@ -84,7 +84,7 @@ const DashboardCard = ({ data, onClick}) => {
       <div style={statusBoxContainerStyle}>
         <div style={statusBox}>
           <div style={statusCircleStyle}></div>
-          <span style={statusTextStyle}>{data.petStatus}</span>
+          <span style={statusTextStyle}>{data.roomStatus}</span>
         </div>
       </div>
     </div>

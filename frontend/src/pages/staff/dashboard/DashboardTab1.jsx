@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import DashboardCard from "../../../components/dashboard/DashboardCard";
+import DashboardCard from "../../../components/dashboard/Room_dashboardCard";
 // --- API Functions (adjust path as needed) ---
 // Now using the new bookedRoomAPI functions
 import {

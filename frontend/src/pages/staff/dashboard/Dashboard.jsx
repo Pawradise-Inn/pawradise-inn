@@ -30,6 +30,7 @@ const Dashboard = () => {
           getTodayCheckOuts(),
         ]);
         
+        const today = new Date()
         // Put the data into a single state object
         const allData = {
           roomBookings: 
@@ -50,7 +51,7 @@ const Dashboard = () => {
           checkOut: allData.checkOut.length,
           services: allData.serviceBookings.length,
         });
-        console.log(allData)
+        console.log("all data", allData)
 
       } catch (error) {
         console.error("Failed to load dashboard data:", error);

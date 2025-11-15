@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import DashboardCard from "../../../components/dashboard/DashboardCard";
+import DashboardCard from "../../../components/dashboard/Service_dashboardCard";
 
 // --- API Functions (adjust path as needed) ---
 // Change this in: src/pages/staff/dashboard/DashboardTab4.jsx

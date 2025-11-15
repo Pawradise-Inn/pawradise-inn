@@ -313,6 +313,7 @@ const getTodayServices = async (req, res) => {
       petName: bs.pet?.name ?? null,
       timeBooked: bs.scheduled,
       petStatus: bs.pet?.status ?? null,
+      serviceStatus:bs.status
     }));
 
     return sendSuccessResponse(res, 200, "LOADED_SUCCESSFULLY", "Today's services loaded", formattedServices);

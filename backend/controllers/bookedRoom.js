@@ -39,6 +39,7 @@ const getBookedRooms = async (req, res) => {
       checkOut: br.checkOut,
       petStatus: br.pet?.status ?? null,
       roomName: br.room.name,
+      roomStatus: br.status
     }));
     return sendSuccessResponse(
       res,
@@ -343,6 +344,7 @@ const getTodayRooms = async (req, res) => {
       checkOut: br.checkOut,
       petStatus: br.pet?.status ?? null,
       roomName: br.room.name,
+      roomStatus:br.status
     }));
 
     return sendSuccessResponse(
@@ -394,6 +396,7 @@ const getTodayCheckOuts = async (req, res) => {
       checkOut: br.checkOut,
       petStatus: br.pet?.status ?? null,
       roomName: br.room.name,
+      roomStatus:br.status
     }));
 
     return sendSuccessResponse(
