@@ -152,7 +152,7 @@ test.describe.serial("US2-1: Customer Registration", () => {
     await page.getByLabel(/username/i).fill("bungRakRoti");
     await page.getByLabel(/^password$/i).fill("roti12345678");
     await page.getByLabel(/confirm.*password/i).fill("roti12345678");
-    await page.getByLabel(/phone/i).fill("5555555555");
+    await page.getByLabel(/phone/i).fill("0961562155");
     await page.getByLabel(/consent|agree/i).check();
 
     await page
