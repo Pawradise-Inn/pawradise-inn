@@ -1,18 +1,20 @@
+// src/pages/room/RoomEdit.jsx
 import { useEffect, useMemo, useState } from "react";
 import { Outlet } from "react-router-dom";
+import { AnimatePresence } from "motion/react";
+
 import { useNotification } from "../../context/notification/NotificationProvider";
 import RoomCard from "../room/RoomCard";
 import AddRoomPopup from "./add_room";
 
 import {
   deleteRoomAPI,
-  fetchAllRoomsAPI,
   fetchAllRoomsWithPaginationAPI,
   updateRoomAPI,
+  // addRoomAPI, // uncomment when you want to support Add
 } from "../../hooks/roomAPI";
 import Overlay from "../Overlay";
 import { overlay, popUP } from "../../styles/animation";
-import { AnimatePresence } from "motion/react";
 
 const RoomEdit = () => {
   const { createNotification } = useNotification();
@@ -25,24 +27,35 @@ const RoomEdit = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selected, setSelected] = useState(null);
 
+  // 🔹 Load rooms from API
   useEffect(() => {
     let mounted = true;
+
     const loadRooms = async () => {
       setLoading(true);
       setTimeoutReached(false);
       setError(null);
 
-      // Set timeout to show timeout message after 10 seconds
       const timeoutId = setTimeout(() => {
         if (mounted) setTimeoutReached(true);
       }, 10000);
 
       try {
-        const response = await fetchAllRoomsWithPaginationAPI();
-        console.log(response.data);
+        const result = await fetchAllRoomsWithPaginationAPI();
+        // result can be:
+        // - the full envelope { success, data, ... }
+        // - or already the array, depending on your hook
+        console.log("Rooms API result:", result);
 
-         if (mounted) {
-          setRooms(Array.isArray(response) ? response : response.data || []);
+        let loadedRooms = [];
+        if (Array.isArray(result)) {
+          loadedRooms = result;
+        } else if (Array.isArray(result.data)) {
+          loadedRooms = result.data;
+        }
+
+        if (mounted) {
+          setRooms(loadedRooms);
         }
       } catch (err) {
         console.error("Failed to fetch rooms:", err);
@@ -64,71 +77,118 @@ const RoomEdit = () => {
     };
   }, []);
 
+  // 🔹 Search filter
   const filtered = useMemo(() => {
     if (rooms.length === 0) return rooms;
     if (!search) return rooms;
     const q = search.toLowerCase();
-    return rooms.filter(
-      (r) =>
-        String(r.roomId).includes(q) ||
-        (r.status ?? "").toLowerCase().includes(q) ||
-        (r.forwhich ?? "").toLowerCase().includes(q)
-    );
+
+    return rooms.filter((r) => {
+      const idStr = String(r.id ?? r.roomId ?? "").toLowerCase();
+      const statusStr = String(r.status ?? "").toLowerCase();
+      const petTypeStr = String(r.forWhich ?? r.petType ?? "").toLowerCase();
+      return (
+        idStr.includes(q) || statusStr.includes(q) || petTypeStr.includes(q)
+      );
+    });
   }, [rooms, search]);
 
   const openAdd = () => {
     setSelected(null);
     setIsPopupOpen(true);
   };
+
   const openEdit = (room) => {
     setSelected(room);
     setIsPopupOpen(true);
   };
+
   const closePopup = () => {
     setIsPopupOpen(false);
     setSelected(null);
   };
 
-  // Map popup payload -> backend fields
+  // 🔹 Map popup payload -> backend fields for update
   const mapPayloadToBackend = (p) => ({
-    // UI fields: { forwhich, price, maxsize, image }
-    // createRoom requires: { capacity, price, petType, picture }
-    capacity: p.maxsize ?? p.size, // UI uses maxsize = capacity
-    price: p.price,
-    petType: p.petType, 
-    picture: p.image, // URL or string per your backend
+    // popup payload: { name, petType, price, capacity, image }
+    ...(p.name ? { name: p.name } : {}),
+    ...(p.price !== undefined ? { price: p.price } : {}),
+    ...(p.capacity !== undefined ? { capacity: p.capacity } : {}),
+    ...(p.petType ? { petType: p.petType } : {}),
+    ...(p.image ? { picture: p.image } : {}),
   });
+
+  const reloadRooms = async () => {
+    try {
+      const result = await fetchAllRoomsWithPaginationAPI();
+      let loadedRooms = [];
+      if (Array.isArray(result)) {
+        loadedRooms = result;
+      } else if (Array.isArray(result.data)) {
+        loadedRooms = result.data;
+      }
+      setRooms(loadedRooms);
+    } catch (err) {
+      console.error("Failed to reload rooms:", err);
+    }
+  };
 
   const handleSaveRoom = async (payload) => {
     try {
-      if (selected) {
-        // EDIT MODE
-        const response = await updateRoomAPI(selected.roomId, payload);
-        const updatedRoom = response.data;
-        setRooms((prev) =>
-          prev.map((item) =>
-            item.roomId === updatedRoom.roomId ? updatedRoom : item
-          )
-        );
+      const id = selected?.id ?? selected?.roomId;
+
+      if (id) {
+        // 🔧 EDIT MODE
+        const backendPayload = mapPayloadToBackend(payload);
+        console.log("Updating room", id, "with", backendPayload);
+
+        await updateRoomAPI(id, backendPayload);
+        createNotification("success", "Room updated", "Room has been updated.");
+
+        await reloadRooms();
       } else {
-        // ADD MODE - Note: You need to import addRoomAPI
-        // const response = await addRoomAPI(payload);
-        // const newRoom = response.data;
-        // setRooms((prev) => [newRoom, ...prev]);
+        // 🆕 ADD MODE (if you want to support creating rooms from here)
+        // const createPayload = {
+        //   name: payload.name,
+        //   capacity: payload.capacity,
+        //   price: payload.price,
+        //   type: payload.petType,      // backend createRoom expects "type"
+        //   picture: payload.image,
+        // };
+        // await addRoomAPI(createPayload);
+        // createNotification("success", "Room added", "New room has been created.");
+        createNotification(
+          "warning",
+          "Add not implemented",
+          "Add mode is not wired to backend yet."
+        );
       }
+
       closePopup();
     } catch (err) {
       console.error("Failed to save room:", err);
+      console.error("Backend response:", err.response?.data);
+      createNotification(
+        "fail",
+        "Failed to save room",
+        err.response?.data?.message || "Server error. Please check backend logs."
+      );
     }
   };
 
   const handleDeleteRoom = async (roomId) => {
     try {
       await deleteRoomAPI(roomId);
-      setRooms((prev) => prev.filter((r) => r.roomId !== roomId));
+      setRooms((prev) => prev.filter((r) => (r.id ?? r.roomId) !== roomId));
+      createNotification("success", "Room deleted", "Room has been deleted.");
       closePopup();
     } catch (err) {
       console.error("Failed to delete room:", err);
+      createNotification(
+        "fail",
+        "Failed to delete room",
+        err.response?.data?.message || "Could not delete room."
+      );
     }
   };
 
@@ -171,22 +231,14 @@ const RoomEdit = () => {
       </div>
 
       {/* Grid / states */}
-      {loading ? (
-        timeoutReached ? (
-          <p className="text-2xl w-full text-center mt-32 italic text-red-600">
-            Server not responding. Please try again later.
-          </p>
-        ) : (
-          <p className="text-2xl w-full text-center mt-32 italic">Loading…</p>
-        )
-      ) : filtered.length === 0 ? (
+      {filtered.length === 0 ? (
         <p className="text-2xl w-full text-center mt-32 italic">No result.</p>
       ) : (
         <div className="px-4 md:px-8">
           <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4">
             {filtered.map((r) => (
               <RoomCard
-                key={r.roomId}
+                key={r.id ?? r.roomId}
                 data={r}
                 actionLabel="EDIT"
                 onClick={() => openEdit(r)}
@@ -212,7 +264,11 @@ const RoomEdit = () => {
               initial="hidden"
               animate="visible"
               exit="hidden"
-              title={selected ? `Edit Room #${selected.roomId}` : "Add room"}
+              title={
+                selected
+                  ? `Edit Room #${selected.id ?? selected.roomId}`
+                  : "Add room"
+              }
               initialData={selected}
               onClose={closePopup}
               onSave={handleSaveRoom}
