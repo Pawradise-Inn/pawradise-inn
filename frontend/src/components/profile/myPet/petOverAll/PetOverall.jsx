@@ -7,7 +7,7 @@ import ServiceCard from "./ServiceCard";
 import BookingCard from "./BookingCard";
 import PetCard from "./PetCard";
 import { useAuth } from "../../../../context/AuthProvider";
-import {getStatusColor, getStatusText, getRoomStatusColor}from "../../../../components/staff/StatusUtils"
+import {getStatusColor, getStatusText, getRoomStatusColor}from "../../../staff/StatusUtils"
 
 const PetOverall = () => {
   const { id } = useParams();
