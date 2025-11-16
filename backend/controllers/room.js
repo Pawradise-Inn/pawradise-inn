@@ -123,16 +123,67 @@ const getRoom = async (req, res) => {
 
 const createRoom = async (req, res) => {
   try {
-    const { number, name, capacity, price, type } = req.body;
+    const { name, capacity, price, type, picture } = req.body;
+    
+    console.log("Received room data:", { name, capacity, price, type, picture });
+    
+    // Validate required fields
+    if (!name || capacity === undefined || price === undefined || !type) {
+      console.error("Missing required fields:", { name, capacity, price, type });
+      return sendErrorResponse(
+        res,
+        400,
+        "MISSING_FIELDS",
+        "Please provide all required fields: name, capacity, price, and type"
+      );
+    }
+    
+    // Validate petType enum
+    const validPetTypes = ['DOG', 'CAT', 'MOUSE', 'RABBIT', 'BIRD'];
+    if (!validPetTypes.includes(type)) {
+      console.error("Invalid pet type:", type);
+      return sendErrorResponse(
+        res,
+        400,
+        "INVALID_PET_TYPE",
+        `Invalid pet type. Must be one of: ${validPetTypes.join(', ')}`
+      );
+    }
+    
+    // Get the last room number and increment by 1
+    const lastRoom = await prisma.room.findFirst({
+      orderBy: { number: 'desc' },
+      select: { number: true }
+    });
+    
+    // If there are existing rooms, increment from the last number
+    // Otherwise, start from 100
+    const nextNumber = lastRoom ? lastRoom.number + 1 : 100;
+    
+    console.log("Last room number:", lastRoom?.number, "Next number:", nextNumber);
+    
+    console.log("Creating room with data:", {
+      number: nextNumber,
+      name,
+      capacity: parseInt(capacity),
+      price: parseFloat(price),
+      petType: type,
+      picture: picture || "https://storage.googleapis.com/paw_image/unnamed.jpg"
+    });
+    
     const room = await prisma.room.create({
       data: {
-        number: number,
+        number: nextNumber,
         name: name,
-        capacity: capacity,
-        price: price,
+        capacity: parseInt(capacity),
+        price: parseFloat(price),
         petType: type,
+        picture: picture || "https://storage.googleapis.com/paw_image/unnamed.jpg",
       },
     });
+    
+    console.log("Room created successfully:", room);
+    
     return sendSuccessResponse(
       res,
       201,
@@ -141,11 +192,14 @@ const createRoom = async (req, res) => {
       room
     );
   } catch (err) {
+    console.error("Error creating room - Full error:", err);
+    console.error("Error message:", err.message);
+    console.error("Error code:", err.code);
     return sendErrorResponse(
       res,
       500,
       "UNABLE_TO_SAVE",
-      "Unable to create room. Please try again"
+      `Unable to create room: ${err.message}`
     );
   }
 };
