@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { motion } from "motion/react";
-import ProfileSideBar from "../../components/profile/ProfileSideBar";
+import ProfileSideBar from "../../components/Profile/ProfileSideBar";
 import { useAuth } from "../../context/AuthProvider";
 
 const Profile = () => {

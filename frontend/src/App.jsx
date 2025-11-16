@@ -9,11 +9,11 @@ import Login from "./pages/Login";
 import Footer from "./components/Footer";
 import RoomEdit from "./components/Management/room_edit";
 import ServiceEdit from "./components/Management/Service_edit";
-import BookingComp from "./components/profile/myBooking/BookingComp";
-import NewPet from "./components/profile/myPet/newPet/NewPet";
-import PetComp from "./components/profile/myPet/PetComp";
-import PetOverall from "./components/profile/myPet/petOverAll/PetOverall";
-import ProfileComp from "./components/profile/myProfile/ProfileComp";
+import BookingComp from "./components/Profile/myBooking/BookingComp.jsx";
+import NewPet from "./components/Profile/myPet/newPet/NewPet.jsx";
+import PetComp from "./components/Profile/myPet/PetComp.jsx";
+import PetOverall from "./components/Profile/myPet/petOverAll/PetOverall.jsx";
+import ProfileComp from "./components/Profile/myProfile/ProfileComp.jsx";
 import Management from "./pages/Management";
 import Dashboard from "./pages/staff/dashboard/Dashboard";
 import DashboardTab1 from "./pages/staff/dashboard/DashboardTab1";
@@ -29,7 +29,7 @@ import ReviewComp from "./components/review/ReviewComp";
 import HistoryComp from "./components/review/history/HistoryComp";
 import StaffPayment from "./pages/staff/PaymentComp";
 import Cart from "./pages/customer/Cart";
-import PaymentHistory from "./components/profile/PaymentHistory/paymenthistory";
+import PaymentHistory from "./components/Profile/PaymentHistory/paymenthistory.jsx";
 import ConfirmPayment from "./pages/customer/ConfirmPayment";
 import PaymentSuccess from "./pages/customer/PaymentSuccess";
 import PaymentFailed from "./pages/customer/PaymentFailed";
@@ -92,7 +92,7 @@ const App = () => {
         />
 
         <Route
-          path="/profile"
+          path="/Profile"
           element={
             <RequireAuth roles={["CUSTOMER", "STAFF"]}>
               <Profile />

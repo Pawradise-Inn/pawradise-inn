@@ -149,7 +149,7 @@ import { fetchMyPayments } from "../../../hooks/paymentAPI";
 import { useEffect, useState } from "react";
 import { startUpVariants } from "../../../styles/animation";
 import { AnimatePresence, motion } from "motion/react";
-import Pagination from "../../../components/Pagination";
+import Pagination from "../../Pagination";
 
 const PaymentHistory = () => {
   const [payment, setPayment] = useState([]);
