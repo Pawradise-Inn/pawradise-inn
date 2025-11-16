@@ -5,6 +5,7 @@ import { defineConfig } from "vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  base: '/', // ensures assets load correctly on Vercel
   server: {
     host: true,           // 0.0.0.0 so Docker can expose it
     watch: {
