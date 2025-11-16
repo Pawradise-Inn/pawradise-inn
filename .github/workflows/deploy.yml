@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -19,7 +19,6 @@ jobs:
         run: npm ci
 
       - name: Deploy to Vercel (Production)
-        if: github.event_name == 'push'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
