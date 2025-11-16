@@ -3,6 +3,9 @@ import { useNotification } from "../../context/notification/NotificationProvider
 import DropDownList from "../DropDownList";
 import { motion } from "motion/react";
 import testImage from "../../assets/test.png";
+import { fetchPetTypesAPI } from "../../hooks/petAPI";
+import { addRoomAPI } from "../../hooks/roomAPI";
+import { uploadImageAPI } from "../../hooks/imageAPI";
 
 const AddRoomPopup = ({
   title = "Add room",
@@ -14,33 +17,31 @@ const AddRoomPopup = ({
 }) => {
   const { createNotification } = useNotification();
 
-  const [status, setStatus] = useState(initialData?.status ?? "available");
-  const [forwhich, setForwhich] = useState(initialData?.forwhich ?? "DOG"); // pet type (DOG/CAT/MOUSE/RABBIT/BIRD)
+  const [roomName, setRoomName] = useState(initialData?.name ?? "");
+  const [petType, setPetType] = useState(initialData?.type ?? "DOG");
   const [price, setPrice] = useState(
     initialData?.price !== undefined ? String(initialData.price) : ""
   );
-  const [size, setSize] = useState(
-    initialData?.size !== undefined ? String(initialData.size) : ""
+  const [capacity, setCapacity] = useState(
+    initialData?.capacity !== undefined ? String(initialData.capacity) : ""
   );
-  const [maxsize, setMaxsize] = useState(
-    initialData?.maxsize !== undefined ? String(initialData.maxsize) : ""
-  );
-  const [image, setImage] = useState(initialData?.image || null);
+  const [image, setImage] = useState(initialData?.picture || null);
+  const [imageFile, setImageFile] = useState(null);
 
+  const [petTypeOptions, setPetTypeOptions] = useState([]);
   const createdObjectUrl = useRef(null);
   const isEdit = useMemo(() => Boolean(initialData?.roomId), [initialData]);
 
+  // Sync when editing existing room
   useEffect(() => {
-    setStatus(initialData?.status ?? "available");
-    setForwhich(initialData?.forwhich ?? "DOG");
+    setRoomName(initialData?.name ?? "");
+    setPetType(initialData?.type ?? "DOG");
     setPrice(initialData?.price !== undefined ? String(initialData.price) : "");
-    setSize(initialData?.size !== undefined ? String(initialData.size) : "");
-    setMaxsize(
-      initialData?.maxsize !== undefined ? String(initialData.maxsize) : ""
-    );
-    setImage(initialData?.image || null);
+    setCapacity(initialData?.capacity !== undefined ? String(initialData.capacity) : "");
+    setImage(initialData?.picture || null);
   }, [initialData]);
 
+  // Lock scroll + cleanup image URL
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -60,6 +61,38 @@ const AddRoomPopup = ({
     return () => window.removeEventListener("keydown", onEsc);
   }, [onClose]);
 
+  // Load pet types from API (DOG, CAT, MOUSE, RABBIT, BIRD, etc.)
+  useEffect(() => {
+    const loadPetTypes = async () => {
+      try {
+        const response = await fetchPetTypesAPI();
+        // Expecting response.data to be an array like ["DOG", "CAT", ...]
+        const types = Array.isArray(response.data) ? response.data : [];
+        // Ensure uppercase as you requested
+        const upperTypes = types.map((t) => String(t).toUpperCase());
+        setPetTypeOptions(upperTypes);
+
+        // If current petType is not in the list, default to the first option
+        if (upperTypes.length > 0 && !upperTypes.includes(petType)) {
+          setPetType(upperTypes[0]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch pet types: ", err);
+        createNotification(
+          "fail",
+          "Failed to load pet types",
+          "Could not load pet type options. Please try again later."
+        );
+        // Optional fallback
+        const fallbackTypes = ["DOG", "CAT", "MOUSE", "RABBIT", "BIRD"];
+        setPetTypeOptions(fallbackTypes);
+      }
+    };
+
+    loadPetTypes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -72,14 +105,22 @@ const AddRoomPopup = ({
     const url = URL.createObjectURL(file);
     createdObjectUrl.current = url;
     setImage(url);
+    setImageFile(file); // Store the actual file for upload
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const nPrice = Number(price);
-    const nSize = Number(size);
-    const nMax = Number(maxsize);
+    const nCapacity = Number(capacity);
+
+    if (!roomName.trim()) {
+      return createNotification(
+        "fail",
+        "Room name required",
+        "Please enter a room name."
+      );
+    }
 
     if (!Number.isFinite(nPrice) || nPrice < 0) {
       return createNotification(
@@ -89,41 +130,79 @@ const AddRoomPopup = ({
       );
     }
 
-    if (!Number.isFinite(nSize) || nSize < 0) {
+    if (!Number.isFinite(nCapacity) || nCapacity < 0) {
       return createNotification(
         "fail",
-        "Invalid current size",
-        "Current size must be a non-negative number."
+        "Invalid capacity",
+        "Capacity must be a non-negative number."
       );
     }
 
-    if (!Number.isFinite(nMax) || nMax < 0) {
+    if (!petType) {
       return createNotification(
         "fail",
-        "Invalid max size",
-        "Max size must be a non-negative number."
+        "Pet type required",
+        "Please select a pet type for this room."
       );
     }
 
-    if (nSize > nMax) {
-      return createNotification(
+    try {
+      // Upload image first if there's a file (like in NewPet.jsx)
+      let pictureUrl = null;
+      if (imageFile) {
+        try {
+          const uploadResponse = await uploadImageAPI(imageFile);
+          console.log("Upload response:", uploadResponse);
+          
+          // Extract the actual image URL from the response
+          pictureUrl = uploadResponse?.message?.details?.imageUrl || null;
+          
+          if (!pictureUrl) {
+            console.error("No imageUrl in response:", uploadResponse);
+            throw new Error("Invalid upload response");
+          }
+          
+          console.log("Uploaded image URL:", pictureUrl);
+        } catch (imgErr) {
+          console.error("Failed to upload image:", imgErr);
+          createNotification(
+            "warning",
+            "Image upload failed",
+            "Room will be created without custom image."
+          );
+        }
+      }
+
+      // Call addRoomAPI with backend expected format (no number field)
+      const roomData = {
+        name: roomName,
+        capacity: nCapacity,
+        price: nPrice,
+        type: petType,
+      };
+
+      // Add picture URL if uploaded
+      if (pictureUrl) {
+        roomData.picture = pictureUrl;
+      }
+
+      await addRoomAPI(roomData);
+      
+      createNotification(
+        "success",
+        "Room Added",
+        "New room has been added successfully"
+      );
+      
+      onSave?.(roomData);
+    } catch (err) {
+      console.error("Failed to add room:", err);
+      createNotification(
         "fail",
-        "Invalid current size",
-        "Current size cannot exceed max size."
+        "Failed to add room",
+        "Could not add room. Please try again."
       );
     }
-
-    const payload = {
-      status,
-      forwhich, // pet type (DOG/CAT/MOUSE/RABBIT/BIRD)
-      price: nPrice,
-      size: nSize,
-      maxsize: nMax,
-      image, // preview URL; replace with uploaded URL when integrating storage
-      // review & pageAmount stay unchanged in parent on edit
-    };
-
-    onSave?.(payload);
   };
 
   const handleDelete = () => {
@@ -154,43 +233,33 @@ const AddRoomPopup = ({
 
       <form id="room-form" onSubmit={handleSubmit} className="flex gap-6">
         <div className="flex flex-col flex-1 space-y-4">
-          {/* Status */}
+          {/* Room Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Status
+              Room Name
             </label>
-            <DropDownList
-              startText="Select..."
-              options={["available", "full", "maintenance"].map((type) => ({
-                name: type,
-                value: type,
-              }))}
-              value={status}
-              onChange={(value) => setStatus(value)}
-              inputSyle="mt-1 border rounded-md px-3 py-2"
-              dropDownStyle="bg-white border border-$var(--brown-color) origin-top translate-y-1"
-              arrowColor="var(--light-brown-color)"
-              activeColor="var(--service-available-color)"
-              focusStyle="outline-none ring border-blue-400"
-              element="addRoomStatus"
+            <input
+              type="text"
+              value={roomName}
+              onChange={(e) => setRoomName(e.target.value)}
+              className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+              required
             />
           </div>
 
-          {/* Pet type */}
+          {/* Pet type from API */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Pet type
             </label>
             <DropDownList
               startText="Select..."
-              options={["DOG", "CAT", "MOUSE", "RABBIT", "BIRD"].map(
-                (type) => ({
-                  name: type,
-                  value: type,
-                })
-              )}
-              value={forwhich}
-              onChange={(value) => setForwhich(value)}
+              options={petTypeOptions.map((type) => ({
+                name: type,
+                value: type,
+              }))}
+              value={petType}
+              onChange={(value) => setPetType(value)}
               inputSyle="mt-1 border rounded-md px-3 py-2"
               dropDownStyle="bg-white border border-$var(--brown-color) origin-top translate-y-1"
               arrowColor="var(--light-brown-color)"
@@ -208,7 +277,7 @@ const AddRoomPopup = ({
             <input
               type="number"
               min="0"
-              step="1"
+              step="0.01"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
@@ -216,36 +285,20 @@ const AddRoomPopup = ({
             />
           </div>
 
-          {/* Size / Max size */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Current size
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={size}
-                onChange={(e) => setSize(e.target.value)}
-                className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Max size
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={maxsize}
-                onChange={(e) => setMaxsize(e.target.value)}
-                className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
-                required
-              />
-            </div>
+          {/* Capacity */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Capacity
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={capacity}
+              onChange={(e) => setCapacity(e.target.value)}
+              className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+              required
+            />
           </div>
         </div>
 
