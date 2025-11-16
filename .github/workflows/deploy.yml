@@ -1,93 +1,31 @@
-name: Deploy to Production
+name: Deploy
 
 on:
   workflow_dispatch:
- 
+
 jobs:
-  deploy:
+  test-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Setup SSH
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy to Vercel (Production)
+        if: github.event_name == 'push'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy via SSH
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'ENDSSH'
-            set -e
-            
-            cd /root/pawradise-inn
-
-            echo "🔹 Pulling latest code..."
-            git fetch origin main
-            git checkout main
-            git reset --hard origin/main
-
-            echo "🔹 Creating config directories..."
-            mkdir -p ./backend/config
-            mkdir -p ./frontend/config
-
-            echo "🔹 Writing backend config..."
-            cat > ./backend/config/config.env << 'ENDBACKEND'
-PORT=${{ secrets.PORT }}
-NODE_ENV=${{ secrets.NODE_ENV }}
-DATABASE_URL=${{ secrets.DATABASE_URL }}
-JWT_SECRET=${{ secrets.JWT_SECRET }}
-JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}
-JWT_COOKIE_EXPIRE=${{ secrets.JWT_COOKIE_EXPIRE }}
-ENDBACKEND
-
-            echo "🔹 Writing frontend config..."
-            cat > ./frontend/config/config.env << 'ENDFRONTEND'
-VITE_BRANCH_ID=${{ secrets.VITE_BRANCH_ID }}
-VITE_API_KEY=${{ secrets.VITE_API_KEY }}
-ENDFRONTEND
-
-            echo "🔹 Writing keyfile.json..."
-            cat > ./backend/config/keyfile.json << 'ENDKEYFILE'
-${{ secrets.GOOGLE_KEYFILE_JSON }}
-ENDKEYFILE
-
-            echo "🔹 Setting proper permissions..."
-            chmod 600 ./backend/config/config.env
-            chmod 600 ./frontend/config/config.env
-            chmod 600 ./backend/config/keyfile.json
-
-            echo "🔹 Stopping old containers..."
-            npm run prod:down || true
-
-            echo "🔹 Cleaning up old images..."
-            docker image prune -f || true
-
-            echo "🔹 Building and starting containers..."
-            npm run prod:up
-
-            echo "🔹 Waiting for services to start..."
-            sleep 10
-
-            echo "🔹 Checking container status..."
-            docker ps
-
-            echo "🔹 Checking backend health..."
-            if curl -f http://localhost:5000/health > /dev/null 2>&1; then
-              echo "✅ Backend is healthy"
-            else
-              echo "⚠️ Backend health check failed (might be normal if no /health endpoint)"
-            fi
-
-            echo "✅ Deployment complete!"
-          ENDSSH
-
-      - name: Notify on Success
-        if: success()
-        run: echo "🎉 Deployment to production succeeded!"
-
-      - name: Notify on Failure
-        if: failure()
-        run: |
-          echo "❌ Deployment failed!"
-          exit 1
+          npm install --global vercel
+          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          vercel build --prod --token=$VERCEL_TOKEN
+          vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
