@@ -29,7 +29,7 @@ import ReviewComp from "./components/review/ReviewComp";
 import HistoryComp from "./components/review/history/HistoryComp";
 import StaffPayment from "./pages/staff/PaymentComp";
 import Cart from "./pages/customer/Cart";
-import PaymentHistory from "./components/profile/PaymentHistory/paymenthistory";
+import PaymentHistory from "./components/profile/PaymentHistory/paymenthistory.jsx";
 import ConfirmPayment from "./pages/customer/ConfirmPayment";
 import PaymentSuccess from "./pages/customer/PaymentSuccess";
 import PaymentFailed from "./pages/customer/PaymentFailed";
