@@ -7,7 +7,7 @@ import { fetchAllServiceWithPaginationAPI } from "../../hooks/serviceAPI";
 import { overlay, popUP, startUpVariants } from "../../styles/animation";
 import { removeWindowScroll } from "../../utils/HandlePopup";
 import { filteredObjectByType } from "../../utils/HandleSearch";
-import CartButton from "../../components/Cart/CartButton";
+import CartButton from "../../components/cart/CartButton";
 
 const BookingService = () => {
   const [mounted, setMounted] = useState(false);

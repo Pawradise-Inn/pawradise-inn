@@ -7,8 +7,8 @@ import Registration from "./pages/customer/Registration";
 import Login from "./pages/Login";
 
 import Footer from "./components/Footer";
-import RoomEdit from "./components/Management/room_edit";
-import ServiceEdit from "./components/Management/Service_edit";
+import RoomEdit from "./components/management/room_edit";
+import ServiceEdit from "./components/management/Service_edit";
 import BookingComp from "./components/profile/myBooking/BookingComp.jsx";
 import NewPet from "./components/profile/myPet/newPet/NewPet.jsx";
 import PetComp from "./components/profile/myPet/PetComp.jsx";

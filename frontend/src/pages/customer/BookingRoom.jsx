@@ -15,7 +15,7 @@ import DropDownList from "../../components/DropDownList";
 import "react-datepicker/dist/react-datepicker.css";
 import DateDropDown from "../../components/DateDropDown";
 import { fetchPetTypesAPI } from "../../hooks/petAPI";
-import CartButton from "../../components/Cart/CartButton";
+import CartButton from "../../components/cart/CartButton";
 import { formatDateForAPI } from "../../utils/dateUtils";
 const BookingRoom = () => {
   const { createNotification } = useNotification();

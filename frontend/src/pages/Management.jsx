@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import ManagementSideBar from "../components/Management/ManagementSideBar";
+import ManagementSideBar from "../components/management/ManagementSideBar";
 
 const Management = () => {
   return (
