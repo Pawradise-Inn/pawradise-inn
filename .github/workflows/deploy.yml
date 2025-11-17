@@ -1,3 +1,5 @@
+# This is your new, simplified workflow file
+
 name: Deploy Frontend and Backend
 
 on:
@@ -7,8 +9,7 @@ jobs:
   deploy-backend:
     name: Deploy Backend to Railway
     runs-on: ubuntu-latest
-    outputs:
-      backend_url: ${{ steps.get-url.outputs.url }}
+    # We don't need 'outputs:' anymore
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,29 +23,15 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
         run: |
+          # This command just starts the deploy and doesn't wait
           railway up --detach --service ${{ secrets.RAILWAY_BACKEND_SERVICE_NAME }}
-
-      - name: Get Railway URL
-        id: get-url
-        working-directory: ./backend
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-        run: |
-          sleep 10
-          URL=$(railway domain --service ${{ secrets.RAILWAY_BACKEND_SERVICE_NAME }} 2>/dev/null || echo "${{ secrets.RAILWAY_DOMAIN }}")
-          if [ -z "$URL" ]; then
-            echo "⚠️ Could not get Railway domain automatically"
-            echo "Please set RAILWAY_DOMAIN secret with your Railway URL"
-            exit 1
-          fi
-          echo "url=https://$URL" >> $GITHUB_OUTPUT
-          echo "Backend deployed to: https://$URL"
+      
+      # We no longer need the 'Get Railway URL' step
 
   deploy-frontend:
     name: Deploy Frontend to Vercel
     runs-on: ubuntu-latest
-    needs: deploy-backend
+    needs: deploy-backend  # This just waits for the backend deploy to *start*
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -59,16 +46,28 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VITE_API_URL: ${{ needs.deploy-backend.outputs.backend_url }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: |
           npm install --global vercel
           cd frontend
+          
+          # Pull Vercel environment variables
           vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          
+          # THIS IS THE FIX:
+          # We manually add your secret to the .env file Vercel reads
           echo "VITE_API_URL=$VITE_API_URL" >> .vercel/.env.production.local
+          
+          # Now, 'vite build' will see the correct URL
           vercel build --prod --token=$VERCEL_TOKEN
+          
+          # Deploy the built app
           vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
-
+          
       - name: Summary
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: |
-          echo "✅ Backend deployed to: ${{ needs.deploy-backend.outputs.backend_url }}"
+          echo "✅ Backend deployment started."
+          echo "✅ Backend URL: $VITE_API_URL"
           echo "✅ Frontend deployed to Vercel"
