@@ -90,7 +90,7 @@ const ConfirmPayment = () => {
       console.log("✅ Uploaded image url:", imageUrl);
 
       // 2️⃣ Check slip validity
-      const slipResult = await checkSlipAPI(imageUrl);
+      const slipResult = await checkSlipAPI(imageUrl, total);
       const slipStatus = slipResult.success;
       console.log("✅ Slip check result:", slipStatus);
 
