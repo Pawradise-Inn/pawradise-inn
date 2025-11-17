@@ -11,11 +11,11 @@ const {
 const {protect, authorize} = require('../middleware/auth');
 
 router.route('/')
-    .get(protect, authorize("STAFF", "CUSTOMER"), getCares)
+    .get(protect, authorize("STAFF"), getCares)
     .post(protect, authorize("STAFF"), createCare);
 
 router.route('/:id')
-    .get(protect, authorize("STAFF", "CUSTOMER"),getCare)
+    .get(protect, authorize("STAFF"),getCare)
     .delete(protect, authorize("STAFF"),deleteCare)
 
 module.exports = router;

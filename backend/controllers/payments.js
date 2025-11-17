@@ -206,7 +206,7 @@ const updatePayment = async (req, res) => {
     try{
         let dataToUpdate = {};
 
-        const paymentId = req.params.id;
+        const paymentId = Number(req.params.id);
         if (req.user.role == "CUSTOMER"){
             if (req.body.slip) dataToUpdate.slip = req.body.slip;
             if (req.body.status) dataToUpdate.status = req.body.status;
@@ -294,7 +294,7 @@ const deletePayment = async (req, res) => {
     try{
         const paymentId = req.params.id;
         const payment = await prisma.payment.delete({
-            where: { id: paymentId },
+            where: { id: Number(paymentId) },
         });
         return sendSuccessResponse(
             res,

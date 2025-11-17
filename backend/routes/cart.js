@@ -43,7 +43,7 @@ module.exports = router;
 /** 
  * @swagger
  * tags:
- *   name: Cart
+ *   name: Carts
  *   description: Shopping cart management API for room and service bookings
  */
 
@@ -52,7 +52,7 @@ module.exports = router;
  * /carts:
  *   get:
  *     summary: Get current user's cart with all items
- *     tags: [Cart]
+ *     tags: [Carts]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -69,7 +69,7 @@ module.exports = router;
  * /carts/rooms:
  *   post:
  *     summary: Add a room booking to cart
- *     tags: [Cart]
+ *     tags: [Carts]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -118,7 +118,7 @@ module.exports = router;
  * /carts/services:
  *   post:
  *     summary: Add a service booking to cart
- *     tags: [Cart]
+ *     tags: [Carts]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -162,7 +162,7 @@ module.exports = router;
  * /carts/rooms/{id}:
  *   delete:
  *     summary: Remove a room booking from cart
- *     tags: [Cart]
+ *     tags: [Carts]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -188,7 +188,7 @@ module.exports = router;
  * /carts/services/{id}:
  *   delete:
  *     summary: Remove a service booking from cart
- *     tags: [Cart]
+ *     tags: [Carts]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -214,7 +214,7 @@ module.exports = router;
  * /carts/rooms/{id}/selected:
  *   patch:
  *     summary: Toggle room selection status in cart (for checkout)
- *     tags: [Cart]
+ *     tags: [Carts]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -254,7 +254,7 @@ module.exports = router;
  * /carts/services/{id}/selected:
  *   patch:
  *     summary: Toggle service selection status in cart (for checkout)
- *     tags: [Cart]
+ *     tags: [Carts]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -289,4 +289,18 @@ module.exports = router;
  *         description: Internal server error
  */
 
+/** 
+ * @swagger
+ * /carts/checks:
+ *   get:
+ *     summary: Get current user's cart with all items
+ *     tags: [Carts]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Check items successfully
+ *       500:
+ *         description: Unable to check items from cart. Please try again
+ */
 

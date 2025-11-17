@@ -204,6 +204,8 @@ module.exports = router;
  *   post:
  *     summary: Logout current user
  *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Logout successful, auth cookie cleared
@@ -275,6 +277,8 @@ module.exports = router;
  *   put:
  *     summary: Update current user profile
  *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -308,6 +312,8 @@ module.exports = router;
  *   delete:
  *     summary: Delete current user account (requires password confirmation)
  *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
