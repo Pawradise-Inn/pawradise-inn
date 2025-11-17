@@ -11,7 +11,7 @@ import {
   deleteRoomAPI,
   fetchAllRoomsWithPaginationAPI,
   updateRoomAPI,
-  // addRoomAPI, // uncomment when you want to support Add
+  addRoomAPI, // uncomment when you want to support Add
 } from "../../hooks/roomAPI";
 import Overlay from "../Overlay";
 import { overlay, popUP } from "../../styles/animation";
@@ -148,20 +148,20 @@ const RoomEdit = () => {
         await reloadRooms();
       } else {
         // 🆕 ADD MODE (if you want to support creating rooms from here)
-        // const createPayload = {
-        //   name: payload.name,
-        //   capacity: payload.capacity,
-        //   price: payload.price,
-        //   type: payload.petType,      // backend createRoom expects "type"
-        //   picture: payload.image,
-        // };
-        // await addRoomAPI(createPayload);
+        const createPayload = {
+          name: payload.name,
+          capacity: payload.capacity,
+          price: payload.price,
+          type: payload.petType,      // backend createRoom expects "type"
+          picture: payload.image,
+        };
+        await addRoomAPI(createPayload);
         // createNotification("success", "Room added", "New room has been created.");
-        createNotification(
-          "warning",
-          "Add not implemented",
-          "Add mode is not wired to backend yet."
-        );
+        // createNotification(
+        //   "warning",
+        //   "Add not implemented",
+        //   "Add mode is not wired to backend yet."
+        // );
       }
 
       closePopup();
