@@ -25,7 +25,7 @@ const getPayments = async (req, res) => {
         }
 
         const page = parseInt(req.query.page, 10) || 1;
-        const limit = parseInt(req.query.limit, 10) || 10;
+        const limit = parseInt(req.query.limit, 10) || 50;
         const startIndex = (page - 1) * limit;
         options.skip = startIndex;
         options.take = limit;

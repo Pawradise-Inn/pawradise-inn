@@ -50,7 +50,7 @@ export const fetchRoomStatusAPI = async (id, entry_date, exit_date) => {
 export const fetchAllRoomsWithPaginationAPI = async () => {
   const response = await axiosInstance.get(`${API_URL}/reviews`);
   // sendSuccessResponse → { success, code, message, data, meta }
-  return response.data.data; // this is the array of rooms
+  return response.data; // this is the array of rooms
 };
 
 // For room reviews list
