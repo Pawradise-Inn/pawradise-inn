@@ -164,7 +164,7 @@ const PaymentHistory = () => {
     try {
       setLoading(true);
       const response = await fetchMyPayments(page, limit);
-
+      console.log("this is the response" ,response.data)
       if (response.success) {
         setPayment(response.data || []);
         // totalCount is inside message.details.count
@@ -243,6 +243,7 @@ const PaymentHistory = () => {
                     items={paymentRecord.items}
                     status={paymentRecord.paymentStatus}
                     totalPrice={paymentRecord.totalPrice}
+                    paymentDate={paymentRecord.paymentDate}
                   />
                 </motion.div>
               ))}
