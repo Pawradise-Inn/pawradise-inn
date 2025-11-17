@@ -1,0 +1,110 @@
+Privacy Policy
+
+Last Updated: November 2025
+
+1. Introduction
+
+Welcome to Pawradise Inn (“we,” “us,” or “our”). We value your trust and are committed to protecting your personal data in accordance with the Personal Data Protection Act B.E. 2562 (PDPA) of Thailand.
+This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website, mobile application, or related services (collectively, the “Service”).
+By using our Service, you consent to the practices described in this Privacy Policy.
+
+2. Information We Collect
+
+We may collect the following types of personal data from you:
+
+    2.1 Information You Provide Directly
+
+    Full name, contact details (email, phone number, address)
+    Account login information (username, password)
+    Payment details (credit/debit card information, billing address)
+    Booking details (check-in/check-out dates, selected services, preferences)
+    Pet-related information (pet name, type, breed, special needs)
+    Communications or feedback sent via forms, chat, or email
+
+    2.2 Information Collected Automatically
+
+    IP address, browser type, operating system
+    Device identifiers and geolocation data (if enabled)
+    Cookies and similar tracking technologies to improve your experience
+
+    2.3 Information from Third Parties
+
+    Payment processors, marketing partners, or social media platforms (if you sign in using those services)
+
+3. Purpose of Data Collection
+
+We collect and process your data for the following purposes:
+To create and manage user accounts
+To process and confirm hotel and service bookings
+To process payments and issue invoices or receipts
+To provide customer support and respond to inquiries
+To improve the Service, user experience, and functionality
+To send notifications, promotional offers, and updates (with consent)
+To comply with legal obligations and protect our legal rights
+
+4. Legal Basis for Processing
+
+Under the PDPA, we process your personal data based on one or more of the following legal grounds:
+Your consent, which you may withdraw at any time
+When it is necessary for contract performance (e.g., booking fulfillment)
+For legitimate business interests (e.g., improving services)
+To comply with legal or regulatory obligations
+
+5. Data Sharing and Disclosure
+
+We do not sell or rent your personal data. However, we may share it with:
+Service providers (payment gateways, booking platforms, hosting providers) who process data on our behalf
+Business partners offering additional services related to your stay or pet care
+Government authorities or regulators, if required by law
+Legal representatives in the event of disputes or investigations
+All third parties are required to maintain appropriate security and confidentiality standards consistent with this Privacy Policy and PDPA requirements.
+
+6. Cookies and Tracking Technologies
+
+We use cookies and similar technologies to:
+Remember your preferences and login sessions
+Analyze traffic and improve performance
+Deliver relevant advertising
+You may disable cookies in your browser settings; however, some parts of our Service may not function properly without them.
+
+7. Data Retention
+
+We retain your personal data only for as long as necessary to fulfill the purposes for which it was collected, or as required by applicable law.
+When data is no longer needed, we securely delete or anonymize it.
+
+8. Data Security
+
+We use appropriate technical and organizational measures to protect your personal data from unauthorized access, loss, misuse, or disclosure. These measures include encryption, secure servers, access controls, and employee training.
+However, no online transmission is completely secure; you acknowledge that data transmission over the Internet carries inherent risks.
+
+9. Your Rights
+
+Under the PDPA, you have the following rights:
+Right to Access: Request a copy of your personal data we hold.
+Right to Correction: Request correction of inaccurate or incomplete data.
+Right to Deletion: Request deletion of data when it is no longer necessary.
+Right to Withdraw Consent: Withdraw consent for processing at any time.
+Right to Data Portability: Request transfer of your personal data to another service provider (where applicable).
+Right to Object: Object to certain types of data processing.
+To exercise any of these rights, please contact us using the details below.
+
+10. International Data Transfers
+
+If your data is transferred or stored outside Thailand, we ensure that it is protected under equivalent data protection standards and appropriate safeguards.
+
+11. Minors
+
+Our Service is not intended for individuals under 18 years old. We do not knowingly collect personal data from minors without parental consent. If we become aware that we have collected such data, we will delete it promptly.
+
+12. Updates to This Policy
+
+We may update this Privacy Policy periodically to reflect changes in our practices, services, or legal obligations. The updated version will be posted on this page with the revised “Last Updated” date.
+
+13. Contact Us
+
+If you have any questions, concerns, or requests related to this Privacy Policy or your personal data, please contact us at:
+
+Pawradise Inn Data Protection Officer
+📧 privacy@pawradiseinn.com
+
+📍 Bangkok, Thailand

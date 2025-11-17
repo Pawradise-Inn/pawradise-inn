@@ -226,14 +226,14 @@ const Registration = () => {
               <label htmlFor="consent" className="text-[var(--brown-color)]">
                 I agree to the{" "}
                 <a
-                  href="/"
+                  href="/policy/term-of-service"
                   className="text-[var(--dark-brown-color)] underline hover:text-[var(--brown-color)] transition-colors duration-200"
                 >
                   Terms of Service
                 </a>{" "}
                 and{" "}
                 <a
-                  href="/"
+                  href="/policy/private-policy"
                   className="text-[var(--dark-brown-color)] underline hover:text-[var(--brown-color)] transition-colors duration-200"
                 >
                   Privacy Policy
