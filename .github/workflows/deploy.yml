@@ -2,9 +2,6 @@ name: Deploy Frontend and Backend
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
   deploy-backend:
@@ -67,7 +64,7 @@ jobs:
           npm install --global vercel
           cd frontend
           vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-          vercel build --prod --token=$VERCEL_TOKEN
+          vercel build --prod --token=$VERCEL_TOKEN --build-env VITE_API_URL=$VITE_API_URL
           vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
 
       - name: Summary
