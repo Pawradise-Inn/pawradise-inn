@@ -1,10 +1,11 @@
 import axiosInstance from "../api/axiosInstance";
 
-export const checkSlipAPI = async (pic_url) => {
+export const checkSlipAPI = async (pic_url, amount) => {
   try {
     const res = await axiosInstance.post("/api/v1/slip/check", {
       url: pic_url,
       log: true,
+      amount: amount,
     });
 
     console.log("SlipOK API response:", res.data);
