@@ -24,7 +24,6 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
         run: |
-          cd backend
           railway up --detach --service ${{ secrets.RAILWAY_BACKEND_SERVICE_NAME }}
           
       - name: Get Railway URL
@@ -32,7 +31,6 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          cd backend
           # Wait for deployment to complete
           sleep 10
           # Get the domain (Railway automatically generates one)
