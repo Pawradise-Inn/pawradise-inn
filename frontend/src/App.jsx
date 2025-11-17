@@ -34,9 +34,14 @@ import ConfirmPayment from "./pages/customer/ConfirmPayment";
 import PaymentSuccess from "./pages/customer/PaymentSuccess";
 import PaymentFailed from "./pages/customer/PaymentFailed";
 import Policy from "./pages/Policy.jsx";
+import { useEffect } from "react";
 
 const App = () => {
   const location = useLocation();
+
+  useEffect(() => {
+    console.log(import.meta.env.VITE_API_URL)
+  }, [])
 
   const isStaffPath = location.pathname.startsWith("/staff");
   const isRegistrationPath = location.pathname === "/register";
