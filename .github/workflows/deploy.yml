@@ -22,10 +22,10 @@ jobs:
       - name: Deploy Backend to Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
         run: |
           cd backend
-          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
-          railway up --detach
+          railway up
           
       - name: Get Railway URL
         id: get-url
@@ -33,7 +33,15 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           cd backend
-          URL=$(railway domain)
+          # Wait for deployment to complete
+          sleep 10
+          # Get the domain (Railway automatically generates one)
+          URL=$(railway domain 2>/dev/null || echo "${{ secrets.RAILWAY_DOMAIN }}")
+          if [ -z "$URL" ]; then
+            echo "⚠️ Could not get Railway domain automatically"
+            echo "Please set RAILWAY_DOMAIN secret with your Railway URL"
+            exit 1
+          fi
           echo "url=https://$URL" >> $GITHUB_OUTPUT
           echo "Backend deployed to: https://$URL"
 
