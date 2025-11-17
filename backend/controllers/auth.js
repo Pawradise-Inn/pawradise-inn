@@ -219,6 +219,47 @@ exports.updateMe = async (req, res) => {
       user
     );
   } catch (err) {
+    console.error("Error updating profile:", err);
+    
+    // Handle unique constraint violations
+    if (err.code === "P2002") {
+      const field = err.meta?.target[0];
+      
+      if (field === "phone_number") {
+        return sendErrorResponse(
+          res,
+          409,
+          "ALREADY_EXISTS",
+          "This phone number is already taken. Please choose a different one"
+        );
+      }
+      
+      if (field === "email") {
+        return sendErrorResponse(
+          res,
+          409,
+          "ALREADY_EXISTS",
+          "This email is already taken. Please choose a different one"
+        );
+      }
+      
+      if (field === "user_name") {
+        return sendErrorResponse(
+          res,
+          409,
+          "ALREADY_EXISTS",
+          "This username is already taken. Please choose a different one"
+        );
+      }
+      
+      return sendErrorResponse(
+        res,
+        409,
+        "ALREADY_EXISTS",
+        `This ${field} is already taken. Please choose a different one`
+      );
+    }
+    
     return sendErrorResponse(
       res,
       500,
