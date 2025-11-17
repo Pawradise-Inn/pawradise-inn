@@ -4,6 +4,8 @@ services:
       context: ./backend
     ports:
       - "5000:5000"
+    env_file:
+      - ./config.env
     volumes:
       - ./backend:/usr/src/app/backend
       - /usr/src/app/backend/node_modules

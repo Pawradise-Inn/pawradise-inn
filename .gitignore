@@ -208,3 +208,4 @@ frontend/playwright/.auth/
 backend/***REMOVED***
 *.env
 backend/*.env*
+.vercel

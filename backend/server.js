@@ -7,8 +7,9 @@ const { PrismaClient } = require("./generated/prisma/client");
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
 
-dotenv.config({ path: "./config/config.env" });
-// dotenv.config({path: './config/config.env.local'});
+// Load environment variables (for local development outside Docker)
+// In Docker, variables are loaded via docker-compose env_file
+dotenv.config({ path: "../config.env" });
 
 const app = express();
 const prisma = new PrismaClient();

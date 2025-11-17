@@ -2,10 +2,18 @@ const {Storage} = require('@google-cloud/storage');
 const path = require('path');
 const { sendErrorResponse, sendSuccessResponse } = require("../utils/responseHandler");
 
+const keyBase64 = process.env.GOOGLE_KEY_JSON;
+
+// 2. Decode it from Base64 back into the JSON string
+const keyJson = Buffer.from(keyBase64, 'base64').toString('utf8');
+
+// 3. Parse the JSON string into an object
+const credentials = JSON.parse(keyJson);
+
 // Initialize GCS client using credentials
 const storage = new Storage({
   projectId: 'sacred-epigram-471206-f5',
-  keyFilename: path.join(__dirname, '../config/keyfile.json')
+  credentials
 })
 const bucket = storage.bucket('paw_image');
 
