@@ -69,9 +69,9 @@ export const updatePaymentStatusAPI = async (paymentId, newStatus) => {
   }
 };
 
-export const generateQrAPI = async () => {
+export const generateQrAPI = async (amount) => {
   try {
-    const response = await axiosInstance.post("/api/v1/qr/generateQr");
+    const response = await axiosInstance.post("/api/v1/qr/generateQr", {amount: amount});
     return response.data;
   } catch (error) {
     console.error("Error generating QR code:", error);

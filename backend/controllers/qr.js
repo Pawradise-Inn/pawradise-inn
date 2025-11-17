@@ -3,7 +3,7 @@ const generatePayload = require('promptpay-qr');
 const { sendErrorResponse, sendSuccessResponse } = require('../utils/responseHandler');
 
 const genQR = async (req, res) => {
-    const {amount} = Number(req.body);
+    const amount = Number(req.body.amount);
     const mobileNumber = '1209000167848';
     const payload = generatePayload(mobileNumber, {amount})
     const option = {

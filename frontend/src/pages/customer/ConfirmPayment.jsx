@@ -52,8 +52,10 @@ const ConfirmPayment = () => {
     console.log("isreupload:", isReupload)
     const fetchQr = async () => {
       try {
-        const response = await generateQrAPI();
-        const qrUrl = response?.data?.qrUrl || response?.data || "";
+        const response = await generateQrAPI(total);
+        console.log("qr", total);
+        console.log(response)
+        const qrUrl = response?.data
         setQrImage(qrUrl);
       } catch (error) {
         console.error("Failed to fetch QR:", error);
