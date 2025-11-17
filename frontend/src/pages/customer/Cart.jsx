@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { getCart, toggleCartRoomSelection, toggleCartServiceSelection, deleteCartRoom, deleteCartService, checkCart } from '../../hooks/cartAPI';
 import { useNotification } from '../../context/notification/NotificationProvider';
 
-import CartItem from '../../components/Cart/CartItem';
+import CartItem from '../../components/cart/CartItem';
 
 const startUpVariants = {
     hidden: { opacity: 0, y: 20 },
