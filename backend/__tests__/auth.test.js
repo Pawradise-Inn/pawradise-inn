@@ -740,6 +740,82 @@ describe('Update Current User Tests', () => {
       expect(response.body.success).toBe(false);
       expect(response.body.error.type).toBe('SERVER_ERROR');
     });
+
+    it('should return 409 when phone number already exists', async () => {
+      const duplicateError = new Error('Unique constraint failed');
+      duplicateError.code = 'P2002';
+      duplicateError.meta = { target: ['phone_number'] };
+
+      prisma.user.update.mockRejectedValue(duplicateError);
+
+      const response = await request(app)
+        .put('/auth/me')
+        .send({ phone_number: '0898765432' });
+
+      expect(response.status).toBe(409);
+      expect(response.body.success).toBe(false);
+      expect(response.body.error.type).toBe('ALREADY_EXISTS');
+      expect(response.body.error.content).toBe(
+        'This phone number is already taken. Please choose a different one'
+      );
+    });
+
+    it('should return 409 when email already exists', async () => {
+      const duplicateError = new Error('Unique constraint failed');
+      duplicateError.code = 'P2002';
+      duplicateError.meta = { target: ['email'] };
+
+      prisma.user.update.mockRejectedValue(duplicateError);
+
+      const response = await request(app)
+        .put('/auth/me')
+        .send({ email: 'existing@example.com' });
+
+      expect(response.status).toBe(409);
+      expect(response.body.success).toBe(false);
+      expect(response.body.error.type).toBe('ALREADY_EXISTS');
+      expect(response.body.error.content).toBe(
+        'This email is already taken. Please choose a different one'
+      );
+    });
+
+    it('should return 409 when username already exists', async () => {
+      const duplicateError = new Error('Unique constraint failed');
+      duplicateError.code = 'P2002';
+      duplicateError.meta = { target: ['user_name'] };
+
+      prisma.user.update.mockRejectedValue(duplicateError);
+
+      const response = await request(app)
+        .put('/auth/me')
+        .send({ user_name: 'existinguser' });
+
+      expect(response.status).toBe(409);
+      expect(response.body.success).toBe(false);
+      expect(response.body.error.type).toBe('ALREADY_EXISTS');
+      expect(response.body.error.content).toBe(
+        'This username is already taken. Please choose a different one'
+      );
+    });
+
+    it('should return 409 for other duplicate fields', async () => {
+      const duplicateError = new Error('Unique constraint failed');
+      duplicateError.code = 'P2002';
+      duplicateError.meta = { target: ['other_field'] };
+
+      prisma.user.update.mockRejectedValue(duplicateError);
+
+      const response = await request(app)
+        .put('/auth/me')
+        .send({ firstname: 'Jane' });
+
+      expect(response.status).toBe(409);
+      expect(response.body.success).toBe(false);
+      expect(response.body.error.type).toBe('ALREADY_EXISTS');
+      expect(response.body.error.content).toBe(
+        'This other_field is already taken. Please choose a different one'
+      );
+    });
   });
 });
 
