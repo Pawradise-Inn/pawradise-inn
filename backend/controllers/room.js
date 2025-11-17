@@ -124,9 +124,9 @@ const getRoom = async (req, res) => {
 const createRoom = async (req, res) => {
   try {
     const { name, capacity, price, type, picture } = req.body;
-    
+
     console.log("Received room data:", { name, capacity, price, type, picture });
-    
+
     // Validate required fields
     if (!name || capacity === undefined || price === undefined || !type) {
       console.error("Missing required fields:", { name, capacity, price, type });
@@ -137,7 +137,7 @@ const createRoom = async (req, res) => {
         "Please provide all required fields: name, capacity, price, and type"
       );
     }
-    
+
     // Validate petType enum
     const validPetTypes = ['DOG', 'CAT', 'MOUSE', 'RABBIT', 'BIRD'];
     if (!validPetTypes.includes(type)) {
@@ -149,19 +149,19 @@ const createRoom = async (req, res) => {
         `Invalid pet type. Must be one of: ${validPetTypes.join(', ')}`
       );
     }
-    
+
     // Get the last room number and increment by 1
     const lastRoom = await prisma.room.findFirst({
       orderBy: { number: 'desc' },
       select: { number: true }
     });
-    
+
     // If there are existing rooms, increment from the last number
     // Otherwise, start from 100
     const nextNumber = lastRoom ? lastRoom.number + 1 : 100;
-    
+
     console.log("Last room number:", lastRoom?.number, "Next number:", nextNumber);
-    
+
     console.log("Creating room with data:", {
       number: nextNumber,
       name,
@@ -170,7 +170,7 @@ const createRoom = async (req, res) => {
       petType: type,
       picture: picture || "https://storage.googleapis.com/paw_image/unnamed.jpg"
     });
-    
+
     const room = await prisma.room.create({
       data: {
         number: nextNumber,
@@ -181,9 +181,9 @@ const createRoom = async (req, res) => {
         picture: picture || "https://storage.googleapis.com/paw_image/unnamed.jpg",
       },
     });
-    
+
     console.log("Room created successfully:", room);
-    
+
     return sendSuccessResponse(
       res,
       201,
@@ -353,7 +353,7 @@ const getRoomStatus = async (req, res) => {
       );
 
     const total = await overlappingRoom(id, checkIn, checkOut);
-    let cartCount = 0; 
+    let cartCount = 0;
     if (req.user && req.user.roleId) {
       cartCount = await prisma.cartRoom.count({
         where: {
@@ -438,7 +438,7 @@ const getAvailableRooms = async (req, res) => {
           : 0;
 
         const count = await overlappingRoom(r.id, entryDate, exitDate);
-        let cartCount = 0; 
+        let cartCount = 0;
         if (req.user && req.user.roleId) {
           cartCount = await prisma.cartRoom.count({
             where: {
@@ -530,7 +530,7 @@ const getRoomsWithPagination = async (req, res) => {
         exitDate.setDate(exitDate.getDate() + 1);
 
         const count = await overlappingRoom(r.id, entryDate, exitDate);
-        let cartCount = 0; 
+        let cartCount = 0;
         if (req.user && req.user.roleId) {
           cartCount = await prisma.cartRoom.count({
             where: {

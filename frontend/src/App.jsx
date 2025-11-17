@@ -9,11 +9,11 @@ import Login from "./pages/Login";
 import Footer from "./components/Footer";
 import RoomEdit from "./components/Management/room_edit";
 import ServiceEdit from "./components/Management/Service_edit";
-import BookingComp from "./components/Profile/myBooking/BookingComp.jsx";
-import NewPet from "./components/Profile/myPet/newPet/NewPet.jsx";
-import PetComp from "./components/Profile/myPet/PetComp.jsx";
-import PetOverall from "./components/Profile/myPet/petOverAll/PetOverall.jsx";
-import ProfileComp from "./components/Profile/myProfile/ProfileComp.jsx";
+import BookingComp from "./components/profile/myBooking/BookingComp.jsx";
+import NewPet from "./components/profile/myPet/newPet/NewPet.jsx";
+import PetComp from "./components/profile/myPet/PetComp.jsx";
+import PetOverall from "./components/profile/myPet/petOverAll/PetOverall.jsx";
+import ProfileComp from "./components/profile/myProfile/ProfileComp.jsx";
 import Management from "./pages/Management";
 import Dashboard from "./pages/staff/dashboard/Dashboard";
 import DashboardTab1 from "./pages/staff/dashboard/DashboardTab1";
@@ -29,10 +29,11 @@ import ReviewComp from "./components/review/ReviewComp";
 import HistoryComp from "./components/review/history/HistoryComp";
 import StaffPayment from "./pages/staff/PaymentComp";
 import Cart from "./pages/customer/Cart";
-import PaymentHistory from "./components/Profile/PaymentHistory/paymenthistory.jsx";
+import PaymentHistory from "./components/profile/paymentHistory/paymenthistory.jsx";
 import ConfirmPayment from "./pages/customer/ConfirmPayment";
 import PaymentSuccess from "./pages/customer/PaymentSuccess";
 import PaymentFailed from "./pages/customer/PaymentFailed";
+import Policy from "./pages/Policy.jsx";
 
 const App = () => {
   const location = useLocation();
@@ -41,8 +42,10 @@ const App = () => {
   const isRegistrationPath = location.pathname === "/register";
   const isCustomerLogin = location.pathname === "/login";
   const isStaffLogin = location.pathname === "/staff/login";
+  const isPolicyPath = location.pathname.startsWith("/policy");
 
-  const hideNavbar = isRegistrationPath || isCustomerLogin || isStaffLogin;
+  const hideNavbar =
+    isRegistrationPath || isCustomerLogin || isStaffLogin || isPolicyPath;
 
   return (
     <div>
@@ -67,6 +70,16 @@ const App = () => {
       )}
 
       <Routes>
+        <Route path="/policy">
+          <Route
+            path="term-of-service"
+            element={<Policy type="term_of_service" />}
+          />
+          <Route
+            path="private-policy"
+            element={<Policy type="private_policy" />}
+          />
+        </Route>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/staff/login" element={<Login />} />
@@ -104,7 +117,7 @@ const App = () => {
           <Route path="pet" element={<PetComp />} />
           <Route path="pet/:id" element={<PetOverall />} />
           <Route path="pet/new" element={<NewPet />} />
-          <Route path="paymentHistory" element={<PaymentHistory/>}/>
+          <Route path="paymentHistory" element={<PaymentHistory />} />
         </Route>
 
         <Route path="/review" element={<Review />}>
@@ -112,7 +125,7 @@ const App = () => {
           <Route path="history" element={<HistoryComp />} />
         </Route>
 
-        <Route 
+        <Route
           path="/cart"
           element={
             <RequireAuth roles={["CUSTOMER"]}>
@@ -123,22 +136,31 @@ const App = () => {
 
         <Route
           path="/payment"
-          element={<RequireAuth roles={["CUSTOMER"]}><ConfirmPayment /></RequireAuth>}
-        >
-        </Route>
+          element={
+            <RequireAuth roles={["CUSTOMER"]}>
+              <ConfirmPayment />
+            </RequireAuth>
+          }
+        ></Route>
         <Route
           path="/payment/success"
-          element={<RequireAuth roles={["CUSTOMER"]}><PaymentSuccess /></RequireAuth>}
-        >
-        </Route>
+          element={
+            <RequireAuth roles={["CUSTOMER"]}>
+              <PaymentSuccess />
+            </RequireAuth>
+          }
+        ></Route>
         <Route
           path="/payment/failed"
-          element={<RequireAuth roles={["CUSTOMER"]}><PaymentFailed /></RequireAuth>}
-        >
-        </Route>
-
+          element={
+            <RequireAuth roles={["CUSTOMER"]}>
+              <PaymentFailed />
+            </RequireAuth>
+          }
+        ></Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />
+
         {/* <Route path="/staff" element={<Navigate to="/staff/login" replace />} /> */}
         <Route path="*" element={<Navigate to="/login" replace />} />
 
