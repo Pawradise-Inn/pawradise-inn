@@ -39,10 +39,6 @@ import { useEffect } from "react";
 const App = () => {
   const location = useLocation();
 
-  useEffect(() => {
-    console.log(import.meta.env.VITE_API_URL)
-  }, [])
-
   const isStaffPath = location.pathname.startsWith("/staff");
   const isRegistrationPath = location.pathname === "/register";
   const isCustomerLogin = location.pathname === "/login";
