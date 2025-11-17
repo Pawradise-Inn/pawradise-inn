@@ -4,8 +4,8 @@ const multer = require("multer");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { PrismaClient } = require("./generated/prisma/client");
-const swaggerJsDoc = require('swagger-jsdoc');
-const swaggerUI = require('swagger-ui-express');
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUI = require("swagger-ui-express");
 
 // Load environment variables (for local development outside Docker)
 // In Docker, variables are loaded via docker-compose env_file
@@ -28,18 +28,18 @@ app.use(multerMid.single("image"));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://pawradise-inn.vercel.app/login"],
     credentials: false,
   })
 );
 
-const swaggerOptions={
-    swaggerDefinition:{
-        openapi: '3.0.0',
-        info: {
-            title: 'PawradiseInn API',
-            version: '1.0.0',
-            description: `
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: "3.0.0",
+    info: {
+      title: "PawradiseInn API",
+      version: "1.0.0",
+      description: `
 # PawradiseInn Pet Hotel & Services API
 
 Welcome to the PawradiseInn API documentation!
@@ -47,20 +47,20 @@ Welcome to the PawradiseInn API documentation!
 ## Authentication Methods
 - **Bearer Token**: Include in Authorization header as \`Bearer <token>\`
 - **Cookie**: Automatically set after login (for browser clients)
-`
-        },
-        servers: [
-            {
-                url: 'http://localhost:5000/api/v1',
-                description: 'Development server'
-            }
-        ]
+`,
     },
-    apis:['./routes/*.js', './swagger-components.js'],
+    servers: [
+      {
+        url: "http://localhost:5000/api/v1",
+        description: "Development server",
+      },
+    ],
+  },
+  apis: ["./routes/*.js", "./swagger-components.js"],
 };
 
-const swaggerDocs=swaggerJsDoc(swaggerOptions);
-app.use('/api-docs',swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 const booking = require("./routes/booking");
 const bookedRoom = require("./routes/bookedRoom");
@@ -73,9 +73,9 @@ const customer = require("./routes/customer");
 const care = require("./routes/cares");
 const picture = require("./routes/picture");
 const cart = require("./routes/cart");
-const payment = require('./routes/payment');
-const qr = require('./routes/qr');
-const slipOk = require('./routes/slipOk')
+const payment = require("./routes/payment");
+const qr = require("./routes/qr");
+const slipOk = require("./routes/slipOk");
 
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/bookings", booking);
@@ -90,9 +90,9 @@ app.use("/api/v1/customers", customer);
 app.use("/api/v1/cares", care);
 app.use("/api/v1/images", picture);
 app.use("/api/v1/carts", cart);
-app.use('/api/v1/payments', payment);
-app.use('/api/v1/qr', qr);
-app.use('/api/v1/slip', slipOk)
+app.use("/api/v1/payments", payment);
+app.use("/api/v1/qr", qr);
+app.use("/api/v1/slip", slipOk);
 
 const PORT = process.env.PORT || 5000;
 
