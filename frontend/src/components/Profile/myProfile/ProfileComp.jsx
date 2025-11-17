@@ -1,0 +1,373 @@
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { useAuth } from "../../../context/AuthProvider";
+import { updateCustomerAPI } from "../../../hooks/customerAPI";
+import { overlay, popUP, startUpVariants } from "../../../styles/animation";
+import { useNotification } from "../../../context/notification/NotificationProvider";
+import { deleteMeAPI } from "../../../hooks/authAPI";
+import Overlay from "../../Overlay";
+import { updateStaffProfileAPI } from "../../../hooks/staffAPI";
+import { validateFormTel } from "../../../utils/HandleForm";
+
+const ProfileComp = () => {
+  const { createNotification } = useNotification();
+  const outletCtx = useOutletContext();
+  const { user, setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const activeBookingCount = outletCtx?.activeBookingCount;
+
+  const [newUser, setNewUser] = useState({
+    id: undefined,
+    firstname: "",
+    lastname: "",
+    user_name: "",
+    phone_number: "",
+    email: "",
+  });
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [password, setPassword] = useState("");
+  const [submitErr, setSubmitErr] = useState("");
+
+  const role = user?.role?.toString?.().toLowerCase?.();
+  const isStaff = role === "staff";
+
+  const fields = [
+    {
+      label: "Firstname",
+      name: "firstname",
+      type: "text",
+      autoComplete: "true",
+    },
+    { label: "Lastname", name: "lastname", type: "text", autoComplete: "true" },
+    {
+      label: "Username",
+      name: "user_name",
+      type: "text",
+      autoComplete: "true",
+    },
+    {
+      label: "Phone Number",
+      name: "phone_number",
+      type: "tel",
+      autoComplete: "true",
+    },
+    { label: "Email", name: "email", type: "text", autoComplete: "true" },
+  ];
+
+  useEffect(() => {
+    if (user) {
+      setNewUser({ id: user.id, ...user });
+    }
+  }, [user]);
+
+  const handleCancel = () => {
+    createNotification(
+      "warning",
+      "Are you sure to cancel your change?",
+      "Your modified infomation will be discarded.",
+      () => {
+        if (user) setNewUser({ id: user.id, ...user });
+      }
+    );
+  };
+
+  const handleConfirm = async (e) => {
+    e.preventDefault();
+    if (!newUser.id) return;
+
+    // Validate all required fields are filled
+    const requiredFields = ['firstname', 'lastname', 'user_name', 'phone_number', 'email'];
+    const emptyFields = requiredFields.filter(field => !newUser[field]?.trim());
+    
+    if (emptyFields.length > 0) {
+      createNotification(
+        "fail",
+        "Missing Information",
+        "Please fill in all required fields"
+      );
+      return;
+    }
+
+    // Validate phone number format
+    if (!validateFormTel({ phoneNumber: newUser.phone_number }, createNotification)) {
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newUser.email)) {
+      createNotification(
+        "fail",
+        "Invalid Email",
+        "Please enter a valid email address"
+      );
+      return;
+    }
+
+    createNotification(
+      "warning",
+      "Confirmation.",
+      "Are you sure to update the data?",
+      async () => {
+        try {
+          console.log(user.role)
+          if(user.role === 'CUSTOMER'){
+            const { id, ...userObjected } = newUser;
+            // Check if customer object exists, if not use the id from newUser
+            const customerId = user.customer?.id || user.id;
+            const data = await updateCustomerAPI(customerId, userObjected);
+            // Preserve the original user structure
+            const updatedUser = {
+              ...user,
+              ...data.data,
+              id: id,
+              customer: user.customer // Preserve customer object
+            };
+            setUser?.(updatedUser);
+          }
+          else if(user.role === 'STAFF'){
+            const { id, customer, ...userObjected } = newUser;
+            const data = await updateStaffProfileAPI(user.id, userObjected);
+            console.log(data)
+            // Preserve the original user structure
+            const updatedUser = {
+              ...user,
+              ...data.data.updatedUser,
+              id: id
+            };
+            setUser?.(updatedUser);
+          }
+        } catch (err) {
+          console.error("Update failed:", err);
+          // handled by axios interceptor
+        }
+      }
+    );
+  };
+
+  const openDeleteModal = () => {
+    // Safety: แม้ปุ่มจะถูกซ่อนอยู่แล้ว แต่กันไว้เผื่อถูกเรียกใช้ทางอื่น
+    if (isStaff) {
+      createNotification(
+        "warning",
+        "Action not allowed",
+        "Staff profile cannot delete account."
+      );
+      return;
+    }
+    setPassword("");
+    setSubmitErr("");
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    // Safety: กันการลบจาก staff
+    if (isStaff) {
+      createNotification(
+        "warning",
+        "Action not allowed",
+        "Staff profile cannot delete account."
+      );
+      return;
+    }
+
+    if (!password) {
+      setSubmitErr("Please enter your password.");
+      return;
+    }
+
+    setShowDeleteModal(false);
+    setUser?.(null);
+    deleteMeAPI(password)
+      .then(() => {
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        navigate("/login");
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  return (
+    <div>
+      <div className="mb-8">
+        <motion.h1
+          variants={startUpVariants}
+          initial="hidden"
+          animate="visible"
+          custom={1}
+          className="text-3xl font-bold"
+        >
+          My Profile
+        </motion.h1>
+      </div>
+
+      <form onSubmit={handleConfirm}>
+        <motion.div
+          variants={startUpVariants}
+          initial="hidden"
+          animate="visible"
+          custom={1}
+          className="max-w-2xk bg-white rounded shadow-lg p-8"
+        >
+          <div className="space-y-6">
+            {fields.map((data, idx) => (
+              <motion.div
+                variants={startUpVariants}
+                initial="hidden"
+                animate="visible"
+                custom={idx / 3 + 2}
+                key={data.name}
+              >
+                <label className="block text-sm font-semibold mb-2">
+                  {data.label}
+                </label>
+                <input
+                  type={data.type}
+                  value={newUser[data.name] || ""}
+                  autoComplete={data.autoComplete}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, [data.name]: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-300 
+                  border-[var(--brown-color)] bg-[var(--cream-color)] 
+                  focus:border-[var(--dark-brown-color)] focus:outline-none
+                  hover:shadow-md"
+                  placeholder={data.label}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Action Buttons Section */}
+          <div
+            className={`
+            flex items-center mt-8 pt-6 
+            border-t border-[var(--brown-color)]
+            ${isStaff ? "justify-end" : "justify-between"}
+          `}
+          >
+            {/* Delete Account Button - Only shown for non-staff */}
+            {!isStaff && (
+              <button
+                type="button"
+                onClick={openDeleteModal}
+                className="px-6 py-2 font-bold rounded shadow cursor-pointer
+                          bg-white !text-red-600 
+                          hover:bg-red-400 hover:!text-white
+                          transition-all duration-300"
+              >
+                Delete account
+              </button>
+            )}
+
+            {/* Cancel and Done Buttons */}
+            <div className="flex space-x-8">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="px-6 py-2 rounded cursor-pointer
+                          hover:bg-[var(--light-brown-color)] hover:scale-90
+                          transition-all duration-300"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-6 py-2 rounded cursor-pointer
+                          !text-white bg-[var(--dark-brown-color)]
+                          hover:scale-90
+                          transition-all duration-300"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </form>
+
+      <AnimatePresence mode="popLayout">
+        {showDeleteModal && !isStaff && (
+          <div>
+            <Overlay
+              variants={overlay}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              bgColor="black"
+              onClick={() => setShowDeleteModal(false)}
+            />
+            <motion.div
+              variants={popUP}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[min(680px,90vw)] rounded-2xl bg-white p-8 shadow-2xl"
+            >
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="absolute right-4 top-3 text-2xl leading-none hover:opacity-70"
+                aria-label="Close"
+              ></button>
+
+              <h2 className="text-center text-3xl font-extrabold mb-6">
+                Are you sure ?
+              </h2>
+
+              <div className="px-2">
+                <h3 className="text-lg font-semibold mb-2">Delete account</h3>
+
+                <p className="text-[var(--brown-color)]/80 mb-4">
+                  Deleting your account is permanent.&nbsp;
+                  <span className="font-semibold">
+                    {typeof activeBookingCount === "number"
+                      ? `You currently have ${activeBookingCount} active booking${
+                          activeBookingCount > 1 ? "s" : ""
+                        }; they will be automatically declined.`
+                      : "Any active bookings (if any) will be automatically declined."}
+                  </span>
+                </p>
+
+                <div className="space-y-3">
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border-2 border-[var(--brown-color)] bg-[var(--cream-color)] focus:border-[var(--dark-brown-color)] focus:outline-none"
+                  />
+                  {submitErr && (
+                    <p className="text-[var(--fail-color)] text-sm">
+                      {submitErr}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-center gap-6 mt-8">
+                  <button
+                    onClick={confirmDelete}
+                    className="cursor-pointer px-8 py-2 rounded-lg !text-white bg-[var(--dark-brown-color)] hover:opacity-90 transition"
+                  >
+                    confirm
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    className="cursor-pointer px-8 py-2 rounded-lg text-[var(--dark-brown-color)] bg-[var(--light-brown-color)] hover:opacity-90 transition"
+                  >
+                    cancel
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default ProfileComp;
